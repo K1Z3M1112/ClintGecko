@@ -19,8 +19,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.filled.Edit
 import com.simplefox.browser.ui.ClintRadioButton
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import com.simplefox.browser.ui.foundation.Text
+import com.simplefox.browser.ui.foundation.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -150,8 +150,8 @@ fun SearchEngineDialog(
                     modifier = Modifier.padding(top = 2.dp)
                 )
             }
-            androidx.compose.material3.IconButton(onClick = { customEditorOpen = true }) {
-                androidx.compose.material3.Icon(
+            com.simplefox.browser.ui.foundation.IconButton(onClick = { customEditorOpen = true }) {
+                com.simplefox.browser.ui.foundation.Icon(
                     androidx.compose.material.icons.Icons.Filled.Edit,
                     contentDescription = stringResource(R.string.action_edit),
                     tint = colors.iconTint
@@ -254,8 +254,8 @@ fun SearchSuggestionsApiDialog(
                     modifier = Modifier.padding(top = 2.dp)
                 )
             }
-            androidx.compose.material3.IconButton(onClick = { customEditorOpen = true }) {
-                androidx.compose.material3.Icon(
+            com.simplefox.browser.ui.foundation.IconButton(onClick = { customEditorOpen = true }) {
+                com.simplefox.browser.ui.foundation.Icon(
                     androidx.compose.material.icons.Icons.Filled.Edit,
                     contentDescription = stringResource(R.string.action_edit),
                     tint = colors.iconTint

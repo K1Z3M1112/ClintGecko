@@ -17,7 +17,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.material3.Surface
+import com.simplefox.browser.ui.foundation.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -44,7 +44,6 @@ fun SetupScreen(
     onIntensitySelected: (String) -> Unit,
     onLanguageSelected: (String) -> Unit,
     onAddressBarPositionSelected: (String) -> Unit,
-    onMenuStyleSelected: (String) -> Unit,
     onScrollHideModeSelected: (String) -> Unit,
     onEngineSelected: (String) -> Unit,
     onCustomEngineSaved: (name: String, url: String) -> Unit,
@@ -132,13 +131,11 @@ fun SetupScreen(
                                     )
                                     3 -> SetupLayoutPage(
                                         addressBarPosition = state.addressBarPosition,
-                                        menuStyle = state.menuStyle,
                                         scrollHideMode = state.scrollHideMode,
                                         hideStatusBar = state.hideStatusBar, hideSystemNavigation = state.hideSystemNavigation,
                                         theme = state.theme,
                                         accent = state.accent,
                                         onAddressBarPositionSelected = onAddressBarPositionSelected,
-                                        onMenuStyleSelected = onMenuStyleSelected,
                                         onScrollHideModeSelected = onScrollHideModeSelected,
                                         onHideStatusBarToggled = onHideStatusBarToggled, onHideSystemNavigationToggled = onHideSystemNavigationToggled,
                                         onNext = onNextFromLayoutPage

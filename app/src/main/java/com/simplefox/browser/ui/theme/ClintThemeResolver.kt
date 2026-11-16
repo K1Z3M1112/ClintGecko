@@ -1,12 +1,6 @@
 package com.simplefox.browser.ui.theme
 
 import android.content.Context
-import android.os.Build
-import androidx.compose.material3.ColorScheme
-import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.dynamicDarkColorScheme
-import androidx.compose.material3.dynamicLightColorScheme
-import androidx.compose.material3.lightColorScheme
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
 
@@ -37,43 +31,53 @@ internal data class ClintResolvedTheme(
     val isLight: Boolean
 )
 
-private val M3_DARK = darkColorScheme()
-private val M3_LIGHT = lightColorScheme()
+private const val ERROR_DARK = 0xFFFFB4AB
+private const val ERROR_LIGHT = 0xFFBA1A1A
+private const val ERROR_CONTAINER_DARK = 0xFF93000A
+private const val ERROR_CONTAINER_LIGHT = 0xFFFFDAD6
+private const val ON_ERROR_CONTAINER_DARK = 0xFFFFDAD6
+private const val ON_ERROR_CONTAINER_LIGHT = 0xFF410002
 
-internal fun dynamicScheme(context: Context, isLight: Boolean): ColorScheme {
-    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-        if (isLight) dynamicLightColorScheme(context) else dynamicDarkColorScheme(context)
-    } else {
-        if (isLight) M3_LIGHT else M3_DARK
-    }
+private fun androidSystemColor(context: Context, name: String, fallback: Color): Color {
+    val id = runCatching { context.resources.getIdentifier(name, "color", "android") }.getOrDefault(0)
+    return if (id != 0) runCatching { Color(context.getColor(id)) }.getOrDefault(fallback) else fallback
 }
 
 private fun materialYouBase(context: Context, isLight: Boolean): ClintResolvedTheme {
-    val s = dynamicScheme(context, isLight)
+    val fallbackPrimary = if (isLight) Color(0xFF6750A4) else Color(0xFFD0BCFF)
+    val primary = androidSystemColor(context, if (isLight) "system_accent1_600" else "system_accent1_200", fallbackPrimary)
+    val background = androidSystemColor(context, if (isLight) "system_neutral1_10" else "system_neutral1_900", if (isLight) Color(0xFFF9F7FF) else Color(0xFF111117))
+    val surface = androidSystemColor(context, if (isLight) "system_neutral1_50" else "system_neutral1_800", if (isLight) Color(0xFFFFFFFF) else Color(0xFF1D1B20))
+    val surfaceVariant = androidSystemColor(context, if (isLight) "system_neutral2_100" else "system_neutral2_700", if (isLight) Color(0xFFE7E0EC) else Color(0xFF49454F))
+    val onSurface = if (isLight) Color(0xFF1C1B1F) else Color(0xFFE6E1E5)
+    val onPrimary = if (isLight) Color.White else Color(0xFF381E72)
+    val error = if (isLight) Color(ERROR_LIGHT) else Color(ERROR_DARK)
+    val errorContainer = if (isLight) Color(ERROR_CONTAINER_LIGHT) else Color(ERROR_CONTAINER_DARK)
+    val onErrorContainer = if (isLight) Color(ON_ERROR_CONTAINER_LIGHT) else Color(ON_ERROR_CONTAINER_DARK)
     return ClintResolvedTheme(
-        primary = s.primary,
-        onPrimary = s.onPrimary,
-        surface = s.surface,
-        onSurface = s.onSurface,
-        background = s.background,
-        statusBar = s.surface,
-        navigationBar = s.surface,
-        addressBar = s.surfaceVariant,
-        popupBackground = s.surfaceContainerHigh,
-        popupText = s.onSurface,
+        primary = primary,
+        onPrimary = onPrimary,
+        surface = surface,
+        onSurface = onSurface,
+        background = background,
+        statusBar = surface,
+        navigationBar = surface,
+        addressBar = surfaceVariant,
+        popupBackground = surface,
+        popupText = onSurface,
         popupStroke = if (isLight) Color(0x1A000000) else Color(0x33FFFFFF),
-        popupCheck = s.primary,
-        secondaryText = s.onSurfaceVariant,
-        divider = s.outlineVariant,
-        surfaceVariant = s.surfaceVariant,
-        buttonBackground = s.primary,
-        buttonTextColor = s.onPrimary,
-        buttonIconTint = s.onPrimary,
-        iconTint = s.primary,
-        cardBackground = s.surfaceContainerHigh,
-        error = s.error,
-        errorContainer = s.errorContainer,
-        onErrorContainer = s.onErrorContainer,
+        popupCheck = primary,
+        secondaryText = if (isLight) Color(0xFF625B71) else Color(0xFFCAC4D0),
+        divider = if (isLight) Color(0x1F000000) else Color(0x33FFFFFF),
+        surfaceVariant = surfaceVariant,
+        buttonBackground = primary,
+        buttonTextColor = onPrimary,
+        buttonIconTint = onPrimary,
+        iconTint = primary,
+        cardBackground = surface,
+        error = error,
+        errorContainer = errorContainer,
+        onErrorContainer = onErrorContainer,
         isLight = isLight
     )
 }
@@ -100,9 +104,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.lightButtonText,
             iconTint = ClintPalette.lightThemeAccent,
             cardBackground = ClintPalette.lightThemeSurface,
-            error = M3_LIGHT.error,
-            errorContainer = M3_LIGHT.errorContainer,
-            onErrorContainer = M3_LIGHT.onErrorContainer,
+            error = Color(ERROR_LIGHT),
+            errorContainer = Color(ERROR_CONTAINER_LIGHT),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_LIGHT),
             isLight = true
         ) else ClintResolvedTheme(
             primary = ClintPalette.darkThemeAccent,
@@ -125,9 +129,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.darkButtonText,
             iconTint = ClintPalette.darkThemeAccent,
             cardBackground = ClintPalette.darkThemeSurface,
-            error = M3_DARK.error,
-            errorContainer = M3_DARK.errorContainer,
-            onErrorContainer = M3_DARK.onErrorContainer,
+            error = Color(ERROR_DARK),
+            errorContainer = Color(ERROR_CONTAINER_DARK),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_DARK),
             isLight = false
         )
     "purple" -> if (isLight) ClintResolvedTheme(
@@ -151,9 +155,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.purpleAccentLightPrimary,
             cardBackground = ClintPalette.purpleAccentLightSurface,
-            error = M3_LIGHT.error,
-            errorContainer = M3_LIGHT.errorContainer,
-            onErrorContainer = M3_LIGHT.onErrorContainer,
+            error = Color(ERROR_LIGHT),
+            errorContainer = Color(ERROR_CONTAINER_LIGHT),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_LIGHT),
             isLight = true
         ) else ClintResolvedTheme(
             primary = ClintPalette.purpleAccentPrimary,
@@ -176,9 +180,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.purpleAccentPrimary,
             cardBackground = ClintPalette.purpleAccentDarkSurface,
-            error = M3_DARK.error,
-            errorContainer = M3_DARK.errorContainer,
-            onErrorContainer = M3_DARK.onErrorContainer,
+            error = Color(ERROR_DARK),
+            errorContainer = Color(ERROR_CONTAINER_DARK),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_DARK),
             isLight = false
         )
     "deep_purple" -> if (isLight) ClintResolvedTheme(
@@ -202,9 +206,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.deepPurpleAccentLightPrimary,
             cardBackground = ClintPalette.deepPurpleAccentLightSurface,
-            error = M3_LIGHT.error,
-            errorContainer = M3_LIGHT.errorContainer,
-            onErrorContainer = M3_LIGHT.onErrorContainer,
+            error = Color(ERROR_LIGHT),
+            errorContainer = Color(ERROR_CONTAINER_LIGHT),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_LIGHT),
             isLight = true
         ) else ClintResolvedTheme(
             primary = ClintPalette.deepPurpleAccentPrimary,
@@ -227,9 +231,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.deepPurpleAccentPrimary,
             cardBackground = ClintPalette.deepPurpleAccentDarkSurface,
-            error = M3_DARK.error,
-            errorContainer = M3_DARK.errorContainer,
-            onErrorContainer = M3_DARK.onErrorContainer,
+            error = Color(ERROR_DARK),
+            errorContainer = Color(ERROR_CONTAINER_DARK),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_DARK),
             isLight = false
         )
     "royal_purple" -> if (isLight) ClintResolvedTheme(
@@ -253,9 +257,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.royalPurpleAccentLightPrimary,
             cardBackground = ClintPalette.royalPurpleAccentLightSurface,
-            error = M3_LIGHT.error,
-            errorContainer = M3_LIGHT.errorContainer,
-            onErrorContainer = M3_LIGHT.onErrorContainer,
+            error = Color(ERROR_LIGHT),
+            errorContainer = Color(ERROR_CONTAINER_LIGHT),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_LIGHT),
             isLight = true
         ) else ClintResolvedTheme(
             primary = ClintPalette.royalPurpleAccentPrimary,
@@ -278,9 +282,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.royalPurpleAccentPrimary,
             cardBackground = ClintPalette.royalPurpleAccentDarkSurface,
-            error = M3_DARK.error,
-            errorContainer = M3_DARK.errorContainer,
-            onErrorContainer = M3_DARK.onErrorContainer,
+            error = Color(ERROR_DARK),
+            errorContainer = Color(ERROR_CONTAINER_DARK),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_DARK),
             isLight = false
         )
     "amethyst" -> if (isLight) ClintResolvedTheme(
@@ -304,9 +308,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.amethystAccentLightPrimary,
             cardBackground = ClintPalette.amethystAccentLightSurface,
-            error = M3_LIGHT.error,
-            errorContainer = M3_LIGHT.errorContainer,
-            onErrorContainer = M3_LIGHT.onErrorContainer,
+            error = Color(ERROR_LIGHT),
+            errorContainer = Color(ERROR_CONTAINER_LIGHT),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_LIGHT),
             isLight = true
         ) else ClintResolvedTheme(
             primary = ClintPalette.amethystAccentPrimary,
@@ -329,9 +333,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.amethystAccentPrimary,
             cardBackground = ClintPalette.amethystAccentDarkSurface,
-            error = M3_DARK.error,
-            errorContainer = M3_DARK.errorContainer,
-            onErrorContainer = M3_DARK.onErrorContainer,
+            error = Color(ERROR_DARK),
+            errorContainer = Color(ERROR_CONTAINER_DARK),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_DARK),
             isLight = false
         )
     "lavender" -> if (isLight) ClintResolvedTheme(
@@ -355,9 +359,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.lavenderAccentLightPrimary,
             cardBackground = ClintPalette.lavenderAccentLightSurface,
-            error = M3_LIGHT.error,
-            errorContainer = M3_LIGHT.errorContainer,
-            onErrorContainer = M3_LIGHT.onErrorContainer,
+            error = Color(ERROR_LIGHT),
+            errorContainer = Color(ERROR_CONTAINER_LIGHT),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_LIGHT),
             isLight = true
         ) else ClintResolvedTheme(
             primary = ClintPalette.lavenderAccentPrimary,
@@ -380,9 +384,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.lavenderAccentPrimary,
             cardBackground = ClintPalette.lavenderAccentDarkSurface,
-            error = M3_DARK.error,
-            errorContainer = M3_DARK.errorContainer,
-            onErrorContainer = M3_DARK.onErrorContainer,
+            error = Color(ERROR_DARK),
+            errorContainer = Color(ERROR_CONTAINER_DARK),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_DARK),
             isLight = false
         )
     "teal" -> if (isLight) ClintResolvedTheme(
@@ -406,9 +410,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.tealAccentLightPrimary,
             cardBackground = ClintPalette.tealAccentLightSurface,
-            error = M3_LIGHT.error,
-            errorContainer = M3_LIGHT.errorContainer,
-            onErrorContainer = M3_LIGHT.onErrorContainer,
+            error = Color(ERROR_LIGHT),
+            errorContainer = Color(ERROR_CONTAINER_LIGHT),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_LIGHT),
             isLight = true
         ) else ClintResolvedTheme(
             primary = ClintPalette.tealAccentPrimary,
@@ -431,9 +435,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.tealAccentPrimary,
             cardBackground = ClintPalette.tealAccentDarkSurface,
-            error = M3_DARK.error,
-            errorContainer = M3_DARK.errorContainer,
-            onErrorContainer = M3_DARK.onErrorContainer,
+            error = Color(ERROR_DARK),
+            errorContainer = Color(ERROR_CONTAINER_DARK),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_DARK),
             isLight = false
         )
     "azure" -> if (isLight) ClintResolvedTheme(
@@ -457,9 +461,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.azureAccentLightPrimary,
             cardBackground = ClintPalette.azureAccentLightSurface,
-            error = M3_LIGHT.error,
-            errorContainer = M3_LIGHT.errorContainer,
-            onErrorContainer = M3_LIGHT.onErrorContainer,
+            error = Color(ERROR_LIGHT),
+            errorContainer = Color(ERROR_CONTAINER_LIGHT),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_LIGHT),
             isLight = true
         ) else ClintResolvedTheme(
             primary = ClintPalette.azureAccentPrimary,
@@ -482,9 +486,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.azureAccentPrimary,
             cardBackground = ClintPalette.azureAccentDarkSurface,
-            error = M3_DARK.error,
-            errorContainer = M3_DARK.errorContainer,
-            onErrorContainer = M3_DARK.onErrorContainer,
+            error = Color(ERROR_DARK),
+            errorContainer = Color(ERROR_CONTAINER_DARK),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_DARK),
             isLight = false
         )
     "pink" -> if (isLight) ClintResolvedTheme(
@@ -508,9 +512,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.pinkAccentLightPrimary,
             cardBackground = ClintPalette.pinkAccentLightSurface,
-            error = M3_LIGHT.error,
-            errorContainer = M3_LIGHT.errorContainer,
-            onErrorContainer = M3_LIGHT.onErrorContainer,
+            error = Color(ERROR_LIGHT),
+            errorContainer = Color(ERROR_CONTAINER_LIGHT),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_LIGHT),
             isLight = true
         ) else ClintResolvedTheme(
             primary = ClintPalette.pinkAccentPrimary,
@@ -533,9 +537,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.pinkAccentPrimary,
             cardBackground = ClintPalette.pinkAccentDarkSurface,
-            error = M3_DARK.error,
-            errorContainer = M3_DARK.errorContainer,
-            onErrorContainer = M3_DARK.onErrorContainer,
+            error = Color(ERROR_DARK),
+            errorContainer = Color(ERROR_CONTAINER_DARK),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_DARK),
             isLight = false
         )
     "indigo" -> if (isLight) ClintResolvedTheme(
@@ -559,9 +563,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.indigoAccentLightPrimary,
             cardBackground = ClintPalette.indigoAccentLightSurface,
-            error = M3_LIGHT.error,
-            errorContainer = M3_LIGHT.errorContainer,
-            onErrorContainer = M3_LIGHT.onErrorContainer,
+            error = Color(ERROR_LIGHT),
+            errorContainer = Color(ERROR_CONTAINER_LIGHT),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_LIGHT),
             isLight = true
         ) else ClintResolvedTheme(
             primary = ClintPalette.indigoAccentPrimary,
@@ -584,9 +588,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.indigoAccentPrimary,
             cardBackground = ClintPalette.indigoAccentDarkSurface,
-            error = M3_DARK.error,
-            errorContainer = M3_DARK.errorContainer,
-            onErrorContainer = M3_DARK.onErrorContainer,
+            error = Color(ERROR_DARK),
+            errorContainer = Color(ERROR_CONTAINER_DARK),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_DARK),
             isLight = false
         )
     "cyan" -> if (isLight) ClintResolvedTheme(
@@ -610,9 +614,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.cyanAccentLightPrimary,
             cardBackground = ClintPalette.cyanAccentLightSurface,
-            error = M3_LIGHT.error,
-            errorContainer = M3_LIGHT.errorContainer,
-            onErrorContainer = M3_LIGHT.onErrorContainer,
+            error = Color(ERROR_LIGHT),
+            errorContainer = Color(ERROR_CONTAINER_LIGHT),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_LIGHT),
             isLight = true
         ) else ClintResolvedTheme(
             primary = ClintPalette.cyanAccentPrimary,
@@ -635,9 +639,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.cyanAccentPrimary,
             cardBackground = ClintPalette.cyanAccentDarkSurface,
-            error = M3_DARK.error,
-            errorContainer = M3_DARK.errorContainer,
-            onErrorContainer = M3_DARK.onErrorContainer,
+            error = Color(ERROR_DARK),
+            errorContainer = Color(ERROR_CONTAINER_DARK),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_DARK),
             isLight = false
         )
     "amber" -> if (isLight) ClintResolvedTheme(
@@ -661,9 +665,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.amberAccentLightPrimary,
             cardBackground = ClintPalette.amberAccentLightSurface,
-            error = M3_LIGHT.error,
-            errorContainer = M3_LIGHT.errorContainer,
-            onErrorContainer = M3_LIGHT.onErrorContainer,
+            error = Color(ERROR_LIGHT),
+            errorContainer = Color(ERROR_CONTAINER_LIGHT),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_LIGHT),
             isLight = true
         ) else ClintResolvedTheme(
             primary = ClintPalette.amberAccentPrimary,
@@ -686,9 +690,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.amberAccentPrimary,
             cardBackground = ClintPalette.amberAccentDarkSurface,
-            error = M3_DARK.error,
-            errorContainer = M3_DARK.errorContainer,
-            onErrorContainer = M3_DARK.onErrorContainer,
+            error = Color(ERROR_DARK),
+            errorContainer = Color(ERROR_CONTAINER_DARK),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_DARK),
             isLight = false
         )
     "mint" -> if (isLight) ClintResolvedTheme(
@@ -712,9 +716,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.mintAccentLightPrimary,
             cardBackground = ClintPalette.mintAccentLightSurface,
-            error = M3_LIGHT.error,
-            errorContainer = M3_LIGHT.errorContainer,
-            onErrorContainer = M3_LIGHT.onErrorContainer,
+            error = Color(ERROR_LIGHT),
+            errorContainer = Color(ERROR_CONTAINER_LIGHT),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_LIGHT),
             isLight = true
         ) else ClintResolvedTheme(
             primary = ClintPalette.mintAccentPrimary,
@@ -737,9 +741,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.mintAccentPrimary,
             cardBackground = ClintPalette.mintAccentDarkSurface,
-            error = M3_DARK.error,
-            errorContainer = M3_DARK.errorContainer,
-            onErrorContainer = M3_DARK.onErrorContainer,
+            error = Color(ERROR_DARK),
+            errorContainer = Color(ERROR_CONTAINER_DARK),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_DARK),
             isLight = false
         )
     "crimson" -> if (isLight) ClintResolvedTheme(
@@ -763,9 +767,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.crimsonAccentLightPrimary,
             cardBackground = ClintPalette.crimsonAccentLightSurface,
-            error = M3_LIGHT.error,
-            errorContainer = M3_LIGHT.errorContainer,
-            onErrorContainer = M3_LIGHT.onErrorContainer,
+            error = Color(ERROR_LIGHT),
+            errorContainer = Color(ERROR_CONTAINER_LIGHT),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_LIGHT),
             isLight = true
         ) else ClintResolvedTheme(
             primary = ClintPalette.crimsonAccentPrimary,
@@ -788,9 +792,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.crimsonAccentPrimary,
             cardBackground = ClintPalette.crimsonAccentDarkSurface,
-            error = M3_DARK.error,
-            errorContainer = M3_DARK.errorContainer,
-            onErrorContainer = M3_DARK.onErrorContainer,
+            error = Color(ERROR_DARK),
+            errorContainer = Color(ERROR_CONTAINER_DARK),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_DARK),
             isLight = false
         )
     "slate" -> if (isLight) ClintResolvedTheme(
@@ -814,9 +818,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.slateAccentLightPrimary,
             cardBackground = ClintPalette.slateAccentLightSurface,
-            error = M3_LIGHT.error,
-            errorContainer = M3_LIGHT.errorContainer,
-            onErrorContainer = M3_LIGHT.onErrorContainer,
+            error = Color(ERROR_LIGHT),
+            errorContainer = Color(ERROR_CONTAINER_LIGHT),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_LIGHT),
             isLight = true
         ) else ClintResolvedTheme(
             primary = ClintPalette.slateAccentPrimary,
@@ -839,9 +843,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.slateAccentPrimary,
             cardBackground = ClintPalette.slateAccentDarkSurface,
-            error = M3_DARK.error,
-            errorContainer = M3_DARK.errorContainer,
-            onErrorContainer = M3_DARK.onErrorContainer,
+            error = Color(ERROR_DARK),
+            errorContainer = Color(ERROR_CONTAINER_DARK),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_DARK),
             isLight = false
         )
     "graphite" -> if (isLight) ClintResolvedTheme(
@@ -865,9 +869,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.graphiteAccentLightPrimary,
             cardBackground = ClintPalette.graphiteAccentLightSurface,
-            error = M3_LIGHT.error,
-            errorContainer = M3_LIGHT.errorContainer,
-            onErrorContainer = M3_LIGHT.onErrorContainer,
+            error = Color(ERROR_LIGHT),
+            errorContainer = Color(ERROR_CONTAINER_LIGHT),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_LIGHT),
             isLight = true
         ) else ClintResolvedTheme(
             primary = ClintPalette.graphiteAccentPrimary,
@@ -890,9 +894,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.graphiteAccentPrimary,
             cardBackground = ClintPalette.graphiteAccentDarkSurface,
-            error = M3_DARK.error,
-            errorContainer = M3_DARK.errorContainer,
-            onErrorContainer = M3_DARK.onErrorContainer,
+            error = Color(ERROR_DARK),
+            errorContainer = Color(ERROR_CONTAINER_DARK),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_DARK),
             isLight = false
         )
     "obsidian" -> if (isLight) ClintResolvedTheme(
@@ -916,9 +920,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.obsidianAccentLightPrimary,
             cardBackground = ClintPalette.obsidianAccentLightSurface,
-            error = M3_LIGHT.error,
-            errorContainer = M3_LIGHT.errorContainer,
-            onErrorContainer = M3_LIGHT.onErrorContainer,
+            error = Color(ERROR_LIGHT),
+            errorContainer = Color(ERROR_CONTAINER_LIGHT),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_LIGHT),
             isLight = true
         ) else ClintResolvedTheme(
             primary = ClintPalette.obsidianAccentPrimary,
@@ -941,9 +945,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.obsidianAccentPrimary,
             cardBackground = ClintPalette.obsidianAccentDarkSurface,
-            error = M3_DARK.error,
-            errorContainer = M3_DARK.errorContainer,
-            onErrorContainer = M3_DARK.onErrorContainer,
+            error = Color(ERROR_DARK),
+            errorContainer = Color(ERROR_CONTAINER_DARK),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_DARK),
             isLight = false
         )
     "onyx" -> if (isLight) ClintResolvedTheme(
@@ -967,9 +971,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.onyxAccentLightPrimary,
             cardBackground = ClintPalette.onyxAccentLightSurface,
-            error = M3_LIGHT.error,
-            errorContainer = M3_LIGHT.errorContainer,
-            onErrorContainer = M3_LIGHT.onErrorContainer,
+            error = Color(ERROR_LIGHT),
+            errorContainer = Color(ERROR_CONTAINER_LIGHT),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_LIGHT),
             isLight = true
         ) else ClintResolvedTheme(
             primary = ClintPalette.onyxAccentPrimary,
@@ -992,9 +996,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.onyxAccentPrimary,
             cardBackground = ClintPalette.onyxAccentDarkSurface,
-            error = M3_DARK.error,
-            errorContainer = M3_DARK.errorContainer,
-            onErrorContainer = M3_DARK.onErrorContainer,
+            error = Color(ERROR_DARK),
+            errorContainer = Color(ERROR_CONTAINER_DARK),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_DARK),
             isLight = false
         )
     "titanium" -> if (isLight) ClintResolvedTheme(
@@ -1018,9 +1022,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.titaniumAccentLightPrimary,
             cardBackground = ClintPalette.titaniumAccentLightSurface,
-            error = M3_LIGHT.error,
-            errorContainer = M3_LIGHT.errorContainer,
-            onErrorContainer = M3_LIGHT.onErrorContainer,
+            error = Color(ERROR_LIGHT),
+            errorContainer = Color(ERROR_CONTAINER_LIGHT),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_LIGHT),
             isLight = true
         ) else ClintResolvedTheme(
             primary = ClintPalette.titaniumAccentPrimary,
@@ -1043,9 +1047,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.titaniumAccentPrimary,
             cardBackground = ClintPalette.titaniumAccentDarkSurface,
-            error = M3_DARK.error,
-            errorContainer = M3_DARK.errorContainer,
-            onErrorContainer = M3_DARK.onErrorContainer,
+            error = Color(ERROR_DARK),
+            errorContainer = Color(ERROR_CONTAINER_DARK),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_DARK),
             isLight = false
         )
     "coral" -> if (isLight) ClintResolvedTheme(
@@ -1069,9 +1073,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.coralAccentLightPrimary,
             cardBackground = ClintPalette.coralAccentLightSurface,
-            error = M3_LIGHT.error,
-            errorContainer = M3_LIGHT.errorContainer,
-            onErrorContainer = M3_LIGHT.onErrorContainer,
+            error = Color(ERROR_LIGHT),
+            errorContainer = Color(ERROR_CONTAINER_LIGHT),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_LIGHT),
             isLight = true
         ) else ClintResolvedTheme(
             primary = ClintPalette.coralAccentPrimary,
@@ -1094,9 +1098,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.coralAccentPrimary,
             cardBackground = ClintPalette.coralAccentDarkSurface,
-            error = M3_DARK.error,
-            errorContainer = M3_DARK.errorContainer,
-            onErrorContainer = M3_DARK.onErrorContainer,
+            error = Color(ERROR_DARK),
+            errorContainer = Color(ERROR_CONTAINER_DARK),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_DARK),
             isLight = false
         )
     "burgundy" -> if (isLight) ClintResolvedTheme(
@@ -1120,9 +1124,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.burgundyAccentLightPrimary,
             cardBackground = ClintPalette.burgundyAccentLightSurface,
-            error = M3_LIGHT.error,
-            errorContainer = M3_LIGHT.errorContainer,
-            onErrorContainer = M3_LIGHT.onErrorContainer,
+            error = Color(ERROR_LIGHT),
+            errorContainer = Color(ERROR_CONTAINER_LIGHT),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_LIGHT),
             isLight = true
         ) else ClintResolvedTheme(
             primary = ClintPalette.burgundyAccentPrimary,
@@ -1145,9 +1149,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.burgundyAccentPrimary,
             cardBackground = ClintPalette.burgundyAccentDarkSurface,
-            error = M3_DARK.error,
-            errorContainer = M3_DARK.errorContainer,
-            onErrorContainer = M3_DARK.onErrorContainer,
+            error = Color(ERROR_DARK),
+            errorContainer = Color(ERROR_CONTAINER_DARK),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_DARK),
             isLight = false
         )
     "midnight" -> if (isLight) ClintResolvedTheme(
@@ -1171,9 +1175,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.midnightAccentLightPrimary,
             cardBackground = ClintPalette.midnightAccentLightSurface,
-            error = M3_LIGHT.error,
-            errorContainer = M3_LIGHT.errorContainer,
-            onErrorContainer = M3_LIGHT.onErrorContainer,
+            error = Color(ERROR_LIGHT),
+            errorContainer = Color(ERROR_CONTAINER_LIGHT),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_LIGHT),
             isLight = true
         ) else ClintResolvedTheme(
             primary = ClintPalette.midnightAccentPrimary,
@@ -1196,9 +1200,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.midnightAccentPrimary,
             cardBackground = ClintPalette.midnightAccentDarkSurface,
-            error = M3_DARK.error,
-            errorContainer = M3_DARK.errorContainer,
-            onErrorContainer = M3_DARK.onErrorContainer,
+            error = Color(ERROR_DARK),
+            errorContainer = Color(ERROR_CONTAINER_DARK),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_DARK),
             isLight = false
         )
     "sepia" -> if (isLight) ClintResolvedTheme(
@@ -1222,9 +1226,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.sepiaAccentLightPrimary,
             cardBackground = ClintPalette.sepiaAccentLightSurface,
-            error = M3_LIGHT.error,
-            errorContainer = M3_LIGHT.errorContainer,
-            onErrorContainer = M3_LIGHT.onErrorContainer,
+            error = Color(ERROR_LIGHT),
+            errorContainer = Color(ERROR_CONTAINER_LIGHT),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_LIGHT),
             isLight = true
         ) else ClintResolvedTheme(
             primary = ClintPalette.sepiaAccentPrimary,
@@ -1247,9 +1251,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.sepiaAccentPrimary,
             cardBackground = ClintPalette.sepiaAccentDarkSurface,
-            error = M3_DARK.error,
-            errorContainer = M3_DARK.errorContainer,
-            onErrorContainer = M3_DARK.onErrorContainer,
+            error = Color(ERROR_DARK),
+            errorContainer = Color(ERROR_CONTAINER_DARK),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_DARK),
             isLight = false
         )
     "mustard" -> if (isLight) ClintResolvedTheme(
@@ -1273,9 +1277,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.mustardAccentLightPrimary,
             cardBackground = ClintPalette.mustardAccentLightSurface,
-            error = M3_LIGHT.error,
-            errorContainer = M3_LIGHT.errorContainer,
-            onErrorContainer = M3_LIGHT.onErrorContainer,
+            error = Color(ERROR_LIGHT),
+            errorContainer = Color(ERROR_CONTAINER_LIGHT),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_LIGHT),
             isLight = true
         ) else ClintResolvedTheme(
             primary = ClintPalette.mustardAccentPrimary,
@@ -1298,9 +1302,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.mustardAccentPrimary,
             cardBackground = ClintPalette.mustardAccentDarkSurface,
-            error = M3_DARK.error,
-            errorContainer = M3_DARK.errorContainer,
-            onErrorContainer = M3_DARK.onErrorContainer,
+            error = Color(ERROR_DARK),
+            errorContainer = Color(ERROR_CONTAINER_DARK),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_DARK),
             isLight = false
         )
     "forest" -> if (isLight) ClintResolvedTheme(
@@ -1324,9 +1328,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.forestAccentLightPrimary,
             cardBackground = ClintPalette.forestAccentLightSurface,
-            error = M3_LIGHT.error,
-            errorContainer = M3_LIGHT.errorContainer,
-            onErrorContainer = M3_LIGHT.onErrorContainer,
+            error = Color(ERROR_LIGHT),
+            errorContainer = Color(ERROR_CONTAINER_LIGHT),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_LIGHT),
             isLight = true
         ) else ClintResolvedTheme(
             primary = ClintPalette.forestAccentPrimary,
@@ -1349,9 +1353,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.forestAccentPrimary,
             cardBackground = ClintPalette.forestAccentDarkSurface,
-            error = M3_DARK.error,
-            errorContainer = M3_DARK.errorContainer,
-            onErrorContainer = M3_DARK.onErrorContainer,
+            error = Color(ERROR_DARK),
+            errorContainer = Color(ERROR_CONTAINER_DARK),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_DARK),
             isLight = false
         )
     "sage" -> if (isLight) ClintResolvedTheme(
@@ -1375,9 +1379,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.sageAccentLightPrimary,
             cardBackground = ClintPalette.sageAccentLightSurface,
-            error = M3_LIGHT.error,
-            errorContainer = M3_LIGHT.errorContainer,
-            onErrorContainer = M3_LIGHT.onErrorContainer,
+            error = Color(ERROR_LIGHT),
+            errorContainer = Color(ERROR_CONTAINER_LIGHT),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_LIGHT),
             isLight = true
         ) else ClintResolvedTheme(
             primary = ClintPalette.sageAccentPrimary,
@@ -1400,9 +1404,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.sageAccentPrimary,
             cardBackground = ClintPalette.sageAccentDarkSurface,
-            error = M3_DARK.error,
-            errorContainer = M3_DARK.errorContainer,
-            onErrorContainer = M3_DARK.onErrorContainer,
+            error = Color(ERROR_DARK),
+            errorContainer = Color(ERROR_CONTAINER_DARK),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_DARK),
             isLight = false
         )
     "plum" -> if (isLight) ClintResolvedTheme(
@@ -1426,9 +1430,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.plumAccentLightPrimary,
             cardBackground = ClintPalette.plumAccentLightSurface,
-            error = M3_LIGHT.error,
-            errorContainer = M3_LIGHT.errorContainer,
-            onErrorContainer = M3_LIGHT.onErrorContainer,
+            error = Color(ERROR_LIGHT),
+            errorContainer = Color(ERROR_CONTAINER_LIGHT),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_LIGHT),
             isLight = true
         ) else ClintResolvedTheme(
             primary = ClintPalette.plumAccentPrimary,
@@ -1451,9 +1455,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.plumAccentPrimary,
             cardBackground = ClintPalette.plumAccentDarkSurface,
-            error = M3_DARK.error,
-            errorContainer = M3_DARK.errorContainer,
-            onErrorContainer = M3_DARK.onErrorContainer,
+            error = Color(ERROR_DARK),
+            errorContainer = Color(ERROR_CONTAINER_DARK),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_DARK),
             isLight = false
         )
     "violet" -> if (isLight) ClintResolvedTheme(
@@ -1477,9 +1481,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.violetAccentLightPrimary,
             cardBackground = ClintPalette.violetAccentLightSurface,
-            error = M3_LIGHT.error,
-            errorContainer = M3_LIGHT.errorContainer,
-            onErrorContainer = M3_LIGHT.onErrorContainer,
+            error = Color(ERROR_LIGHT),
+            errorContainer = Color(ERROR_CONTAINER_LIGHT),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_LIGHT),
             isLight = true
         ) else ClintResolvedTheme(
             primary = ClintPalette.violetAccentPrimary,
@@ -1502,9 +1506,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.violetAccentPrimary,
             cardBackground = ClintPalette.violetAccentDarkSurface,
-            error = M3_DARK.error,
-            errorContainer = M3_DARK.errorContainer,
-            onErrorContainer = M3_DARK.onErrorContainer,
+            error = Color(ERROR_DARK),
+            errorContainer = Color(ERROR_CONTAINER_DARK),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_DARK),
             isLight = false
         )
     "sand" -> if (isLight) ClintResolvedTheme(
@@ -1528,9 +1532,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.sandAccentLightPrimary,
             cardBackground = ClintPalette.sandAccentLightSurface,
-            error = M3_LIGHT.error,
-            errorContainer = M3_LIGHT.errorContainer,
-            onErrorContainer = M3_LIGHT.onErrorContainer,
+            error = Color(ERROR_LIGHT),
+            errorContainer = Color(ERROR_CONTAINER_LIGHT),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_LIGHT),
             isLight = true
         ) else ClintResolvedTheme(
             primary = ClintPalette.sandAccentPrimary,
@@ -1553,9 +1557,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.sandAccentPrimary,
             cardBackground = ClintPalette.sandAccentDarkSurface,
-            error = M3_DARK.error,
-            errorContainer = M3_DARK.errorContainer,
-            onErrorContainer = M3_DARK.onErrorContainer,
+            error = Color(ERROR_DARK),
+            errorContainer = Color(ERROR_CONTAINER_DARK),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_DARK),
             isLight = false
         )
     "ruby" -> if (isLight) ClintResolvedTheme(
@@ -1579,9 +1583,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.rubyAccentLightPrimary,
             cardBackground = ClintPalette.rubyAccentLightSurface,
-            error = M3_LIGHT.error,
-            errorContainer = M3_LIGHT.errorContainer,
-            onErrorContainer = M3_LIGHT.onErrorContainer,
+            error = Color(ERROR_LIGHT),
+            errorContainer = Color(ERROR_CONTAINER_LIGHT),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_LIGHT),
             isLight = true
         ) else ClintResolvedTheme(
             primary = ClintPalette.rubyAccentPrimary,
@@ -1604,9 +1608,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.rubyAccentPrimary,
             cardBackground = ClintPalette.rubyAccentDarkSurface,
-            error = M3_DARK.error,
-            errorContainer = M3_DARK.errorContainer,
-            onErrorContainer = M3_DARK.onErrorContainer,
+            error = Color(ERROR_DARK),
+            errorContainer = Color(ERROR_CONTAINER_DARK),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_DARK),
             isLight = false
         )
     "sky" -> if (isLight) ClintResolvedTheme(
@@ -1630,9 +1634,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.skyAccentLightPrimary,
             cardBackground = ClintPalette.skyAccentLightSurface,
-            error = M3_LIGHT.error,
-            errorContainer = M3_LIGHT.errorContainer,
-            onErrorContainer = M3_LIGHT.onErrorContainer,
+            error = Color(ERROR_LIGHT),
+            errorContainer = Color(ERROR_CONTAINER_LIGHT),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_LIGHT),
             isLight = true
         ) else ClintResolvedTheme(
             primary = ClintPalette.skyAccentPrimary,
@@ -1655,9 +1659,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.skyAccentPrimary,
             cardBackground = ClintPalette.skyAccentDarkSurface,
-            error = M3_DARK.error,
-            errorContainer = M3_DARK.errorContainer,
-            onErrorContainer = M3_DARK.onErrorContainer,
+            error = Color(ERROR_DARK),
+            errorContainer = Color(ERROR_CONTAINER_DARK),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_DARK),
             isLight = false
         )
     "charcoal" -> if (isLight) ClintResolvedTheme(
@@ -1681,9 +1685,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.charcoalAccentLightPrimary,
             cardBackground = ClintPalette.charcoalAccentLightSurface,
-            error = M3_LIGHT.error,
-            errorContainer = M3_LIGHT.errorContainer,
-            onErrorContainer = M3_LIGHT.onErrorContainer,
+            error = Color(ERROR_LIGHT),
+            errorContainer = Color(ERROR_CONTAINER_LIGHT),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_LIGHT),
             isLight = true
         ) else ClintResolvedTheme(
             primary = ClintPalette.charcoalAccentPrimary,
@@ -1706,9 +1710,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.charcoalAccentPrimary,
             cardBackground = ClintPalette.charcoalAccentDarkSurface,
-            error = M3_DARK.error,
-            errorContainer = M3_DARK.errorContainer,
-            onErrorContainer = M3_DARK.onErrorContainer,
+            error = Color(ERROR_DARK),
+            errorContainer = Color(ERROR_CONTAINER_DARK),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_DARK),
             isLight = false
         )
     "peach" -> if (isLight) ClintResolvedTheme(
@@ -1732,9 +1736,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.peachAccentLightPrimary,
             cardBackground = ClintPalette.peachAccentLightSurface,
-            error = M3_LIGHT.error,
-            errorContainer = M3_LIGHT.errorContainer,
-            onErrorContainer = M3_LIGHT.onErrorContainer,
+            error = Color(ERROR_LIGHT),
+            errorContainer = Color(ERROR_CONTAINER_LIGHT),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_LIGHT),
             isLight = true
         ) else ClintResolvedTheme(
             primary = ClintPalette.peachAccentPrimary,
@@ -1757,9 +1761,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.peachAccentPrimary,
             cardBackground = ClintPalette.peachAccentDarkSurface,
-            error = M3_DARK.error,
-            errorContainer = M3_DARK.errorContainer,
-            onErrorContainer = M3_DARK.onErrorContainer,
+            error = Color(ERROR_DARK),
+            errorContainer = Color(ERROR_CONTAINER_DARK),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_DARK),
             isLight = false
         )
     "terracotta" -> if (isLight) ClintResolvedTheme(
@@ -1783,9 +1787,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.terracottaAccentLightPrimary,
             cardBackground = ClintPalette.terracottaAccentLightSurface,
-            error = M3_LIGHT.error,
-            errorContainer = M3_LIGHT.errorContainer,
-            onErrorContainer = M3_LIGHT.onErrorContainer,
+            error = Color(ERROR_LIGHT),
+            errorContainer = Color(ERROR_CONTAINER_LIGHT),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_LIGHT),
             isLight = true
         ) else ClintResolvedTheme(
             primary = ClintPalette.terracottaAccentPrimary,
@@ -1808,9 +1812,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.terracottaAccentPrimary,
             cardBackground = ClintPalette.terracottaAccentDarkSurface,
-            error = M3_DARK.error,
-            errorContainer = M3_DARK.errorContainer,
-            onErrorContainer = M3_DARK.onErrorContainer,
+            error = Color(ERROR_DARK),
+            errorContainer = Color(ERROR_CONTAINER_DARK),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_DARK),
             isLight = false
         )
     "emerald" -> if (isLight) ClintResolvedTheme(
@@ -1834,9 +1838,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.emeraldAccentLightPrimary,
             cardBackground = ClintPalette.emeraldAccentLightSurface,
-            error = M3_LIGHT.error,
-            errorContainer = M3_LIGHT.errorContainer,
-            onErrorContainer = M3_LIGHT.onErrorContainer,
+            error = Color(ERROR_LIGHT),
+            errorContainer = Color(ERROR_CONTAINER_LIGHT),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_LIGHT),
             isLight = true
         ) else ClintResolvedTheme(
             primary = ClintPalette.emeraldAccentPrimary,
@@ -1859,9 +1863,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.emeraldAccentPrimary,
             cardBackground = ClintPalette.emeraldAccentDarkSurface,
-            error = M3_DARK.error,
-            errorContainer = M3_DARK.errorContainer,
-            onErrorContainer = M3_DARK.onErrorContainer,
+            error = Color(ERROR_DARK),
+            errorContainer = Color(ERROR_CONTAINER_DARK),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_DARK),
             isLight = false
         )
     "blue" -> if (isLight) ClintResolvedTheme(
@@ -1885,9 +1889,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.blueAccentLightPrimary,
             cardBackground = ClintPalette.blueAccentLightSurface,
-            error = M3_LIGHT.error,
-            errorContainer = M3_LIGHT.errorContainer,
-            onErrorContainer = M3_LIGHT.onErrorContainer,
+            error = Color(ERROR_LIGHT),
+            errorContainer = Color(ERROR_CONTAINER_LIGHT),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_LIGHT),
             isLight = true
         ) else ClintResolvedTheme(
             primary = ClintPalette.blueAccentPrimary,
@@ -1910,9 +1914,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.blueAccentPrimary,
             cardBackground = ClintPalette.blueAccentDarkSurface,
-            error = M3_DARK.error,
-            errorContainer = M3_DARK.errorContainer,
-            onErrorContainer = M3_DARK.onErrorContainer,
+            error = Color(ERROR_DARK),
+            errorContainer = Color(ERROR_CONTAINER_DARK),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_DARK),
             isLight = false
         )
     "yellow" -> if (isLight) ClintResolvedTheme(
@@ -1936,9 +1940,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.yellowAccentLightPrimary,
             cardBackground = ClintPalette.yellowAccentLightSurface,
-            error = M3_LIGHT.error,
-            errorContainer = M3_LIGHT.errorContainer,
-            onErrorContainer = M3_LIGHT.onErrorContainer,
+            error = Color(ERROR_LIGHT),
+            errorContainer = Color(ERROR_CONTAINER_LIGHT),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_LIGHT),
             isLight = true
         ) else ClintResolvedTheme(
             primary = ClintPalette.yellowAccentPrimary,
@@ -1961,9 +1965,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.yellowAccentPrimary,
             cardBackground = ClintPalette.yellowAccentDarkSurface,
-            error = M3_DARK.error,
-            errorContainer = M3_DARK.errorContainer,
-            onErrorContainer = M3_DARK.onErrorContainer,
+            error = Color(ERROR_DARK),
+            errorContainer = Color(ERROR_CONTAINER_DARK),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_DARK),
             isLight = false
         )
     "lemon" -> if (isLight) ClintResolvedTheme(
@@ -1987,9 +1991,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.lemonAccentLightPrimary,
             cardBackground = ClintPalette.lemonAccentLightSurface,
-            error = M3_LIGHT.error,
-            errorContainer = M3_LIGHT.errorContainer,
-            onErrorContainer = M3_LIGHT.onErrorContainer,
+            error = Color(ERROR_LIGHT),
+            errorContainer = Color(ERROR_CONTAINER_LIGHT),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_LIGHT),
             isLight = true
         ) else ClintResolvedTheme(
             primary = ClintPalette.lemonAccentPrimary,
@@ -2012,9 +2016,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.lemonAccentPrimary,
             cardBackground = ClintPalette.lemonAccentDarkSurface,
-            error = M3_DARK.error,
-            errorContainer = M3_DARK.errorContainer,
-            onErrorContainer = M3_DARK.onErrorContainer,
+            error = Color(ERROR_DARK),
+            errorContainer = Color(ERROR_CONTAINER_DARK),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_DARK),
             isLight = false
         )
     "gold" -> if (isLight) ClintResolvedTheme(
@@ -2038,9 +2042,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.goldAccentLightPrimary,
             cardBackground = ClintPalette.goldAccentLightSurface,
-            error = M3_LIGHT.error,
-            errorContainer = M3_LIGHT.errorContainer,
-            onErrorContainer = M3_LIGHT.onErrorContainer,
+            error = Color(ERROR_LIGHT),
+            errorContainer = Color(ERROR_CONTAINER_LIGHT),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_LIGHT),
             isLight = true
         ) else ClintResolvedTheme(
             primary = ClintPalette.goldAccentPrimary,
@@ -2063,9 +2067,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.goldAccentPrimary,
             cardBackground = ClintPalette.goldAccentDarkSurface,
-            error = M3_DARK.error,
-            errorContainer = M3_DARK.errorContainer,
-            onErrorContainer = M3_DARK.onErrorContainer,
+            error = Color(ERROR_DARK),
+            errorContainer = Color(ERROR_CONTAINER_DARK),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_DARK),
             isLight = false
         )
     "red" -> if (isLight) ClintResolvedTheme(
@@ -2089,9 +2093,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.redAccentLightPrimary,
             cardBackground = ClintPalette.redAccentLightSurface,
-            error = M3_LIGHT.error,
-            errorContainer = M3_LIGHT.errorContainer,
-            onErrorContainer = M3_LIGHT.onErrorContainer,
+            error = Color(ERROR_LIGHT),
+            errorContainer = Color(ERROR_CONTAINER_LIGHT),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_LIGHT),
             isLight = true
         ) else ClintResolvedTheme(
             primary = ClintPalette.redAccentPrimary,
@@ -2114,9 +2118,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.redAccentPrimary,
             cardBackground = ClintPalette.redAccentDarkSurface,
-            error = M3_DARK.error,
-            errorContainer = M3_DARK.errorContainer,
-            onErrorContainer = M3_DARK.onErrorContainer,
+            error = Color(ERROR_DARK),
+            errorContainer = Color(ERROR_CONTAINER_DARK),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_DARK),
             isLight = false
         )
     "green" -> if (isLight) ClintResolvedTheme(
@@ -2140,9 +2144,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.greenAccentLightPrimary,
             cardBackground = ClintPalette.greenAccentLightSurface,
-            error = M3_LIGHT.error,
-            errorContainer = M3_LIGHT.errorContainer,
-            onErrorContainer = M3_LIGHT.onErrorContainer,
+            error = Color(ERROR_LIGHT),
+            errorContainer = Color(ERROR_CONTAINER_LIGHT),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_LIGHT),
             isLight = true
         ) else ClintResolvedTheme(
             primary = ClintPalette.greenAccentPrimary,
@@ -2165,9 +2169,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.greenAccentPrimary,
             cardBackground = ClintPalette.greenAccentDarkSurface,
-            error = M3_DARK.error,
-            errorContainer = M3_DARK.errorContainer,
-            onErrorContainer = M3_DARK.onErrorContainer,
+            error = Color(ERROR_DARK),
+            errorContainer = Color(ERROR_CONTAINER_DARK),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_DARK),
             isLight = false
         )
     "orange" -> if (isLight) ClintResolvedTheme(
@@ -2191,9 +2195,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.orangeAccentLightPrimary,
             cardBackground = ClintPalette.orangeAccentLightSurface,
-            error = M3_LIGHT.error,
-            errorContainer = M3_LIGHT.errorContainer,
-            onErrorContainer = M3_LIGHT.onErrorContainer,
+            error = Color(ERROR_LIGHT),
+            errorContainer = Color(ERROR_CONTAINER_LIGHT),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_LIGHT),
             isLight = true
         ) else ClintResolvedTheme(
             primary = ClintPalette.orangeAccentPrimary,
@@ -2216,9 +2220,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.orangeAccentPrimary,
             cardBackground = ClintPalette.orangeAccentDarkSurface,
-            error = M3_DARK.error,
-            errorContainer = M3_DARK.errorContainer,
-            onErrorContainer = M3_DARK.onErrorContainer,
+            error = Color(ERROR_DARK),
+            errorContainer = Color(ERROR_CONTAINER_DARK),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_DARK),
             isLight = false
         )
     "scarlet" -> if (isLight) ClintResolvedTheme(
@@ -2242,9 +2246,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.scarletAccentLightPrimary,
             cardBackground = ClintPalette.scarletAccentLightSurface,
-            error = M3_LIGHT.error,
-            errorContainer = M3_LIGHT.errorContainer,
-            onErrorContainer = M3_LIGHT.onErrorContainer,
+            error = Color(ERROR_LIGHT),
+            errorContainer = Color(ERROR_CONTAINER_LIGHT),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_LIGHT),
             isLight = true
         ) else ClintResolvedTheme(
             primary = ClintPalette.scarletAccentPrimary,
@@ -2267,9 +2271,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.scarletAccentPrimary,
             cardBackground = ClintPalette.scarletAccentDarkSurface,
-            error = M3_DARK.error,
-            errorContainer = M3_DARK.errorContainer,
-            onErrorContainer = M3_DARK.onErrorContainer,
+            error = Color(ERROR_DARK),
+            errorContainer = Color(ERROR_CONTAINER_DARK),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_DARK),
             isLight = false
         )
     "lime" -> if (isLight) ClintResolvedTheme(
@@ -2293,9 +2297,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.limeAccentLightPrimary,
             cardBackground = ClintPalette.limeAccentLightSurface,
-            error = M3_LIGHT.error,
-            errorContainer = M3_LIGHT.errorContainer,
-            onErrorContainer = M3_LIGHT.onErrorContainer,
+            error = Color(ERROR_LIGHT),
+            errorContainer = Color(ERROR_CONTAINER_LIGHT),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_LIGHT),
             isLight = true
         ) else ClintResolvedTheme(
             primary = ClintPalette.limeAccentPrimary,
@@ -2318,9 +2322,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.limeAccentPrimary,
             cardBackground = ClintPalette.limeAccentDarkSurface,
-            error = M3_DARK.error,
-            errorContainer = M3_DARK.errorContainer,
-            onErrorContainer = M3_DARK.onErrorContainer,
+            error = Color(ERROR_DARK),
+            errorContainer = Color(ERROR_CONTAINER_DARK),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_DARK),
             isLight = false
         )
     "olive" -> if (isLight) ClintResolvedTheme(
@@ -2344,9 +2348,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.oliveAccentLightPrimary,
             cardBackground = ClintPalette.oliveAccentLightSurface,
-            error = M3_LIGHT.error,
-            errorContainer = M3_LIGHT.errorContainer,
-            onErrorContainer = M3_LIGHT.onErrorContainer,
+            error = Color(ERROR_LIGHT),
+            errorContainer = Color(ERROR_CONTAINER_LIGHT),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_LIGHT),
             isLight = true
         ) else ClintResolvedTheme(
             primary = ClintPalette.oliveAccentPrimary,
@@ -2369,9 +2373,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.oliveAccentPrimary,
             cardBackground = ClintPalette.oliveAccentDarkSurface,
-            error = M3_DARK.error,
-            errorContainer = M3_DARK.errorContainer,
-            onErrorContainer = M3_DARK.onErrorContainer,
+            error = Color(ERROR_DARK),
+            errorContainer = Color(ERROR_CONTAINER_DARK),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_DARK),
             isLight = false
         )
     "deep_orange" -> if (isLight) ClintResolvedTheme(
@@ -2395,9 +2399,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.deepOrangeAccentLightPrimary,
             cardBackground = ClintPalette.deepOrangeAccentLightSurface,
-            error = M3_LIGHT.error,
-            errorContainer = M3_LIGHT.errorContainer,
-            onErrorContainer = M3_LIGHT.onErrorContainer,
+            error = Color(ERROR_LIGHT),
+            errorContainer = Color(ERROR_CONTAINER_LIGHT),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_LIGHT),
             isLight = true
         ) else ClintResolvedTheme(
             primary = ClintPalette.deepOrangeAccentPrimary,
@@ -2420,9 +2424,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.deepOrangeAccentPrimary,
             cardBackground = ClintPalette.deepOrangeAccentDarkSurface,
-            error = M3_DARK.error,
-            errorContainer = M3_DARK.errorContainer,
-            onErrorContainer = M3_DARK.onErrorContainer,
+            error = Color(ERROR_DARK),
+            errorContainer = Color(ERROR_CONTAINER_DARK),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_DARK),
             isLight = false
         )
     "tangerine" -> if (isLight) ClintResolvedTheme(
@@ -2446,9 +2450,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.tangerineAccentLightPrimary,
             cardBackground = ClintPalette.tangerineAccentLightSurface,
-            error = M3_LIGHT.error,
-            errorContainer = M3_LIGHT.errorContainer,
-            onErrorContainer = M3_LIGHT.onErrorContainer,
+            error = Color(ERROR_LIGHT),
+            errorContainer = Color(ERROR_CONTAINER_LIGHT),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_LIGHT),
             isLight = true
         ) else ClintResolvedTheme(
             primary = ClintPalette.tangerineAccentPrimary,
@@ -2471,9 +2475,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.tangerineAccentPrimary,
             cardBackground = ClintPalette.tangerineAccentDarkSurface,
-            error = M3_DARK.error,
-            errorContainer = M3_DARK.errorContainer,
-            onErrorContainer = M3_DARK.onErrorContainer,
+            error = Color(ERROR_DARK),
+            errorContainer = Color(ERROR_CONTAINER_DARK),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_DARK),
             isLight = false
         )
     "apricot" -> if (isLight) ClintResolvedTheme(
@@ -2497,9 +2501,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.apricotAccentLightPrimary,
             cardBackground = ClintPalette.apricotAccentLightSurface,
-            error = M3_LIGHT.error,
-            errorContainer = M3_LIGHT.errorContainer,
-            onErrorContainer = M3_LIGHT.onErrorContainer,
+            error = Color(ERROR_LIGHT),
+            errorContainer = Color(ERROR_CONTAINER_LIGHT),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_LIGHT),
             isLight = true
         ) else ClintResolvedTheme(
             primary = ClintPalette.apricotAccentPrimary,
@@ -2522,9 +2526,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.apricotAccentPrimary,
             cardBackground = ClintPalette.apricotAccentDarkSurface,
-            error = M3_DARK.error,
-            errorContainer = M3_DARK.errorContainer,
-            onErrorContainer = M3_DARK.onErrorContainer,
+            error = Color(ERROR_DARK),
+            errorContainer = Color(ERROR_CONTAINER_DARK),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_DARK),
             isLight = false
         )
     "copper" -> if (isLight) ClintResolvedTheme(
@@ -2548,9 +2552,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.copperAccentLightPrimary,
             cardBackground = ClintPalette.copperAccentLightSurface,
-            error = M3_LIGHT.error,
-            errorContainer = M3_LIGHT.errorContainer,
-            onErrorContainer = M3_LIGHT.onErrorContainer,
+            error = Color(ERROR_LIGHT),
+            errorContainer = Color(ERROR_CONTAINER_LIGHT),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_LIGHT),
             isLight = true
         ) else ClintResolvedTheme(
             primary = ClintPalette.copperAccentPrimary,
@@ -2573,9 +2577,9 @@ private fun accentBase(isLight: Boolean, accent: String): ClintResolvedTheme = w
             buttonIconTint = ClintPalette.onSurface,
             iconTint = ClintPalette.copperAccentPrimary,
             cardBackground = ClintPalette.copperAccentDarkSurface,
-            error = M3_DARK.error,
-            errorContainer = M3_DARK.errorContainer,
-            onErrorContainer = M3_DARK.onErrorContainer,
+            error = Color(ERROR_DARK),
+            errorContainer = Color(ERROR_CONTAINER_DARK),
+            onErrorContainer = Color(ON_ERROR_CONTAINER_DARK),
             isLight = false
         )
     else -> accentBase(isLight, "default")

@@ -26,7 +26,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Icon
+import com.simplefox.browser.ui.foundation.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -168,77 +168,6 @@ fun AddressBarPreview(position: String, bg: Color, surface: Color, onSurface: Co
                 NavDotsRow(onSurface)
             }
         }
-    }
-}
-
-@Composable
-fun MenuStylePreview(
-    variant: String,
-    addressBarPosition: String,
-    bg: Color,
-    surface: Color,
-    onSurface: Color,
-    panelBg: Color
-) {
-    val topColor = topBarColorFor(addressBarPosition, surface, bg)
-    val bottomColor = bottomBarColorFor(addressBarPosition, surface, bg)
-    val bottomVisible = addressBarPosition != "top"
-    val navDotsVisible = addressBarPosition == "split"
-    val pillAtTop = addressBarPosition != "bottom"
-    val cardAtTop = addressBarPosition != "bottom"
-
-    Box(
-        Modifier
-            .size(PreviewWidth, PreviewHeight)
-            .clip(RoundedCornerShape(8.dp))
-            .background(bg)
-    ) {
-        Box(Modifier.fillMaxWidth().height(BarHeight).align(Alignment.TopCenter).background(topColor))
-        Pill(onSurface, atTop = pillAtTop)
-
-        if (variant == "popup") {
-            ContentLinesStack(onSurface, topPad = 24.dp, bottomPad = 8.dp)
-            Box(
-                Modifier
-                    .align(if (cardAtTop) Alignment.TopEnd else Alignment.BottomEnd)
-                    .padding(
-                        end = 2.dp,
-                        top = if (cardAtTop) 14.dp else 0.dp,
-                        bottom = if (cardAtTop) 0.dp else 14.dp
-                    )
-                    .size(28.dp, 30.dp)
-                    .clip(RoundedCornerShape(4.dp))
-                    .background(panelBg)
-            ) {
-                Box(Modifier.align(Alignment.TopCenter).padding(top = 5.dp).width(18.dp).height(2.dp).alpha(0.20f).background(onSurface))
-                Box(Modifier.align(Alignment.Center).width(14.dp).height(2.dp).alpha(0.20f).background(onSurface))
-                Box(Modifier.align(Alignment.BottomCenter).padding(bottom = 5.dp).width(18.dp).height(2.dp).alpha(0.20f).background(onSurface))
-            }
-        } else {
-            ContentLinesStack(onSurface, topPad = 24.dp, bottomPad = 34.dp)
-            Box(
-                Modifier
-                    .align(Alignment.BottomCenter)
-                    .fillMaxWidth()
-                    .height(30.dp)
-                    .clip(RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp))
-                    .background(panelBg)
-            ) {
-                Box(Modifier.align(Alignment.TopCenter).padding(top = 4.dp).width(10.dp).height(2.dp).alpha(0.30f).background(onSurface))
-                Row(
-                    Modifier.align(Alignment.BottomCenter).fillMaxWidth().padding(horizontal = 4.dp).padding(bottom = 5.dp),
-                    horizontalArrangement = Arrangement.spacedBy(4.dp)
-                ) {
-                    Box(Modifier.weight(1f).height(8.dp).alpha(0.12f).background(onSurface))
-                    Box(Modifier.weight(1f).height(8.dp).alpha(0.12f).background(onSurface))
-                }
-            }
-        }
-
-        if (bottomVisible) {
-            Box(Modifier.fillMaxWidth().height(BarHeight).align(Alignment.BottomCenter).background(bottomColor))
-        }
-        if (navDotsVisible) NavDotsRow(onSurface)
     }
 }
 

@@ -9,7 +9,6 @@ import androidx.compose.material.icons.filled.Workspaces
 import androidx.compose.material.icons.filled.Fullscreen
 import androidx.compose.material.icons.filled.Layers
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Reorder
 import androidx.compose.material.icons.filled.SwapVert
@@ -32,8 +31,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ContentCopy
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
+import com.simplefox.browser.ui.foundation.Icon
+import com.simplefox.browser.ui.foundation.Text
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
@@ -65,7 +64,6 @@ fun LookAndFeelScreen(
     onIntensitySelected: (String) -> Unit,
     onLanguageSelected: (String) -> Unit,
     onAddressBarPositionSelected: (String) -> Unit,
-    onMenuStyleSelected: (String) -> Unit,
     onScrollHideModeSelected: (String) -> Unit,
     onHideStatusBarRowClicked: () -> Unit,
     onHideSystemNavigationRowClicked: () -> Unit,
@@ -99,10 +97,6 @@ fun LookAndFeelScreen(
                 LookAndFeelDialog.ADDRESS_BAR_POSITION -> AddressBarPositionDialog(
                     current = state.addressBarPosition, theme = state.theme, accent = state.accent, hideStatusBar = state.hideStatusBar, hideSystemNavigation = state.hideSystemNavigation,
                     onSelect = onAddressBarPositionSelected, onDismiss = { state.openDialog = null }
-                )
-                LookAndFeelDialog.MENU_STYLE -> MenuStyleDialog(
-                    current = state.menuStyle, addressBarPosition = state.addressBarPosition, theme = state.theme, accent = state.accent,
-                    hideStatusBar = state.hideStatusBar, hideSystemNavigation = state.hideSystemNavigation, onSelect = onMenuStyleSelected, onDismiss = { state.openDialog = null }
                 )
                 LookAndFeelDialog.SCROLL_HIDE_MODE -> ScrollHideModeDialog(
                     current = state.scrollHideMode, addressBarPosition = state.addressBarPosition, theme = state.theme, accent = state.accent,
@@ -252,14 +246,6 @@ fun LookAndFeelScreen(
         SettingsSectionLabel(stringResource(R.string.menu))
         SettingsSection(colors.cardBackground) {
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.MoreVert,
-                title = stringResource(R.string.pref_menu_style_title),
-                summary = stringResource(menuStyleSummaryRes(state.menuStyle)),
-                colors = colors,
-                onClick = { state.openDialog = LookAndFeelDialog.MENU_STYLE }
-            )
-            RowDivider(colors.divider)
-            SettingsRow(
                 icon = androidx.compose.material.icons.Icons.Filled.Reorder,
                 title = stringResource(R.string.menu_customization_title),
                 summary = stringResource(R.string.menu_customization_settings_summary),
@@ -393,9 +379,6 @@ private fun addressBarPositionSummaryRes(position: String): Int = when (position
     "bottom" -> R.string.address_bar_position_bottom
     else -> R.string.address_bar_position_split
 }
-
-private fun menuStyleSummaryRes(style: String): Int =
-    if (style == "bottom_sheet") R.string.menu_style_bottom_sheet else R.string.menu_style_popup
 
 private fun exitConfirmationSummaryRes(value: String): Int = when (value) {
     "off" -> R.string.exit_confirmation_off

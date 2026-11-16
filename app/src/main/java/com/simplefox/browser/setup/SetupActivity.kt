@@ -103,7 +103,6 @@ class SetupActivity : ClintActivity(), OverlayHostActivity {
             initialIntensity = prefs.getString("surface_intensity", "soft_tint") ?: "soft_tint",
             initialLanguage = prefs.getString(LocaleHelper.PREF_APP_LANGUAGE, LocaleHelper.LANGUAGE_SYSTEM) ?: LocaleHelper.LANGUAGE_SYSTEM,
             initialAddressBarPosition = prefs.getString("address_bar_position", "bottom") ?: "bottom",
-            initialMenuStyle = prefs.getString("menu_style", "popup") ?: "popup",
             initialScrollHideMode = prefs.getString("scroll_hide_mode", "off") ?: "off",
             initialHideStatusBar = hideStatusBar, initialHideSystemNavigation = hideSystemNavigation,
             initialEngine = "duckduckgo",
@@ -139,7 +138,6 @@ class SetupActivity : ClintActivity(), OverlayHostActivity {
                     uiState.addressBarPosition = position
                     uiState.scrollHideMode = sanitizeScrollHideMode(uiState.scrollHideMode, position)
                 },
-                onMenuStyleSelected = { style -> uiState.menuStyle = style },
                 onScrollHideModeSelected = { mode -> uiState.scrollHideMode = mode },
                 onEngineSelected = { engine -> uiState.engine = engine },
                 onCustomEngineSaved = { name, url ->
@@ -264,7 +262,6 @@ class SetupActivity : ClintActivity(), OverlayHostActivity {
             .putString(com.simplefox.browser.browser.CustomSearchEngineNameKey, uiState.customEngineName)
             .putString(com.simplefox.browser.browser.CustomSearchEngineUrlKey, uiState.customEngineUrl)
             .putString("address_bar_position", uiState.addressBarPosition)
-            .putString("menu_style", uiState.menuStyle)
             .putString("scroll_hide_mode", uiState.scrollHideMode)
             .putBoolean("hide_status_bar", uiState.hideStatusBar)
             .putBoolean("hide_system_navigation", uiState.hideSystemNavigation)

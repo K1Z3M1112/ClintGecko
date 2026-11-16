@@ -30,12 +30,12 @@ import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.ExtendedFloatingActionButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
+import com.simplefox.browser.ui.foundation.ExtendedFloatingActionButton
+import com.simplefox.browser.ui.foundation.Icon
+import com.simplefox.browser.ui.foundation.IconButton
+import com.simplefox.browser.ui.foundation.LinearProgressIndicator
+import com.simplefox.browser.ui.foundation.Surface
+import com.simplefox.browser.ui.foundation.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -540,10 +540,10 @@ private fun DownloadsDeleteConfirmDialog(count: Int, hideStatusBar: Boolean, hid
         onDismiss = onDismiss,
         footer = {
             Row(Modifier.fillMaxWidth().padding(end = 12.dp, bottom = 8.dp), horizontalArrangement = Arrangement.End) {
-                androidx.compose.material3.TextButton(onClick = onDismiss) {
+                com.simplefox.browser.ui.foundation.TextButton(onClick = onDismiss) {
                     Text(stringResource(R.string.action_cancel), color = colors.primary, fontWeight = FontWeight.Medium)
                 }
-                androidx.compose.material3.TextButton(onClick = { onConfirm(deleteFromStorage) }) {
+                com.simplefox.browser.ui.foundation.TextButton(onClick = { onConfirm(deleteFromStorage) }) {
                     Text(stringResource(R.string.action_delete), color = colors.primary, fontWeight = FontWeight.Medium)
                 }
             }

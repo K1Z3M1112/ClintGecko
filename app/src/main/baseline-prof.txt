@@ -4,14 +4,12 @@ HSPLandroidx/compose/runtime/**;->**(**)**
 HSPLandroidx/compose/ui/**;->**(**)**
 HSPLandroidx/compose/foundation/**;->**(**)**
 HSPLandroidx/compose/animation/**;->**(**)**
-HSPLandroidx/compose/material3/**;->**(**)**
 HSPLandroidx/activity/compose/**;->**(**)**
 HSPLandroidx/lifecycle/**;->**(**)**
 Landroidx/compose/runtime/**;
 Landroidx/compose/ui/**;
 Landroidx/compose/foundation/**;
 Landroidx/compose/animation/**;
-Landroidx/compose/material3/**;
 HSPLcom/simplefox/browser/browser/**;->**(**)**
 HSPLcom/simplefox/browser/tabs/**;->**(**)**
 HSPLcom/simplefox/browser/ui/**;->**(**)**

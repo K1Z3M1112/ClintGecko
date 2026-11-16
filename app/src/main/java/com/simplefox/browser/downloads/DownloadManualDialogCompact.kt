@@ -11,9 +11,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Folder
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
+import com.simplefox.browser.ui.foundation.CircularProgressIndicator
+import com.simplefox.browser.ui.foundation.Icon
+import com.simplefox.browser.ui.foundation.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier

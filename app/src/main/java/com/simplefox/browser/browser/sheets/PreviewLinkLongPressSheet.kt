@@ -11,11 +11,10 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.Text
-import androidx.compose.material3.rememberModalBottomSheetState
+import com.simplefox.browser.ui.foundation.Icon
+import com.simplefox.browser.ui.foundation.ModalBottomSheet
+import com.simplefox.browser.ui.foundation.Text
+import com.simplefox.browser.ui.foundation.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -31,7 +30,6 @@ import com.simplefox.browser.ui.theme.LocalClintColors
 
 data class PreviewLinkLongPressRequest(val url: String, val linkText: String)
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun PreviewLinkLongPressSheet(request: PreviewLinkLongPressRequest, activity: MainActivity, onDismiss: () -> Unit) {
     val colors = LocalClintColors.current

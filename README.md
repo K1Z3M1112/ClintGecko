@@ -88,7 +88,7 @@ Built and maintained by **[@jhaiian](https://github.com/jhaiian)** — a solo de
 
 ### 🎨 UI & Customization
 
-Clint Gecko is built with **Material 3** and **Jetpack Compose**, with a highly customizable interface.
+Clint Gecko uses a custom interface built in the app module with **Jetpack Compose Foundation, Layout, and Canvas**, with a highly customizable interface.
 
 - 50 accent colors
 - Light and Dark themes

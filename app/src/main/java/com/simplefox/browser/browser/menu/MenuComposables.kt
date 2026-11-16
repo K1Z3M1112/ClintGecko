@@ -30,10 +30,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.LocalTextStyle
-import androidx.compose.material3.Text
+import com.simplefox.browser.ui.foundation.Icon
+import com.simplefox.browser.ui.foundation.IconButton
+import com.simplefox.browser.ui.foundation.LocalTextStyle
+import com.simplefox.browser.ui.foundation.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -98,7 +98,8 @@ internal data class BrowserMenuSnapshot(
     val canUseCookiesControl: Boolean,
     val canTranslatePage: Boolean,
     val isPageTranslated: Boolean,
-    val visibleMenuItems: List<CustomizableMenuItem>
+    val visibleMenuItems: List<CustomizableMenuItem>,
+    val menuRows: Int
 )
 
 internal class BrowserMenuActions(
@@ -171,7 +172,8 @@ internal fun MainActivity.buildMenuSnapshot(previous: BrowserMenuSnapshot?): Bro
             (currentUrl.startsWith("http://") || currentUrl.startsWith("https://")),
         canTranslatePage = currentUrl.startsWith("http://") || currentUrl.startsWith("https://"),
         isPageTranslated = wv != null && wv.translator.state.value.isRequested,
-        visibleMenuItems = BrowserMenuCustomizationStore.visibleOrderedItems(prefs)
+        visibleMenuItems = BrowserMenuCustomizationStore.visibleOrderedItems(prefs),
+        menuRows = BrowserMenuCustomizationStore.readRows(prefs)
     )
 }
 
@@ -294,7 +296,7 @@ internal fun MenuTriggerButton(activity: MainActivity, modifier: Modifier = Modi
                 onDismissRequest = { expanded = false },
                 properties = androidx.compose.ui.window.PopupProperties(focusable = true)
             ) {
-                androidx.compose.material3.Surface(
+                com.simplefox.browser.ui.foundation.Surface(
                     color = colors.popupBackground,
                     shape = PopupShape,
                     shadowElevation = 8.dp,
@@ -347,59 +349,74 @@ private fun BrowserMenuContent(
             .background(colors.popupBackground)
             .padding(vertical = 4.dp)
     ) {
-        // One horizontal bar that scrolls left/right.
-        Row(
+        // 1-3 rows of cells sharing one horizontal scroll, so the rows scroll together.
+        val rowCount = snapshot.menuRows.coerceIn(1, 3)
+        val navCount = if (snapshot.showNavRow) 5 else 0
+        val perRow = (navCount + entries.size + rowCount - 1) / rowCount
+        val firstRowCount = if (rowCount == 1) entries.size else (perRow - navCount).coerceIn(0, entries.size)
+        val rest = entries.drop(firstRowCount)
+        val restRows: List<List<MenuGridEntry>> = if (rowCount > 1 && rest.isNotEmpty()) {
+            val restPerRow = (rest.size + rowCount - 2) / (rowCount - 1)
+            rest.chunked(restPerRow)
+        } else emptyList()
+        val renderEntry: @Composable (MenuGridEntry) -> Unit = { entry ->
+            when (entry) {
+                MenuGridEntry.Settings -> MenuGridCell(
+                    androidx.compose.material.icons.Icons.Filled.Settings,
+                    stringResource(R.string.settings),
+                    onClick = actions.onSettings
+                )
+                is MenuGridEntry.Item -> MenuGridCellFor(entry.item, snapshot, actions, extensionsExpanded, onToggleExtensions)
+            }
+        }
+        Column(
             Modifier
                 .fillMaxWidth()
                 .horizontalScroll(rememberScrollState())
                 .padding(horizontal = 6.dp)
         ) {
-            if (snapshot.showNavRow) {
-                MenuGridCell(
-                    androidx.compose.material.icons.Icons.AutoMirrored.Filled.ArrowBack,
-                    stringResource(R.string.back),
-                    enabled = snapshot.canGoBack,
-                    onClick = actions.onGoBack
-                )
-                MenuGridCell(
-                    androidx.compose.material.icons.Icons.AutoMirrored.Filled.ArrowForward,
-                    stringResource(R.string.forward),
-                    enabled = snapshot.canGoForward,
-                    onClick = actions.onGoForward
-                )
-                MenuGridCell(
-                    androidx.compose.material.icons.Icons.Filled.Home,
-                    stringResource(R.string.home),
-                    onClick = actions.onHome
-                )
-                MenuGridCell(
-                    if (snapshot.isLoading) androidx.compose.material.icons.Icons.Filled.Close else androidx.compose.material.icons.Icons.Filled.Refresh,
-                    stringResource(R.string.refresh),
-                    onClick = actions.onRefreshOrStop
-                )
-                MenuGridCell(
-                    if (snapshot.page.isBookmarked) androidx.compose.material.icons.Icons.Filled.Bookmark else androidx.compose.material.icons.Icons.Filled.BookmarkBorder,
-                    stringResource(R.string.content_desc_bookmark),
-                    onClick = actions.onToggleBookmark
-                )
-                Box(
-                    Modifier
-                        .padding(horizontal = 4.dp, vertical = 10.dp)
-                        .width(1.dp)
-                        .height(40.dp)
-                        .background(colors.popupStroke)
-                        .align(Alignment.CenterVertically)
-                )
-            }
-            entries.forEach { entry ->
-                when (entry) {
-                    MenuGridEntry.Settings -> MenuGridCell(
-                        androidx.compose.material.icons.Icons.Filled.Settings,
-                        stringResource(R.string.settings),
-                        onClick = actions.onSettings
+            Row {
+                if (snapshot.showNavRow) {
+                    MenuGridCell(
+                        androidx.compose.material.icons.Icons.AutoMirrored.Filled.ArrowBack,
+                        stringResource(R.string.back),
+                        enabled = snapshot.canGoBack,
+                        onClick = actions.onGoBack
                     )
-                    is MenuGridEntry.Item -> MenuGridCellFor(entry.item, snapshot, actions, extensionsExpanded, onToggleExtensions)
+                    MenuGridCell(
+                        androidx.compose.material.icons.Icons.AutoMirrored.Filled.ArrowForward,
+                        stringResource(R.string.forward),
+                        enabled = snapshot.canGoForward,
+                        onClick = actions.onGoForward
+                    )
+                    MenuGridCell(
+                        androidx.compose.material.icons.Icons.Filled.Home,
+                        stringResource(R.string.home),
+                        onClick = actions.onHome
+                    )
+                    MenuGridCell(
+                        if (snapshot.isLoading) androidx.compose.material.icons.Icons.Filled.Close else androidx.compose.material.icons.Icons.Filled.Refresh,
+                        stringResource(R.string.refresh),
+                        onClick = actions.onRefreshOrStop
+                    )
+                    MenuGridCell(
+                        if (snapshot.page.isBookmarked) androidx.compose.material.icons.Icons.Filled.Bookmark else androidx.compose.material.icons.Icons.Filled.BookmarkBorder,
+                        stringResource(R.string.content_desc_bookmark),
+                        onClick = actions.onToggleBookmark
+                    )
+                    Box(
+                        Modifier
+                            .padding(horizontal = 4.dp, vertical = 10.dp)
+                            .width(1.dp)
+                            .height(40.dp)
+                            .background(colors.popupStroke)
+                            .align(Alignment.CenterVertically)
+                    )
                 }
+                entries.take(firstRowCount).forEach { renderEntry(it) }
+            }
+            restRows.forEach { rowEntries ->
+                Row { rowEntries.forEach { renderEntry(it) } }
             }
         }
         if (snapshot.visibleMenuItems.contains(CustomizableMenuItem.EXTENSIONS)) {

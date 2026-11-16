@@ -13,7 +13,6 @@ class SetupUiState(
     initialIntensity: String,
     initialLanguage: String,
     initialAddressBarPosition: String,
-    initialMenuStyle: String,
     initialScrollHideMode: String,
     initialHideStatusBar: Boolean, initialHideSystemNavigation: Boolean,
     initialEngine: String,
@@ -28,7 +27,6 @@ class SetupUiState(
     var language by mutableStateOf(initialLanguage)
 
     var addressBarPosition by mutableStateOf(initialAddressBarPosition)
-    var menuStyle by mutableStateOf(initialMenuStyle)
     var scrollHideMode by mutableStateOf(initialScrollHideMode)
     var hideStatusBar by mutableStateOf(initialHideStatusBar)
     var hideSystemNavigation by mutableStateOf(initialHideSystemNavigation)

@@ -8,12 +8,10 @@ import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
-import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
-import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
@@ -26,13 +24,12 @@ fun Context.findActivity(): Activity? {
     return null
 }
 
-@OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
 @Composable
 fun rememberMaxContentWidth(activity: Activity): Dp? {
-    val windowSizeClass = calculateWindowSizeClass(activity)
-    return when (windowSizeClass.widthSizeClass) {
-        WindowWidthSizeClass.Medium -> 700.dp
-        WindowWidthSizeClass.Expanded -> 960.dp
+    val widthDp = LocalConfiguration.current.screenWidthDp
+    return when {
+        widthDp >= 840 -> 960.dp
+        widthDp >= 600 -> 700.dp
         else -> null
     }
 }
@@ -51,9 +48,7 @@ fun AdaptiveWidthContainer(
 ) {
     Box(modifier.fillMaxWidth().fillMaxHeight(), contentAlignment = Alignment.TopCenter) {
         Box(
-            Modifier
-                .fillMaxWidth()
-                .fillMaxHeight()
+            Modifier.fillMaxWidth().fillMaxHeight()
                 .then(if (maxContentWidth != null) Modifier.widthIn(max = maxContentWidth) else Modifier),
             content = content
         )

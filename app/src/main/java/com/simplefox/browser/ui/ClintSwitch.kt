@@ -2,9 +2,9 @@ package com.simplefox.browser.ui
 import androidx.compose.material.icons.filled.Check
 
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Switch
-import androidx.compose.material3.SwitchDefaults
+import com.simplefox.browser.ui.foundation.Icon
+import com.simplefox.browser.ui.foundation.Switch
+import com.simplefox.browser.ui.foundation.SwitchDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color

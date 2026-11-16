@@ -47,8 +47,8 @@ import androidx.compose.material.icons.filled.Slideshow
 import androidx.compose.material.icons.filled.Storage
 import androidx.compose.material.icons.filled.Subtitles
 import androidx.compose.material.icons.filled.TableChart
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
+import com.simplefox.browser.ui.foundation.Icon
+import com.simplefox.browser.ui.foundation.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf

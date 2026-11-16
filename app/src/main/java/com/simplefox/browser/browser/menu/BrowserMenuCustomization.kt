@@ -93,6 +93,16 @@ fun CustomizableMenuItem.titleRes(): Int = when (this) {
 object BrowserMenuCustomizationStore {
     private const val PREF_ORDER = "browser_menu_item_order"
     private const val PREF_HIDDEN = "browser_menu_hidden_items"
+    private const val PREF_ROWS = "browser_menu_rows"
+    const val MIN_ROWS = 1
+    const val MAX_ROWS = 3
+
+    fun readRows(prefs: SharedPreferences): Int =
+        runCatching { prefs.getInt(PREF_ROWS, MIN_ROWS) }.getOrDefault(MIN_ROWS).coerceIn(MIN_ROWS, MAX_ROWS)
+
+    fun writeRows(prefs: SharedPreferences, rows: Int) {
+        prefs.edit().putInt(PREF_ROWS, rows.coerceIn(MIN_ROWS, MAX_ROWS)).apply()
+    }
 
     fun readOrder(prefs: SharedPreferences): List<CustomizableMenuItem> {
         val storedIds = prefs.getString(PREF_ORDER, null)?.split(",")?.filter { it.isNotBlank() } ?: emptyList()
@@ -115,7 +125,7 @@ object BrowserMenuCustomizationStore {
     }
 
     fun resetToDefault(prefs: SharedPreferences) {
-        prefs.edit().remove(PREF_ORDER).remove(PREF_HIDDEN).apply()
+        prefs.edit().remove(PREF_ORDER).remove(PREF_HIDDEN).remove(PREF_ROWS).apply()
     }
 
     fun visibleOrderedItems(prefs: SharedPreferences): List<CustomizableMenuItem> {

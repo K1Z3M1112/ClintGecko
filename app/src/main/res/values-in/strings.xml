@@ -258,11 +258,6 @@
     <string name="tab_bar_position_follow_desc">Selalu berada di samping kolom penelusuran, di mana pun Anda meletakkannya</string>
     <string name="tab_bar_position_top_desc">Selalu di bagian atas layar</string>
     <string name="tab_bar_position_bottom_desc">Selalu di bagian bawah layar</string>
-    <string name="pref_menu_style_title">Gaya Menu</string>
-    <string name="menu_style_popup">Menu Pop-up</string>
-    <string name="menu_style_popup_desc">Menu ringkas yang muncul di dekat toolbar</string>
-    <string name="menu_style_bottom_sheet">Sheet Bawah</string>
-    <string name="menu_style_bottom_sheet_desc">Menu selebar layar yang muncul dari bawah</string>
     <string name="menu_customization_title">Sesuaikan Menu</string>
     <string name="menu_customization_settings_summary">Sembunyikan, tampilkan, dan ubah urutan item menu</string>
     <string name="menu_customization_description">Tarik tuas untuk mengubah urutan. Nonaktifkan item yang tidak ingin Anda lihat di menu.</string>
@@ -421,9 +416,6 @@
     <string name="about_library_markwon_label">Markwon oleh Noties</string>
     <string name="about_library_markwon_license">Apache License 2.0 ↗</string>
     <string name="about_library_markwon_usage">Merender konten Markdown dari GitHub untuk ditampilkan di aplikasi.</string>
-    <string name="about_library_material_label">Material Components oleh Google</string>
-    <string name="about_library_material_license">Apache License 2.0 ↗</string>
-    <string name="about_library_material_usage">Sheet bawah, kartu, dialog, dan elemen UI lain yang mengikuti Material Design.</string>
     <string name="about_library_okhttp_label">OkHttp oleh Square</string>
     <string name="about_library_okhttp_license">Apache License 2.0 ↗</string>
     <string name="about_library_okhttp_usage">Menangani permintaan jaringan di seluruh aplikasi, termasuk pemeriksaan pembaruan, penampil dokumen, pemuatan gambar di browser, download, dan banyak lagi.</string>
@@ -442,9 +434,6 @@
     <string name="about_library_media3_label">AndroidX Media3</string>
     <string name="about_library_media3_license">Apache License 2.0 ↗</string>
     <string name="about_library_media3_usage">Digunakan untuk menggabungkan trek video dan audio yang didownload menjadi satu file.</string>
-    <string name="about_library_colorpicker_label">ColorPicker Compose</string>
-    <string name="about_library_colorpicker_license">Apache License 2.0 ↗</string>
-    <string name="about_library_colorpicker_usage">Menjalankan roda warna HSV dan penggeser kecerahan di pemilih warna kustom.</string>
     <string name="about_linktree_url">jhaiian ↗</string>
     <string name="open_in_app_dialog_title">Buka di aplikasi?</string>
     <string name="open_in_app_dialog_message">%1$s ingin membuka %2$s.</string>
@@ -761,7 +750,6 @@
     <string name="setup_layout_title">Tata Letak Browser</string>
     <string name="setup_layout_subtitle">Atur susunan antarmuka browser. Anda bisa menyesuaikannya lagi kapan saja di Setelan.</string>
     <string name="setup_section_address_bar">POSISI KOLOM ALAMAT</string>
-    <string name="setup_section_menu_style">GAYA MENU</string>
     <string name="setup_section_nested_scroll">NESTED SCROLL</string>
     <string name="setup_section_status_bar">STATUS BAR</string>
     <string name="setup_accent_section_label">WARNA AKSEN</string>

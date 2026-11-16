@@ -38,11 +38,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import com.simplefox.browser.ui.foundation.Icon
+import com.simplefox.browser.ui.foundation.IconButton
+import com.simplefox.browser.ui.foundation.Surface
+import com.simplefox.browser.ui.foundation.Text
+import com.simplefox.browser.ui.foundation.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -247,7 +247,7 @@ private fun ClintYearGrid(selectedYear: Int, onYearSelected: (Int) -> Unit, modi
 }
 
 @Composable
-private fun ClintCalendar(
+internal fun ClintCalendar(
     displayedMonth: YearMonth,
     onDisplayedMonthChange: (YearMonth) -> Unit,
     selectedDate: LocalDate,
@@ -427,7 +427,7 @@ private fun ClintWheelColumn(
 }
 
 @Composable
-private fun ClintTimeWheels(
+internal fun ClintTimeWheels(
     hour: Int,
     minute: Int,
     is24Hour: Boolean,

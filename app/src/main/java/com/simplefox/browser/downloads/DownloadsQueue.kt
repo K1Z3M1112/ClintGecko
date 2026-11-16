@@ -48,9 +48,9 @@ import androidx.compose.material.icons.filled.Speed
 import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material.icons.filled.Wifi
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Text
+import com.simplefox.browser.ui.foundation.Icon
+import com.simplefox.browser.ui.foundation.IconButton
+import com.simplefox.browser.ui.foundation.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState

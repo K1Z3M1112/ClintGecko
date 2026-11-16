@@ -1,7 +1,7 @@
 package com.simplefox.browser.ui
 
-import androidx.compose.material3.Slider
-import androidx.compose.material3.SliderDefaults
+import com.simplefox.browser.ui.foundation.Slider
+import com.simplefox.browser.ui.foundation.SliderDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.simplefox.browser.ui.theme.LocalClintColors

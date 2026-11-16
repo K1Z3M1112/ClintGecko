@@ -1,7 +1,7 @@
 package com.simplefox.browser.ui
 
-import androidx.compose.material3.RadioButton
-import androidx.compose.material3.RadioButtonDefaults
+import com.simplefox.browser.ui.foundation.RadioButton
+import com.simplefox.browser.ui.foundation.RadioButtonDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.simplefox.browser.ui.theme.LocalClintColors

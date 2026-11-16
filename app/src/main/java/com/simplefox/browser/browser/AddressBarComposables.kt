@@ -35,11 +35,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.draw.clip
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
-import androidx.compose.material3.LocalTextStyle
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
+import com.simplefox.browser.ui.foundation.CircularProgressIndicator
+import com.simplefox.browser.ui.foundation.Icon
+import com.simplefox.browser.ui.foundation.LocalTextStyle
+import com.simplefox.browser.ui.foundation.Surface
+import com.simplefox.browser.ui.foundation.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState

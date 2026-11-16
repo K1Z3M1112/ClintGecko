@@ -145,7 +145,6 @@ fun LookAndFeelPane(activity: SettingsActivity) {
             initialLanguage = prefs.getString(LocaleHelper.PREF_APP_LANGUAGE, LocaleHelper.LANGUAGE_SYSTEM) ?: LocaleHelper.LANGUAGE_SYSTEM,
             initialScrollHideMode = prefs.getString("scroll_hide_mode", "off") ?: "off",
             initialAddressBarPosition = prefs.getString("address_bar_position", "bottom") ?: "bottom",
-            initialMenuStyle = prefs.getString("menu_style", "popup") ?: "popup",
             initialHideStatusBar = prefs.getBoolean("hide_status_bar", false),
             initialHideSystemNavigation = prefs.getBoolean("hide_system_navigation", false),
             initialShowHomeButton = prefs.getBoolean("show_home_button", true),
@@ -162,7 +161,6 @@ fun LookAndFeelPane(activity: SettingsActivity) {
     OnResume {
         uiState.scrollHideMode = prefs.getString("scroll_hide_mode", "off") ?: "off"
         uiState.addressBarPosition = prefs.getString("address_bar_position", "bottom") ?: "bottom"
-        uiState.menuStyle = prefs.getString("menu_style", "popup") ?: "popup"
         uiState.hideStatusBar = prefs.getBoolean("hide_status_bar", false)
         uiState.hideSystemNavigation = prefs.getBoolean("hide_system_navigation", false)
         uiState.showHomeButton = prefs.getBoolean("show_home_button", true)
@@ -318,11 +316,6 @@ fun LookAndFeelPane(activity: SettingsActivity) {
         onIntensitySelected = { newIntensity -> uiState.openDialog = null; activity.captureAndApplySurfaceIntensity(newIntensity) },
         onLanguageSelected = { newLanguage -> uiState.openDialog = null; activity.captureAndApplyLanguage(newLanguage) },
         onAddressBarPositionSelected = ::selectAddressBarPosition,
-        onMenuStyleSelected = { style ->
-            prefs.edit().putString("menu_style", style).apply()
-            uiState.menuStyle = style
-            uiState.openDialog = null
-        },
         onScrollHideModeSelected = ::selectScrollHideMode,
         onHideStatusBarRowClicked = ::onHideStatusBarRowClicked,
         onHideSystemNavigationRowClicked = ::onHideSystemNavigationRowClicked,

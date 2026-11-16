@@ -10,10 +10,12 @@ class MenuCustomizationEntry(val item: CustomizableMenuItem, visible: Boolean) {
     var visible by mutableStateOf(visible)
 }
 
-class MenuCustomizationUiState(initialEntries: List<MenuCustomizationEntry>) {
+class MenuCustomizationUiState(initialEntries: List<MenuCustomizationEntry>, initialRows: Int = 1) {
+    var rows by mutableStateOf(initialRows)
     val entries = mutableStateListOf<MenuCustomizationEntry>().apply { addAll(initialEntries) }
 
-    fun replaceAll(newEntries: List<MenuCustomizationEntry>) {
+    fun replaceAll(newEntries: List<MenuCustomizationEntry>, newRows: Int = rows) {
+        rows = newRows
         entries.clear()
         entries.addAll(newEntries)
     }

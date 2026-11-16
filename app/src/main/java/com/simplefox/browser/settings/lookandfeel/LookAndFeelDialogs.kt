@@ -13,8 +13,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import com.simplefox.browser.ui.ClintRadioButton
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import com.simplefox.browser.ui.foundation.Text
+import com.simplefox.browser.ui.foundation.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -37,7 +37,6 @@ import com.simplefox.browser.setup.AddressBarPreview
 import com.simplefox.browser.setup.CheckSlot
 import com.simplefox.browser.setup.DefaultChip
 import com.simplefox.browser.setup.DrawableImage
-import com.simplefox.browser.setup.MenuStylePreview
 import com.simplefox.browser.setup.ScrollHidePreview
 import com.simplefox.browser.setup.SelectableCard
 import com.simplefox.browser.setup.navBarSlotDescRes
@@ -361,45 +360,6 @@ fun TabBarPositionDialog(
                     Text(stringResource(descRes), color = colors.secondaryText, fontSize = 12.sp, modifier = Modifier.padding(top = 2.dp))
                 }
                 CheckSlot(current == key, colors.primary)
-            }
-        }
-    }
-}
-
-@Composable
-fun MenuStyleDialog(
-    current: String,
-    addressBarPosition: String,
-    theme: String,
-    accent: String,
-    hideStatusBar: Boolean, hideSystemNavigation: Boolean,
-    onSelect: (String) -> Unit,
-    onDismiss: () -> Unit
-) {
-    val colors = LocalClintColors.current
-    val (bg, surface) = rememberBgSurface(theme, accent)
-    val onSurface = colors.onSurface
-    val panelBg = colors.popupBackground
-    val scrollState = rememberScrollState()
-
-    ClintDialog(title = stringResource(R.string.pref_menu_style_title), hideStatusBar = hideStatusBar, hideSystemNavigation = hideSystemNavigation, onDismiss = onDismiss, scrollState = scrollState) {
-        data class MenuOption(val key: String, val variant: String, val titleRes: Int, val descRes: Int)
-        listOf(
-            MenuOption("popup", "popup", R.string.menu_style_popup, R.string.menu_style_popup_desc),
-            MenuOption("bottom_sheet", "sheet", R.string.menu_style_bottom_sheet, R.string.menu_style_bottom_sheet_desc)
-        ).forEach { option ->
-            SelectableCard(
-                selected = current == option.key, onClick = { onSelect(option.key) },
-                cardBackground = colors.surfaceVariant, primary = colors.primary,
-                contentPadding = OptionContentPadding, bottomSpacing = OptionBottomSpacing,
-                modifier = Modifier.scrollToSelection(scrollState, current == option.key)
-            ) {
-                MenuStylePreview(option.variant, addressBarPosition, bg, surface, onSurface, panelBg)
-                Column(Modifier.weight(1f).padding(start = 12.dp, end = 8.dp)) {
-                    Text(stringResource(option.titleRes), color = colors.onSurface, fontSize = 15.sp, fontWeight = FontWeight.Medium)
-                    Text(stringResource(option.descRes), color = colors.secondaryText, fontSize = 12.sp, modifier = Modifier.padding(top = 2.dp))
-                }
-                CheckSlot(current == option.key, colors.primary)
             }
         }
     }

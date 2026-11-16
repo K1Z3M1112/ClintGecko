@@ -6,9 +6,9 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.HorizontalDivider
+import com.simplefox.browser.ui.foundation.HorizontalDivider
 import com.simplefox.browser.ui.ClintRadioButton
-import androidx.compose.material3.Text
+import com.simplefox.browser.ui.foundation.Text
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember

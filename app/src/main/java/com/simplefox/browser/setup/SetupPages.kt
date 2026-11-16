@@ -21,13 +21,13 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Checkbox
-import androidx.compose.material3.CheckboxDefaults
-import androidx.compose.material3.Icon
+import com.simplefox.browser.ui.foundation.Card
+import com.simplefox.browser.ui.foundation.CardDefaults
+import com.simplefox.browser.ui.foundation.Checkbox
+import com.simplefox.browser.ui.foundation.CheckboxDefaults
+import com.simplefox.browser.ui.foundation.Icon
 import com.simplefox.browser.ui.ClintRadioButton
-import androidx.compose.material3.Text
+import com.simplefox.browser.ui.foundation.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -471,8 +471,8 @@ fun SetupEnginePage(
                     modifier = Modifier.padding(top = 2.dp)
                 )
             }
-            androidx.compose.material3.IconButton(onClick = { customEditorOpen = true }) {
-                androidx.compose.material3.Icon(
+            com.simplefox.browser.ui.foundation.IconButton(onClick = { customEditorOpen = true }) {
+                com.simplefox.browser.ui.foundation.Icon(
                     androidx.compose.material.icons.Icons.Filled.Edit,
                     contentDescription = stringResource(R.string.action_edit),
                     tint = colors.iconTint

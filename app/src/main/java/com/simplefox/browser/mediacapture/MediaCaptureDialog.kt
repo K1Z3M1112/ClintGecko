@@ -38,17 +38,16 @@ import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Subtitles
 import androidx.compose.material.icons.filled.VideoFile
 import androidx.compose.material.icons.filled.VideoLibrary
-import androidx.compose.material3.BottomSheetDefaults
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.Text
-import androidx.compose.material3.rememberModalBottomSheetState
+import com.simplefox.browser.ui.foundation.BottomSheetDefaults
+import com.simplefox.browser.ui.foundation.Button
+import com.simplefox.browser.ui.foundation.ButtonDefaults
+import com.simplefox.browser.ui.foundation.DropdownMenu
+import com.simplefox.browser.ui.foundation.HorizontalDivider
+import com.simplefox.browser.ui.foundation.Icon
+import com.simplefox.browser.ui.foundation.IconButton
+import com.simplefox.browser.ui.foundation.ModalBottomSheet
+import com.simplefox.browser.ui.foundation.Text
+import com.simplefox.browser.ui.foundation.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -78,7 +77,6 @@ import com.simplefox.browser.ui.theme.LocalClintColors
 import com.simplefox.browser.util.formatFileSize
 import java.util.Locale
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MediaCaptureDialog(
     tabId: String,
