@@ -2,6 +2,10 @@ package com.simplefox.browser.browser.sheets
 import com.simplefox.browser.ui.theme.SystemDarkState
 import androidx.compose.material.icons.automirrored.filled.ChromeReaderMode
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Tune
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material.icons.filled.Public
 
@@ -160,7 +164,7 @@ internal fun ContentPreviewSheet(request: ContentPreviewRequest, activity: MainA
                     }
                     if (request.isImageReader) {
                         IconButton(onClick = { showReaderSettings = true }, modifier = Modifier.size(44.dp)) {
-                            Icon(androidx.compose.material.icons.Icons.Filled.Tune, contentDescription = stringResource(R.string.image_reader_settings), tint = colors.iconTint)
+                            Icon(Icons.Filled.Tune, contentDescription = stringResource(R.string.image_reader_settings), tint = colors.iconTint)
                         }
                     }
                     IconButton(onClick = {
@@ -203,7 +207,7 @@ internal fun ContentPreviewSheet(request: ContentPreviewRequest, activity: MainA
                             enabled = request.prevUrl.isNotEmpty(),
                             modifier = Modifier.weight(1f)
                         ) {
-                            Icon(androidx.compose.material.icons.Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null, modifier = Modifier.size(18.dp))
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null, modifier = Modifier.size(18.dp))
                             Text(stringResource(R.string.image_reader_prev), modifier = Modifier.padding(start = 6.dp))
                         }
                         androidx.compose.material3.FilledTonalButton(
@@ -212,7 +216,7 @@ internal fun ContentPreviewSheet(request: ContentPreviewRequest, activity: MainA
                             modifier = Modifier.weight(1f)
                         ) {
                             Text(stringResource(R.string.image_reader_next), modifier = Modifier.padding(end = 6.dp))
-                            Icon(androidx.compose.material.icons.Icons.AutoMirrored.Filled.ArrowForward, contentDescription = null, modifier = Modifier.size(18.dp))
+                            Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = null, modifier = Modifier.size(18.dp))
                         }
                     }
                 }
