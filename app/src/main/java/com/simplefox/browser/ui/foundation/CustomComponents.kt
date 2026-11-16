@@ -72,6 +72,8 @@ import androidx.compose.animation.core.tween
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.semantics.ProgressBarRangeInfo
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.semantics.toggleableState
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.state.ToggleableState
@@ -114,7 +116,7 @@ fun Text(
             fontFamily = fontFamily,
             letterSpacing = letterSpacing,
             textDecoration = textDecoration,
-            textAlign = textAlign,
+            textAlign = textAlign ?: TextAlign.Unspecified,
             lineHeight = lineHeight
         )
     )
@@ -160,7 +162,7 @@ fun Text(
             fontFamily = fontFamily,
             letterSpacing = letterSpacing,
             textDecoration = textDecoration,
-            textAlign = textAlign,
+            textAlign = textAlign ?: TextAlign.Unspecified,
             lineHeight = lineHeight
         )
     )
@@ -184,6 +186,16 @@ fun Icon(
     tint: Color = LocalCustomContentColor.current.takeIf { it != Color.Unspecified } ?: LocalClintColors.current.iconTint
 ) {
     val painter = rememberVectorPainter(imageVector)
+    Image(painter = painter, contentDescription = contentDescription, modifier = modifier, colorFilter = ColorFilter.tint(tint))
+}
+
+@Composable
+fun Icon(
+    painter: Painter,
+    contentDescription: String?,
+    modifier: Modifier = Modifier,
+    tint: Color = LocalCustomContentColor.current.takeIf { it != Color.Unspecified } ?: LocalClintColors.current.iconTint
+) {
     Image(painter = painter, contentDescription = contentDescription, modifier = modifier, colorFilter = ColorFilter.tint(tint))
 }
 
@@ -774,7 +786,7 @@ fun Slider(
     }
     Canvas(
         modifier.height(40.dp)
-            .semantics { role = Role.Slider; progressBarRangeInfo = ProgressBarRangeInfo(value, valueRange, steps) }
+            .semantics { progressBarRangeInfo = ProgressBarRangeInfo(value, valueRange, steps) }
             .pointerInput(enabled, valueRange, steps) {
                 if (enabled) detectTapGestures { point ->
                     val f = (point.x / size.width).coerceIn(0f, 1f)
@@ -884,7 +896,6 @@ fun OutlinedSecureTextField(
                 state = state,
                 modifier = Modifier.weight(1f).onFocusChanged { focused = it.isFocused },
                 enabled = enabled,
-                lineLimits = TextFieldLineLimits.SingleLine,
                 keyboardOptions = keyboardOptions,
                 textStyle = TextStyle(color = LocalClintColors.current.onSurface, fontSize = 15.sp),
                 cursorBrush = androidx.compose.ui.graphics.SolidColor(LocalClintColors.current.primary),
