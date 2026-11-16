@@ -5,12 +5,10 @@ import androidx.compose.material.icons.filled.Update
 
 import com.simplefox.browser.R
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import com.simplefox.browser.ui.listscreen.PopupShape
 import com.simplefox.browser.ui.listscreen.ListMenuItem
 import com.simplefox.browser.ui.theme.LocalClintColors

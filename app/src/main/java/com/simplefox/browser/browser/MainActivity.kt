@@ -34,7 +34,6 @@ import androidx.core.view.WindowCompat
 import androidx.preference.PreferenceManager
 import com.simplefox.browser.base.ClintActivity
 import com.simplefox.browser.R
-import com.simplefox.browser.BuildConfig
 import com.simplefox.browser.crash.CrashHandler
 import com.simplefox.browser.downloads.ClintDownloadManager
 import com.simplefox.browser.tabs.TabManager
@@ -43,7 +42,6 @@ import com.simplefox.browser.ui.ConfirmDialogHostActivity
 import com.simplefox.browser.ui.OverlayHostActivity
 import com.simplefox.browser.ui.SnackbarHostActivity
 import com.simplefox.browser.ui.theme.ClintComposeTheme
-import com.simplefox.browser.ui.theme.ThemeMode
 
 class MainActivity : ClintActivity(), OverlayHostActivity, SnackbarHostActivity, ConfirmDialogHostActivity {
 
@@ -97,6 +95,7 @@ class MainActivity : ClintActivity(), OverlayHostActivity, SnackbarHostActivity,
     internal var nestedScrollActive = false
     internal var canvasTouchActive = false
     internal var swipeGuardBlocked = false
+    internal var pipAspectRatio: android.util.Rational? = null
     internal var contentInsetsUpdatePosted = false
     private var swipeGuardInitX = 0f
     private var swipeGuardInitY = 0f
@@ -513,6 +512,11 @@ class MainActivity : ClintActivity(), OverlayHostActivity, SnackbarHostActivity,
         tabManager.activeTab?.webView?.onResume()
     }
 
+    override fun onUserLeaveHint() {
+        super.onUserLeaveHint()
+        enterVideoPictureInPicture()
+    }
+
     override fun onStop() {
         super.onStop()
         recordBrowsingMode()
@@ -666,7 +670,14 @@ class MainActivity : ClintActivity(), OverlayHostActivity, SnackbarHostActivity,
 
     fun onTabSelected(index: Int) { captureActiveTabThumbnail(); tabManager.switchTo(index); attachActiveWebView() }
     fun onSwipeTabChange(direction: Int): Boolean {
-        val visibleIndices = tabManager.tabs.indices.filter { !tabManager.isGhostTab(tabManager.tabs[it]) }
+        // direction: 1 = swipe right (previous tab), -1 = swipe left (next tab).
+        // Only moves through tabs of the current mode (normal / incognito); no wrap-around at the ends.
+        val activeIncognito = tabManager.activeTab?.isIncognito == true
+        val visibleIndices = tabManager.tabs.indices.filter {
+            val tab = tabManager.tabs[it]
+            !tabManager.isGhostTab(tab) && tab.isIncognito == activeIncognito
+        }
+        if (visibleIndices.size < 2) return false
         val currentPos = visibleIndices.indexOf(tabManager.activeIndex)
         if (currentPos == -1) return false
         val newPos = currentPos - direction
@@ -872,51 +883,6 @@ class MainActivity : ClintActivity(), OverlayHostActivity, SnackbarHostActivity,
     fun onMenuOpenWebsiteBlockerSettings() {
         startActivity(android.content.Intent(this, com.simplefox.browser.blocker.WebsiteBlockerActivity::class.java))
     }
-    fun onMenuReaderMode() {
-        val wv = tabManager.activeTab?.webView ?: return
-        val pageUrl = wv.url ?: return
-        wv.extractReaderContent { raw ->
-            if (isFinishing) return@extractReaderContent
-            val json = runCatching { org.json.JSONObject(raw ?: "") }.getOrNull()
-            val content = json?.optString("content", "").orEmpty()
-            if (json == null || content.isBlank()) {
-                runOnUiThread { Toast.makeText(this, R.string.reader_mode_unavailable, Toast.LENGTH_SHORT).show() }
-                return@extractReaderContent
-            }
-            val title = json.optString("title", "")
-            val prefs = androidx.preference.PreferenceManager.getDefaultSharedPreferences(this)
-            val theme = prefs.getString("app_theme", "system") ?: "system"
-            val isDark = !ThemeMode.isLight(theme)
-            val bgColor = if (isDark) "#121212" else "#ffffff"
-            val textColor = if (isDark) "#e0e0e0" else "#1a1a1a"
-            val secondaryColor = if (isDark) "#aaaaaa" else "#555555"
-            val linkColor = if (isDark) "#90caf9" else "#1a73e8"
-            val html = """<!DOCTYPE html>
-<html>
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<style>
-body{font-family:Georgia,'Times New Roman',serif;font-size:18px;line-height:1.75;max-width:700px;margin:0 auto;padding:16px 20px 32px;background-color:$bgColor;color:$textColor;}
-h1,h2,h3,h4,h5,h6{font-family:-apple-system,sans-serif;line-height:1.3;color:$textColor;}
-a{color:$linkColor;}
-img{max-width:100%;height:auto;display:block;margin:12px auto;}
-pre,code{overflow-x:auto;font-size:14px;}
-blockquote{border-left:3px solid $secondaryColor;margin:0;padding:4px 16px;color:$secondaryColor;}
-figure{margin:12px 0;}
-figcaption{font-size:13px;color:$secondaryColor;text-align:center;margin-top:4px;}
-table{border-collapse:collapse;width:100%;}
-td,th{border:1px solid $secondaryColor;padding:6px 8px;}
-</style>
-</head>
-<body>$content</body>
-</html>"""
-            runOnUiThread {
-                uiState.contentPreviewRequest = com.simplefox.browser.browser.sheets.ContentPreviewRequest.forReaderMode(pageUrl, title, html)
-            }
-        }
-    }
-
     inner class NestedScrollBridge {
         @android.webkit.JavascriptInterface
         fun onNestedScroll(active: Boolean) {
@@ -1066,7 +1032,7 @@ td,th{border:1px solid $secondaryColor;padding:6px 8px;}
         when (prefs.getString("scroll_hide_mode", "off")) {
             "top_only" -> prefs.edit().putString("scroll_hide_mode", "search_bar").apply()
             "bottom_only" -> {
-                val position = prefs.getString("address_bar_position", "top") ?: "top"
+                val position = prefs.getString("address_bar_position", "bottom") ?: "bottom"
                 val newValue = if (position == "bottom") "search_bar" else "navigation_bar"
                 prefs.edit().putString("scroll_hide_mode", newValue).apply()
             }

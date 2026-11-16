@@ -1,5 +1,6 @@
 package com.simplefox.browser.browser.webview
 
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.SharedPreferences
@@ -18,7 +19,6 @@ import com.simplefox.browser.mediacapture.MediaCaptureStore
 import com.simplefox.browser.settings.sitepermissions.SitePermissionActivity
 import com.simplefox.browser.settings.sitepermissions.SitePermissionDatabase
 import com.simplefox.browser.settings.sitepermissions.SitePermissionManager
-import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 
 class ClintWebViewClient(
     private val prefs: SharedPreferences,

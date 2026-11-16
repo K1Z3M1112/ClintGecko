@@ -1,8 +1,7 @@
 package com.simplefox.browser.tabs
 
-import androidx.compose.animation.core.animateFloatAsState
+import com.simplefox.browser.ui.animateFloatAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -24,13 +23,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.DriveFileMove
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Checklist
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.CreateNewFolder
@@ -49,7 +46,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -65,14 +61,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
@@ -112,94 +106,6 @@ internal fun tabGroupDisplayName(group: TabGroup): String =
 @Composable
 internal fun TabGroupDot(color: Int, size: Dp, modifier: Modifier = Modifier) {
     Box(modifier.size(size).clip(CircleShape).background(Color(color)))
-}
-
-@Composable
-internal fun TabGroupBar(
-    state: TabGroupBarState,
-    onSelectTab: (String) -> Unit,
-    onNewTab: () -> Unit,
-    onToggleCollapsed: () -> Unit,
-    onOpenGroup: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    val colors = LocalClintColors.current
-    val listState = rememberLazyListState()
-    val collapsed = state.group.collapsed
-    val activeIndex = state.tabs.indexOfFirst { it.id == state.activeTabId }
-    LaunchedEffect(state.activeTabId, state.tabs.size, collapsed) {
-        if (!collapsed && activeIndex >= 0) listState.animateScrollToItem(activeIndex)
-    }
-    val groupName = tabGroupDisplayName(state.group)
-    val toggleDescription = stringResource(
-        if (collapsed) R.string.tab_group_expand else R.string.tab_group_collapse
-    )
-    val base = Color(state.group.color)
-    val chipContent = if (base.luminance() > 0.55f) Color(0xFF1B1B1F) else Color.White
-    Row(
-        modifier.fillMaxWidth().height(44.dp).padding(horizontal = 8.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Row(
-            Modifier
-                .widthIn(max = 160.dp)
-                .height(30.dp)
-                .clip(RoundedCornerShape(15.dp))
-                .background(base)
-                .combinedClickable(onClick = onToggleCollapsed, onLongClick = onOpenGroup)
-                .semantics { contentDescription = "$groupName, $toggleDescription" }
-                .padding(start = 12.dp, end = 8.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                groupName,
-                color = chipContent,
-                fontSize = 13.sp,
-                fontWeight = FontWeight.SemiBold,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.weight(1f, fill = false)
-            )
-            if (collapsed) {
-                Text(
-                    state.tabs.size.toString(),
-                    color = chipContent.copy(alpha = 0.8f),
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Medium,
-                    modifier = Modifier.padding(start = 6.dp)
-                )
-            }
-            Icon(
-                Icons.Filled.ExpandMore,
-                contentDescription = null,
-                tint = chipContent,
-                modifier = Modifier.padding(start = 2.dp).size(18.dp).rotate(if (collapsed) 0f else 180f)
-            )
-        }
-        if (collapsed) {
-            Spacer(Modifier.weight(1f))
-        } else {
-            LazyRow(
-                state = listState,
-                modifier = Modifier.weight(1f).padding(start = 6.dp),
-                horizontalArrangement = Arrangement.spacedBy(4.dp),
-                contentPadding = PaddingValues(horizontal = 2.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                items(state.tabs, key = { it.id }) { tab ->
-                    TabGroupBarItem(
-                        tab = tab,
-                        active = tab.id == state.activeTabId,
-                        groupColor = state.group.color,
-                        onClick = { onSelectTab(tab.id) }
-                    )
-                }
-            }
-        }
-        IconButton(onClick = onNewTab, modifier = Modifier.size(38.dp)) {
-            Icon(Icons.Filled.Add, contentDescription = stringResource(R.string.tab_group_new_tab_in_group), tint = colors.iconTint)
-        }
-    }
 }
 
 @Composable

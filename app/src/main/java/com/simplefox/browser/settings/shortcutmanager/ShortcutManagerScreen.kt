@@ -1,7 +1,6 @@
 package com.simplefox.browser.settings.shortcutmanager
 
 import android.graphics.Bitmap
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable

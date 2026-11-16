@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="192dp"
+    android:height="192dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <group android:scaleX="1.3" android:scaleY="1.3" android:pivotX="54" android:pivotY="58">
+    <!-- Drop -->
+    <path android:pathData="M54,24 C54,24 36,44 36,59 A18,18 0 0 0 72,59 C72,44 54,24 54,24 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:type="linear"
+                android:startX="40" android:startY="26"
+                android:endX="70" android:endY="78"
+                android:startColor="#22D3EE"
+                android:endColor="#7C3AED" />
+        </aapt:attr>
+    </path>
+
+    <!-- Depth chevron -->
+    <path
+        android:pathData="M45,54 L54,63 L63,54"
+        android:fillColor="#00000000"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="4"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+
+    <!-- Ripples -->
+    <path
+        android:pathData="M36,84 Q54,92 72,84"
+        android:fillColor="#00000000"
+        android:strokeColor="#22D3EE"
+        android:strokeWidth="2.6"
+        android:strokeLineCap="round" />
+    <path
+        android:pathData="M44,89 Q54,93 64,89"
+        android:fillColor="#00000000"
+        android:strokeColor="#7C3AED"
+        android:strokeWidth="2.2"
+        android:strokeLineCap="round" />
+    </group>
+</vector>

@@ -167,15 +167,13 @@ internal fun PartsStrip(
 @Composable
 internal fun ProgressRing(progress: DownloadRowProgress, color: Color, modifier: Modifier = Modifier, strokeWidth: Dp = 4.dp) {
     val track = LocalClintColors.current.primary.copy(alpha = 0.14f)
-    val sweepStart = if (progress is DownloadRowProgress.Indeterminate) {
-        val transition = rememberInfiniteTransition(label = "ring")
-        val angle by transition.animateFloat(
+    val angleState: androidx.compose.runtime.State<Float>? = if (progress is DownloadRowProgress.Indeterminate) {
+        rememberInfiniteTransition(label = "ring").animateFloat(
             initialValue = 0f, targetValue = 360f,
             animationSpec = infiniteRepeatable(tween(1100, easing = LinearEasing), RepeatMode.Restart),
             label = "ring_angle"
         )
-        angle
-    } else 0f
+    } else null
     Canvas(modifier) {
         val stroke = strokeWidth.toPx()
         val arcSize = Size(size.width - stroke, size.height - stroke)
@@ -185,7 +183,7 @@ internal fun ProgressRing(progress: DownloadRowProgress, color: Color, modifier:
             is DownloadRowProgress.Determinate -> if (progress.fraction > 0f) {
                 drawArc(color, -90f, 360f * progress.fraction.coerceIn(0f, 1f), false, topLeft, arcSize, style = Stroke(stroke, cap = StrokeCap.Round))
             }
-            is DownloadRowProgress.Indeterminate -> drawArc(color, sweepStart - 90f, 90f, false, topLeft, arcSize, style = Stroke(stroke, cap = StrokeCap.Round))
+            is DownloadRowProgress.Indeterminate -> drawArc(color, (angleState?.value ?: 0f) - 90f, 90f, false, topLeft, arcSize, style = Stroke(stroke, cap = StrokeCap.Round))
             is DownloadRowProgress.None -> Unit
         }
     }
@@ -314,10 +312,10 @@ internal fun SwipeActionsBox(
                                     value < -threshold -> latestEnd
                                     else -> null
                                 }
-                                scope.launch { offset.animateTo(0f, tween(220)) }
+                                scope.launch { offset.snapTo(0f) }
                                 triggered?.onTrigger?.invoke()
                             },
-                            onDragCancel = { scope.launch { offset.animateTo(0f, tween(220)) } },
+                            onDragCancel = { scope.launch { offset.snapTo(0f) } },
                             onHorizontalDrag = { change, delta ->
                                 val limit = widthPx * 0.55f
                                 val next = (offset.value + delta).coerceIn(

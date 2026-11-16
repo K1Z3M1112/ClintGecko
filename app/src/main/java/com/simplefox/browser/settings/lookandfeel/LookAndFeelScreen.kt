@@ -7,7 +7,6 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Contrast
 import androidx.compose.material.icons.filled.Workspaces
 import androidx.compose.material.icons.filled.Fullscreen
-import androidx.compose.material.icons.filled.GridView
 import androidx.compose.material.icons.filled.Layers
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.MoreVert
@@ -247,15 +246,6 @@ fun LookAndFeelScreen(
                 trailing = {
                     ClintSwitch(checked = state.tabGroupsEnabled)
                 }
-            )
-            RowDivider(colors.divider)
-            SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.Layers,
-                title = stringResource(R.string.pref_tab_group_bar_position_title),
-                summary = stringResource(tabBarPositionSummaryRes(state.tabGroupBarPosition)),
-                colors = colors,
-                enabled = state.tabGroupsEnabled,
-                onClick = { if (state.tabGroupsEnabled) state.openDialog = LookAndFeelDialog.TAB_GROUP_BAR_POSITION }
             )
         }
 

@@ -7,23 +7,19 @@
     <string name="refresh">रीफ़्रेश करें</string>
     <string name="home">होम</string>
     <string name="menu">मेन्यू</string>
-    <string name="tabs">टैब</string>
     <string name="tabs_section_normal">सामान्य टैब</string>
     <string name="tabs_section_incognito">गुप्त टैब</string>
     <string name="settings">सेटिंग</string>
     <string name="settings_select_category">सेटिंग देखने के लिए कोई कैटगरी चुनें</string>
     <string name="share_url">यूआरएल शेयर करें</string>
-    <string name="downloading">डाउनलोड हो रहा है…</string>
     <string name="privacy_settings">निजता और सुरक्षा</string>
     <string name="browser_settings">ब्राउज़र</string>
     <string name="browser_settings_summary">सर्च, होमपेज, टैब, एक्सटेंशन, प्रोफ़ाइल और वेबसाइट ब्लॉकर</string>
     <string name="pref_category_appearance">रंग-रूप</string>
-    <string name="pref_category_layout">लेआउट</string>
     <string name="pref_category_search">सर्च</string>
     <string name="pref_category_protection">कॉन्टेंट ब्लॉकर</string>
     <string name="pref_category_navigation">नेविगेशन</string>
     <string name="pref_category_language">भाषा</string>
-    <string name="pref_category_shortcuts">शॉर्टकट</string>
     <string name="pref_category_tabs">टैब</string>
     <string name="pref_category_web_content">वेब कॉन्टेंट</string>
     <string name="pref_category_tools">टूल</string>
@@ -280,12 +276,10 @@
     <string name="menu_customization_reset_confirm_title">मेन्यू रीसेट करना है?</string>
     <string name="menu_customization_reset_confirm_message">इससे डिफ़ॉल्ट क्रम वापस आ जाएगा और मेन्यू के सभी आइटम फिर से दिखने लगेंगे.</string>
     <string name="menu_customization_reset_action">रीसेट करें</string>
-    <string name="pref_updates_title">अपडेट</string>
     <string name="download_settings_title">डाउनलोड</string>
     <string name="download_settings_summary">डाउनलोड मैनेजर, जगह, शेड्यूल, स्पीड लिमिट और दोबारा कोशिश</string>
     <string name="download_section_manager">डाउनलोड मैनेजर</string>
     <string name="download_manager_title">डाउनलोड मैनेजर</string>
-    <string name="download_manager_summary">चुनें कि नए डाउनलोड कौनसा ऐप संभालेगा</string>
     <string name="download_manager_dialog_title">डाउनलोड मैनेजर चुनें</string>
     <string name="download_manager_option_clint">SimpleFox (डिफ़ॉल्ट)</string>
     <string name="download_manager_option_1dm">1DM</string>
@@ -392,17 +386,6 @@
     <string name="download_status_retrying">दोबारा कोशिश हो रही है&#8230;</string>
     <string name="download_status_retrying_in">%1$d सेकंड में दोबारा कोशिश&#8230;</string>
     <string name="download_retry_hint">हो सकता है डाउनलोड लिंक की समय-सीमा खत्म हो गई हो. आइटम मेन्यू में &#8220;लिंक अपडेट करें&#8221; से इसे अपडेट करके देखें, या नया लिंक पाने के लिए &#8220;ब्राउज़र में लिंक अपडेट करें&#8221; इस्तेमाल करें.</string>
-    <string name="pref_updates_summary">अपने-आप जांच, मीटर्ड नेटवर्क और बीटा चैनल</string>
-    <string name="check_update_on_launch_title">ऐप खुलने पर अपडेट जांचें</string>
-    <string name="check_update_on_launch_summary">ऐप शुरू होने पर हर बार नए वर्शन की जांच अपने-आप करें</string>
-    <string name="skip_update_on_metered_title">मोबाइल डेटा या मीटर्ड कनेक्शन पर, ऐप खुलने पर अपडेट न जांचें</string>
-    <string name="skip_update_on_metered_summary">मीटर्ड या मोबाइल डेटा कनेक्शन इस्तेमाल करते समय, ऐप खुलने पर अपडेट की जांच न करें</string>
-    <string name="check_for_updates_title">अपडेट जांचें</string>
-    <string name="check_for_updates_summary">नए स्टेबल या बीटा वर्शन की अभी जांच करें</string>
-    <string name="view_changelog_title">बदलावों की सूची देखें</string>
-    <string name="view_changelog_summary">देखें कि हर वर्शन में क्या नया है</string>
-    <string name="beta_channel_title">बीटा में शामिल हों</string>
-    <string name="beta_channel_summary">स्टेबल वर्शन आने से पहले ही नए बिल्ड पाएं. इनमें बग हो सकते हैं.</string>
     <string name="debug_title">डीबग और क्रैश रिपोर्ट</string>
     <string name="debug_summary">क्रैश लॉग और बग रिपोर्ट का तैयार टेम्प्लेट</string>
     <string name="crash_reports_title">क्रैश लॉग</string>
@@ -484,8 +467,6 @@
     <string name="menu_downloads">डाउनलोड</string>
     <string name="menu_bookmarks">बुकमार्क</string>
     <string name="menu_history">हिस्ट्री</string>
-    <string name="reader_mode">रीडर मोड</string>
-    <string name="reader_mode_unavailable">इस पेज पर रीडर मोड उपलब्ध नहीं है</string>
 
     <string name="action_ok">ठीक है</string>
     <string name="action_add">जोड़ें</string>
@@ -572,7 +553,6 @@
     <string name="download_menu_copy_filename">फ़ाइल का नाम कॉपी करें</string>
     <string name="download_menu_copy_path">फ़ाइल का पाथ कॉपी करें</string>
     <string name="download_menu_properties">प्रॉपर्टी</string>
-    <string name="download_multi_options_desc">और विकल्प</string>
     <string name="redownload_multi_confirm_title">%1$d आइटम फिर से डाउनलोड करने हैं?</string>
     <string name="redownload_multi_confirm_message">मौजूदा फ़ाइलें मिटाकर फिर से डाउनलोड की जाएंगी. जारी रखें?</string>
     <string name="download_menu_link_copied">लिंक कॉपी हो गया</string>
@@ -684,28 +664,11 @@
     <string name="restart_required_message">यह बदलाव लागू करने के लिए ऐप को रीस्टार्ट करना होगा.</string>
     <string name="restart_required_confirm">अभी रीस्टार्ट करें</string>
 
-    <string name="beta_enrol_title">बीटा में शामिल हों</string>
-    <string name="beta_enrol_message">बीटा वर्शन से आपको नई सुविधाएं स्टेबल चैनल पर आने से पहले ही मिल जाती हैं.\n\nबीटा बिल्ड में बग, अधूरी सुविधाएं या अनचाहा व्यवहार हो सकता है. अपने मुख्य डिवाइस पर रोज़ाना इस्तेमाल के लिए इनकी सलाह नहीं दी जाती.\n\nआप कभी भी स्टेबल पर वापस जा सकते हैं.</string>
-    <string name="beta_enrol_confirm">शामिल हों</string>
 
-    <string name="update_dialog_title">v%1$s%2$s उपलब्ध है</string>
-    <string name="update_dialog_skip">यह वर्शन छोड़ें</string>
-    <string name="update_dialog_download">डाउनलोड करें</string>
-    <string name="update_dialog_view_github">GitHub पर देखें</string>
-    <string name="update_download_dialog_title">अपडेट डाउनलोड हो रहा है</string>
-    <string name="update_download_preparing">तैयारी हो रही है…</string>
-    <string name="update_download_in_progress">अपडेट डाउनलोड हो रहा है…</string>
-    <string name="update_download_progress_size_known">%1$s / %2$s (%3$d%%)</string>
-    <string name="update_download_progress_size_unknown">%1$s डाउनलोड हुआ</string>
-    <string name="update_up_to_date_title">आपका ऐप अप-टू-डेट है</string>
-    <string name="update_up_to_date_message">SimpleFox का सबसे नया वर्शन चल रहा है.</string>
-    <string name="update_check_failed_title">अपडेट की जांच नहीं हो सकी</string>
-    <string name="update_check_failed_message">अपडेट सर्वर तक नहीं पहुंचा जा सका. अपना कनेक्शन जांचें और फिर से कोशिश करें.</string>
 
     <string name="download_status_progress">%1$d%%  •  %2$s / %3$s</string>
     <string name="download_status_progress_unknown_total">%1$d%%  •  %2$s / ?</string>
     <string name="download_status_progress_indeterminate">%1$s / ?</string>
-    <string name="download_status_complete_label">पूरा हुआ</string>
     <string name="download_status_failed_label">नहीं हो सका</string>
     <string name="download_info_with_time">%1$s  •  %2$s</string>
     <string name="download_error_unknown">अनजान गड़बड़ी</string>
@@ -780,10 +743,6 @@
     <string name="action_play">चलाएं</string>
     <string name="action_pause">रोकें</string>
     <string name="action_resume">फिर से शुरू करें</string>
-    <string name="download_pause_desc">डाउनलोड रोकें</string>
-    <string name="download_resume_desc">डाउनलोड फिर से शुरू करें</string>
-    <string name="download_resumable_yes">फिर से शुरू: हां</string>
-    <string name="download_resumable_no">फिर से शुरू: नहीं</string>
 
     <string name="setup_default_browser_title">डिफ़ॉल्ट ब्राउज़र</string>
     <string name="setup_default_browser_description">SimpleFox को अपना डिफ़ॉल्ट ब्राउज़र बनाएं, ताकि दूसरे ऐप के लिंक अपने-आप यहीं खुलें. यह पूरी तरह आपकी मर्ज़ी है, आप इसे कभी भी डिवाइस की सेटिंग में बदल सकते हैं.</string>
@@ -795,7 +754,6 @@
     <string name="document_viewer_error">दस्तावेज़ लोड नहीं हो सका.\nअपना कनेक्शन जांचें और फिर से कोशिश करें.</string>
     <string name="document_viewer_privacy_policy_title">निजता नीति</string>
     <string name="document_viewer_terms_title">सेवा की शर्तें</string>
-    <string name="document_viewer_changelog_title">बदलावों की सूची</string>
     <string name="setup_theme_title">अपनी थीम चुनें</string>
     <string name="setup_theme_subtitle">अपनी पसंद का लुक चुनें. आप इसे बाद में सेटिंग में कभी भी बदल सकते हैं.</string>
 
@@ -950,7 +908,6 @@
 
     <string name="setup_welcome_title">SimpleFox में आपका स्वागत है</string>
     <string name="setup_welcome_subtitle">शुरू करने से पहले, कृपया हमारी शर्तें पढ़ लें.</string>
-    <string name="setup_terms_read">पढ़ें</string>
     <string name="setup_terms_agree">मैंने निजता नीति और सेवा की शर्तें पढ़ ली हैं और मैं इनसे सहमत हूं</string>
     <string name="setup_terms_continue">सहमत हूं और जारी रखें</string>
 
@@ -973,7 +930,6 @@
     <string name="bookmarks_delete_confirm_message">%d बुकमार्क मिटाने हैं?</string>
     <string name="bookmarks_items_deleted">बुकमार्क मिटा दिए गए</string>
     <string name="bookmarks_sort_by_date_added">जोड़ने की तारीख</string>
-    <string name="bookmarks_new_folder_desc">नया फ़ोल्डर</string>
     <string name="bookmarks_new_folder_title">नया फ़ोल्डर</string>
     <string name="bookmarks_folder_name_hint">फ़ोल्डर का नाम</string>
     <string name="bookmarks_folder_create">बनाएं</string>
@@ -1004,7 +960,6 @@
     <string name="bookmarks_export_error">बुकमार्क एक्सपोर्ट नहीं हो सके</string>
 
     <string name="downloads_title">डाउनलोड</string>
-    <string name="downloads_empty">अभी तक कोई डाउनलोड नहीं है</string>
     <string name="downloads_filter_all">सभी</string>
     <string name="downloads_type_video">वीडियो</string>
     <string name="downloads_type_audio">ऑडियो</string>
@@ -1108,7 +1063,6 @@
     <string name="downloads_sort_by_size">साइज़</string>
     <string name="downloads_sort_by_status">स्थिति</string>
     <string name="downloads_selected_count">%d चुने गए</string>
-    <string name="downloads_delete_selected_desc">चुने गए डाउनलोड हटाएं</string>
     <string name="downloads_delete_confirm_title">डाउनलोड हटाएं</string>
     <string name="downloads_delete_confirm_message">%d डाउनलोड हटाने हैं?</string>
     <string name="downloads_delete_also_from_storage">फ़ाइल को स्टोरेज से भी मिटाएं</string>
@@ -1206,7 +1160,6 @@
     <string name="menu_website_blocker">वेबसाइट ब्लॉकर</string>
     <string name="about_webview_label">इंजन</string>
     <string name="about_webview_info">%1$s\n%2$s\nv%3$s</string>
-    <string name="about_webview_unavailable">उपलब्ध नहीं</string>
 
     <string name="suggestion_icon_desc">सर्च सुझाव</string>
     <string name="suggestion_fill_desc">सर्च बार में भरें</string>
@@ -1265,7 +1218,6 @@
     <string name="history_invert_selection">उलटा चुनें</string>
     <string name="history_deselect_all">सभी से चुनाव हटाएं</string>
     <string name="history_delete_selected">मिटाएं</string>
-    <string name="history_delete_selected_desc">चुने गए आइटम मिटाएं</string>
     <string name="history_sort">क्रम से लगाएं</string>
     <string name="history_sort_by_title">शीर्षक</string>
     <string name="history_sort_by_last_visit">पिछली बार देखा गया</string>
@@ -1390,7 +1342,6 @@
     <string name="tab_menu_invert_selection">उलटा चुनें</string>
     <string name="tab_menu_delete_selected">चुने गए टैब मिटाएं</string>
     <string name="tab_menu_drag_handle_desc">क्रम बदलने के लिए खींचें</string>
-    <string name="tab_menu_select_tab_desc">टैब चुनें</string>
     <string name="tab_group_new">नया टैब ग्रुप</string>
     <string name="tab_group_new_tab_in_group">ग्रुप में नया टैब</string>
     <string name="tab_group_edit">नाम और रंग बदलें</string>
@@ -1409,7 +1360,6 @@
     <string name="tab_group_expand_all">सभी ग्रुप बड़े करें</string>
     <string name="tab_group_bar_show">ग्रुप बार दिखाएं</string>
     <string name="tab_group_options_desc">ग्रुप के विकल्प</string>
-    <string name="tab_group_bar_open_desc">टैब स्विचर में %1$s दिखाएं</string>
     <string name="tab_group_move_title">ग्रुप में ले जाएं</string>
     <string name="tab_group_closed_message">“%1$s” ग्रुप बंद किया गया</string>
     <string name="tab_selection_group">ग्रुप बनाएं</string>
@@ -1483,8 +1433,6 @@
 
     <string name="data_saver_browser_section">ब्राउज़र</string>
 
-    <string name="update_section_updates">अपडेट</string>
-    <string name="update_section_channel">चैनल</string>
 
     <string name="misc_section_app">ऐप</string>
     <string name="misc_section_setup">सेटअप</string>
@@ -1621,8 +1569,6 @@
 
     <string name="website_blocker_title">वेबसाइट ब्लॉकर</string>
     <string name="website_blocker_settings_summary">पोर्नोग्राफ़ी, जुआ और दूसरी वेबसाइटें ब्लॉक करें.</string>
-    <string name="website_blocker_status_working">काम चल रहा है…</string>
-    <string name="website_blocker_status_active">%d जाने-माने डोमेन से आपकी सुरक्षा कर रहा है</string>
     <string name="website_blocker_fab_save_desc">बदलाव सेव और लागू करें</string>
     <string name="website_blocker_compile_failed">ब्लॉकलिस्ट अपडेट नहीं हो सकी. कृपया फिर से कोशिश करें.</string>
     <string name="website_blocker_delete_confirm_title">कैटगरी रीसेट करनी है?</string>
@@ -1703,7 +1649,6 @@
     <string name="additional_websites_invalid_host">सही डोमेन डालें, जैसे example.com</string>
     <string name="additional_websites_delete_confirm_title">वेबसाइट मिटानी है?</string>
     <string name="additional_websites_delete_confirm_message">इससे चुनी गई %d वेबसाइटें \"दूसरी वेबसाइटें\" से मिट जाएंगी.</string>
-    <string name="select_picker_default_title">कोई विकल्प चुनें</string>
 
     <string name="menu_media_capture">मीडिया</string>
     <string name="media_capture_dialog_title">मिला हुआ मीडिया</string>
@@ -1717,14 +1662,12 @@
     <string name="media_capture_section_video">वीडियो</string>
     <string name="media_capture_section_audio">ऑडियो</string>
     <string name="media_capture_section_subtitles">सबटाइटल</string>
-    <string name="media_capture_downloads_not_supported_yet">मिली हुई स्ट्रीम को डाउनलोड करने की सुविधा अभी उपलब्ध नहीं है. किसी और जगह खोलने के लिए लिंक कॉपी करें.</string>
     <string name="media_capture_live_badge">लाइव</string>
     <string name="media_capture_no_audio_badge">ऑडियो नहीं</string>
     <string name="media_capture_best_badge">सबसे अच्छा</string>
     <string name="media_capture_sort_quality">क्वालिटी</string>
     <string name="media_capture_sort_newest">सबसे नए पहले</string>
     <string name="media_capture_sort_oldest">सबसे पुराने पहले</string>
-    <string name="media_capture_copy_link">लिंक कॉपी करें</string>
     <string name="media_capture_download">डाउनलोड करें</string>
     <string name="media_capture_duplicate_link_updated">डाउनलोड लिंक अपडेट हो गया</string>
     <string name="media_capture_link_clip_label">मीडिया यूआरएल</string>
@@ -1740,7 +1683,6 @@
     <string name="media_capture_menu_preview">झलक देखें</string>
     <string name="media_capture_subtitle_preview_title">सबटाइटल की झलक</string>
     <string name="media_capture_subtitle_preview_error">सबटाइटल लोड नहीं हो सका.\nअपना कनेक्शन जांचें और फिर से कोशिश करें.</string>
-    <string name="media_capture_video_preview_title">वीडियो की झलक</string>
     <string name="media_capture_video_preview_error">वीडियो नहीं चल सका.\nअपना कनेक्शन जांचें और फिर से कोशिश करें.</string>
     <string name="media_capture_audio_preview_title">ऑडियो की झलक</string>
     <string name="media_capture_audio_preview_error">ऑडियो नहीं चल सका.\nअपना कनेक्शन जांचें और फिर से कोशिश करें.</string>

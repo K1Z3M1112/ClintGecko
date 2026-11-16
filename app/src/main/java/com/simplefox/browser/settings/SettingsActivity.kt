@@ -21,7 +21,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.activity.compose.BackHandler
-import androidx.compose.animation.AnimatedContent
+import com.simplefox.browser.ui.AnimatedContent
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
@@ -41,14 +41,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.view.WindowCompat
 import androidx.preference.PreferenceManager
-import com.simplefox.browser.BuildConfig
 import com.simplefox.browser.R
 import com.simplefox.browser.base.ClintActivity
 import com.simplefox.browser.settings.backuprestore.BackupRestorePane
@@ -58,7 +56,6 @@ import com.simplefox.browser.settings.main.MainSettingsEntry
 import com.simplefox.browser.settings.main.MainSettingsScreen
 import com.simplefox.browser.settings.search.SettingsSearchResults
 import com.simplefox.browser.settings.search.SettingsSearchToolbar
-import com.simplefox.browser.ui.DocumentViewer
 import com.simplefox.browser.ui.OverlayHostActivity
 import com.simplefox.browser.ui.theme.ClintComposeTheme
 import com.simplefox.browser.ui.theme.LocalClintColors
@@ -96,7 +93,7 @@ class SettingsActivity : ClintActivity(), OverlayHostActivity {
         val prefs = PreferenceManager.getDefaultSharedPreferences(this)
         hideStatusBarAtLaunch = prefs.getBoolean("hide_status_bar", false)
         hideSystemNavigationAtLaunch = prefs.getBoolean("hide_system_navigation", false)
-        addressBarPositionAtLaunch = prefs.getString("address_bar_position", "top") ?: "top"
+        addressBarPositionAtLaunch = prefs.getString("address_bar_position", "bottom") ?: "bottom"
         val theme = prefs.getString("app_theme", "system") ?: "system"
 
         val initialDestination = when (intent.getStringExtra(EXTRA_OPEN_FRAGMENT)) {
@@ -121,7 +118,7 @@ class SettingsActivity : ClintActivity(), OverlayHostActivity {
         val effectiveHideSystemNavigation = pendingHideSystemNavigation ?: prefs.getBoolean("hide_system_navigation", false)
         val statusBarChanged = effectiveHideStatusBar != hideStatusBarAtLaunch
         val navigationChanged = effectiveHideSystemNavigation != hideSystemNavigationAtLaunch
-        val positionChanged = (prefs.getString("address_bar_position", "top") ?: "top") != addressBarPositionAtLaunch
+        val positionChanged = (prefs.getString("address_bar_position", "bottom") ?: "bottom") != addressBarPositionAtLaunch
         pendingRestart = statusBarChanged || navigationChanged || positionChanged
     }
 

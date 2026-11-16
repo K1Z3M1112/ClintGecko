@@ -1,14 +1,12 @@
 package com.simplefox.browser.browser.sheets
 import com.simplefox.browser.ui.theme.SystemDarkState
-import androidx.compose.material.icons.automirrored.filled.ChromeReaderMode
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material.icons.filled.Public
 
 import android.annotation.SuppressLint
 import android.graphics.Bitmap
-import android.os.Handler
-import android.os.Looper
 import com.simplefox.browser.browser.webview.ClintWebView
 import com.simplefox.browser.browser.webview.ClintWebChromeClient
 import com.simplefox.browser.browser.webview.ContextMenuInfo
@@ -45,7 +43,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -56,29 +53,18 @@ import com.simplefox.browser.settings.datasaver.DataSaverMode
 import com.simplefox.browser.R
 import com.simplefox.browser.browser.MainActivity
 import com.simplefox.browser.browser.webview.ClintWebViewClient
-import com.simplefox.browser.browser.webview.loadJsAsset
-import com.simplefox.browser.settings.sitepermissions.SitePermissionDatabase
-import com.simplefox.browser.settings.sitepermissions.SitePermissionManager
 import com.simplefox.browser.ui.ClintDialogStatusBarEffect
 import com.simplefox.browser.ui.FaviconCache
 import com.simplefox.browser.ui.theme.LocalClintColors
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 data class ContentPreviewRequest(
     val url: String,
     val isPage: Boolean,
-    val isDesktop: Boolean = false,
-    val isReaderMode: Boolean = false,
-    val readerHtml: String = "",
-    val readerTitle: String = ""
+    val isDesktop: Boolean = false
 ) {
     companion object {
         fun forImage(imageUrl: String) = ContentPreviewRequest(url = imageUrl, isPage = false)
         fun forPage(pageUrl: String, isDesktop: Boolean) = ContentPreviewRequest(url = pageUrl, isPage = true, isDesktop = isDesktop)
-        fun forReaderMode(pageUrl: String, pageTitle: String, html: String) =
-            ContentPreviewRequest(url = pageUrl, isPage = false, isReaderMode = true, readerHtml = html, readerTitle = pageTitle)
     }
 }
 
@@ -93,8 +79,8 @@ internal fun ContentPreviewSheet(request: ContentPreviewRequest, activity: MainA
 
     val host = remember(request.url) { runCatching { java.net.URL(request.url).host }.getOrElse { "" } }
 
-    var titleText by remember { mutableStateOf(if (request.isReaderMode) request.readerTitle.ifEmpty { host } else if (request.isPage) host else request.url.substringAfterLast("/").substringBefore("?").ifEmpty { request.url }) }
-    var urlText by remember { mutableStateOf(if (request.isReaderMode) host.ifEmpty { request.url } else if (request.isPage) request.url else host) }
+    var titleText by remember { mutableStateOf(if (request.isPage) host else request.url.substringAfterLast("/").substringBefore("?").ifEmpty { request.url }) }
+    var urlText by remember { mutableStateOf(if (request.isPage) request.url else host) }
     var favicon by remember { mutableStateOf<Bitmap?>(null) }
     var webViewRef by remember { mutableStateOf<ClintWebView?>(null) }
     var webViewScrollY by remember { mutableIntStateOf(0) }
@@ -104,8 +90,8 @@ internal fun ContentPreviewSheet(request: ContentPreviewRequest, activity: MainA
 
     val quiverGuardPreviewTabId = remember { "preview-" + System.identityHashCode(request) }
 
-    androidx.compose.runtime.LaunchedEffect(request.url, request.isReaderMode, request.isPage) {
-        if ((request.isReaderMode || request.isPage) && request.url.isNotEmpty()) {
+    androidx.compose.runtime.LaunchedEffect(request.url, request.isPage) {
+        if (request.isPage && request.url.isNotEmpty()) {
             val faviconUrl = FaviconCache.faviconUrlFor(request.url)
             if (faviconUrl.isNotEmpty()) {
                 FaviconCache.load(context, faviconUrl) { bmp -> if (bmp != null) favicon = bmp }
@@ -138,7 +124,7 @@ internal fun ContentPreviewSheet(request: ContentPreviewRequest, activity: MainA
                         Image(favicon!!.asImageBitmap(), contentDescription = null, modifier = Modifier.size(20.dp))
                     } else {
                         Icon(
-                            if (request.isReaderMode) androidx.compose.material.icons.Icons.AutoMirrored.Filled.ChromeReaderMode else androidx.compose.material.icons.Icons.Filled.Public,
+                            androidx.compose.material.icons.Icons.Filled.Public,
                             contentDescription = null,
                             tint = colors.iconTint,
                             modifier = Modifier.size(20.dp)
@@ -208,7 +194,7 @@ private fun PreviewWebView(
         item {
             AndroidView(
                 modifier = Modifier.fillParentMaxSize(),
-                update = { wv -> if (!request.isReaderMode) applyPreviewDarkMode(wv.context, wv, systemDark) },
+                update = { wv -> applyPreviewDarkMode(wv.context, wv, systemDark) },
                 factory = { ctx ->
                     val prefs = PreferenceManager.getDefaultSharedPreferences(ctx)
                     val dataSaverEnabled = DataSaverMode.isActive(prefs)
@@ -225,7 +211,7 @@ private fun PreviewWebView(
                         mediaPlaybackRequiresUserGesture = disableAutoplay
                     }
 
-                    if (!request.isReaderMode) applyPreviewDarkMode(ctx, wv, systemDark)
+                    applyPreviewDarkMode(ctx, wv, systemDark)
 
                     wv.scrollListener = { scrollY, _ -> onScrollYChanged(scrollY) }
                     wv.touchObserver = { wv.parent?.requestDisallowInterceptTouchEvent(true) }
@@ -266,9 +252,7 @@ private fun PreviewWebView(
                         }
                     }
 
-                    if (request.isReaderMode) {
-                        wv.loadHtml(request.readerHtml)
-                    } else if (request.url.isNotEmpty()) {
+                    if (request.url.isNotEmpty()) {
                         wv.loadUrl(request.url)
                     }
 

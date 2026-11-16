@@ -14,7 +14,6 @@ import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.FrameLayout
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.ui.graphics.toArgb
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
@@ -188,6 +187,10 @@ abstract class ClintActivity : AppCompatActivity() {
 
     private fun startRevealIfNeeded() {
         val (bmp, cx, cy) = ThemeRevealHolder.consume() ?: return
+        if (!THEME_REVEAL_ANIMATION_ENABLED) {
+            bmp.recycle()
+            return
+        }
         if (isFinishing || isDestroyed) {
             bmp.recycle()
             return
@@ -238,23 +241,6 @@ abstract class ClintActivity : AppCompatActivity() {
         if (hasFocus && openDialogCount == 0) applyStatusBarVisibility()
     }
 
-    fun applyStatusBarFlagToDialog(dialog: android.app.Dialog) {
-        val prefs = PreferenceManager.getDefaultSharedPreferences(this)
-        val hideStatusBar = prefs.getBoolean("hide_status_bar", false)
-        val hideSystemNavigation = prefs.getBoolean("hide_system_navigation", false)
-        if (hideStatusBar || hideSystemNavigation) {
-            dialog.window?.let { dialogWindow ->
-                val dialogController = WindowInsetsControllerCompat(dialogWindow, dialogWindow.decorView)
-                dialogController.systemBarsBehavior =
-                    WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-                if (hideStatusBar) dialogController.hide(WindowInsetsCompat.Type.statusBars())
-                if (hideSystemNavigation) dialogController.hide(WindowInsetsCompat.Type.navigationBars())
-            }
-        }
-        trackDialogShown()
-        dialog.setOnDismissListener { trackDialogDismissed() }
-    }
-
     private fun applyStatusBarVisibility() {
         val prefs = PreferenceManager.getDefaultSharedPreferences(this)
         val hideStatusBar = prefs.getBoolean("hide_status_bar", false)
@@ -275,3 +261,5 @@ abstract class ClintActivity : AppCompatActivity() {
         window.decorView.requestApplyInsets()
     }
 }
+
+private const val THEME_REVEAL_ANIMATION_ENABLED = false

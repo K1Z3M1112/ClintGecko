@@ -7,23 +7,19 @@
     <string name="refresh">Muat ulang</string>
     <string name="home">Beranda</string>
     <string name="menu">Menu</string>
-    <string name="tabs">Tab</string>
     <string name="tabs_section_normal">TAB BIASA</string>
     <string name="tabs_section_incognito">TAB SAMARAN</string>
     <string name="settings">Setelan</string>
     <string name="settings_select_category">Pilih kategori untuk melihat setelannya</string>
     <string name="share_url">Bagikan URL</string>
-    <string name="downloading">Mendownload…</string>
     <string name="privacy_settings">Privasi &amp; Keamanan</string>
     <string name="browser_settings">Browser</string>
     <string name="browser_settings_summary">Penelusuran, halaman beranda, tab, ekstensi, profil, dan pemblokir situs</string>
     <string name="pref_category_appearance">Tampilan</string>
-    <string name="pref_category_layout">Tata letak</string>
     <string name="pref_category_search">Penelusuran</string>
     <string name="pref_category_protection">Pemblokir Konten</string>
     <string name="pref_category_navigation">Navigasi</string>
     <string name="pref_category_language">Bahasa</string>
-    <string name="pref_category_shortcuts">Pintasan</string>
     <string name="pref_category_tabs">Tab</string>
     <string name="pref_category_web_content">Konten web</string>
     <string name="pref_category_tools">Alat</string>
@@ -276,12 +272,10 @@
     <string name="menu_customization_reset_confirm_title">Reset menu?</string>
     <string name="menu_customization_reset_confirm_message">Tindakan ini akan mengembalikan urutan default dan menampilkan lagi semua item menu.</string>
     <string name="menu_customization_reset_action">Reset</string>
-    <string name="pref_updates_title">Pembaruan</string>
     <string name="download_settings_title">Download</string>
     <string name="download_settings_summary">Pengelola download, lokasi, jadwal, batas kecepatan, dan percobaan ulang</string>
     <string name="download_section_manager">PENGELOLA DOWNLOAD</string>
     <string name="download_manager_title">Pengelola Download</string>
-    <string name="download_manager_summary">Pilih aplikasi yang menangani download baru</string>
     <string name="download_manager_dialog_title">Pilih pengelola download</string>
     <string name="download_manager_option_clint">SimpleFox (Default)</string>
     <string name="download_manager_option_1dm">1DM</string>
@@ -388,17 +382,6 @@
     <string name="download_status_retrying">Mencoba lagi&#8230;</string>
     <string name="download_status_retrying_in">Mencoba lagi dalam %1$d dtk&#8230;</string>
     <string name="download_retry_hint">Link download mungkin sudah kedaluwarsa. Coba perbarui melalui opsi &#8220;Perbarui link&#8221; di menu item, atau gunakan &#8220;Perbarui link di browser&#8221; untuk mendapatkan link baru.</string>
-    <string name="pref_updates_summary">Pemeriksaan otomatis, jaringan berkuota, dan saluran beta</string>
-    <string name="check_update_on_launch_title">Periksa pembaruan saat aplikasi dibuka</string>
-    <string name="check_update_on_launch_summary">Otomatis memeriksa versi baru setiap kali aplikasi dibuka</string>
-    <string name="skip_update_on_metered_title">Lewati pemeriksaan pembaruan saat membuka aplikasi jika memakai data seluler atau koneksi berkuota</string>
-    <string name="skip_update_on_metered_summary">Jangan periksa pembaruan saat aplikasi dibuka jika memakai data seluler atau koneksi berkuota</string>
-    <string name="check_for_updates_title">Periksa pembaruan</string>
-    <string name="check_for_updates_summary">Periksa sekarang rilis stabil atau beta terbaru</string>
-    <string name="view_changelog_title">Lihat Log Perubahan</string>
-    <string name="view_changelog_summary">Lihat apa saja yang baru di setiap rilis</string>
-    <string name="beta_channel_title">Ikut Program Beta</string>
-    <string name="beta_channel_summary">Dapatkan build lebih awal sebelum masuk ke versi stabil. Mungkin masih ada bug.</string>
     <string name="debug_title">Debug &amp; Laporan Error</string>
     <string name="debug_summary">Log error dan template laporan bug yang siap pakai</string>
     <string name="crash_reports_title">LOG ERROR</string>
@@ -480,8 +463,6 @@
     <string name="menu_downloads">Download</string>
     <string name="menu_bookmarks">Bookmark</string>
     <string name="menu_history">Histori</string>
-    <string name="reader_mode">Mode Baca</string>
-    <string name="reader_mode_unavailable">Mode baca tidak tersedia di halaman ini</string>
 
     <string name="action_ok">Oke</string>
     <string name="action_add">Tambah</string>
@@ -568,7 +549,6 @@
     <string name="download_menu_copy_filename">Salin nama file</string>
     <string name="download_menu_copy_path">Salin jalur file</string>
     <string name="download_menu_properties">Properti</string>
-    <string name="download_multi_options_desc">Opsi lainnya</string>
     <string name="redownload_multi_confirm_title">Download ulang %1$d item?</string>
     <string name="redownload_multi_confirm_message">File yang ada akan dihapus dan didownload lagi. Lanjutkan?</string>
     <string name="download_menu_link_copied">Link disalin</string>
@@ -680,28 +660,11 @@
     <string name="restart_required_message">Aplikasi perlu dimulai ulang agar perubahan ini berlaku.</string>
     <string name="restart_required_confirm">Mulai ulang sekarang</string>
 
-    <string name="beta_enrol_title">Ikut Program Beta</string>
-    <string name="beta_enrol_message">Rilis beta memberi Anda akses lebih awal ke fitur baru sebelum masuk ke saluran stabil.\n\nBuild beta mungkin masih mengandung bug, fitur yang belum lengkap, atau perilaku yang tidak terduga. Build ini tidak disarankan untuk penggunaan sehari-hari di perangkat utama Anda.\n\nAnda bisa kembali ke versi stabil kapan saja.</string>
-    <string name="beta_enrol_confirm">Ikut</string>
 
-    <string name="update_dialog_title">v%1$s%2$s tersedia</string>
-    <string name="update_dialog_skip">Lewati versi ini</string>
-    <string name="update_dialog_download">Download</string>
-    <string name="update_dialog_view_github">Lihat di GitHub</string>
-    <string name="update_download_dialog_title">Mendownload Pembaruan</string>
-    <string name="update_download_preparing">Menyiapkan…</string>
-    <string name="update_download_in_progress">Mendownload pembaruan…</string>
-    <string name="update_download_progress_size_known">%1$s / %2$s (%3$d%%)</string>
-    <string name="update_download_progress_size_unknown">%1$s terdownload</string>
-    <string name="update_up_to_date_title">Aplikasi sudah versi terbaru</string>
-    <string name="update_up_to_date_message">SimpleFox yang Anda gunakan sudah versi terbaru.</string>
-    <string name="update_check_failed_title">Gagal memeriksa pembaruan</string>
-    <string name="update_check_failed_message">Server pembaruan tidak dapat dijangkau. Periksa koneksi Anda, lalu coba lagi.</string>
 
     <string name="download_status_progress">%1$d%%  •  %2$s / %3$s</string>
     <string name="download_status_progress_unknown_total">%1$d%%  •  %2$s / ?</string>
     <string name="download_status_progress_indeterminate">%1$s / ?</string>
-    <string name="download_status_complete_label">Selesai</string>
     <string name="download_status_failed_label">Gagal</string>
     <string name="download_info_with_time">%1$s  •  %2$s</string>
     <string name="download_error_unknown">Error tidak diketahui</string>
@@ -776,10 +739,6 @@
     <string name="action_play">Putar</string>
     <string name="action_pause">Jeda</string>
     <string name="action_resume">Lanjutkan</string>
-    <string name="download_pause_desc">Jeda download</string>
-    <string name="download_resume_desc">Lanjutkan download</string>
-    <string name="download_resumable_yes">Bisa dilanjutkan: Ya</string>
-    <string name="download_resumable_no">Bisa dilanjutkan: Tidak</string>
 
     <string name="setup_default_browser_title">Browser Default</string>
     <string name="setup_default_browser_description">Jadikan SimpleFox sebagai browser default agar link dari aplikasi lain otomatis terbuka di sini. Langkah ini sepenuhnya opsional, dan Anda bisa mengubahnya kapan saja di setelan perangkat.</string>
@@ -791,7 +750,6 @@
     <string name="document_viewer_error">Tidak dapat memuat dokumen.\nPeriksa koneksi Anda, lalu coba lagi.</string>
     <string name="document_viewer_privacy_policy_title">Kebijakan Privasi</string>
     <string name="document_viewer_terms_title">Persyaratan Layanan</string>
-    <string name="document_viewer_changelog_title">Log Perubahan</string>
     <string name="setup_theme_title">Pilih Tema Anda</string>
     <string name="setup_theme_subtitle">Pilih tampilan yang cocok untuk Anda. Anda bisa mengubahnya nanti di Setelan.</string>
 
@@ -946,7 +904,6 @@
 
     <string name="setup_welcome_title">Selamat datang di SimpleFox</string>
     <string name="setup_welcome_subtitle">Sebelum memulai, harap baca persyaratan kami.</string>
-    <string name="setup_terms_read">Baca</string>
     <string name="setup_terms_agree">Saya telah membaca dan menyetujui Kebijakan Privasi dan Persyaratan Layanan</string>
     <string name="setup_terms_continue">Setuju &amp; Lanjutkan</string>
 
@@ -969,7 +926,6 @@
     <string name="bookmarks_delete_confirm_message">Hapus %d bookmark?</string>
     <string name="bookmarks_items_deleted">Bookmark dihapus</string>
     <string name="bookmarks_sort_by_date_added">Tanggal Ditambahkan</string>
-    <string name="bookmarks_new_folder_desc">Folder baru</string>
     <string name="bookmarks_new_folder_title">Folder Baru</string>
     <string name="bookmarks_folder_name_hint">Nama folder</string>
     <string name="bookmarks_folder_create">Buat</string>
@@ -1000,7 +956,6 @@
     <string name="bookmarks_export_error">Gagal mengekspor bookmark</string>
 
     <string name="downloads_title">Download</string>
-    <string name="downloads_empty">Belum ada download</string>
     <string name="downloads_filter_all">Semua</string>
     <string name="downloads_type_video">Video</string>
     <string name="downloads_type_audio">Audio</string>
@@ -1099,7 +1054,6 @@
     <string name="downloads_sort_by_size">Ukuran</string>
     <string name="downloads_sort_by_status">Status</string>
     <string name="downloads_selected_count">%d dipilih</string>
-    <string name="downloads_delete_selected_desc">Hapus download yang dipilih</string>
     <string name="downloads_delete_confirm_title">Hapus download</string>
     <string name="downloads_delete_confirm_message">Hapus %d download?</string>
     <string name="downloads_delete_also_from_storage">Hapus juga file dari penyimpanan</string>
@@ -1197,7 +1151,6 @@
     <string name="menu_website_blocker">Pemblokir Situs</string>
     <string name="about_webview_label">MESIN</string>
     <string name="about_webview_info">%1$s\n%2$s\nv%3$s</string>
-    <string name="about_webview_unavailable">Tidak tersedia</string>
 
     <string name="suggestion_icon_desc">Saran penelusuran</string>
     <string name="suggestion_fill_desc">Isi ke kolom penelusuran</string>
@@ -1252,7 +1205,6 @@
     <string name="history_invert_selection">Balikkan</string>
     <string name="history_deselect_all">Batalkan Semua Pilihan</string>
     <string name="history_delete_selected">Hapus</string>
-    <string name="history_delete_selected_desc">Hapus item yang dipilih</string>
     <string name="history_sort">Urutkan</string>
     <string name="history_sort_by_title">Judul</string>
     <string name="history_sort_by_last_visit">Kunjungan Terakhir</string>
@@ -1370,7 +1322,6 @@
     <string name="tab_menu_invert_selection">Balikkan Pilihan</string>
     <string name="tab_menu_delete_selected">Hapus Tab yang Dipilih</string>
     <string name="tab_menu_drag_handle_desc">Tarik untuk mengubah urutan</string>
-    <string name="tab_menu_select_tab_desc">Pilih tab</string>
     <string name="tab_group_new">Grup Tab Baru</string>
     <string name="tab_group_new_tab_in_group">Tab Baru di Grup</string>
     <string name="tab_group_edit">Edit Nama dan Warna</string>
@@ -1389,7 +1340,6 @@
     <string name="tab_group_expand_all">Luaskan Semua Grup</string>
     <string name="tab_group_bar_show">Tampilkan Bilah Grup</string>
     <string name="tab_group_options_desc">Opsi grup</string>
-    <string name="tab_group_bar_open_desc">Tampilkan %1$s di pengalih tab</string>
     <string name="tab_group_move_title">Pindahkan ke grup</string>
     <string name="tab_group_closed_message">Grup “%1$s” ditutup</string>
     <string name="tab_selection_group">Grup</string>
@@ -1461,8 +1411,6 @@
 
     <string name="data_saver_browser_section">BROWSER</string>
 
-    <string name="update_section_updates">PEMBARUAN</string>
-    <string name="update_section_channel">SALURAN</string>
 
     <string name="misc_section_app">APLIKASI</string>
     <string name="misc_section_setup">PENYIAPAN</string>
@@ -1599,8 +1547,6 @@
 
     <string name="website_blocker_title">Pemblokir Situs</string>
     <string name="website_blocker_settings_summary">Blokir situs pornografi, judi, dan situs lainnya.</string>
-    <string name="website_blocker_status_working">Memproses…</string>
-    <string name="website_blocker_status_active">Melindungi Anda dari %d domain yang dikenal</string>
     <string name="website_blocker_fab_save_desc">Simpan dan terapkan perubahan</string>
     <string name="website_blocker_compile_failed">Gagal memperbarui daftar blokir. Silakan coba lagi.</string>
     <string name="website_blocker_delete_confirm_title">Reset kategori?</string>
@@ -1681,7 +1627,6 @@
     <string name="additional_websites_invalid_host">Masukkan domain yang valid, misalnya example.com</string>
     <string name="additional_websites_delete_confirm_title">Hapus situs?</string>
     <string name="additional_websites_delete_confirm_message">Tindakan ini akan menghapus %d situs yang dipilih dari Situs Tambahan.</string>
-    <string name="select_picker_default_title">Pilih salah satu</string>
 
     <string name="menu_media_capture">Media</string>
     <string name="media_capture_dialog_title">Media Terdeteksi</string>
@@ -1695,14 +1640,12 @@
     <string name="media_capture_section_video">VIDEO</string>
     <string name="media_capture_section_audio">AUDIO</string>
     <string name="media_capture_section_subtitles">SUBTITEL</string>
-    <string name="media_capture_downloads_not_supported_yet">Download streaming yang terdeteksi belum didukung. Salin link-nya untuk dibuka di tempat lain.</string>
     <string name="media_capture_live_badge">LIVE</string>
     <string name="media_capture_no_audio_badge">TANPA AUDIO</string>
     <string name="media_capture_best_badge">TERBAIK</string>
     <string name="media_capture_sort_quality">Kualitas</string>
     <string name="media_capture_sort_newest">Terbaru dulu</string>
     <string name="media_capture_sort_oldest">Terlama dulu</string>
-    <string name="media_capture_copy_link">Salin link</string>
     <string name="media_capture_download">Download</string>
     <string name="media_capture_duplicate_link_updated">Link download diperbarui</string>
     <string name="media_capture_link_clip_label">URL media</string>
@@ -1718,7 +1661,6 @@
     <string name="media_capture_menu_preview">Pratinjau</string>
     <string name="media_capture_subtitle_preview_title">Pratinjau Subtitel</string>
     <string name="media_capture_subtitle_preview_error">Tidak dapat memuat subtitel.\nPeriksa koneksi Anda, lalu coba lagi.</string>
-    <string name="media_capture_video_preview_title">Pratinjau Video</string>
     <string name="media_capture_video_preview_error">Tidak dapat memutar video.\nPeriksa koneksi Anda, lalu coba lagi.</string>
     <string name="media_capture_audio_preview_title">Pratinjau Audio</string>
     <string name="media_capture_audio_preview_error">Tidak dapat memutar audio.\nPeriksa koneksi Anda, lalu coba lagi.</string>

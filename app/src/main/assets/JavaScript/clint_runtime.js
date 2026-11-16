@@ -156,17 +156,6 @@ function onNative(m) {
     try { mediaScan(m); } catch (e) {}
     return;
   }
-  if (m.k === "reader") {
-    var rout = "null";
-    try {
-      var art = new Readability(document.cloneNode(true)).parse();
-      if (art && art.content) {
-        rout = JSON.stringify({ title: art.title || document.title || "", content: art.content });
-      }
-    } catch (e) {}
-    if (m.id) post({ k: "evalRes", id: m.id, v: rout });
-    return;
-  }
   if (m.k === "eval") {
     var out = "null";
     var r = pageEval(m.code);

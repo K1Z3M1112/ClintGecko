@@ -16,9 +16,8 @@ import com.simplefox.browser.R
 
 import android.content.Context
 import android.text.format.DateFormat
-import androidx.compose.animation.animateColorAsState
+import com.simplefox.browser.ui.animateColorAsState
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
@@ -162,7 +161,7 @@ fun HistoryScreen(
                                     when (entry) {
                                         is HistoryEntry.Header -> HistorySectionHeader(
                                             label = entry.label,
-                                            modifier = Modifier.animateItem()
+                                            modifier = Modifier
                                         )
                                         is HistoryEntry.Row -> HistoryRow(
                                             item = entry.item,
@@ -181,7 +180,7 @@ fun HistoryScreen(
                                                 }
                                             },
                                             onDelete = { onDeleteItem(entry.item) },
-                                            modifier = Modifier.animateItem()
+                                            modifier = Modifier
                                         )
                                     }
                                 }

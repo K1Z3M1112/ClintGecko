@@ -4,7 +4,6 @@ import com.simplefox.browser.R
 import com.simplefox.browser.browser.MainActivity
 import com.simplefox.browser.browser.home.isClintHomeUrl
 import com.simplefox.browser.tabs.TabGroup
-import com.simplefox.browser.tabs.TabGroupBarState
 import com.simplefox.browser.tabs.TabGroupPrefs
 import com.simplefox.browser.ui.UNDO_SNACKBAR_TIMEOUT_MS
 import com.simplefox.browser.ui.showClintSnackbar
@@ -18,14 +17,8 @@ private data class ClosedTabSnapshot(
 )
 
 internal fun MainActivity.refreshTabGroupBar() {
-    val active = tabManager.activeTab
-    val group = tabManager.groupOf(active)
-    if (active == null || group == null || tabManager.isGhostTab(active) || !prefs.getBoolean(TabGroupPrefs.PREF_SHOW_GROUP_BAR, true)) {
-        uiState.tabGroupBar = null
-        return
-    }
-    val members = tabManager.previews().filter { it.groupId == group.id }
-    uiState.tabGroupBar = TabGroupBarState(group, members, active.id)
+    // The separate group bar was removed; groups are shown in the tab strip only.
+    uiState.tabGroupBar = null
 }
 
 internal fun MainActivity.applyTabGroupsSetting() {

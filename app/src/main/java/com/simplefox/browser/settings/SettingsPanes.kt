@@ -2,7 +2,6 @@ package com.simplefox.browser.settings
 import com.simplefox.browser.browser.home.PREF_HOMEPAGE
 import com.simplefox.browser.browser.home.HOMEPAGE_CLINT
 import com.simplefox.browser.browser.home.PREF_HOMEPAGE_DESIGN
-import com.simplefox.browser.browser.home.HOMEPAGE_DESIGN_GRADIENT
 import com.simplefox.browser.browser.home.HOMEPAGE_DESIGN_IMAGE
 import com.simplefox.browser.browser.home.PREF_HOMEPAGE_IMAGE_VERSION
 import com.simplefox.browser.browser.home.homepageImageFile
@@ -24,7 +23,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -146,7 +144,7 @@ fun LookAndFeelPane(activity: SettingsActivity) {
             initialIntensity = prefs.getString("surface_intensity", "soft_tint") ?: "soft_tint",
             initialLanguage = prefs.getString(LocaleHelper.PREF_APP_LANGUAGE, LocaleHelper.LANGUAGE_SYSTEM) ?: LocaleHelper.LANGUAGE_SYSTEM,
             initialScrollHideMode = prefs.getString("scroll_hide_mode", "off") ?: "off",
-            initialAddressBarPosition = prefs.getString("address_bar_position", "top") ?: "top",
+            initialAddressBarPosition = prefs.getString("address_bar_position", "bottom") ?: "bottom",
             initialMenuStyle = prefs.getString("menu_style", "popup") ?: "popup",
             initialHideStatusBar = prefs.getBoolean("hide_status_bar", false),
             initialHideSystemNavigation = prefs.getBoolean("hide_system_navigation", false),
@@ -163,7 +161,7 @@ fun LookAndFeelPane(activity: SettingsActivity) {
 
     OnResume {
         uiState.scrollHideMode = prefs.getString("scroll_hide_mode", "off") ?: "off"
-        uiState.addressBarPosition = prefs.getString("address_bar_position", "top") ?: "top"
+        uiState.addressBarPosition = prefs.getString("address_bar_position", "bottom") ?: "bottom"
         uiState.menuStyle = prefs.getString("menu_style", "popup") ?: "popup"
         uiState.hideStatusBar = prefs.getBoolean("hide_status_bar", false)
         uiState.hideSystemNavigation = prefs.getBoolean("hide_system_navigation", false)

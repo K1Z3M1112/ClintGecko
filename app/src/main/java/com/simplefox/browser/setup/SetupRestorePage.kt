@@ -37,7 +37,6 @@ import com.simplefox.browser.backup.StageResult
 import com.simplefox.browser.backup.UnlockResult
 import com.simplefox.browser.settings.backuprestore.BackupRestoreStage
 import com.simplefox.browser.settings.backuprestore.BackupRestoreUiState
-import com.simplefox.browser.settings.backuprestore.CategoryCheckboxRow
 import com.simplefox.browser.settings.backuprestore.ProgressDialog
 import com.simplefox.browser.settings.backuprestore.RestoreCategoryDialog
 import com.simplefox.browser.settings.backuprestore.RestorePasswordDialog

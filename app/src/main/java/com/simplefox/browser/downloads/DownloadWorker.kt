@@ -19,7 +19,6 @@ import com.simplefox.browser.util.formatFileSize
 import com.simplefox.browser.settings.downloads.DownloadSettingsKeys
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.currentCoroutineContext
@@ -35,10 +34,6 @@ import java.io.File
 import java.io.IOException
 import java.io.SequenceInputStream
 import java.nio.ByteBuffer
-import java.util.concurrent.atomic.AtomicBoolean
-import java.util.concurrent.atomic.AtomicInteger
-import java.util.concurrent.atomic.AtomicLong
-import java.util.concurrent.atomic.AtomicReference
 
 internal object DownloadWorker {
 

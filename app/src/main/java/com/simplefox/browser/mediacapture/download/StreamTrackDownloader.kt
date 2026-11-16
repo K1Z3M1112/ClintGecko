@@ -381,25 +381,6 @@ object StreamTrackDownloader {
         }
     }
 
-    fun concatenate(segments: List<DownloadedSegment>, outputFile: File, onProgress: ((pct: Int) -> Unit)? = null) {
-        outputFile.parentFile?.mkdirs()
-        val totalBytes = segments.sumOf { it.file.length() }
-        var written = 0L
-        var lastPct = -1
-        FileOutputStream(outputFile).channel.use { out ->
-            for (seg in segments) {
-                written += transferAll(seg.file, out)
-                if (onProgress != null && totalBytes > 0L) {
-                    val pct = ((written * 100L) / totalBytes).toInt().coerceIn(0, 100)
-                    if (pct != lastPct) {
-                        lastPct = pct
-                        onProgress(pct)
-                    }
-                }
-            }
-        }
-    }
-
     fun concatenateMoving(
         segments: List<DownloadedSegment>,
         outputFile: File,

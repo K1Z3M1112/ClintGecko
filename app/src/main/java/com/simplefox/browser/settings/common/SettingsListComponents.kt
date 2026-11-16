@@ -1,7 +1,6 @@
 package com.simplefox.browser.settings.common
 
 import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -40,7 +39,6 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -146,7 +144,8 @@ fun Modifier.settingsSearchHighlight(title: String, highlightColor: Color): Modi
             delay(350)
             requester.bringIntoView()
             flash.snapTo(1f)
-            flash.animateTo(0f, tween(durationMillis = 1600))
+            delay(1600)
+            flash.snapTo(0f)
         }
     }
     return this

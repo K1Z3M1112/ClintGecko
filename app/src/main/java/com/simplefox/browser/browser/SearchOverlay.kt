@@ -1,6 +1,5 @@
 package com.simplefox.browser.browser
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -240,7 +239,7 @@ internal fun SearchOverlay(
                     onClick = { onSuggestionClick(it.query) },
                     onFill = { fill(it.query) },
                     onDelete = { onSuggestionDelete(it.query) },
-                    modifier = Modifier.animateItem()
+                    modifier = Modifier
                 )
             }
         }

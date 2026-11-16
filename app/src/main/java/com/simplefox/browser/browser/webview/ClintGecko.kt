@@ -576,7 +576,6 @@ object ClintGecko {
     private fun loadRuntime(): String =
         runtimeJs ?: (
             appContext.assets.open("JavaScript/clint_runtime.js").bufferedReader().use { it.readText() } + "\n" +
-                appContext.assets.open("JavaScript/readability.js").bufferedReader().use { it.readText() } + "\n" +
                 appContext.assets.open("JavaScript/media_scanner.js").bufferedReader().use { it.readText() }
             ).also { runtimeJs = it }
 
@@ -672,10 +671,6 @@ object ClintGecko {
         }
         latch.await(3500, TimeUnit.MILLISECONDS)
         return out
-    }
-
-    fun clearAllData() {
-        runtime.storageController.clearData(StorageController.ClearFlags.ALL)
     }
 
     fun isRuntimeReady(): Boolean = runtimeRef != null

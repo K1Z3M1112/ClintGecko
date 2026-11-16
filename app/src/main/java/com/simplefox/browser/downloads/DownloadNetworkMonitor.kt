@@ -4,8 +4,6 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
-import androidx.preference.PreferenceManager
-import com.simplefox.browser.settings.downloads.DownloadSettingsKeys
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -102,14 +100,6 @@ internal object DownloadNetworkMonitor {
         val caps = cm.getNetworkCapabilities(cm.activeNetwork) ?: return false
         return caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) &&
             caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
-    }
-
-    fun isUnmeteredOnlyEnabled(context: Context): Boolean {
-        val prefs = PreferenceManager.getDefaultSharedPreferences(context)
-        return prefs.getBoolean(
-            DownloadSettingsKeys.PREF_UNMETERED_ONLY,
-            DownloadSettingsKeys.DEFAULT_UNMETERED_ONLY
-        )
     }
 
     fun isNetworkUnmetered(context: Context): Boolean {

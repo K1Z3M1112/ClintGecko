@@ -7,10 +7,8 @@ import android.content.Intent
 import android.content.pm.ServiceInfo
 import android.os.Build
 import android.os.PowerManager
-import androidx.core.app.NotificationCompat
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.lifecycleScope
-import com.simplefox.browser.R
 import com.simplefox.browser.util.LocaleHelper
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay

@@ -5,7 +5,6 @@ import android.net.Uri
 import android.os.Environment
 import android.os.StatFs
 import android.os.storage.StorageManager
-import android.widget.TextView
 import androidx.preference.PreferenceManager
 import com.simplefox.browser.R
 import com.simplefox.browser.settings.downloads.DownloadSettingsKeys
@@ -88,10 +87,6 @@ internal fun resolveStorageInfoText(context: Context, mode: String, customUri: U
     } catch (_: Throwable) {
         context.getString(R.string.download_dialog_storage_unavailable)
     }
-}
-
-internal fun updateStorageInfo(context: Context, tvStorage: TextView, mode: String, customUri: Uri?) {
-    tvStorage.text = resolveStorageInfoText(context, mode, customUri)
 }
 
 internal fun checkStorageAvailable(

@@ -1278,30 +1278,6 @@ object ClintDownloadManager {
         }
     }
 
-    fun clearCompleted() {
-        var cleared: List<DownloadItem> = emptyList()
-        _downloads.update { list ->
-            val (keep, remove) = list.partition { it.status in DownloadStatus.NOT_FINISHED }
-            cleared = remove
-            keep
-        }
-        applicationScope.launch {
-            val ctx = appContext
-            cleared.forEach { item ->
-                deletePersistedDownload(item.id)
-                ctx?.let { File(it.filesDir, "stream_downloads/${item.id}").deleteRecursively() }
-                val leftover = item.file
-                if (item.status == DownloadStatus.FAILED && leftover != null && ctx != null &&
-                    (DownloadFileHelper.isInTempDir(ctx, leftover) || DownloadFileHelper.isPartFile(leftover))
-                ) {
-                    runCatching { leftover.delete() }
-                }
-                val partialDocument = item.takeIf { it.status == DownloadStatus.FAILED && it.file == null }?.contentUri
-                if (partialDocument != null && ctx != null) SafDirectWriter.deleteIfPart(ctx, Uri.parse(partialDocument))
-            }
-        }
-    }
-
     fun retryFailed(context: Context, id: Int) {
         DownloadLog.i(id, "USER") { "Manual retry requested" }
         val item = downloadsFlow.value.find { it.id == id } ?: return
