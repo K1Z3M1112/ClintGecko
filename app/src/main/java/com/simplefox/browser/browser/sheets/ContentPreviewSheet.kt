@@ -21,15 +21,14 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.SheetValue
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.material3.rememberModalBottomSheetState
+import com.simplefox.browser.ui.foundation.HorizontalDivider
+import com.simplefox.browser.ui.foundation.Icon
+import com.simplefox.browser.ui.foundation.IconButton
+import com.simplefox.browser.ui.foundation.ModalBottomSheet
+import com.simplefox.browser.ui.foundation.SheetValue
+import com.simplefox.browser.ui.foundation.Surface
+import com.simplefox.browser.ui.foundation.Text
+import com.simplefox.browser.ui.foundation.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
@@ -68,7 +67,6 @@ data class ContentPreviewRequest(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun ContentPreviewSheet(request: ContentPreviewRequest, activity: MainActivity, onDismiss: () -> Unit) {
     val colors = LocalClintColors.current

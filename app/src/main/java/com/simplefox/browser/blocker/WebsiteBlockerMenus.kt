@@ -5,8 +5,8 @@ import androidx.compose.material.icons.filled.Update
 
 import com.simplefox.browser.R
 
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.HorizontalDivider
+import com.simplefox.browser.ui.foundation.DropdownMenu
+import com.simplefox.browser.ui.foundation.HorizontalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import com.simplefox.browser.ui.listscreen.PopupShape

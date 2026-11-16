@@ -5,16 +5,15 @@ import com.simplefox.browser.customtheme.isCustomAccent
 import com.simplefox.browser.customtheme.resolveCustomPalette
 import com.simplefox.browser.customtheme.toClintColors
 import android.content.Context
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
 import androidx.preference.PreferenceManager
+import com.simplefox.browser.ui.foundation.LocalTextStyle
 
 data class ClintColors(
     val background: Color,
@@ -85,30 +84,14 @@ fun ClintComposeTheme(theme: String, content: @Composable () -> Unit) {
     val prefs = remember { PreferenceManager.getDefaultSharedPreferences(context) }
     val accent = prefs.getString("accent_color", "material_you") ?: "material_you"
     val intensity = prefs.getString("surface_intensity", "soft_tint") ?: "soft_tint"
-
     val revision = prefs.getLong(CUSTOM_THEME_REVISION_PREF, 0L)
-
     val clintColors = remember(resolvedTheme, accent, intensity, revision) {
         resolveClintColors(context, isLightTheme, accent, intensity)
     }
-
-    val isLight = clintColors.isLight
-    val base = if (isLight) lightColorScheme() else darkColorScheme()
-    val colorScheme = base.copy(
-        primary = clintColors.primary,
-        onPrimary = clintColors.onPrimary,
-        background = clintColors.background,
-        onBackground = clintColors.onSurface,
-        surface = clintColors.cardBackground,
-        onSurface = clintColors.onSurface,
-        surfaceVariant = clintColors.surfaceVariant,
-        onSurfaceVariant = clintColors.secondaryText,
-        error = clintColors.colorError,
-        errorContainer = clintColors.colorErrorContainer,
-        onErrorContainer = clintColors.colorOnErrorContainer
-    )
-
-    CompositionLocalProvider(LocalClintColors provides clintColors) {
-        MaterialTheme(colorScheme = colorScheme, content = content)
+    CompositionLocalProvider(
+        LocalClintColors provides clintColors,
+        LocalTextStyle provides TextStyle(color = clintColors.onSurface)
+    ) {
+        content()
     }
 }

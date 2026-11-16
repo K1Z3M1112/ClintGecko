@@ -46,15 +46,14 @@ import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material.icons.filled.Verified
 import androidx.compose.material.icons.filled.Videocam
 import androidx.compose.material.icons.filled.Warning
-import androidx.compose.material3.BottomSheetDefaults
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.rememberModalBottomSheetState
+import com.simplefox.browser.ui.foundation.BottomSheetDefaults
+import com.simplefox.browser.ui.foundation.DropdownMenu
+import com.simplefox.browser.ui.foundation.HorizontalDivider
+import com.simplefox.browser.ui.foundation.Icon
+import com.simplefox.browser.ui.foundation.ModalBottomSheet
+import com.simplefox.browser.ui.foundation.Text
+import com.simplefox.browser.ui.foundation.TextButton
+import com.simplefox.browser.ui.foundation.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -114,7 +113,6 @@ internal data class SiteInfoRequest(
     val trackers: SiteInfoTrackers? = null
 )
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun SiteInfoSheet(
     request: SiteInfoRequest,

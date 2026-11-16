@@ -270,11 +270,6 @@
     <string name="tab_bar_position_follow_desc">Располагается рядом со строкой поиска, где бы она ни находилась</string>
     <string name="tab_bar_position_top_desc">Всегда в верхней части экрана</string>
     <string name="tab_bar_position_bottom_desc">Всегда в нижней части экрана</string>
-    <string name="pref_menu_style_title">Стиль меню</string>
-    <string name="menu_style_popup">Всплывающее меню</string>
-    <string name="menu_style_popup_desc">Компактное меню рядом с панелью инструментов</string>
-    <string name="menu_style_bottom_sheet">Нижняя панель</string>
-    <string name="menu_style_bottom_sheet_desc">Меню на всю ширину, выезжающее снизу</string>
     <string name="menu_customization_title">Настроить меню</string>
     <string name="menu_customization_settings_summary">Скрытие, отображение и изменение порядка пунктов меню</string>
     <string name="menu_customization_description">Перетащите за маркер, чтобы изменить порядок. Отключите пункты, которые не хотите видеть в меню.</string>
@@ -433,9 +428,6 @@
     <string name="about_library_markwon_label">Markwon от Noties</string>
     <string name="about_library_markwon_license">Apache License 2.0 \u2197</string>
     <string name="about_library_markwon_usage">Отображает содержимое в формате Markdown с GitHub внутри приложения.</string>
-    <string name="about_library_material_label">Material Components от Google</string>
-    <string name="about_library_material_license">Apache License 2.0 \u2197</string>
-    <string name="about_library_material_usage">Нижние панели, карточки, диалоги и другие элементы интерфейса в стиле Material Design.</string>
     <string name="about_library_okhttp_label">OkHttp от Square</string>
     <string name="about_library_okhttp_license">Apache License 2.0 \u2197</string>
     <string name="about_library_okhttp_usage">Обрабатывает сетевые запросы во всём приложении, включая проверку обновлений, просмотр документов, загрузку изображений в браузере, загрузки и многое другое.</string>
@@ -454,9 +446,6 @@
     <string name="about_library_media3_label">AndroidX Media3</string>
     <string name="about_library_media3_license">Apache License 2.0 \u2197</string>
     <string name="about_library_media3_usage">Используется для объединения загруженных видео- и аудиодорожек в один файл.</string>
-    <string name="about_library_colorpicker_label">ColorPicker Compose</string>
-    <string name="about_library_colorpicker_license">Apache License 2.0 \u2197</string>
-    <string name="about_library_colorpicker_usage">Обеспечивает цветовой круг HSV и ползунок яркости в пользовательском выборе цвета.</string>
     <string name="about_linktree_url">jhaiian \u2197</string>
     <string name="open_in_app_dialog_title">Открыть в приложении?</string>
     <string name="open_in_app_dialog_message">%1$s хочет открыть %2$s.</string>
@@ -773,7 +762,6 @@
     <string name="setup_layout_title">Расположение браузера</string>
     <string name="setup_layout_subtitle">Настройте расположение элементов интерфейса браузера. Вы всегда можете это уточнить в настройках.</string>
     <string name="setup_section_address_bar">ПОЛОЖЕНИЕ АДРЕСНОЙ СТРОКИ</string>
-    <string name="setup_section_menu_style">СТИЛЬ МЕНЮ</string>
     <string name="setup_section_nested_scroll">ВЛОЖЕННАЯ ПРОКРУТКА</string>
     <string name="setup_section_status_bar">СТРОКА СОСТОЯНИЯ</string>
     <string name="setup_accent_section_label">АКЦЕНТНЫЙ ЦВЕТ</string>

@@ -26,7 +26,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import kotlin.math.abs
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.material3.SnackbarHostState
+import com.simplefox.browser.ui.foundation.SnackbarHostState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.content.ContextCompat

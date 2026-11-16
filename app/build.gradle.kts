@@ -13,13 +13,6 @@ if (localPropertiesFile.exists()) {
     }
 }
 
-val ccacheExecutable: String? = (System.getenv("PATH") ?: "")
-    .split(File.pathSeparator)
-    .filter { it.isNotEmpty() }
-    .flatMap { dir -> listOf(File(dir, "ccache"), File(dir, "ccache.exe")) }
-    .firstOrNull { it.isFile && it.canExecute() }
-    ?.absolutePath
-
 android {
     namespace = "com.simplefox.browser"
     compileSdk {
@@ -28,8 +21,6 @@ android {
         }
     }
 
-    ndkVersion = "27.2.12479018"
-
     defaultConfig {
         applicationId = "com.simplefox.browser"
         minSdk = 26
@@ -37,26 +28,8 @@ android {
         versionCode = 6
         versionName = "1.0.5"
 
-        externalNativeBuild {
-            cmake {
-                arguments.addAll(
-                    listOf(
-                        "-DANDROID_STL=c++_static",
-                        "-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON"
-                    )
-                )
-                if (ccacheExecutable != null) {
-                    arguments.add("-DCMAKE_CXX_COMPILER_LAUNCHER=$ccacheExecutable")
-                }
-                abiFilters("arm64-v8a", "armeabi-v7a", "x86_64")
-            }
-        }
-    }
-
-    externalNativeBuild {
-        cmake {
-            path = rootProject.file("native/websiteblocker-cpp/CMakeLists.txt")
-            version = "3.22.1"
+        ndk {
+            abiFilters += listOf("arm64-v8a", "armeabi-v7a", "x86_64")
         }
     }
 
@@ -151,7 +124,6 @@ dependencies {
     implementation("androidx.core:core-ktx:1.19.1")
     implementation("androidx.documentfile:documentfile:1.1.0")
     implementation("androidx.appcompat:appcompat:1.8.0")
-    implementation("com.google.android.material:material:1.14.0")
     implementation("org.mozilla.geckoview:geckoview:159.0.20261022150525")
     implementation("androidx.preference:preference-ktx:1.2.1")
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.2.0")
@@ -182,10 +154,8 @@ dependencies {
     implementation("androidx.compose.ui:ui-tooling-preview")
     debugImplementation("androidx.compose.ui:ui-tooling")
     implementation("androidx.compose.foundation:foundation")
-    implementation("androidx.compose.material3:material3")
+    implementation("androidx.compose.animation:animation-core")
     implementation("androidx.compose.material:material-icons-extended")
-    implementation("com.github.skydoves:colorpicker-compose:1.3.0")
-    implementation("androidx.compose.material3:material3-window-size-class")
     implementation("androidx.activity:activity-compose:1.13.0")
     implementation("androidx.profileinstaller:profileinstaller:1.4.1")
 }

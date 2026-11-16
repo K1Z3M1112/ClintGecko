@@ -3,10 +3,10 @@ package com.simplefox.browser.ui
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.TextObfuscationMode
-import androidx.compose.material3.OutlinedSecureTextField
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.TextFieldColors
+import com.simplefox.browser.ui.foundation.OutlinedSecureTextField
+import com.simplefox.browser.ui.foundation.OutlinedTextField
+import com.simplefox.browser.ui.foundation.OutlinedTextFieldDefaults
+import com.simplefox.browser.ui.foundation.TextFieldColors
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.simplefox.browser.ui.theme.LocalClintColors

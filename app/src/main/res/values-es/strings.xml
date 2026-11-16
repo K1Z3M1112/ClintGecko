@@ -265,11 +265,6 @@
     <string name="tab_bar_position_follow_desc">Se queda junto a la barra de búsqueda, esté donde esté</string>
     <string name="tab_bar_position_top_desc">Siempre en la parte superior de la pantalla</string>
     <string name="tab_bar_position_bottom_desc">Siempre en la parte inferior de la pantalla</string>
-    <string name="pref_menu_style_title">Estilo de menú</string>
-    <string name="menu_style_popup">Menú emergente</string>
-    <string name="menu_style_popup_desc">Menú compacto que flota cerca de la barra de herramientas</string>
-    <string name="menu_style_bottom_sheet">Panel inferior</string>
-    <string name="menu_style_bottom_sheet_desc">Menú de ancho completo que sube desde abajo</string>
     <string name="menu_customization_title">Personalizar menú</string>
     <string name="menu_customization_settings_summary">Oculta, muestra y reordena los elementos del menú</string>
     <string name="menu_customization_description">Arrastra el asa para reordenar. Desactiva los elementos que no quieras ver en el menú.</string>
@@ -428,9 +423,6 @@
     <string name="about_library_markwon_label">Markwon de Noties</string>
     <string name="about_library_markwon_license">Licencia Apache 2.0 \u2197</string>
     <string name="about_library_markwon_usage">Renderiza el contenido en Markdown de GitHub para mostrarlo en la app.</string>
-    <string name="about_library_material_label">Material Components de Google</string>
-    <string name="about_library_material_license">Licencia Apache 2.0 \u2197</string>
-    <string name="about_library_material_usage">Paneles inferiores, tarjetas, diálogos y otros elementos de interfaz que siguen Material Design.</string>
     <string name="about_library_okhttp_label">OkHttp de Square</string>
     <string name="about_library_okhttp_license">Licencia Apache 2.0 \u2197</string>
     <string name="about_library_okhttp_usage">Gestiona las solicitudes de red en toda la app, incluida la búsqueda de actualizaciones, los visores de documentos, la carga de imágenes del navegador, las descargas y mucho más.</string>
@@ -449,9 +441,6 @@
     <string name="about_library_media3_label">AndroidX Media3</string>
     <string name="about_library_media3_license">Licencia Apache 2.0 \u2197</string>
     <string name="about_library_media3_usage">Se usa para combinar las pistas de video y audio descargadas en un solo archivo.</string>
-    <string name="about_library_colorpicker_label">ColorPicker Compose</string>
-    <string name="about_library_colorpicker_license">Licencia Apache 2.0 \u2197</string>
-    <string name="about_library_colorpicker_usage">Habilita la rueda de color HSV y el control de brillo del selector de color personalizado.</string>
     <string name="about_linktree_url">jhaiian \u2197</string>
     <string name="open_in_app_dialog_title">¿Abrir en la app?</string>
     <string name="open_in_app_dialog_message">%1$s quiere abrir %2$s.</string>
@@ -768,7 +757,6 @@
     <string name="setup_layout_title">Diseño del navegador</string>
     <string name="setup_layout_subtitle">Configura cómo se organiza la interfaz del navegador. Puedes ajustar esto en cualquier momento en Configuración.</string>
     <string name="setup_section_address_bar">POSICIÓN DE LA BARRA DE DIRECCIONES</string>
-    <string name="setup_section_menu_style">ESTILO DE MENÚ</string>
     <string name="setup_section_nested_scroll">DESPLAZAMIENTO DE BARRAS</string>
     <string name="setup_section_status_bar">BARRA DE ESTADO</string>
     <string name="setup_accent_section_label">COLOR DE ACENTO</string>

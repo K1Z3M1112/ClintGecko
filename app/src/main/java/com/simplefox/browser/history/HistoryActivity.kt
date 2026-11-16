@@ -10,7 +10,7 @@ import androidx.activity.compose.setContent
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
-import androidx.compose.material3.SnackbarHostState
+import com.simplefox.browser.ui.foundation.SnackbarHostState
 import com.simplefox.browser.base.ClintActivity
 import com.simplefox.browser.ui.ClintSnackbarHost
 import com.simplefox.browser.ui.SnackbarHostActivity

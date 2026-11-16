@@ -1,7 +1,7 @@
 package com.simplefox.browser.ui
 
-import androidx.compose.material3.Checkbox
-import androidx.compose.material3.CheckboxDefaults
+import com.simplefox.browser.ui.foundation.Checkbox
+import com.simplefox.browser.ui.foundation.CheckboxDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.simplefox.browser.ui.theme.LocalClintColors

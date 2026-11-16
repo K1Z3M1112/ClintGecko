@@ -16,10 +16,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
+import com.simplefox.browser.ui.foundation.Icon
+import com.simplefox.browser.ui.foundation.IconButton
+import com.simplefox.browser.ui.foundation.Surface
+import com.simplefox.browser.ui.foundation.Text
 import androidx.activity.compose.BackHandler
 import com.simplefox.browser.ui.AnimatedContent
 import androidx.compose.animation.fadeIn
@@ -27,9 +27,6 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
-import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
-import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
@@ -159,7 +156,6 @@ class SettingsActivity : ClintActivity(), OverlayHostActivity {
     }
 }
 
-@OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
 @Composable
 private fun SettingsNavHost(activity: SettingsActivity, initialDestination: String?) {
     var selectedDestination by rememberSaveable { mutableStateOf(initialDestination) }
@@ -167,7 +163,7 @@ private fun SettingsNavHost(activity: SettingsActivity, initialDestination: Stri
     var searchActive by rememberSaveable { mutableStateOf(false) }
     var searchQuery by rememberSaveable { mutableStateOf("") }
     var searchTarget by remember { mutableStateOf<SettingsSearchTarget?>(null) }
-    val isTwoPane = calculateWindowSizeClass(activity).widthSizeClass != WindowWidthSizeClass.Compact
+    val isTwoPane = activity.resources.configuration.screenWidthDp >= 600
 
     val navigate: (String, String?) -> Unit = { destination, targetTitle ->
         searchTarget = targetTitle?.let { SettingsSearchTarget(it) }

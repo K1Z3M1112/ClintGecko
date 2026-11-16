@@ -1,6 +1,5 @@
 package com.simplefox.browser.setup
 import androidx.compose.material.icons.filled.ViewAgenda
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.SwapVert
 import androidx.compose.material.icons.filled.VisibilityOff
 
@@ -18,10 +17,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
+import com.simplefox.browser.ui.foundation.Card
+import com.simplefox.browser.ui.foundation.CardDefaults
 import com.simplefox.browser.ui.ClintSwitch
-import androidx.compose.material3.Text
+import com.simplefox.browser.ui.foundation.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -38,13 +37,11 @@ import com.simplefox.browser.ui.theme.LocalClintColors
 @Composable
 fun SetupLayoutPage(
     addressBarPosition: String,
-    menuStyle: String,
     scrollHideMode: String,
     hideStatusBar: Boolean, hideSystemNavigation: Boolean,
     theme: String,
     accent: String,
     onAddressBarPositionSelected: (String) -> Unit,
-    onMenuStyleSelected: (String) -> Unit,
     onScrollHideModeSelected: (String) -> Unit,
     onHideStatusBarToggled: (Boolean) -> Unit,
     onHideSystemNavigationToggled: (Boolean) -> Unit,
@@ -59,7 +56,6 @@ fun SetupLayoutPage(
     val bg = androidx.compose.ui.graphics.Color(swatch.bg)
     val surface = androidx.compose.ui.graphics.Color(swatch.surface)
     val onSurface = colors.onSurface
-    val panelBg = colors.popupBackground
 
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 28.dp)) {
         SetupPageHeader(
@@ -92,32 +88,6 @@ fun SetupLayoutPage(
         }
         Crossfade(targetState = addressBarPosition, label = "addrCaption") { key ->
             addrOptions.firstOrNull { it.key == key }?.let { SetupCaption(stringResource(it.descRes)) }
-        }
-
-        data class MenuOption(val key: String, val variant: String, val titleRes: Int, val descRes: Int)
-        val menuOptions = listOf(
-            MenuOption("popup", "popup", R.string.menu_style_popup, R.string.menu_style_popup_desc),
-            MenuOption("bottom_sheet", "sheet", R.string.menu_style_bottom_sheet, R.string.menu_style_bottom_sheet_desc)
-        )
-        SetupSectionHeading(
-            androidx.compose.material.icons.Icons.Filled.Menu,
-            stringResource(R.string.setup_section_menu_style), colors.primary,
-            Modifier.fillMaxWidth().padding(top = 24.dp, bottom = 12.dp)
-        )
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            menuOptions.forEach { option ->
-                OptionTile(
-                    selected = menuStyle == option.key,
-                    onClick = { onMenuStyleSelected(option.key) },
-                    label = stringResource(option.titleRes),
-                    cardBackground = colors.cardBackground, primary = colors.primary, onPrimary = colors.onPrimary
-                ) {
-                    MenuStylePreview(option.variant, addressBarPosition, bg, surface, onSurface, panelBg)
-                }
-            }
-        }
-        Crossfade(targetState = menuStyle, label = "menuCaption") { key ->
-            menuOptions.firstOrNull { it.key == key }?.let { SetupCaption(stringResource(it.descRes)) }
         }
 
         data class ScrollOption(val key: String, val titleRes: Int, val descRes: Int)

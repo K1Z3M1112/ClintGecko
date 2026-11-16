@@ -35,12 +35,11 @@ import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material.icons.filled.VerticalAlignTop
-import androidx.compose.material3.BottomSheetDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.Text
-import androidx.compose.material3.rememberModalBottomSheetState
+import com.simplefox.browser.ui.foundation.BottomSheetDefaults
+import com.simplefox.browser.ui.foundation.Icon
+import com.simplefox.browser.ui.foundation.ModalBottomSheet
+import com.simplefox.browser.ui.foundation.Text
+import com.simplefox.browser.ui.foundation.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -58,7 +57,7 @@ import com.simplefox.browser.util.formatRelativeTimestamp
 
 private class SheetAction(val label: String, val icon: ImageVector, val onClick: () -> Unit)
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 internal fun DownloadItemSheet(
     item: DownloadItem,
@@ -231,7 +230,6 @@ internal fun DownloadItemSheet(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun DownloadsSelectionSheet(
     count: Int,

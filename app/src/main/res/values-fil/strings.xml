@@ -261,11 +261,6 @@
     <string name="tab_bar_position_follow_desc">Nasa tabi ng search bar, saan mo man ito ilagay</string>
     <string name="tab_bar_position_top_desc">Laging nasa itaas ng screen</string>
     <string name="tab_bar_position_bottom_desc">Laging nasa ibaba ng screen</string>
-    <string name="pref_menu_style_title">Istilo ng Menu</string>
-    <string name="menu_style_popup">Pop-up na Menu</string>
-    <string name="menu_style_popup_desc">Compact na menu na lumulutang malapit sa toolbar</string>
-    <string name="menu_style_bottom_sheet">Bottom Sheet</string>
-    <string name="menu_style_bottom_sheet_desc">Full-width na menu na dumudulas pataas mula sa ibaba</string>
     <string name="menu_customization_title">I-customize ang Menu</string>
     <string name="menu_customization_settings_summary">Itago, ipakita, at ayusin muli ang mga item sa menu</string>
     <string name="menu_customization_description">I-drag ang handle para ayusin ang pagkakasunod-sunod. I-off ang mga item na ayaw mong makita sa menu.</string>
@@ -424,9 +419,6 @@
     <string name="about_library_markwon_label">Markwon by Noties</string>
     <string name="about_library_markwon_license">Apache License 2.0 \u2197</string>
     <string name="about_library_markwon_usage">Nagre-render ng Markdown content mula sa GitHub para ipakita sa app.</string>
-    <string name="about_library_material_label">Material Components by Google</string>
-    <string name="about_library_material_license">Apache License 2.0 \u2197</string>
-    <string name="about_library_material_usage">Mga bottom sheet, card, dialog, at iba pang UI element na sumusunod sa Material Design.</string>
     <string name="about_library_okhttp_label">OkHttp by Square</string>
     <string name="about_library_okhttp_license">Apache License 2.0 \u2197</string>
     <string name="about_library_okhttp_usage">Humahawak ng mga network request sa buong app, kasama ang pag-check ng update, document viewer, pag-load ng larawan sa browser, mga download, at marami pa.</string>
@@ -445,9 +437,6 @@
     <string name="about_library_media3_label">AndroidX Media3</string>
     <string name="about_library_media3_license">Apache License 2.0 \u2197</string>
     <string name="about_library_media3_usage">Ginagamit para pagsamahin ang na-download na video at audio track papunta sa iisang file.</string>
-    <string name="about_library_colorpicker_label">ColorPicker Compose</string>
-    <string name="about_library_colorpicker_license">Apache License 2.0 \u2197</string>
-    <string name="about_library_colorpicker_usage">Nagbibigay ng HSV color wheel at brightness slider sa custom na color picker.</string>
     <string name="about_linktree_url">jhaiian \u2197</string>
     <string name="open_in_app_dialog_title">Buksan sa app?</string>
     <string name="open_in_app_dialog_message">Gustong buksan ng %1$s ang %2$s.</string>
@@ -764,7 +753,6 @@
     <string name="setup_layout_title">Layout ng Browser</string>
     <string name="setup_layout_subtitle">I-configure kung paano nakaayos ang interface ng browser. Puwede mo itong i-fine-tune anumang oras sa Settings.</string>
     <string name="setup_section_address_bar">POSISYON NG ADDRESS BAR</string>
-    <string name="setup_section_menu_style">ISTILO NG MENU</string>
     <string name="setup_section_nested_scroll">NESTED SCROLL</string>
     <string name="setup_section_status_bar">STATUS BAR</string>
     <string name="setup_accent_section_label">KULAY NG ACCENT</string>

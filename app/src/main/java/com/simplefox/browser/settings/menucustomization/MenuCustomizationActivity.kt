@@ -42,7 +42,7 @@ class MenuCustomizationActivity : ClintActivity() {
         val hideStatusBar = prefs.getBoolean("hide_status_bar", false)
         val hideSystemNavigation = prefs.getBoolean("hide_system_navigation", false)
 
-        uiState = MenuCustomizationUiState(buildEntries(prefs))
+        uiState = MenuCustomizationUiState(buildEntries(prefs), BrowserMenuCustomizationStore.readRows(prefs))
 
         setContent {
             ClintComposeTheme(theme = theme) {
@@ -59,6 +59,10 @@ class MenuCustomizationActivity : ClintActivity() {
                             entry?.let { it.visible = !it.visible }
                             persistHidden(prefs)
                         },
+                        onRowsChange = { rows ->
+                            uiState.rows = rows
+                            BrowserMenuCustomizationStore.writeRows(prefs, rows)
+                        },
                         onCommitReorder = { orderedIds ->
                             val items = orderedIds.mapNotNull { CustomizableMenuItem.fromId(it) }
                             BrowserMenuCustomizationStore.writeOrder(prefs, items)
@@ -71,7 +75,7 @@ class MenuCustomizationActivity : ClintActivity() {
                                 positiveLabel = getString(R.string.menu_customization_reset_action),
                                 onPositive = {
                                     BrowserMenuCustomizationStore.resetToDefault(prefs)
-                                    uiState.replaceAll(buildEntries(prefs))
+                                    uiState.replaceAll(buildEntries(prefs), BrowserMenuCustomizationStore.readRows(prefs))
                                 }
                             )
                         }

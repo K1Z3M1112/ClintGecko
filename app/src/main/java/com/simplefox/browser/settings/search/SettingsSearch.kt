@@ -107,12 +107,12 @@ import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material.icons.filled.Web
 import androidx.compose.material.icons.filled.WebAsset
 import androidx.compose.material.icons.filled.Wifi
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
+import com.simplefox.browser.ui.foundation.Card
+import com.simplefox.browser.ui.foundation.CardDefaults
+import com.simplefox.browser.ui.foundation.Icon
+import com.simplefox.browser.ui.foundation.IconButton
+import com.simplefox.browser.ui.foundation.Surface
+import com.simplefox.browser.ui.foundation.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -293,10 +293,6 @@ internal fun buildSettingsSearchEntries(context: Context): List<SettingsSearchEn
         item(
             R.string.pref_address_bar_position_title, section = R.string.pref_category_address_bar,
             extras = listOf(R.string.address_bar_position_top, R.string.address_bar_position_bottom, R.string.address_bar_position_split)
-        )
-        item(
-            R.string.pref_menu_style_title, section = R.string.menu,
-            extras = listOf(R.string.menu_style_bottom_sheet, R.string.menu_style_popup)
         )
         item(R.string.menu_customization_title, R.string.menu_customization_settings_summary, R.string.menu, icon = Icons.Filled.Reorder)
         item(R.string.pref_tab_strip_title, R.string.pref_tab_strip_summary, R.string.pref_category_tabs, icon = Icons.Filled.Tab)

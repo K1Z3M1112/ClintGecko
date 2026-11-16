@@ -8,9 +8,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
+import com.simplefox.browser.ui.foundation.HorizontalDivider
+import com.simplefox.browser.ui.foundation.Surface
+import com.simplefox.browser.ui.foundation.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,7 +36,6 @@ private const val GECKOVIEW_URL = "https://mozilla.github.io/geckoview/"
 private const val MPL_2_LICENSE_URL = "https://www.mozilla.org/MPL/2.0/"
 private const val MARKWON_URL = "https://github.com/noties/Markwon"
 private const val ANDROIDX_URL = "https://developer.android.com/jetpack/androidx"
-private const val MATERIAL_URL = "https://github.com/material-components/material-components-android"
 private const val OKHTTP_URL = "https://github.com/square/okhttp"
 private const val SIMPLEMAGIC_URL = "https://github.com/j256/simplemagic"
 private const val SIMPLEMAGIC_LICENSE_URL = "https://opensource.org/licenses/ISC"
@@ -45,7 +44,6 @@ private const val COROUTINES_URL = "https://github.com/Kotlin/kotlinx.coroutines
 private const val BOUNCYCASTLE_URL = "https://www.bouncycastle.org"
 private const val BOUNCYCASTLE_LICENSE_URL = "https://www.bouncycastle.org/licence.html"
 private const val MEDIA3_URL = "https://developer.android.com/guide/topics/media/media3"
-private const val COLORPICKER_URL = "https://github.com/skydoves/colorpicker-compose"
 
 @Composable
 private fun AboutCard(label: String, colors: ClintColors, content: @Composable () -> Unit) {
@@ -251,12 +249,6 @@ fun AboutScreen(
             )
             AboutThinDivider(colors.surfaceVariant)
             AboutLibraryEntry(
-                stringResource(R.string.about_library_material_label), stringResource(R.string.about_library_material_license),
-                stringResource(R.string.about_library_material_usage), colors,
-                { onLinkClick(MATERIAL_URL) }, { onLinkClick(APACHE_2_LICENSE_URL) }
-            )
-            AboutThinDivider(colors.surfaceVariant)
-            AboutLibraryEntry(
                 stringResource(R.string.about_library_okhttp_label), stringResource(R.string.about_library_okhttp_license),
                 stringResource(R.string.about_library_okhttp_usage), colors,
                 { onLinkClick(OKHTTP_URL) }, { onLinkClick(APACHE_2_LICENSE_URL) }
@@ -290,12 +282,6 @@ fun AboutScreen(
                 stringResource(R.string.about_library_media3_label), stringResource(R.string.about_library_media3_license),
                 stringResource(R.string.about_library_media3_usage), colors,
                 { onLinkClick(MEDIA3_URL) }, { onLinkClick(APACHE_2_LICENSE_URL) }
-            )
-            AboutThinDivider(colors.surfaceVariant)
-            AboutLibraryEntry(
-                stringResource(R.string.about_library_colorpicker_label), stringResource(R.string.about_library_colorpicker_license),
-                stringResource(R.string.about_library_colorpicker_usage), colors,
-                { onLinkClick(COLORPICKER_URL) }, { onLinkClick(APACHE_2_LICENSE_URL) }
             )
         }
 

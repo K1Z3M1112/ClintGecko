@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -25,11 +26,11 @@ import androidx.compose.material.icons.filled.DragHandle
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.RestartAlt
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
+import com.simplefox.browser.ui.foundation.HorizontalDivider
+import com.simplefox.browser.ui.foundation.Icon
+import com.simplefox.browser.ui.foundation.IconButton
+import com.simplefox.browser.ui.foundation.Surface
+import com.simplefox.browser.ui.foundation.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -43,12 +44,14 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import com.simplefox.browser.R
+import com.simplefox.browser.browser.menu.BrowserMenuCustomizationStore
 import com.simplefox.browser.browser.menu.icon
 import com.simplefox.browser.browser.menu.titleRes
 import com.simplefox.browser.ui.AdaptiveWidthContainer
@@ -61,6 +64,7 @@ fun MenuCustomizationScreen(
     maxContentWidth: Dp?,
     onExit: () -> Unit,
     onToggleVisible: (String) -> Unit,
+    onRowsChange: (Int) -> Unit,
     onCommitReorder: (List<String>) -> Unit,
     onResetClick: () -> Unit
 ) {
@@ -104,6 +108,9 @@ fun MenuCustomizationScreen(
                             modifier = Modifier.fillMaxSize(),
                             contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp)
                         ) {
+                            item(key = "menu_rows_selector") {
+                                MenuRowsSelector(rows = state.rows, onRowsChange = onRowsChange)
+                            }
                             items(entries, key = { menuItemDragKey(it.item.id) }) { entry ->
                                 val isDragging = dragState.draggingId == entry.item.id
                                 val ghostAlpha by animateFloatAsState(if (isDragging) 0.2f else 1f, label = "menuItemGhostAlpha")
@@ -279,6 +286,55 @@ private fun PinnedSettingsNote() {
                 lineHeight = 16.sp,
                 modifier = Modifier.padding(top = 2.dp)
             )
+        }
+    }
+}
+
+@Composable
+private fun MenuRowsSelector(rows: Int, onRowsChange: (Int) -> Unit) {
+    val colors = LocalClintColors.current
+    Column(
+        Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp)
+            .clip(RoundedCornerShape(14.dp))
+            .background(colors.cardBackground)
+            .padding(14.dp)
+    ) {
+        Text(
+            stringResource(R.string.menu_customization_rows_title),
+            color = colors.onSurface,
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Medium
+        )
+        Text(
+            stringResource(R.string.menu_customization_rows_desc),
+            color = colors.secondaryText,
+            fontSize = 12.sp,
+            lineHeight = 16.sp,
+            modifier = Modifier.padding(top = 2.dp, bottom = 10.dp)
+        )
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(8.dp)) {
+            for (n in BrowserMenuCustomizationStore.MIN_ROWS..BrowserMenuCustomizationStore.MAX_ROWS) {
+                val selected = n == rows
+                Box(
+                    Modifier
+                        .weight(1f)
+                        .heightIn(min = 40.dp)
+                        .clip(RoundedCornerShape(10.dp))
+                        .background(if (selected) colors.primary else colors.primary.copy(alpha = 0.10f))
+                        .clickable { if (!selected) onRowsChange(n) },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        n.toString(),
+                        color = if (selected) colors.onPrimary else colors.primary,
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        textAlign = TextAlign.Center
+                    )
+                }
+            }
         }
     }
 }

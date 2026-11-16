@@ -262,11 +262,6 @@
     <string name="tab_bar_position_follow_desc">Stays next to the search bar, wherever you put it</string>
     <string name="tab_bar_position_top_desc">Always at the top of the screen</string>
     <string name="tab_bar_position_bottom_desc">Always at the bottom of the screen</string>
-    <string name="pref_menu_style_title">Menu Style</string>
-    <string name="menu_style_popup">Pop-up Menu</string>
-    <string name="menu_style_popup_desc">Compact menu floating near the toolbar</string>
-    <string name="menu_style_bottom_sheet">Bottom Sheet</string>
-    <string name="menu_style_bottom_sheet_desc">Full-width menu sliding up from the bottom</string>
     <string name="menu_customization_title">Customize Menu</string>
     <string name="menu_customization_settings_summary">Hide, show, and reorder menu items</string>
     <string name="menu_customization_description">Drag the handle to reorder. Turn off items you don\'t want to see in the menu.</string>
@@ -425,9 +420,6 @@
     <string name="about_library_markwon_label">Markwon by Noties</string>
     <string name="about_library_markwon_license">Apache License 2.0 \u2197</string>
     <string name="about_library_markwon_usage">Renders Markdown content from GitHub to display in the app.</string>
-    <string name="about_library_material_label">Material Components by Google</string>
-    <string name="about_library_material_license">Apache License 2.0 \u2197</string>
-    <string name="about_library_material_usage">Bottom sheets, cards, dialogs, and other UI elements that follow Material Design.</string>
     <string name="about_library_okhttp_label">OkHttp by Square</string>
     <string name="about_library_okhttp_license">Apache License 2.0 \u2197</string>
     <string name="about_library_okhttp_usage">Handles network requests throughout the app, including update checking, document viewers, browser image loading, and downloads, and much more.</string>
@@ -446,9 +438,6 @@
     <string name="about_library_media3_label">AndroidX Media3</string>
     <string name="about_library_media3_license">Apache License 2.0 \u2197</string>
     <string name="about_library_media3_usage">Used to remux downloaded video and audio tracks into a single file.</string>
-    <string name="about_library_colorpicker_label">ColorPicker Compose</string>
-    <string name="about_library_colorpicker_license">Apache License 2.0 \u2197</string>
-    <string name="about_library_colorpicker_usage">Powers the HSV color wheel and brightness slider in the custom color picker.</string>
     <string name="about_linktree_url">jhaiian \u2197</string>
     <string name="open_in_app_dialog_title">Open in app?</string>
     <string name="open_in_app_dialog_message">%1$s wants to open %2$s.</string>
@@ -765,7 +754,6 @@
     <string name="setup_layout_title">Browser Layout</string>
     <string name="setup_layout_subtitle">Configure how the browser\'s interface is arranged. You can fine-tune these any time in Settings.</string>
     <string name="setup_section_address_bar">ADDRESS BAR POSITION</string>
-    <string name="setup_section_menu_style">MENU STYLE</string>
     <string name="setup_section_nested_scroll">NESTED SCROLL</string>
     <string name="setup_section_status_bar">STATUS BAR</string>
     <string name="setup_accent_section_label">ACCENT COLOR</string>
@@ -2377,4 +2365,6 @@
     <string name="address_bar_link_copied">Page link copied</string>
     <string name="address_bar_paste">Paste</string>
     <string name="address_bar_paste_and_go">Paste &amp; Go</string>
+    <string name="menu_customization_rows_title">Menu rows</string>
+    <string name="menu_customization_rows_desc">Choose how many rows the menu bar uses (1–3). Rows scroll left/right together.</string>
 </resources>

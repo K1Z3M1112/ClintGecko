@@ -262,11 +262,6 @@
     <string name="tab_bar_position_follow_desc">सर्च बार के बगल में रहता है, आप उसे जहां भी रखें</string>
     <string name="tab_bar_position_top_desc">हमेशा स्क्रीन के सबसे ऊपर</string>
     <string name="tab_bar_position_bottom_desc">हमेशा स्क्रीन के सबसे नीचे</string>
-    <string name="pref_menu_style_title">मेन्यू की स्टाइल</string>
-    <string name="menu_style_popup">पॉप-अप मेन्यू</string>
-    <string name="menu_style_popup_desc">टूलबार के पास दिखने वाला छोटा मेन्यू</string>
-    <string name="menu_style_bottom_sheet">बॉटम शीट</string>
-    <string name="menu_style_bottom_sheet_desc">नीचे से ऊपर खुलने वाला पूरी चौड़ाई का मेन्यू</string>
     <string name="menu_customization_title">मेन्यू कस्टमाइज़ करें</string>
     <string name="menu_customization_settings_summary">मेन्यू के आइटम छिपाएं, दिखाएं और उनका क्रम बदलें</string>
     <string name="menu_customization_description">क्रम बदलने के लिए हैंडल को खींचें. जो आइटम आप मेन्यू में नहीं देखना चाहते, उन्हें बंद कर दें.</string>
@@ -425,9 +420,6 @@
     <string name="about_library_markwon_label">Noties की Markwon</string>
     <string name="about_library_markwon_license">Apache License 2.0 ↗</string>
     <string name="about_library_markwon_usage">GitHub से आने वाले Markdown कॉन्टेंट को ऐप में दिखाती है.</string>
-    <string name="about_library_material_label">Google के Material Components</string>
-    <string name="about_library_material_license">Apache License 2.0 ↗</string>
-    <string name="about_library_material_usage">बॉटम शीट, कार्ड, डायलॉग और Material Design पर आधारित दूसरे UI एलिमेंट.</string>
     <string name="about_library_okhttp_label">Square की OkHttp</string>
     <string name="about_library_okhttp_license">Apache License 2.0 ↗</string>
     <string name="about_library_okhttp_usage">पूरे ऐप में नेटवर्क अनुरोध संभालती है, जैसे अपडेट की जांच, दस्तावेज़ व्यूअर, ब्राउज़र में इमेज लोड करना, डाउनलोड और बहुत कुछ.</string>
@@ -446,9 +438,6 @@
     <string name="about_library_media3_label">AndroidX Media3</string>
     <string name="about_library_media3_license">Apache License 2.0 ↗</string>
     <string name="about_library_media3_usage">डाउनलोड किए गए वीडियो और ऑडियो ट्रैक को एक ही फ़ाइल में जोड़ने के लिए इस्तेमाल होती है.</string>
-    <string name="about_library_colorpicker_label">ColorPicker Compose</string>
-    <string name="about_library_colorpicker_license">Apache License 2.0 ↗</string>
-    <string name="about_library_colorpicker_usage">कस्टम कलर पिकर में HSV कलर व्हील और चमक का स्लाइडर चलाती है.</string>
     <string name="about_linktree_url">jhaiian ↗</string>
     <string name="open_in_app_dialog_title">ऐप में खोलना है?</string>
     <string name="open_in_app_dialog_message">%1$s, %2$s खोलना चाहता है.</string>
@@ -765,7 +754,6 @@
     <string name="setup_layout_title">ब्राउज़र का लेआउट</string>
     <string name="setup_layout_subtitle">तय करें कि ब्राउज़र का इंटरफ़ेस कैसे व्यवस्थित हो. आप सेटिंग में इन्हें कभी भी बदल सकते हैं.</string>
     <string name="setup_section_address_bar">पता बार की जगह</string>
-    <string name="setup_section_menu_style">मेन्यू की स्टाइल</string>
     <string name="setup_section_nested_scroll">नेस्टेड स्क्रोल</string>
     <string name="setup_section_status_bar">स्टेटस बार</string>
     <string name="setup_accent_section_label">एक्सेंट रंग</string>

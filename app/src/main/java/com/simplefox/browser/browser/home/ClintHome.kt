@@ -43,15 +43,14 @@ import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Tab
 import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.pulltorefresh.PullToRefreshBox
-import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
-import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
+import com.simplefox.browser.ui.foundation.HorizontalDivider
+import com.simplefox.browser.ui.foundation.Icon
+import com.simplefox.browser.ui.foundation.IconButton
+import com.simplefox.browser.ui.foundation.PullToRefreshBox
+import com.simplefox.browser.ui.foundation.PullToRefreshDefaults
+import com.simplefox.browser.ui.foundation.rememberPullToRefreshState
+import com.simplefox.browser.ui.foundation.Surface
+import com.simplefox.browser.ui.foundation.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -157,7 +156,6 @@ private suspend fun loadRecentSites(context: Context): List<HomeSite> =
 private suspend fun loadHomeTiles(context: Context): List<HomeTile> =
     withContext(Dispatchers.IO) { HomeTileStore.load(context) }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun ClintHomeScreen(activity: MainActivity, state: MainUiState, modifier: Modifier = Modifier) {
     val colors = LocalClintColors.current
