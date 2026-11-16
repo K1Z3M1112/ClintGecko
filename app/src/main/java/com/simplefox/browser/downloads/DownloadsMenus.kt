@@ -2,34 +2,20 @@ package com.simplefox.browser.downloads
 import androidx.compose.material.icons.filled.Abc
 import androidx.compose.material.icons.filled.ArrowDownward
 import androidx.compose.material.icons.filled.ArrowUpward
-import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.BugReport
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.FormatSize
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Language
-import androidx.compose.material.icons.filled.Link
-import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.SwapVert
-import androidx.compose.material.icons.filled.Tune
 
 import com.simplefox.browser.R
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import com.simplefox.browser.ui.listscreen.ListMenuItem
 import com.simplefox.browser.ui.listscreen.ListSortOrder
 import com.simplefox.browser.ui.listscreen.PopupShape
@@ -122,79 +108,3 @@ data class DownloadItemActions(
     val onProperties: (DownloadItem) -> Unit
 )
 
-@Composable
-fun DownloadItemOptionsMenu(
-    expanded: Boolean,
-    item: DownloadItem,
-    onDismiss: () -> Unit,
-    onOpen: () -> Unit,
-    onShare: () -> Unit,
-    onOpenFolder: () -> Unit,
-    onRename: () -> Unit,
-    onRedownload: () -> Unit,
-    onRedownloadOptions: () -> Unit,
-    onChangeSettings: () -> Unit,
-    onUpdateLink: () -> Unit,
-    onUpdateLinkInBrowser: () -> Unit,
-    onRemove: () -> Unit,
-    onCopyLink: () -> Unit,
-    onCopyFilename: () -> Unit,
-    onCopyPath: () -> Unit,
-    onProperties: () -> Unit
-) {
-    val colors = LocalClintColors.current
-    DropdownMenu(
-        expanded = expanded,
-        onDismissRequest = onDismiss,
-        shape = PopupShape,
-        containerColor = colors.popupBackground,
-        border = null
-    ) {
-        ListMenuItem(androidx.compose.material.icons.Icons.AutoMirrored.Filled.OpenInNew, stringResource(R.string.action_open), false) { onDismiss(); onOpen() }
-        ListMenuItem(androidx.compose.material.icons.Icons.Filled.Share, stringResource(R.string.download_menu_share), false) { onDismiss(); onShare() }
-        ListMenuItem(androidx.compose.material.icons.Icons.Filled.Folder, stringResource(R.string.download_menu_open_folder), false) { onDismiss(); onOpenFolder() }
-        if (item.status == DownloadStatus.COMPLETE) {
-            ListMenuItem(androidx.compose.material.icons.Icons.Filled.Edit, stringResource(R.string.download_menu_rename), false) { onDismiss(); onRename() }
-        }
-        ListMenuItem(androidx.compose.material.icons.Icons.Filled.Refresh, stringResource(R.string.download_menu_redownload), false) { onDismiss(); onRedownload() }
-        ListMenuItem(androidx.compose.material.icons.Icons.Filled.Download, stringResource(R.string.download_menu_redownload_options), false) { onDismiss(); onRedownloadOptions() }
-        if (item.status in DownloadStatus.NOT_FINISHED) {
-            ListMenuItem(androidx.compose.material.icons.Icons.Filled.Tune, stringResource(R.string.download_menu_change_settings), false) { onDismiss(); onChangeSettings() }
-        }
-        if (item.status != DownloadStatus.COMPLETE && item.mega == null) {
-            ListMenuItem(androidx.compose.material.icons.Icons.Filled.Link, stringResource(R.string.download_menu_update_link), false) { onDismiss(); onUpdateLink() }
-            ListMenuItem(androidx.compose.material.icons.Icons.Filled.Language, stringResource(R.string.download_menu_update_link_in_browser), false) { onDismiss(); onUpdateLinkInBrowser() }
-        }
-        ListMenuItem(androidx.compose.material.icons.Icons.Filled.Delete, stringResource(R.string.download_menu_remove), false) { onDismiss(); onRemove() }
-        ListMenuItem(androidx.compose.material.icons.Icons.Filled.ContentCopy, stringResource(R.string.download_menu_copy_link), false) { onDismiss(); onCopyLink() }
-        ListMenuItem(androidx.compose.material.icons.Icons.Filled.ContentCopy, stringResource(R.string.download_menu_copy_filename), false) { onDismiss(); onCopyFilename() }
-        ListMenuItem(androidx.compose.material.icons.Icons.Filled.ContentCopy, stringResource(R.string.download_menu_copy_path), false) { onDismiss(); onCopyPath() }
-        ListMenuItem(androidx.compose.material.icons.Icons.Filled.Info, stringResource(R.string.download_menu_properties), false) { onDismiss(); onProperties() }
-    }
-}
-
-@Composable
-fun DownloadsMultiItemOptionsMenu(
-    expanded: Boolean,
-    onDismiss: () -> Unit,
-    onRedownload: () -> Unit,
-    onRemove: () -> Unit,
-    onCopyLink: () -> Unit,
-    onCopyFilename: () -> Unit,
-    onCopyPath: () -> Unit
-) {
-    val colors = LocalClintColors.current
-    DropdownMenu(
-        expanded = expanded,
-        onDismissRequest = onDismiss,
-        shape = PopupShape,
-        containerColor = colors.popupBackground,
-        border = null
-    ) {
-        ListMenuItem(androidx.compose.material.icons.Icons.Filled.Refresh, stringResource(R.string.download_menu_redownload), false) { onDismiss(); onRedownload() }
-        ListMenuItem(androidx.compose.material.icons.Icons.Filled.Delete, stringResource(R.string.download_menu_remove), false) { onDismiss(); onRemove() }
-        ListMenuItem(androidx.compose.material.icons.Icons.Filled.ContentCopy, stringResource(R.string.download_menu_copy_link), false) { onDismiss(); onCopyLink() }
-        ListMenuItem(androidx.compose.material.icons.Icons.Filled.ContentCopy, stringResource(R.string.download_menu_copy_filename), false) { onDismiss(); onCopyFilename() }
-        ListMenuItem(androidx.compose.material.icons.Icons.Filled.ContentCopy, stringResource(R.string.download_menu_copy_path), false) { onDismiss(); onCopyPath() }
-    }
-}

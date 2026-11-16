@@ -1,18 +1,12 @@
 package com.simplefox.browser.browser.sheets
 import com.simplefox.browser.ui.theme.SystemDarkState
-import androidx.compose.material.icons.automirrored.filled.ChromeReaderMode
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Tune
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material.icons.filled.Public
 
 import android.annotation.SuppressLint
 import android.graphics.Bitmap
-import android.os.Handler
-import android.os.Looper
 import com.simplefox.browser.browser.webview.ClintWebView
 import com.simplefox.browser.browser.webview.ClintWebChromeClient
 import com.simplefox.browser.browser.webview.ContextMenuInfo
@@ -25,7 +19,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -50,7 +43,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -61,36 +53,18 @@ import com.simplefox.browser.settings.datasaver.DataSaverMode
 import com.simplefox.browser.R
 import com.simplefox.browser.browser.MainActivity
 import com.simplefox.browser.browser.webview.ClintWebViewClient
-import com.simplefox.browser.browser.webview.loadJsAsset
-import com.simplefox.browser.settings.sitepermissions.SitePermissionDatabase
-import com.simplefox.browser.settings.sitepermissions.SitePermissionManager
 import com.simplefox.browser.ui.ClintDialogStatusBarEffect
 import com.simplefox.browser.ui.FaviconCache
 import com.simplefox.browser.ui.theme.LocalClintColors
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 data class ContentPreviewRequest(
     val url: String,
     val isPage: Boolean,
-    val isDesktop: Boolean = false,
-    val isReaderMode: Boolean = false,
-    val readerHtml: String = "",
-    val readerTitle: String = "",
-    val prevUrl: String = "",
-    val nextUrl: String = "",
-    val isImageReader: Boolean = false,
-    val images: List<String> = emptyList(),
-    val allImages: List<String> = emptyList()
+    val isDesktop: Boolean = false
 ) {
     companion object {
         fun forImage(imageUrl: String) = ContentPreviewRequest(url = imageUrl, isPage = false)
         fun forPage(pageUrl: String, isDesktop: Boolean) = ContentPreviewRequest(url = pageUrl, isPage = true, isDesktop = isDesktop)
-        fun forImageReader(pageUrl: String, pageTitle: String, html: String, prevUrl: String, nextUrl: String, images: List<String>, allImages: List<String> = images) =
-            ContentPreviewRequest(url = pageUrl, isPage = false, isReaderMode = true, readerHtml = html, readerTitle = pageTitle, prevUrl = prevUrl, nextUrl = nextUrl, isImageReader = true, images = images, allImages = allImages)
-        fun forReaderMode(pageUrl: String, pageTitle: String, html: String) =
-            ContentPreviewRequest(url = pageUrl, isPage = false, isReaderMode = true, readerHtml = html, readerTitle = pageTitle)
     }
 }
 
@@ -105,21 +79,19 @@ internal fun ContentPreviewSheet(request: ContentPreviewRequest, activity: MainA
 
     val host = remember(request.url) { runCatching { java.net.URL(request.url).host }.getOrElse { "" } }
 
-    var titleText by remember { mutableStateOf(if (request.isReaderMode) request.readerTitle.ifEmpty { host } else if (request.isPage) host else request.url.substringAfterLast("/").substringBefore("?").ifEmpty { request.url }) }
-    var urlText by remember { mutableStateOf(if (request.isReaderMode) host.ifEmpty { request.url } else if (request.isPage) request.url else host) }
+    var titleText by remember { mutableStateOf(if (request.isPage) host else request.url.substringAfterLast("/").substringBefore("?").ifEmpty { request.url }) }
+    var urlText by remember { mutableStateOf(if (request.isPage) request.url else host) }
     var favicon by remember { mutableStateOf<Bitmap?>(null) }
     var webViewRef by remember { mutableStateOf<ClintWebView?>(null) }
     var webViewScrollY by remember { mutableIntStateOf(0) }
 
-    var showReaderSettings by remember { mutableStateOf(false) }
-    var readerPrefs by remember { mutableStateOf(com.simplefox.browser.browser.imagereader.ImageReaderStore.load(context)) }
     var nestedImageRequest by remember { mutableStateOf<ImageLongPressRequest?>(null) }
     var nestedPreviewLinkRequest by remember { mutableStateOf<PreviewLinkLongPressRequest?>(null) }
 
     val quiverGuardPreviewTabId = remember { "preview-" + System.identityHashCode(request) }
 
-    androidx.compose.runtime.LaunchedEffect(request.url, request.isReaderMode, request.isPage) {
-        if ((request.isReaderMode || request.isPage) && request.url.isNotEmpty()) {
+    androidx.compose.runtime.LaunchedEffect(request.url, request.isPage) {
+        if (request.isPage && request.url.isNotEmpty()) {
             val faviconUrl = FaviconCache.faviconUrlFor(request.url)
             if (faviconUrl.isNotEmpty()) {
                 FaviconCache.load(context, faviconUrl) { bmp -> if (bmp != null) favicon = bmp }
@@ -152,7 +124,7 @@ internal fun ContentPreviewSheet(request: ContentPreviewRequest, activity: MainA
                         Image(favicon!!.asImageBitmap(), contentDescription = null, modifier = Modifier.size(20.dp))
                     } else {
                         Icon(
-                            if (request.isReaderMode) androidx.compose.material.icons.Icons.AutoMirrored.Filled.ChromeReaderMode else androidx.compose.material.icons.Icons.Filled.Public,
+                            androidx.compose.material.icons.Icons.Filled.Public,
                             contentDescription = null,
                             tint = colors.iconTint,
                             modifier = Modifier.size(20.dp)
@@ -161,11 +133,6 @@ internal fun ContentPreviewSheet(request: ContentPreviewRequest, activity: MainA
                     Column(Modifier.weight(1f).padding(start = 8.dp)) {
                         Text(titleText, color = colors.onSurface, fontSize = 14.sp, fontWeight = FontWeight.Bold, maxLines = 1)
                         Text(urlText, color = colors.secondaryText, fontSize = 11.sp, maxLines = 1)
-                    }
-                    if (request.isImageReader) {
-                        IconButton(onClick = { showReaderSettings = true }, modifier = Modifier.size(44.dp)) {
-                            Icon(Icons.Filled.Tune, contentDescription = stringResource(R.string.image_reader_settings), tint = colors.iconTint)
-                        }
                     }
                     IconButton(onClick = {
                         val currentUrl = if (request.isPage) webViewRef?.url?.takeIf { it.isNotEmpty() } ?: request.url else request.url
@@ -195,47 +162,7 @@ internal fun ContentPreviewSheet(request: ContentPreviewRequest, activity: MainA
                     onPreviewLinkLongPress = { nestedPreviewLinkRequest = it }
                 )
             }
-            if (request.isImageReader) {
-                HorizontalDivider(color = colors.divider, thickness = 1.dp)
-                Surface(color = colors.popupBackground) {
-                    Row(
-                        Modifier.fillMaxWidth().navigationBarsPadding().padding(horizontal = 12.dp, vertical = 6.dp),
-                        horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(8.dp)
-                    ) {
-                        androidx.compose.material3.FilledTonalButton(
-                            onClick = { onDismiss(); activity.openImageReaderFor(request.prevUrl) },
-                            enabled = request.prevUrl.isNotEmpty(),
-                            modifier = Modifier.weight(1f)
-                        ) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null, modifier = Modifier.size(18.dp))
-                            Text(stringResource(R.string.image_reader_prev), modifier = Modifier.padding(start = 6.dp))
-                        }
-                        androidx.compose.material3.FilledTonalButton(
-                            onClick = { onDismiss(); activity.openImageReaderFor(request.nextUrl) },
-                            enabled = request.nextUrl.isNotEmpty(),
-                            modifier = Modifier.weight(1f)
-                        ) {
-                            Text(stringResource(R.string.image_reader_next), modifier = Modifier.padding(end = 6.dp))
-                            Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = null, modifier = Modifier.size(18.dp))
-                        }
-                    }
-                }
-            }
         }
-    }
-
-    if (showReaderSettings && request.isImageReader) {
-        com.simplefox.browser.browser.imagereader.ImageReaderSettingsSheet(
-            activity = activity,
-            request = request,
-            prefs = readerPrefs,
-            onPrefsChange = { np ->
-                readerPrefs = np
-                com.simplefox.browser.browser.imagereader.ImageReaderStore.save(context, np)
-                webViewRef?.loadHtml(com.simplefox.browser.browser.imagereader.ImageReaderHtml.build(request.images, np))
-            },
-            onDismiss = { showReaderSettings = false }
-        )
     }
 
     nestedImageRequest?.let { req ->
@@ -267,7 +194,7 @@ private fun PreviewWebView(
         item {
             AndroidView(
                 modifier = Modifier.fillParentMaxSize(),
-                update = { wv -> if (!request.isReaderMode) applyPreviewDarkMode(wv.context, wv, systemDark) },
+                update = { wv -> applyPreviewDarkMode(wv.context, wv, systemDark) },
                 factory = { ctx ->
                     val prefs = PreferenceManager.getDefaultSharedPreferences(ctx)
                     val dataSaverEnabled = DataSaverMode.isActive(prefs)
@@ -284,7 +211,7 @@ private fun PreviewWebView(
                         mediaPlaybackRequiresUserGesture = disableAutoplay
                     }
 
-                    if (!request.isReaderMode) applyPreviewDarkMode(ctx, wv, systemDark)
+                    applyPreviewDarkMode(ctx, wv, systemDark)
 
                     wv.scrollListener = { scrollY, _ -> onScrollYChanged(scrollY) }
                     wv.touchObserver = { wv.parent?.requestDisallowInterceptTouchEvent(true) }
@@ -325,9 +252,7 @@ private fun PreviewWebView(
                         }
                     }
 
-                    if (request.isReaderMode) {
-                        wv.loadHtml(request.readerHtml)
-                    } else if (request.url.isNotEmpty()) {
+                    if (request.url.isNotEmpty()) {
                         wv.loadUrl(request.url)
                     }
 

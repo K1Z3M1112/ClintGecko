@@ -19,15 +19,6 @@ class FileChooserParams(
         const val MODE_OPEN = 0
         const val MODE_OPEN_MULTIPLE = 1
 
-        fun parseResult(resultCode: Int, data: android.content.Intent?): Array<Uri>? {
-            if (resultCode != android.app.Activity.RESULT_OK || data == null) return null
-            val clip = data.clipData
-            if (clip != null && clip.itemCount > 0) {
-                return Array(clip.itemCount) { clip.getItemAt(it).uri }
-            }
-            val single = data.data ?: return null
-            return arrayOf(single)
-        }
     }
 }
 

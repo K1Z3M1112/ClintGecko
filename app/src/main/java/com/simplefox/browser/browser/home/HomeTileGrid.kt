@@ -3,10 +3,8 @@ package com.simplefox.browser.browser.home
 import android.os.SystemClock
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationVector2D
-import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.VectorConverter
 import com.simplefox.browser.ui.animateFloatAsState
-import androidx.compose.animation.core.spring
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background

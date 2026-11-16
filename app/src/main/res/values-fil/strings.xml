@@ -7,23 +7,19 @@
     <string name="refresh">I-refresh</string>
     <string name="home">Home</string>
     <string name="menu">Menu</string>
-    <string name="tabs">Mga Tab</string>
     <string name="tabs_section_normal">MGA REGULAR NA TAB</string>
     <string name="tabs_section_incognito">MGA INCOGNITO NA TAB</string>
     <string name="settings">Mga Setting</string>
     <string name="settings_select_category">Pumili ng kategorya para makita ang mga setting nito</string>
     <string name="share_url">Ibahagi ang URL</string>
-    <string name="downloading">Dina-download\u2026</string>
     <string name="privacy_settings">Privacy &amp; Seguridad</string>
     <string name="browser_settings">Browser</string>
     <string name="browser_settings_summary">Search, homepage, mga tab, extension, profile, at website blocker</string>
     <string name="pref_category_appearance">Hitsura</string>
-    <string name="pref_category_layout">Layout</string>
     <string name="pref_category_search">Paghahanap</string>
     <string name="pref_category_protection">Content Blocker</string>
     <string name="pref_category_navigation">Navigation</string>
     <string name="pref_category_language">Wika</string>
-    <string name="pref_category_shortcuts">Shortcuts</string>
     <string name="pref_category_tabs">Mga Tab</string>
     <string name="pref_category_web_content">Nilalaman ng web</string>
     <string name="pref_category_tools">Mga tool</string>
@@ -279,12 +275,10 @@
     <string name="menu_customization_reset_confirm_title">I-reset ang menu?</string>
     <string name="menu_customization_reset_confirm_message">Ibabalik nito ang default na ayos at ipapakita muli ang lahat ng item sa menu.</string>
     <string name="menu_customization_reset_action">I-reset</string>
-    <string name="pref_updates_title">Mga Update</string>
     <string name="download_settings_title">Mga Download</string>
     <string name="download_settings_summary">Download manager, lokasyon, iskedyul, speed limit, at retry</string>
     <string name="download_section_manager">DOWNLOAD MANAGER</string>
     <string name="download_manager_title">Download Manager</string>
-    <string name="download_manager_summary">Piliin kung aling app ang hahawak sa mga bagong download</string>
     <string name="download_manager_dialog_title">Piliin ang download manager</string>
     <string name="download_manager_option_clint">SimpleFox (Default)</string>
     <string name="download_manager_option_1dm">1DM</string>
@@ -391,17 +385,6 @@
     <string name="download_status_retrying">Nagre-retry&#8230;</string>
     <string name="download_status_retrying_in">Magre-retry sa loob ng %1$ds&#8230;</string>
     <string name="download_retry_hint">Maaaring nag-expire na ang download link. Subukang i-update ito gamit ang &#8220;I-update ang download link&#8221; sa menu ng item, o gamitin ang &#8220;I-update ang download link sa browser&#8221; para makakuha ng bago.</string>
-    <string name="pref_updates_summary">Awtomatikong pag-check, metered network, at beta channel</string>
-    <string name="check_update_on_launch_title">I-check ang mga update sa pag-launch</string>
-    <string name="check_update_on_launch_summary">Awtomatikong maghanap ng bagong bersyon tuwing bubuksan ang app</string>
-    <string name="skip_update_on_metered_title">Laktawan ang pag-check ng update sa pag-launch kapag naka-mobile data o metered ang koneksyon</string>
-    <string name="skip_update_on_metered_summary">Hindi magche-check ng update sa pag-launch kapag metered o mobile data ang gamit na koneksyon</string>
-    <string name="check_for_updates_title">I-check ang mga update</string>
-    <string name="check_for_updates_summary">Tingnan ngayon kung may bagong stable o beta release</string>
-    <string name="view_changelog_title">Tingnan ang Changelog</string>
-    <string name="view_changelog_summary">Tingnan kung ano ang bago sa bawat release</string>
-    <string name="beta_channel_title">Sumali sa Beta</string>
-    <string name="beta_channel_summary">Maagang access sa mga bagong build bago ito maging stable. Maaaring may mga bug.</string>
     <string name="debug_title">Debug &amp; Crash Reports</string>
     <string name="debug_summary">Mga crash log at handang template para sa bug report</string>
     <string name="crash_reports_title">CRASH LOGS</string>
@@ -483,8 +466,6 @@
     <string name="menu_downloads">Mga Download</string>
     <string name="menu_bookmarks">Mga Bookmark</string>
     <string name="menu_history">History</string>
-    <string name="reader_mode">Reader Mode</string>
-    <string name="reader_mode_unavailable">Hindi available ang Reader Mode sa page na ito</string>
 
     <string name="action_ok">OK</string>
     <string name="action_add">Idagdag</string>
@@ -571,7 +552,6 @@
     <string name="download_menu_copy_filename">Kopyahin ang pangalan ng file</string>
     <string name="download_menu_copy_path">Kopyahin ang path ng file</string>
     <string name="download_menu_properties">Properties</string>
-    <string name="download_multi_options_desc">Higit pang opsyon</string>
     <string name="redownload_multi_confirm_title">I-download ulit ang %1$d item?</string>
     <string name="redownload_multi_confirm_message">Buburahin ang mga kasalukuyang file at ida-download ulit. Magpatuloy?</string>
     <string name="download_menu_link_copied">Nakopya ang link</string>
@@ -683,28 +663,11 @@
     <string name="restart_required_message">Kailangang mag-restart ang app para mailapat ang pagbabagong ito.</string>
     <string name="restart_required_confirm">I-restart na ngayon</string>
 
-    <string name="beta_enrol_title">Sumali sa Beta</string>
-    <string name="beta_enrol_message">Sa beta release, mauuna mong magamit ang mga bagong feature bago maging stable.\n\nMaaaring may bug, kulang na feature, o kakaibang behavior ang mga beta build, kaya hindi ito inirerekomenda para sa araw-araw na gamit sa pangunahing device mo.\n\nPuwede kang bumalik sa stable anumang oras.</string>
-    <string name="beta_enrol_confirm">Sumali</string>
 
-    <string name="update_dialog_title">Available na ang v%1$s%2$s</string>
-    <string name="update_dialog_skip">Laktawan ang bersyong ito</string>
-    <string name="update_dialog_download">I-download</string>
-    <string name="update_dialog_view_github">Tingnan sa GitHub</string>
-    <string name="update_download_dialog_title">Dina-download ang Update</string>
-    <string name="update_download_preparing">Naghahanda\u2026</string>
-    <string name="update_download_in_progress">Dina-download ang update\u2026</string>
-    <string name="update_download_progress_size_known">%1$s / %2$s (%3$d%%)</string>
-    <string name="update_download_progress_size_unknown">%1$s na-download</string>
-    <string name="update_up_to_date_title">Updated ka na</string>
-    <string name="update_up_to_date_message">Pinakabagong bersyon na ng SimpleFox ang gamit mo.</string>
-    <string name="update_check_failed_title">Nabigong mag-check ng update</string>
-    <string name="update_check_failed_message">Hindi makakonekta sa update server. Paki-check ang koneksyon mo at subukan ulit.</string>
 
     <string name="download_status_progress">%1$d%%  \u2022  %2$s / %3$s</string>
     <string name="download_status_progress_unknown_total">%1$d%%  \u2022  %2$s / ?</string>
     <string name="download_status_progress_indeterminate">%1$s / ?</string>
-    <string name="download_status_complete_label">Kumpleto</string>
     <string name="download_status_failed_label">Nabigo</string>
     <string name="download_info_with_time">%1$s  \u2022  %2$s</string>
     <string name="download_error_unknown">Hindi kilalang error</string>
@@ -779,10 +742,6 @@
     <string name="action_play">I-play</string>
     <string name="action_pause">I-pause</string>
     <string name="action_resume">Ituloy</string>
-    <string name="download_pause_desc">I-pause ang download</string>
-    <string name="download_resume_desc">Ituloy ang download</string>
-    <string name="download_resumable_yes">Puwedeng ituloy: Oo</string>
-    <string name="download_resumable_no">Puwedeng ituloy: Hindi</string>
 
     <string name="setup_default_browser_title">Default na Browser</string>
     <string name="setup_default_browser_description">Gawing default browser mo ang SimpleFox para awtomatikong dito magbukas ang mga link mula sa ibang app. Opsyonal lang ito, puwede mo itong baguhin anumang oras sa settings ng iyong device.</string>
@@ -794,7 +753,6 @@
     <string name="document_viewer_error">Hindi na-load ang dokumento.\nPaki-check ang iyong koneksyon at subukan ulit.</string>
     <string name="document_viewer_privacy_policy_title">Patakaran sa Privacy</string>
     <string name="document_viewer_terms_title">Mga Tuntunin ng Serbisyo</string>
-    <string name="document_viewer_changelog_title">Changelog</string>
     <string name="setup_theme_title">Piliin ang Iyong Tema</string>
     <string name="setup_theme_subtitle">Pumili ng hitsurang bagay sa iyo. Puwede mo itong baguhin anumang oras sa Settings.</string>
 
@@ -949,7 +907,6 @@
 
     <string name="setup_welcome_title">Welcome sa SimpleFox</string>
     <string name="setup_welcome_subtitle">Bago tayo magsimula, basahin muna ang aming mga tuntunin.</string>
-    <string name="setup_terms_read">Basahin</string>
     <string name="setup_terms_agree">Nabasa ko at sumasang-ayon ako sa Patakaran sa Privacy at Mga Tuntunin ng Serbisyo</string>
     <string name="setup_terms_continue">Sumang-ayon at Magpatuloy</string>
 
@@ -972,7 +929,6 @@
     <string name="bookmarks_delete_confirm_message">Burahin ang %d bookmark?</string>
     <string name="bookmarks_items_deleted">Nabura ang mga bookmark</string>
     <string name="bookmarks_sort_by_date_added">Kailan idinagdag</string>
-    <string name="bookmarks_new_folder_desc">Bagong folder</string>
     <string name="bookmarks_new_folder_title">Bagong Folder</string>
     <string name="bookmarks_folder_name_hint">Pangalan ng folder</string>
     <string name="bookmarks_folder_create">Gumawa</string>
@@ -1003,7 +959,6 @@
     <string name="bookmarks_export_error">Nabigong mag-export ng mga bookmark</string>
 
     <string name="downloads_title">Mga Download</string>
-    <string name="downloads_empty">Wala pang download</string>
     <string name="downloads_filter_all">Lahat</string>
     <string name="downloads_type_video">Mga video</string>
     <string name="downloads_type_audio">Audio</string>
@@ -1107,7 +1062,6 @@
     <string name="downloads_sort_by_size">Laki</string>
     <string name="downloads_sort_by_status">Status</string>
     <string name="downloads_selected_count">%d napili</string>
-    <string name="downloads_delete_selected_desc">Alisin ang mga piniling download</string>
     <string name="downloads_delete_confirm_title">Alisin ang mga download</string>
     <string name="downloads_delete_confirm_message">Alisin ang %d download?</string>
     <string name="downloads_delete_also_from_storage">Burahin din ang file sa storage</string>
@@ -1205,7 +1159,6 @@
     <string name="menu_website_blocker">Website Blocker</string>
     <string name="about_webview_label">ENGINE</string>
     <string name="about_webview_info">%1$s\n%2$s\nv%3$s</string>
-    <string name="about_webview_unavailable">Hindi Available</string>
 
     <string name="suggestion_icon_desc">Search suggestion</string>
     <string name="suggestion_fill_desc">Ilagay sa search bar</string>
@@ -1264,7 +1217,6 @@
     <string name="history_invert_selection">I-invert</string>
     <string name="history_deselect_all">Alisin ang Lahat ng Napili</string>
     <string name="history_delete_selected">Burahin</string>
-    <string name="history_delete_selected_desc">Burahin ang mga piniling item</string>
     <string name="history_sort">I-sort</string>
     <string name="history_sort_by_title">Pamagat</string>
     <string name="history_sort_by_last_visit">Huling Binisita</string>
@@ -1382,7 +1334,6 @@
     <string name="tab_menu_invert_selection">Baligtarin ang Pagpili</string>
     <string name="tab_menu_delete_selected">Tanggalin ang mga Napiling Tab</string>
     <string name="tab_menu_drag_handle_desc">I-drag para ayusin muli</string>
-    <string name="tab_menu_select_tab_desc">Piliin ang tab</string>
     <string name="tab_group_new">Bagong Tab Group</string>
     <string name="tab_group_new_tab_in_group">Bagong Tab sa Grupo</string>
     <string name="tab_group_edit">Palitan ang Pangalan at Kulay</string>
@@ -1401,7 +1352,6 @@
     <string name="tab_group_expand_all">Palawakin Lahat ng Grupo</string>
     <string name="tab_group_bar_show">Ipakita ang Group Bar</string>
     <string name="tab_group_options_desc">Mga opsyon ng grupo</string>
-    <string name="tab_group_bar_open_desc">Tingnan ang %1$s sa tab switcher</string>
     <string name="tab_group_move_title">Ilipat sa grupo</string>
     <string name="tab_group_closed_message">Isinara ang grupong “%1$s”</string>
     <string name="tab_selection_group">Igrupo</string>
@@ -1473,8 +1423,6 @@
 
     <string name="data_saver_browser_section">BROWSER</string>
 
-    <string name="update_section_updates">MGA UPDATE</string>
-    <string name="update_section_channel">CHANNEL</string>
 
     <string name="misc_section_app">APP</string>
     <string name="misc_section_setup">SETUP</string>
@@ -1629,8 +1577,6 @@
 
     <string name="website_blocker_title">Website Blocker</string>
     <string name="website_blocker_settings_summary">Harangan ang pornograpiya, sugal, at iba pang website.</string>
-    <string name="website_blocker_status_working">Pinoproseso\u2026</string>
-    <string name="website_blocker_status_active">Protektado ka laban sa %d kilalang domain</string>
     <string name="website_blocker_fab_save_desc">I-save at i-apply ang mga pagbabago</string>
     <string name="website_blocker_compile_failed">Hindi na-update ang blocklist. Pakisubukan ulit.</string>
     <string name="website_blocker_delete_confirm_title">I-reset ang kategorya?</string>
@@ -1711,7 +1657,6 @@
     <string name="additional_websites_invalid_host">Maglagay ng wastong domain, tulad ng example.com</string>
     <string name="additional_websites_delete_confirm_title">Tanggalin ang website?</string>
     <string name="additional_websites_delete_confirm_message">Tatanggalin nito ang %d napiling website mula sa Karagdagang Websites.</string>
-    <string name="select_picker_default_title">Pumili ng opsyon</string>
 
     <string name="menu_media_capture">Media</string>
     <string name="media_capture_dialog_title">Na-detect na Media</string>
@@ -1725,14 +1670,12 @@
     <string name="media_capture_section_video">VIDEO</string>
     <string name="media_capture_section_audio">AUDIO</string>
     <string name="media_capture_section_subtitles">SUBTITLES</string>
-    <string name="media_capture_downloads_not_supported_yet">Hindi pa sinusuportahan ang pag-download ng mga na-detect na stream. Kopyahin ang link para buksan ito sa ibang app.</string>
     <string name="media_capture_live_badge">LIVE</string>
     <string name="media_capture_no_audio_badge">NO AUDIO</string>
     <string name="media_capture_best_badge">BEST</string>
     <string name="media_capture_sort_quality">Kalidad</string>
     <string name="media_capture_sort_newest">Pinakabago muna</string>
     <string name="media_capture_sort_oldest">Pinakaluma muna</string>
-    <string name="media_capture_copy_link">Kopyahin ang link</string>
     <string name="media_capture_download">I-download</string>
     <string name="media_capture_duplicate_link_updated">Na-update ang download link</string>
     <string name="media_capture_link_clip_label">URL ng Media</string>
@@ -1748,7 +1691,6 @@
     <string name="media_capture_menu_preview">I-preview</string>
     <string name="media_capture_subtitle_preview_title">Preview ng Subtitle</string>
     <string name="media_capture_subtitle_preview_error">Hindi na-load ang subtitle.\nPaki-check ang iyong koneksyon at subukan ulit.</string>
-    <string name="media_capture_video_preview_title">Preview ng Video</string>
     <string name="media_capture_video_preview_error">Hindi ma-play ang video.\nPaki-check ang iyong koneksyon at subukan ulit.</string>
     <string name="media_capture_audio_preview_title">Preview ng Audio</string>
     <string name="media_capture_audio_preview_error">Hindi ma-play ang audio.\nPaki-check ang iyong koneksyon at subukan ulit.</string>

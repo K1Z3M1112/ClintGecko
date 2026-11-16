@@ -2,7 +2,6 @@ package com.simplefox.browser.tabs
 
 import android.content.Context
 import android.content.SharedPreferences
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable

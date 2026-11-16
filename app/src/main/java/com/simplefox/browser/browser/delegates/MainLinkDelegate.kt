@@ -7,8 +7,6 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
-import android.os.Handler
-import android.os.Looper
 import com.simplefox.browser.browser.webview.ClintWebView
 import android.widget.Toast
 import com.simplefox.browser.R

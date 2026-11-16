@@ -3,9 +3,6 @@ package com.simplefox.browser.tabs
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.Canvas
-import android.graphics.Paint
-import android.graphics.PaintFlagsDrawFilter
 import android.os.Build
 import android.util.LruCache
 import com.simplefox.browser.browser.webview.ClintWebView
@@ -15,7 +12,7 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Executors
 
 object TabThumbnailCache {
-    private const val MAX_DIMENSION_PX = 1024
+    private const val MAX_DIMENSION_PX = 720
     const val DIR_NAME = "tab_thumbnails"
     private const val WEBP_QUALITY = 85
 

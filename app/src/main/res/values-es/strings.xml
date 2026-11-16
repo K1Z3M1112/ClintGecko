@@ -7,23 +7,19 @@
     <string name="refresh">Actualizar</string>
     <string name="home">Inicio</string>
     <string name="menu">Menú</string>
-    <string name="tabs">Pestañas</string>
     <string name="tabs_section_normal">PESTAÑAS NORMALES</string>
     <string name="tabs_section_incognito">PESTAÑAS DE INCÓGNITO</string>
     <string name="settings">Configuración</string>
     <string name="settings_select_category">Elige una categoría para ver su configuración</string>
     <string name="share_url">Compartir URL</string>
-    <string name="downloading">Descargando\u2026</string>
     <string name="privacy_settings">Privacidad y seguridad</string>
     <string name="browser_settings">Navegador</string>
     <string name="browser_settings_summary">Búsqueda, página de inicio, pestañas, extensiones, perfiles y bloqueador de sitios</string>
     <string name="pref_category_appearance">Apariencia</string>
-    <string name="pref_category_layout">Diseño</string>
     <string name="pref_category_search">Búsqueda</string>
     <string name="pref_category_protection">Bloqueador de contenido</string>
     <string name="pref_category_navigation">Navegación</string>
     <string name="pref_category_language">Idioma</string>
-    <string name="pref_category_shortcuts">Accesos directos</string>
     <string name="pref_category_tabs">Pestañas</string>
     <string name="pref_category_web_content">Contenido web</string>
     <string name="pref_category_tools">Herramientas</string>
@@ -283,12 +279,10 @@
     <string name="menu_customization_reset_confirm_title">¿Restablecer el menú?</string>
     <string name="menu_customization_reset_confirm_message">Esto restaura el orden predeterminado y vuelve a mostrar todos los elementos del menú.</string>
     <string name="menu_customization_reset_action">Restablecer</string>
-    <string name="pref_updates_title">Actualizaciones</string>
     <string name="download_settings_title">Descargas</string>
     <string name="download_settings_summary">Gestor de descargas, ubicación, programación, límites de velocidad y reintentos</string>
     <string name="download_section_manager">GESTOR DE DESCARGAS</string>
     <string name="download_manager_title">Gestor de descargas</string>
-    <string name="download_manager_summary">Elige qué app gestiona las nuevas descargas</string>
     <string name="download_manager_dialog_title">Elegir gestor de descargas</string>
     <string name="download_manager_option_clint">SimpleFox (predeterminado)</string>
     <string name="download_manager_option_1dm">1DM</string>
@@ -395,17 +389,6 @@
     <string name="download_status_retrying">Reintentando&#8230;</string>
     <string name="download_status_retrying_in">Reintentando en %1$ds&#8230;</string>
     <string name="download_retry_hint">Puede que el enlace de descarga haya expirado. Intenta actualizarlo con la opción \u201cActualizar enlace\u201d en el menú del elemento, o usa \u201cActualizar enlace en el navegador\u201d para obtener uno nuevo.</string>
-    <string name="pref_updates_summary">Comprobación automática, redes de uso medido y canal beta</string>
-    <string name="check_update_on_launch_title">Buscar actualizaciones al iniciar</string>
-    <string name="check_update_on_launch_summary">Busca automáticamente una nueva versión cada vez que se abre la app</string>
-    <string name="skip_update_on_metered_title">Omitir la búsqueda de actualizaciones al iniciar si hay datos móviles o conexión de pago por uso</string>
-    <string name="skip_update_on_metered_summary">No buscar actualizaciones al iniciar si usas una conexión de pago por uso o datos móviles</string>
-    <string name="check_for_updates_title">Buscar actualizaciones</string>
-    <string name="check_for_updates_summary">Busca ahora la última versión estable o beta</string>
-    <string name="view_changelog_title">Ver registro de cambios</string>
-    <string name="view_changelog_summary">Consulta las novedades de cada versión</string>
-    <string name="beta_channel_title">Unirse a la beta</string>
-    <string name="beta_channel_summary">Recibe compilaciones de acceso anticipado antes de que lleguen al canal estable. Pueden contener errores.</string>
     <string name="debug_title">Depuración y reportes de errores</string>
     <string name="debug_summary">Registros de errores y una plantilla lista para reportar fallos</string>
     <string name="crash_reports_title">REGISTROS DE ERRORES</string>
@@ -487,8 +470,6 @@
     <string name="menu_downloads">Descargas</string>
     <string name="menu_bookmarks">Marcadores</string>
     <string name="menu_history">Historial</string>
-    <string name="reader_mode">Modo lectura</string>
-    <string name="reader_mode_unavailable">El modo lectura no está disponible en esta página</string>
 
     <string name="action_ok">Aceptar</string>
     <string name="action_add">Agregar</string>
@@ -575,7 +556,6 @@
     <string name="download_menu_copy_filename">Copiar nombre del archivo</string>
     <string name="download_menu_copy_path">Copiar ruta del archivo</string>
     <string name="download_menu_properties">Propiedades</string>
-    <string name="download_multi_options_desc">Más opciones</string>
     <string name="redownload_multi_confirm_title">¿Volver a descargar %1$d elementos?</string>
     <string name="redownload_multi_confirm_message">Se eliminarán los archivos existentes y se descargarán de nuevo. ¿Continuar?</string>
     <string name="download_menu_link_copied">Enlace copiado</string>
@@ -687,28 +667,11 @@
     <string name="restart_required_message">La app necesita reiniciarse para aplicar este cambio.</string>
     <string name="restart_required_confirm">Reiniciar ahora</string>
 
-    <string name="beta_enrol_title">Unirse a la beta</string>
-    <string name="beta_enrol_message">Las versiones beta te dan acceso anticipado a nuevas funciones antes de que lleguen al canal estable.\n\nLas compilaciones beta pueden tener errores, funciones incompletas o comportamientos inesperados. No se recomiendan para el uso diario en tu dispositivo principal.\n\nPuedes volver al canal estable cuando quieras.</string>
-    <string name="beta_enrol_confirm">Unirme</string>
 
-    <string name="update_dialog_title">v%1$s%2$s disponible</string>
-    <string name="update_dialog_skip">Omitir esta versión</string>
-    <string name="update_dialog_download">Descargar</string>
-    <string name="update_dialog_view_github">Ver en GitHub</string>
-    <string name="update_download_dialog_title">Descargando actualización</string>
-    <string name="update_download_preparing">Preparando\u2026</string>
-    <string name="update_download_in_progress">Descargando actualización\u2026</string>
-    <string name="update_download_progress_size_known">%1$s / %2$s (%3$d%%)</string>
-    <string name="update_download_progress_size_unknown">%1$s descargados</string>
-    <string name="update_up_to_date_title">Ya tienes la última versión</string>
-    <string name="update_up_to_date_message">SimpleFox está actualizado a la última versión.</string>
-    <string name="update_check_failed_title">Error al buscar actualizaciones</string>
-    <string name="update_check_failed_message">No se pudo acceder al servidor de actualizaciones. Revisa tu conexión e inténtalo de nuevo.</string>
 
     <string name="download_status_progress">%1$d%%  \u2022  %2$s / %3$s</string>
     <string name="download_status_progress_unknown_total">%1$d%%  \u2022  %2$s / ?</string>
     <string name="download_status_progress_indeterminate">%1$s / ?</string>
-    <string name="download_status_complete_label">Completada</string>
     <string name="download_status_failed_label">Fallida</string>
     <string name="download_info_with_time">%1$s  \u2022  %2$s</string>
     <string name="download_error_unknown">Error desconocido</string>
@@ -783,10 +746,6 @@
     <string name="action_play">Reproducir</string>
     <string name="action_pause">Pausar</string>
     <string name="action_resume">Reanudar</string>
-    <string name="download_pause_desc">Pausar descarga</string>
-    <string name="download_resume_desc">Reanudar descarga</string>
-    <string name="download_resumable_yes">Reanudable: Sí</string>
-    <string name="download_resumable_no">Reanudable: No</string>
 
     <string name="setup_default_browser_title">Navegador predeterminado</string>
     <string name="setup_default_browser_description">Convierte a SimpleFox en tu navegador predeterminado para que los enlaces de otras apps se abran aquí automáticamente. Esto es totalmente opcional; puedes cambiarlo cuando quieras en la configuración de tu dispositivo.</string>
@@ -798,7 +757,6 @@
     <string name="document_viewer_error">No se pudo cargar el documento.\nRevisa tu conexión e inténtalo de nuevo.</string>
     <string name="document_viewer_privacy_policy_title">Política de privacidad</string>
     <string name="document_viewer_terms_title">Términos del servicio</string>
-    <string name="document_viewer_changelog_title">Registro de cambios</string>
     <string name="setup_theme_title">Elige tu tema</string>
     <string name="setup_theme_subtitle">Elige el aspecto que más te guste. Siempre puedes cambiarlo después en Configuración.</string>
 
@@ -953,7 +911,6 @@
 
     <string name="setup_welcome_title">Bienvenido a SimpleFox</string>
     <string name="setup_welcome_subtitle">Antes de empezar, revisa nuestros términos.</string>
-    <string name="setup_terms_read">Leer</string>
     <string name="setup_terms_agree">He leído y acepto la Política de privacidad y los Términos del servicio</string>
     <string name="setup_terms_continue">Aceptar y continuar</string>
 
@@ -976,7 +933,6 @@
     <string name="bookmarks_delete_confirm_message">¿Eliminar %d marcador(es)?</string>
     <string name="bookmarks_items_deleted">Marcadores eliminados</string>
     <string name="bookmarks_sort_by_date_added">Fecha de creación</string>
-    <string name="bookmarks_new_folder_desc">Nueva carpeta</string>
     <string name="bookmarks_new_folder_title">Nueva carpeta</string>
     <string name="bookmarks_folder_name_hint">Nombre de la carpeta</string>
     <string name="bookmarks_folder_create">Crear</string>
@@ -1007,7 +963,6 @@
     <string name="bookmarks_export_error">No se pudieron exportar los marcadores</string>
 
     <string name="downloads_title">Descargas</string>
-    <string name="downloads_empty">Aún no hay descargas</string>
     <string name="downloads_filter_all">Todas</string>
     <string name="downloads_type_video">Videos</string>
     <string name="downloads_type_audio">Audio</string>
@@ -1116,7 +1071,6 @@
     <string name="downloads_sort_by_size">Tamaño</string>
     <string name="downloads_sort_by_status">Estado</string>
     <string name="downloads_selected_count">%d seleccionadas</string>
-    <string name="downloads_delete_selected_desc">Quitar descargas seleccionadas</string>
     <string name="downloads_delete_confirm_title">Quitar descargas</string>
     <string name="downloads_delete_confirm_message">¿Quitar %d descarga(s)?</string>
     <string name="downloads_delete_also_from_storage">Eliminar también el archivo del almacenamiento</string>
@@ -1214,7 +1168,6 @@
     <string name="menu_website_blocker">Bloqueador de sitios web</string>
     <string name="about_webview_label">MOTOR</string>
     <string name="about_webview_info">%1$s\n%2$s\nv%3$s</string>
-    <string name="about_webview_unavailable">No disponible</string>
 
     <string name="suggestion_icon_desc">Sugerencia de búsqueda</string>
     <string name="suggestion_fill_desc">Rellenar en la barra de búsqueda</string>
@@ -1273,7 +1226,6 @@
     <string name="history_invert_selection">Invertir</string>
     <string name="history_deselect_all">Anular selección</string>
     <string name="history_delete_selected">Eliminar</string>
-    <string name="history_delete_selected_desc">Eliminar elementos seleccionados</string>
     <string name="history_sort">Ordenar</string>
     <string name="history_sort_by_title">Título</string>
     <string name="history_sort_by_last_visit">Última visita</string>
@@ -1398,7 +1350,6 @@
     <string name="tab_menu_invert_selection">Invertir selección</string>
     <string name="tab_menu_delete_selected">Eliminar pestañas seleccionadas</string>
     <string name="tab_menu_drag_handle_desc">Arrastrar para reordenar</string>
-    <string name="tab_menu_select_tab_desc">Seleccionar pestaña</string>
     <string name="tab_group_new">Nuevo grupo de pestañas</string>
     <string name="tab_group_new_tab_in_group">Nueva pestaña en el grupo</string>
     <string name="tab_group_edit">Cambiar nombre y color</string>
@@ -1417,7 +1368,6 @@
     <string name="tab_group_expand_all">Expandir todos los grupos</string>
     <string name="tab_group_bar_show">Mostrar barra de grupo</string>
     <string name="tab_group_options_desc">Opciones del grupo</string>
-    <string name="tab_group_bar_open_desc">Ver %1$s en el selector de pestañas</string>
     <string name="tab_group_move_title">Mover a un grupo</string>
     <string name="tab_group_closed_message">Se cerró el grupo «%1$s»</string>
     <string name="tab_selection_group">Agrupar</string>
@@ -1491,8 +1441,6 @@
 
     <string name="data_saver_browser_section">NAVEGADOR</string>
 
-    <string name="update_section_updates">ACTUALIZACIONES</string>
-    <string name="update_section_channel">CANAL</string>
 
     <string name="misc_section_app">APP</string>
     <string name="misc_section_setup">CONFIGURACIÓN INICIAL</string>
@@ -1647,8 +1595,6 @@
 
     <string name="website_blocker_title">Bloqueador de sitios web</string>
     <string name="website_blocker_settings_summary">Bloquea pornografía, apuestas y otros sitios web.</string>
-    <string name="website_blocker_status_working">Trabajando…</string>
-    <string name="website_blocker_status_active">Protegiéndote de %d dominios conocidos</string>
     <string name="website_blocker_fab_save_desc">Guardar y aplicar cambios</string>
     <string name="website_blocker_compile_failed">No se pudo actualizar la lista de bloqueo. Inténtalo de nuevo.</string>
     <string name="website_blocker_delete_confirm_title">¿Restablecer categoría?</string>
@@ -1729,7 +1675,6 @@
     <string name="additional_websites_invalid_host">Ingresa un dominio válido, como example.com</string>
     <string name="additional_websites_delete_confirm_title">¿Eliminar sitio web?</string>
     <string name="additional_websites_delete_confirm_message">Esto eliminará %d sitios web seleccionados de Sitios web adicionales.</string>
-    <string name="select_picker_default_title">Selecciona una opción</string>
 
     <string name="menu_media_capture">Multimedia</string>
     <string name="media_capture_dialog_title">Contenido multimedia detectado</string>
@@ -1743,14 +1688,12 @@
     <string name="media_capture_section_video">VIDEO</string>
     <string name="media_capture_section_audio">AUDIO</string>
     <string name="media_capture_section_subtitles">SUBTÍTULOS</string>
-    <string name="media_capture_downloads_not_supported_yet">Aún no se admite la descarga de transmisiones detectadas. Copia un enlace para abrirlo en otro lugar.</string>
     <string name="media_capture_live_badge">EN VIVO</string>
     <string name="media_capture_no_audio_badge">SIN AUDIO</string>
     <string name="media_capture_best_badge">MEJOR</string>
     <string name="media_capture_sort_quality">Calidad</string>
     <string name="media_capture_sort_newest">Más recientes primero</string>
     <string name="media_capture_sort_oldest">Más antiguos primero</string>
-    <string name="media_capture_copy_link">Copiar enlace</string>
     <string name="media_capture_download">Descargar</string>
     <string name="media_capture_duplicate_link_updated">Enlace de descarga actualizado</string>
     <string name="media_capture_link_clip_label">URL del contenido multimedia</string>
@@ -1766,7 +1709,6 @@
     <string name="media_capture_menu_preview">Vista previa</string>
     <string name="media_capture_subtitle_preview_title">Vista previa de subtítulos</string>
     <string name="media_capture_subtitle_preview_error">No se pudo cargar el subtítulo.\nRevisa tu conexión e inténtalo de nuevo.</string>
-    <string name="media_capture_video_preview_title">Vista previa de video</string>
     <string name="media_capture_video_preview_error">No se pudo reproducir el video.\nRevisa tu conexión e inténtalo de nuevo.</string>
     <string name="media_capture_audio_preview_title">Vista previa de audio</string>
     <string name="media_capture_audio_preview_error">No se pudo reproducir el audio.\nRevisa tu conexión e inténtalo de nuevo.</string>

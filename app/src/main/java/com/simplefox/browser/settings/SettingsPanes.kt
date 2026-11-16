@@ -2,7 +2,6 @@ package com.simplefox.browser.settings
 import com.simplefox.browser.browser.home.PREF_HOMEPAGE
 import com.simplefox.browser.browser.home.HOMEPAGE_CLINT
 import com.simplefox.browser.browser.home.PREF_HOMEPAGE_DESIGN
-import com.simplefox.browser.browser.home.HOMEPAGE_DESIGN_GRADIENT
 import com.simplefox.browser.browser.home.HOMEPAGE_DESIGN_IMAGE
 import com.simplefox.browser.browser.home.PREF_HOMEPAGE_IMAGE_VERSION
 import com.simplefox.browser.browser.home.homepageImageFile
@@ -24,7 +23,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember

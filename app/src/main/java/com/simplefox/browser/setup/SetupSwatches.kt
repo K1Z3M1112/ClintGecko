@@ -95,11 +95,13 @@ private fun BoxScope.ContentLinesStack(onSurface: Color, topPad: Dp, bottomPad: 
     }
 }
 
-private fun Modifier.translateYByBarHeight(translationFraction: Float): Modifier =
-    this.graphicsLayer { translationY = translationFraction * BarHeight.toPx() }
+private fun Modifier.translateYByBarHeight(translationFraction: () -> Float): Modifier =
+    this.graphicsLayer { translationY = translationFraction() * BarHeight.toPx() }
+
+private val NoFraction: () -> Float = { 0f }
 
 @Composable
-private fun BoxScope.Pill(color: Color, atTop: Boolean, translationFraction: Float = 0f) {
+private fun BoxScope.Pill(color: Color, atTop: Boolean, translationFraction: () -> Float = NoFraction) {
     Box(
         Modifier
             .align(if (atTop) Alignment.TopCenter else Alignment.BottomCenter)
@@ -114,7 +116,7 @@ private fun BoxScope.Pill(color: Color, atTop: Boolean, translationFraction: Flo
 }
 
 @Composable
-private fun BoxScope.NavDotsRow(onSurface: Color, translationFraction: Float = 0f) {
+private fun BoxScope.NavDotsRow(onSurface: Color, translationFraction: () -> Float = NoFraction) {
     Row(
         Modifier
             .align(Alignment.BottomCenter)
@@ -276,15 +278,20 @@ fun ScrollHidePreview(
     val pillAtTop = addressBarPosition != "bottom"
     val navDotsVisible = addressBarPosition == "split"
 
-    val transition = rememberInfiniteTransition(label = "scrollHide")
-    val f = if (animate) {
-        transition.animateFloat(initialValue = 0f, targetValue = 1f, animationSpec = loopSpec(), label = "f").value
-    } else 0f
+    // The animated value is only read inside graphicsLayer lambdas (draw phase), so the
+    // preview is never recomposed per frame.
+    val fState: androidx.compose.runtime.State<Float>? = if (animate) {
+        rememberInfiniteTransition(label = "scrollHide")
+            .animateFloat(initialValue = 0f, targetValue = 1f, animationSpec = loopSpec(), label = "f")
+    } else null
+    val f: () -> Float = { fState?.value ?: 0f }
 
-    val topFraction = if (kind == "search_bar" || kind == "both") -f else 0f
-    val bottomFraction = if (kind == "navigation_bar" || kind == "both") f else 0f
+    val moveTop = kind == "search_bar" || kind == "both"
+    val moveBottom = kind == "navigation_bar" || kind == "both"
+    val topFraction: () -> Float = if (moveTop) ({ -f() }) else NoFraction
+    val bottomFraction: () -> Float = if (moveBottom) f else NoFraction
     val pillFraction = if (pillAtTop) topFraction else bottomFraction
-    val dotsFraction = if (kind == "navigation_bar" || kind == "both") bottomFraction else 0f
+    val dotsFraction = bottomFraction
 
     Box(
         Modifier

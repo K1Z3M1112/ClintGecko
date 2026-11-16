@@ -1,7 +1,6 @@
 package com.simplefox.browser.downloads.mega
 
 import android.net.Uri
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box

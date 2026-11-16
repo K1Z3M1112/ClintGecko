@@ -24,10 +24,8 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -71,7 +69,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.graphics.asAndroidBitmap
@@ -82,7 +79,6 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -325,13 +321,19 @@ internal fun ClintHomeScreen(activity: MainActivity, state: MainUiState, modifie
                 bitmap = bitmap,
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxSize().graphicsLayer { alpha = bgAlpha }
+                modifier = Modifier.fillMaxSize().graphicsLayer {
+                    alpha = bgAlpha
+                    compositingStrategy = androidx.compose.ui.graphics.CompositingStrategy.ModulateAlpha
+                }
             )
             if (!state.homepageImageFullBrightness) {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .graphicsLayer { alpha = bgAlpha }
+                        .graphicsLayer {
+                    alpha = bgAlpha
+                    compositingStrategy = androidx.compose.ui.graphics.CompositingStrategy.ModulateAlpha
+                }
                         .background(
                             Brush.verticalGradient(
                                 listOf(colors.background.copy(alpha = scrimTop), colors.background.copy(alpha = scrimBottom))
@@ -548,84 +550,6 @@ internal fun ClintHomeScreen(activity: MainActivity, state: MainUiState, modifie
             val target = folderId ?: newHomeTileId()
             commitTiles(tiles.moveSiteToFolder(siteId, target, defaultFolderName))
             if (folderId == null) renameFolderId = target
-        }
-    }
-}
-
-@Composable
-private fun HomeHero(isIncognito: Boolean, showGlow: Boolean, compact: Boolean, greeting: String) {
-    val colors = LocalClintColors.current
-    val glowSize = if (compact) 72.dp else 96.dp
-    val cardSize = if (compact) 52.dp else 68.dp
-    val shape = RoundedCornerShape(22.dp)
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Box(modifier = Modifier.size(glowSize), contentAlignment = Alignment.Center) {
-            if (showGlow) {
-                if (showGlow) {
-                    Box(
-                        modifier = Modifier
-                            .matchParentSize()
-                            .background(
-                                Brush.radialGradient(listOf(colors.primary.copy(alpha = 0.30f), Color.Transparent)),
-                                CircleShape
-                            )
-                    )
-                }
-            }
-            Box(
-                modifier = Modifier
-                    .size(cardSize)
-                    .clip(shape)
-                    .background(colors.cardBackground.copy(alpha = LocalHomeCardAlpha.current))
-                    .border(1.dp, colors.primary.copy(alpha = 0.25f), shape),
-                contentAlignment = Alignment.Center
-            ) {
-                if (isIncognito) {
-                    Icon(
-                        imageVector = Icons.Filled.VisibilityOff,
-                        contentDescription = null,
-                        tint = colors.primary,
-                        modifier = Modifier.size(if (compact) 28.dp else 36.dp)
-                    )
-                } else {
-                    Image(
-                        painter = painterResource(R.drawable.ic_clint_logo),
-                        contentDescription = null,
-                        colorFilter = ColorFilter.tint(colors.primary),
-                        modifier = Modifier.size(if (compact) 40.dp else 52.dp)
-                    )
-                }
-            }
-        }
-        Spacer(Modifier.height(if (compact) 8.dp else 14.dp))
-        if (isIncognito) {
-            Text(
-                text = stringResource(R.string.incognito),
-                color = colors.onSurface,
-                fontSize = if (compact) 26.sp else 32.sp,
-                fontWeight = FontWeight.Bold
-            )
-            Text(
-                text = stringResource(R.string.home_incognito_message),
-                color = colors.secondaryText,
-                fontSize = 14.sp,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.padding(top = 6.dp, start = 12.dp, end = 12.dp)
-            )
-        } else {
-            Text(
-                text = greeting,
-                color = colors.secondaryText,
-                fontSize = 15.sp,
-                fontWeight = FontWeight.Medium
-            )
-            Text(
-                text = stringResource(R.string.app_name),
-                color = colors.onSurface,
-                fontSize = if (compact) 28.sp else 36.sp,
-                fontWeight = FontWeight.Bold,
-                letterSpacing = (-0.5).sp
-            )
         }
     }
 }
@@ -876,85 +800,6 @@ private fun HomeTilesSection(
 private fun HomeRecentSection(recent: List<HomeSite>, onOpen: (HomeSite) -> Unit, menuFor: (HomeSite) -> List<HomeMenuEntry>) {
     HomeSectionTitle(stringResource(R.string.home_recent))
     HomeRecentCard(sites = recent, onOpen = onOpen, menuFor = menuFor)
-}
-
-@Composable
-private fun HomeDesktopHero(isIncognito: Boolean, showGlow: Boolean, compact: Boolean, greeting: String, date: String) {
-    val colors = LocalClintColors.current
-    val cardSize = if (compact) 56.dp else 76.dp
-    val shape = RoundedCornerShape(22.dp)
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Box(modifier = Modifier.size(cardSize + 24.dp), contentAlignment = Alignment.Center) {
-                Box(
-                    modifier = Modifier
-                        .matchParentSize()
-                        .background(
-                            Brush.radialGradient(listOf(colors.primary.copy(alpha = 0.30f), Color.Transparent)),
-                            CircleShape
-                        )
-                )
-                Box(
-                    modifier = Modifier
-                        .size(cardSize)
-                        .clip(shape)
-                        .background(colors.cardBackground.copy(alpha = LocalHomeCardAlpha.current))
-                        .border(1.dp, colors.primary.copy(alpha = 0.25f), shape),
-                    contentAlignment = Alignment.Center
-                ) {
-                    if (isIncognito) {
-                        Icon(
-                            imageVector = Icons.Filled.VisibilityOff,
-                            contentDescription = null,
-                            tint = colors.primary,
-                            modifier = Modifier.size(if (compact) 28.dp else 38.dp)
-                        )
-                    } else {
-                        Image(
-                            painter = painterResource(R.drawable.ic_clint_logo),
-                            contentDescription = null,
-                            colorFilter = ColorFilter.tint(colors.primary),
-                            modifier = Modifier.size(if (compact) 40.dp else 54.dp)
-                        )
-                    }
-                }
-            }
-            Spacer(Modifier.width(8.dp))
-            Column {
-                if (!isIncognito) {
-                    Text(
-                        text = greeting,
-                        color = colors.secondaryText,
-                        fontSize = 15.sp,
-                        fontWeight = FontWeight.Medium
-                    )
-                }
-                Text(
-                    text = stringResource(if (isIncognito) R.string.incognito else R.string.app_name),
-                    color = colors.onSurface,
-                    fontSize = if (compact) 32.sp else 44.sp,
-                    fontWeight = FontWeight.Bold,
-                    letterSpacing = (-0.5).sp
-                )
-                if (!isIncognito) {
-                    Text(
-                        text = date,
-                        color = colors.secondaryText,
-                        fontSize = 14.sp
-                    )
-                }
-            }
-        }
-        if (isIncognito) {
-            Text(
-                text = stringResource(R.string.home_incognito_message),
-                color = colors.secondaryText,
-                fontSize = 14.sp,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.widthIn(max = 480.dp).padding(top = 8.dp, start = 12.dp, end = 12.dp)
-            )
-        }
-    }
 }
 
 @Composable

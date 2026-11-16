@@ -1,42 +1,26 @@
 package com.simplefox.browser.browser.menu
-import android.content.res.Configuration
 import android.net.Uri
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.AddToHomeScreen
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.BookmarkBorder
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.automirrored.filled.ChromeReaderMode
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.DataSaverOn
-import androidx.compose.material.icons.filled.DesktopWindows
-import androidx.compose.material.icons.filled.Download
-import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.Share
-import androidx.compose.material.icons.filled.Security
-import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -44,19 +28,12 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.BottomSheetDefaults
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -70,10 +47,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -81,28 +55,22 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.unit.Velocity
 import androidx.preference.PreferenceManager
 import com.simplefox.browser.R
 import com.simplefox.browser.bookmarks.BookmarkManager
 import com.simplefox.browser.browser.MainActivity
-import com.simplefox.browser.browser.sheets.LongPressContentMaxWidth
 import com.simplefox.browser.downloads.ClintDownloadManager
 import com.simplefox.browser.downloads.DownloadStatus
-import com.simplefox.browser.settings.sitepermissions.SitePermissionDatabase
-import com.simplefox.browser.settings.sitepermissions.SitePermissionManager
 import com.simplefox.browser.settings.datasaver.DataSaverSiteException
-import com.simplefox.browser.ui.ClintDialogStatusBarEffect
 import com.simplefox.browser.ui.listscreen.PopupShape
 import com.simplefox.browser.ui.theme.LocalClintColors
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-private val MenuPopupWidth = 260.dp
-private const val MenuPopupColumns = 3
+// Each entry of the horizontal menu bar has this fixed width; the bar scrolls left/right.
+private val MenuBarCellWidth = 72.dp
 // Space kept between the menu and the address bar so the bar is never covered.
 private val MenuBarClearance = 20.dp
-private const val MenuGridMinCellWidthDp = 72
 
 internal data class BrowserMenuPageState(
     val isBookmarked: Boolean,
@@ -157,8 +125,6 @@ internal class BrowserMenuActions(
     val onHistory: () -> Unit,
     val onDesktopMode: () -> Unit,
     val onSettings: () -> Unit,
-    val onReaderMode: () -> Unit,
-    val onImageReader: () -> Unit,
     val onDataSaver: () -> Unit,
     val onOpenDataSaverSettings: () -> Unit,
     val onOpenDesktopModeSettings: () -> Unit,
@@ -254,8 +220,6 @@ internal fun MainActivity.buildMenuActions(dismiss: () -> Unit): BrowserMenuActi
     onHistory = { dismiss(); onMenuHistory() },
     onDesktopMode = { dismiss(); onMenuDesktopMode() },
     onSettings = { dismiss(); onMenuSettings() },
-    onReaderMode = { dismiss(); onMenuReaderMode() },
-    onImageReader = { dismiss(); onMenuImageReader() },
     onDataSaver = { dismiss(); onMenuDataSaver() },
     onOpenDataSaverSettings = { dismiss(); onMenuOpenDataSaverSettings() },
     onOpenDesktopModeSettings = { dismiss(); onMenuOpenDesktopModeSettings() },
@@ -276,7 +240,8 @@ internal fun MenuTriggerButton(activity: MainActivity, modifier: Modifier = Modi
     val colors = LocalClintColors.current
     val configuration = LocalConfiguration.current
     val maxMenuHeight = configuration.screenHeightDp.dp * 0.7f
-    val menuWidth = MenuPopupWidth.coerceAtMost((configuration.screenWidthDp - 24).dp)
+    // Full-width horizontal bar (minus a small edge gap on both sides).
+    val menuWidth = (configuration.screenWidthDp - 16).dp
     val actions = remember(activity) { activity.buildMenuActions(dismiss = { expanded = false }) }
 
     LaunchedEffect(expanded) {
@@ -336,61 +301,8 @@ internal fun MenuTriggerButton(activity: MainActivity, modifier: Modifier = Modi
                     modifier = Modifier.width(menuWidth).heightIn(max = maxMenuHeight)
                 ) {
                     Column(Modifier.verticalScroll(androidx.compose.foundation.rememberScrollState())) {
-                        BrowserMenuContent(currentSnapshot, actions, columns = MenuPopupColumns)
+                        BrowserMenuContent(currentSnapshot, actions)
                     }
-                }
-            }
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun BrowserMenuBottomSheet(
-    snapshot: BrowserMenuSnapshot,
-    actions: BrowserMenuActions,
-    onDismissRequest: () -> Unit
-) {
-    val colors = LocalClintColors.current
-    val context = LocalContext.current
-    val configuration = LocalConfiguration.current
-    val hideStatusBar = remember {
-        PreferenceManager.getDefaultSharedPreferences(context).getBoolean("hide_status_bar", false)
-    }
-    val hideSystemNavigation = remember {
-        PreferenceManager.getDefaultSharedPreferences(context).getBoolean("hide_system_navigation", false)
-    }
-    val listState = rememberLazyListState()
-
-    val flingBoundaryConnection = remember {
-        object : NestedScrollConnection {
-            override suspend fun onPostFling(consumed: Velocity, available: Velocity): Velocity = available
-        }
-    }
-
-    val isPortrait = configuration.orientation == Configuration.ORIENTATION_PORTRAIT
-    val maxSheetHeight = if (isPortrait) {
-        (configuration.screenHeightDp.dp * 0.8f).coerceAtLeast(320.dp)
-    } else {
-        (configuration.screenHeightDp.dp - 96.dp).coerceAtLeast(320.dp)
-    }
-    val sheetWidthDp = configuration.screenWidthDp.coerceAtMost(LongPressContentMaxWidth.value.toInt())
-    val columns = ((sheetWidthDp - 16) / MenuGridMinCellWidthDp).coerceIn(MenuPopupColumns, 5)
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    ModalBottomSheet(
-        onDismissRequest = onDismissRequest,
-        sheetState = sheetState,
-        containerColor = colors.popupBackground,
-        dragHandle = { BottomSheetDefaults.DragHandle(color = colors.divider) }
-    ) {
-        ClintDialogStatusBarEffect(hideStatusBar, hideSystemNavigation)
-        LazyColumn(
-            Modifier.fillMaxWidth().heightIn(max = maxSheetHeight).nestedScroll(flingBoundaryConnection),
-            state = listState
-        ) {
-            item {
-                Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.TopCenter) {
-                    BrowserMenuContent(snapshot, actions, columns = columns, modifier = Modifier.fillMaxWidth().widthIn(max = LongPressContentMaxWidth))
                 }
             }
         }
@@ -406,7 +318,6 @@ private sealed interface MenuGridEntry {
 private fun BrowserMenuContent(
     snapshot: BrowserMenuSnapshot,
     actions: BrowserMenuActions,
-    columns: Int,
     modifier: Modifier = Modifier
 ) {
     val colors = LocalClintColors.current
@@ -436,58 +347,74 @@ private fun BrowserMenuContent(
             .background(colors.popupBackground)
             .padding(vertical = 4.dp)
     ) {
-        entries.chunked(columns).forEach { rowEntries ->
-            Row(Modifier.fillMaxWidth().padding(horizontal = 6.dp)) {
-                rowEntries.forEach { entry ->
-                    when (entry) {
-                        MenuGridEntry.Settings -> MenuGridCell(
-                            androidx.compose.material.icons.Icons.Filled.Settings,
-                            stringResource(R.string.settings),
-                            onClick = actions.onSettings
-                        )
-                        is MenuGridEntry.Item -> MenuGridCellFor(entry.item, snapshot, actions, extensionsExpanded, onToggleExtensions)
-                    }
-                }
-                repeat(columns - rowEntries.size) { Spacer(Modifier.weight(1f)) }
-            }
-            val hasExtensions = rowEntries.any { it is MenuGridEntry.Item && it.item == CustomizableMenuItem.EXTENSIONS }
-            if (hasExtensions) {
-                ExtensionsMenuPanel(
-                    expanded = extensionsExpanded,
-                    onExtensionClick = actions.onExtensionClick,
-                    onExtensionSettings = actions.onOpenExtensionSettings,
-                    onManage = actions.onOpenExtensionsSettings
+        // One horizontal bar that scrolls left/right.
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .horizontalScroll(rememberScrollState())
+                .padding(horizontal = 6.dp)
+        ) {
+            if (snapshot.showNavRow) {
+                MenuGridCell(
+                    androidx.compose.material.icons.Icons.AutoMirrored.Filled.ArrowBack,
+                    stringResource(R.string.back),
+                    enabled = snapshot.canGoBack,
+                    onClick = actions.onGoBack
                 )
+                MenuGridCell(
+                    androidx.compose.material.icons.Icons.AutoMirrored.Filled.ArrowForward,
+                    stringResource(R.string.forward),
+                    enabled = snapshot.canGoForward,
+                    onClick = actions.onGoForward
+                )
+                MenuGridCell(
+                    androidx.compose.material.icons.Icons.Filled.Home,
+                    stringResource(R.string.home),
+                    onClick = actions.onHome
+                )
+                MenuGridCell(
+                    if (snapshot.isLoading) androidx.compose.material.icons.Icons.Filled.Close else androidx.compose.material.icons.Icons.Filled.Refresh,
+                    stringResource(R.string.refresh),
+                    onClick = actions.onRefreshOrStop
+                )
+                MenuGridCell(
+                    if (snapshot.page.isBookmarked) androidx.compose.material.icons.Icons.Filled.Bookmark else androidx.compose.material.icons.Icons.Filled.BookmarkBorder,
+                    stringResource(R.string.content_desc_bookmark),
+                    onClick = actions.onToggleBookmark
+                )
+                Box(
+                    Modifier
+                        .padding(horizontal = 4.dp, vertical = 10.dp)
+                        .width(1.dp)
+                        .height(40.dp)
+                        .background(colors.popupStroke)
+                        .align(Alignment.CenterVertically)
+                )
+            }
+            entries.forEach { entry ->
+                when (entry) {
+                    MenuGridEntry.Settings -> MenuGridCell(
+                        androidx.compose.material.icons.Icons.Filled.Settings,
+                        stringResource(R.string.settings),
+                        onClick = actions.onSettings
+                    )
+                    is MenuGridEntry.Item -> MenuGridCellFor(entry.item, snapshot, actions, extensionsExpanded, onToggleExtensions)
+                }
             }
         }
-        if (snapshot.showNavRow) {
-            MenuDivider()
-            Row(
-                modifier = Modifier.fillMaxWidth()
-                    .padding(horizontal = 8.dp, vertical = 2.dp)
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(colors.surfaceVariant)
-                    .height(44.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                MenuNavIcon(androidx.compose.material.icons.Icons.AutoMirrored.Filled.ArrowBack, stringResource(R.string.back), snapshot.canGoBack, actions.onGoBack)
-                MenuNavIcon(androidx.compose.material.icons.Icons.AutoMirrored.Filled.ArrowForward, stringResource(R.string.forward), snapshot.canGoForward, actions.onGoForward)
-                MenuNavIcon(androidx.compose.material.icons.Icons.Filled.Home, stringResource(R.string.home), true, actions.onHome)
-                MenuNavIcon(
-                    if (snapshot.isLoading) androidx.compose.material.icons.Icons.Filled.Close else androidx.compose.material.icons.Icons.Filled.Refresh,
-                    stringResource(R.string.refresh), true, actions.onRefreshOrStop
-                )
-                MenuNavIcon(
-                    if (snapshot.page.isBookmarked) androidx.compose.material.icons.Icons.Filled.Bookmark else androidx.compose.material.icons.Icons.Filled.BookmarkBorder,
-                    stringResource(R.string.content_desc_bookmark), true, actions.onToggleBookmark
-                )
-            }
+        if (snapshot.visibleMenuItems.contains(CustomizableMenuItem.EXTENSIONS)) {
+            ExtensionsMenuPanel(
+                expanded = extensionsExpanded,
+                onExtensionClick = actions.onExtensionClick,
+                onExtensionSettings = actions.onOpenExtensionSettings,
+                onManage = actions.onOpenExtensionsSettings
+            )
         }
     }
 }
 
 @Composable
-private fun RowScope.MenuGridCellFor(
+private fun MenuGridCellFor(
     item: CustomizableMenuItem,
     snapshot: BrowserMenuSnapshot,
     actions: BrowserMenuActions,
@@ -546,8 +473,6 @@ private fun RowScope.MenuGridCellFor(
         )
         CustomizableMenuItem.BOOKMARKS -> MenuGridCell(item.icon(), stringResource(item.titleRes()), onClick = actions.onBookmarks)
         CustomizableMenuItem.HISTORY -> MenuGridCell(item.icon(), stringResource(item.titleRes()), onClick = actions.onHistory)
-        CustomizableMenuItem.READER_MODE -> MenuGridCell(item.icon(), stringResource(item.titleRes()), onClick = actions.onReaderMode)
-        CustomizableMenuItem.IMAGE_READER -> MenuGridCell(item.icon(), stringResource(item.titleRes()), onClick = actions.onImageReader)
         CustomizableMenuItem.TRANSLATE -> MenuGridCell(
             item.icon(),
             stringResource(item.titleRes()),
@@ -591,30 +516,9 @@ private fun RowScope.MenuGridCellFor(
     }
 }
 
-@Composable
-private fun MenuDivider() {
-    HorizontalDivider(
-        color = LocalClintColors.current.popupStroke,
-        modifier = Modifier.padding(horizontal = 16.dp, vertical = 2.dp)
-    )
-}
-
-@Composable
-private fun RowScope.MenuNavIcon(iconRes: androidx.compose.ui.graphics.vector.ImageVector, description: String, enabled: Boolean, onClick: () -> Unit) {
-    val colors = LocalClintColors.current
-    IconButton(onClick = onClick, modifier = Modifier.weight(1f).fillMaxHeight()) {
-        Icon(
-            imageVector = iconRes,
-            contentDescription = description,
-            tint = colors.iconTint,
-            modifier = Modifier.alpha(if (enabled) 1.0f else 0.38f)
-        )
-    }
-}
-
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun RowScope.MenuGridCell(
+private fun MenuGridCell(
     iconRes: androidx.compose.ui.graphics.vector.ImageVector,
     label: String,
     enabled: Boolean = true,
@@ -628,7 +532,7 @@ private fun RowScope.MenuGridCell(
     val isOn = checked == true
     Box(
         modifier = Modifier
-            .weight(1f)
+            .width(MenuBarCellWidth)
             .padding(1.dp)
             .clip(RoundedCornerShape(12.dp))
             .let { if (enabled) it.combinedClickable(role = Role.Button, onClick = onClick, onLongClick = onLongClick) else it }

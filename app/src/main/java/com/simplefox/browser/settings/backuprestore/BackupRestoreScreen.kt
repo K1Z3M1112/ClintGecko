@@ -20,7 +20,6 @@ import androidx.compose.material.icons.filled.Extension
 import androidx.compose.material.icons.filled.Restore
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.PrivacyTip
-import androidx.compose.material.icons.filled.Security
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Shield
 import androidx.compose.material.icons.filled.SwitchAccount
@@ -63,7 +62,6 @@ import com.simplefox.browser.settings.common.SettingsScreenScaffold
 import com.simplefox.browser.settings.common.SettingsSection
 import com.simplefox.browser.ui.ClintCheckbox
 import com.simplefox.browser.ui.ClintDialog
-import com.simplefox.browser.ui.ClintDialogCancelFooter
 import com.simplefox.browser.ui.ClintOutlinedPasswordField
 import com.simplefox.browser.ui.ClintRadioButton
 import com.simplefox.browser.ui.listscreen.ConfirmDialogConfig

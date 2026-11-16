@@ -36,11 +36,6 @@ object WebsiteBlockerEngine {
         return true
     }
 
-    @Synchronized
-    fun deactivate() {
-        deactivateLocked()
-    }
-
     private fun deactivateLocked() {
         if (handle != 0L) {
             WebsiteBlockerNative.nativeUnloadDatabase(handle)

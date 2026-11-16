@@ -1,18 +1,13 @@
 package com.simplefox.browser.browser.delegates
 import com.simplefox.browser.settings.datasaver.DataSaverBridge
 import com.simplefox.browser.settings.datasaver.DataSaverMode
-import androidx.compose.ui.graphics.toArgb
 import com.simplefox.browser.ui.theme.ThemeMode
 import com.simplefox.browser.browser.webview.*
 import com.simplefox.browser.browser.MainActivity
 
 import android.annotation.SuppressLint
-import android.content.SharedPreferences
-import com.simplefox.browser.downloads.ClintDownloadManager
 import com.simplefox.browser.downloads.DownloadFilenameResolver
 import com.simplefox.browser.mediacapture.MEDIA_CAPTURE_ENABLED_PREF
-import com.simplefox.browser.mediacapture.MediaCaptureDetector
-import com.simplefox.browser.mediacapture.MediaCaptureStore
 import com.simplefox.browser.tabs.BrowserTab
 import com.simplefox.browser.profiles.WebProfiles
 import com.simplefox.browser.util.registeredDomain
@@ -126,10 +121,6 @@ internal fun MainActivity.buildRequestConfig(): org.json.JSONObject {
         .put("ds", dataSaver)
 }
 
-internal fun MainActivity.syncRequestConfig() {
-    ClintGecko.pushConfig()
-}
-
 internal fun MainActivity.installServiceWorkerMediaCapture() {}
 
 internal fun MainActivity.buildDesktopHeaders(): Map<String, String>? = null
@@ -153,8 +144,6 @@ internal fun MainActivity.buildRequestHeaders(url: String? = null): Map<String, 
 internal fun MainActivity.addDoNotTrackScript(tab: BrowserTab? = null) {
     ClintGecko.setScript("dnt", if (isDoNotTrackActive()) loadJsAsset("do_not_track.js") else null)
 }
-
-internal fun MainActivity.removeDoNotTrackScript(tab: BrowserTab? = null) {}
 
 internal fun MainActivity.reloadActiveTabWithHeaders() {
     ClintGecko.pushConfig()

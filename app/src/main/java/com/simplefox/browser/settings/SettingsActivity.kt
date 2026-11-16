@@ -41,14 +41,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.view.WindowCompat
 import androidx.preference.PreferenceManager
-import com.simplefox.browser.BuildConfig
 import com.simplefox.browser.R
 import com.simplefox.browser.base.ClintActivity
 import com.simplefox.browser.settings.backuprestore.BackupRestorePane
@@ -58,7 +56,6 @@ import com.simplefox.browser.settings.main.MainSettingsEntry
 import com.simplefox.browser.settings.main.MainSettingsScreen
 import com.simplefox.browser.settings.search.SettingsSearchResults
 import com.simplefox.browser.settings.search.SettingsSearchToolbar
-import com.simplefox.browser.ui.DocumentViewer
 import com.simplefox.browser.ui.OverlayHostActivity
 import com.simplefox.browser.ui.theme.ClintComposeTheme
 import com.simplefox.browser.ui.theme.LocalClintColors

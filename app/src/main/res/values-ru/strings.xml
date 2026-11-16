@@ -7,23 +7,19 @@
     <string name="refresh">Обновить</string>
     <string name="home">Главная</string>
     <string name="menu">Меню</string>
-    <string name="tabs">Вкладки</string>
     <string name="tabs_section_normal">ОБЫЧНЫЕ ВКЛАДКИ</string>
     <string name="tabs_section_incognito">ВКЛАДКИ ИНКОГНИТО</string>
     <string name="settings">Настройки</string>
     <string name="settings_select_category">Выберите категорию, чтобы увидеть её настройки</string>
     <string name="share_url">Поделиться ссылкой</string>
-    <string name="downloading">Загрузка\u2026</string>
     <string name="privacy_settings">Конфиденциальность и безопасность</string>
     <string name="browser_settings">Браузер</string>
     <string name="browser_settings_summary">Поиск, домашняя страница, вкладки, расширения, профили и блокировщик сайтов</string>
     <string name="pref_category_appearance">Внешний вид</string>
-    <string name="pref_category_layout">Расположение</string>
     <string name="pref_category_search">Поиск</string>
     <string name="pref_category_protection">Блокировщик контента</string>
     <string name="pref_category_navigation">Навигация</string>
     <string name="pref_category_language">Язык</string>
-    <string name="pref_category_shortcuts">Ярлыки</string>
     <string name="pref_category_tabs">Вкладки</string>
     <string name="pref_category_web_content">Веб-контент</string>
     <string name="pref_category_tools">Инструменты</string>
@@ -288,12 +284,10 @@
     <string name="menu_customization_reset_confirm_title">Сбросить меню?</string>
     <string name="menu_customization_reset_confirm_message">Это восстановит порядок по умолчанию и снова покажет все пункты меню.</string>
     <string name="menu_customization_reset_action">Сбросить</string>
-    <string name="pref_updates_title">Обновления</string>
     <string name="download_settings_title">Загрузки</string>
     <string name="download_settings_summary">Менеджер загрузок, место сохранения, расписание, ограничение скорости и повторы</string>
     <string name="download_section_manager">МЕНЕДЖЕР ЗАГРУЗОК</string>
     <string name="download_manager_title">Менеджер загрузок</string>
-    <string name="download_manager_summary">Выберите приложение для обработки новых загрузок</string>
     <string name="download_manager_dialog_title">Выберите менеджер загрузок</string>
     <string name="download_manager_option_clint">SimpleFox (по умолчанию)</string>
     <string name="download_manager_option_1dm">1DM</string>
@@ -400,17 +394,6 @@
     <string name="download_status_retrying">Повторная попытка&#8230;</string>
     <string name="download_status_retrying_in">Повтор через %1$d с&#8230;</string>
     <string name="download_retry_hint">Ссылка на загрузку могла устареть — попробуйте обновить её через пункт \u201cОбновить ссылку\u201d в меню элемента, либо используйте \u201cОбновить ссылку в браузере\u201d, чтобы получить новую.</string>
-    <string name="pref_updates_summary">Автопроверка, лимитные сети и бета-канал</string>
-    <string name="check_update_on_launch_title">Проверять обновления при запуске</string>
-    <string name="check_update_on_launch_summary">Автоматически проверять наличие новой версии при каждом запуске приложения</string>
-    <string name="skip_update_on_metered_title">Пропускать проверку обновлений при запуске в мобильной сети или лимитном соединении</string>
-    <string name="skip_update_on_metered_summary">Не проверять обновления при запуске, если используется лимитное или мобильное соединение</string>
-    <string name="check_for_updates_title">Проверить обновления</string>
-    <string name="check_for_updates_summary">Проверить сейчас наличие последней стабильной или бета-версии</string>
-    <string name="view_changelog_title">Посмотреть журнал изменений</string>
-    <string name="view_changelog_summary">Узнать, что нового в каждой версии</string>
-    <string name="beta_channel_title">Участвовать в бета-тестировании</string>
-    <string name="beta_channel_summary">Получать ранний доступ к сборкам до их выхода в стабильный канал. Может содержать ошибки.</string>
     <string name="debug_title">Отладка и отчёты о сбоях</string>
     <string name="debug_summary">Журналы сбоев и готовый шаблон отчёта об ошибке</string>
     <string name="crash_reports_title">ЖУРНАЛЫ СБОЕВ</string>
@@ -492,8 +475,6 @@
     <string name="menu_downloads">Загрузки</string>
     <string name="menu_bookmarks">Закладки</string>
     <string name="menu_history">История</string>
-    <string name="reader_mode">Режим чтения</string>
-    <string name="reader_mode_unavailable">Режим чтения недоступен на этой странице</string>
 
     <string name="action_ok">ОК</string>
     <string name="action_add">Добавить</string>
@@ -580,7 +561,6 @@
     <string name="download_menu_copy_filename">Скопировать имя файла</string>
     <string name="download_menu_copy_path">Скопировать путь к файлу</string>
     <string name="download_menu_properties">Свойства</string>
-    <string name="download_multi_options_desc">Дополнительные параметры</string>
     <string name="redownload_multi_confirm_title">Загрузить заново %1$d элемент(ов)?</string>
     <string name="redownload_multi_confirm_message">Существующие файлы будут удалены и загружены заново. Продолжить?</string>
     <string name="download_menu_link_copied">Ссылка скопирована</string>
@@ -692,28 +672,11 @@
     <string name="restart_required_message">Чтобы изменения вступили в силу, приложению нужно перезапуститься.</string>
     <string name="restart_required_confirm">Перезапустить сейчас</string>
 
-    <string name="beta_enrol_title">Участвовать в бета-тестировании</string>
-    <string name="beta_enrol_message">Бета-версии дают ранний доступ к новым функциям до их выхода в стабильный канал.\n\nБета-сборки могут содержать ошибки, незавершённые функции или неожиданное поведение. Они не рекомендуются для повседневного использования на основном устройстве.\n\nВы можете вернуться к стабильному каналу в любой момент.</string>
-    <string name="beta_enrol_confirm">Участвовать</string>
 
-    <string name="update_dialog_title">Доступна версия v%1$s%2$s</string>
-    <string name="update_dialog_skip">Пропустить эту версию</string>
-    <string name="update_dialog_download">Загрузить</string>
-    <string name="update_dialog_view_github">Посмотреть на GitHub</string>
-    <string name="update_download_dialog_title">Загрузка обновления</string>
-    <string name="update_download_preparing">Подготовка\u2026</string>
-    <string name="update_download_in_progress">Загрузка обновления\u2026</string>
-    <string name="update_download_progress_size_known">%1$s / %2$s (%3$d%%)</string>
-    <string name="update_download_progress_size_unknown">Загружено %1$s</string>
-    <string name="update_up_to_date_title">У вас последняя версия</string>
-    <string name="update_up_to_date_message">SimpleFox работает на последней версии.</string>
-    <string name="update_check_failed_title">Не удалось проверить обновления</string>
-    <string name="update_check_failed_message">Не удалось подключиться к серверу обновлений. Проверьте соединение и попробуйте снова.</string>
 
     <string name="download_status_progress">%1$d%%  \u2022  %2$s / %3$s</string>
     <string name="download_status_progress_unknown_total">%1$d%%  \u2022  %2$s / ?</string>
     <string name="download_status_progress_indeterminate">%1$s / ?</string>
-    <string name="download_status_complete_label">Завершено</string>
     <string name="download_status_failed_label">Ошибка</string>
     <string name="download_info_with_time">%1$s  \u2022  %2$s</string>
     <string name="download_error_unknown">Неизвестная ошибка</string>
@@ -788,10 +751,6 @@
     <string name="action_play">Воспроизвести</string>
     <string name="action_pause">Пауза</string>
     <string name="action_resume">Продолжить</string>
-    <string name="download_pause_desc">Приостановить загрузку</string>
-    <string name="download_resume_desc">Возобновить загрузку</string>
-    <string name="download_resumable_yes">Возобновляемая: Да</string>
-    <string name="download_resumable_no">Возобновляемая: Нет</string>
 
     <string name="setup_default_browser_title">Браузер по умолчанию</string>
     <string name="setup_default_browser_description">Сделайте SimpleFox браузером по умолчанию, чтобы ссылки из других приложений открывались в нём автоматически. Это полностью необязательно, вы можете изменить это в любой момент в настройках устройства.</string>
@@ -803,7 +762,6 @@
     <string name="document_viewer_error">Не удалось загрузить документ.\nПроверьте соединение и попробуйте снова.</string>
     <string name="document_viewer_privacy_policy_title">Политика конфиденциальности</string>
     <string name="document_viewer_terms_title">Условия использования</string>
-    <string name="document_viewer_changelog_title">Журнал изменений</string>
     <string name="setup_theme_title">Выберите тему</string>
     <string name="setup_theme_subtitle">Выберите подходящий вам вид. Вы всегда сможете изменить это позже в настройках.</string>
 
@@ -958,7 +916,6 @@
 
     <string name="setup_welcome_title">Добро пожаловать в SimpleFox</string>
     <string name="setup_welcome_subtitle">Прежде чем начать, ознакомьтесь с нашими условиями.</string>
-    <string name="setup_terms_read">Читать</string>
     <string name="setup_terms_agree">Я прочитал(а) и согласен(на) с Политикой конфиденциальности и Условиями использования</string>
     <string name="setup_terms_continue">Принять и продолжить</string>
 
@@ -981,7 +938,6 @@
     <string name="bookmarks_delete_confirm_message">Удалить закладок: %d?</string>
     <string name="bookmarks_items_deleted">Закладки удалены</string>
     <string name="bookmarks_sort_by_date_added">Дата добавления</string>
-    <string name="bookmarks_new_folder_desc">Новая папка</string>
     <string name="bookmarks_new_folder_title">Новая папка</string>
     <string name="bookmarks_folder_name_hint">Название папки</string>
     <string name="bookmarks_folder_create">Создать</string>
@@ -1012,7 +968,6 @@
     <string name="bookmarks_export_error">Не удалось экспортировать закладки</string>
 
     <string name="downloads_title">Загрузки</string>
-    <string name="downloads_empty">Загрузок пока нет</string>
     <string name="downloads_filter_all">Все</string>
     <string name="downloads_type_video">Видео</string>
     <string name="downloads_type_audio">Аудио</string>
@@ -1126,7 +1081,6 @@
     <string name="downloads_sort_by_size">Размер</string>
     <string name="downloads_sort_by_status">Статус</string>
     <string name="downloads_selected_count">Выбрано: %d</string>
-    <string name="downloads_delete_selected_desc">Удалить выбранные загрузки</string>
     <string name="downloads_delete_confirm_title">Удаление загрузок</string>
     <string name="downloads_delete_confirm_message">Удалить загрузок: %d?</string>
     <string name="downloads_delete_also_from_storage">Также удалить файл из хранилища</string>
@@ -1224,7 +1178,6 @@
     <string name="menu_website_blocker">Блокировщик сайтов</string>
     <string name="about_webview_label">ДВИЖОК</string>
     <string name="about_webview_info">%1$s\n%2$s\nv%3$s</string>
-    <string name="about_webview_unavailable">Недоступно</string>
 
     <string name="suggestion_icon_desc">Поисковая подсказка</string>
     <string name="suggestion_fill_desc">Вставить в поисковую строку</string>
@@ -1291,7 +1244,6 @@
     <string name="history_invert_selection">Инвертировать</string>
     <string name="history_deselect_all">Снять выделение</string>
     <string name="history_delete_selected">Удалить</string>
-    <string name="history_delete_selected_desc">Удалить выбранные элементы</string>
     <string name="history_sort">Сортировка</string>
     <string name="history_sort_by_title">Название</string>
     <string name="history_sort_by_last_visit">Последнее посещение</string>
@@ -1430,7 +1382,6 @@
     <string name="tab_menu_invert_selection">Инвертировать выбор</string>
     <string name="tab_menu_delete_selected">Удалить выбранные вкладки</string>
     <string name="tab_menu_drag_handle_desc">Перетащите для изменения порядка</string>
-    <string name="tab_menu_select_tab_desc">Выбрать вкладку</string>
     <string name="tab_group_new">Новая группа вкладок</string>
     <string name="tab_group_new_tab_in_group">Новая вкладка в группе</string>
     <string name="tab_group_edit">Изменить название и цвет</string>
@@ -1449,7 +1400,6 @@
     <string name="tab_group_expand_all">Развернуть все группы</string>
     <string name="tab_group_bar_show">Показывать панель группы</string>
     <string name="tab_group_options_desc">Параметры группы</string>
-    <string name="tab_group_bar_open_desc">Показать «%1$s» в списке вкладок</string>
     <string name="tab_group_move_title">Переместить в группу</string>
     <string name="tab_group_closed_message">Группа «%1$s» закрыта</string>
     <string name="tab_selection_group">В группу</string>
@@ -1527,8 +1477,6 @@
 
     <string name="data_saver_browser_section">БРАУЗЕР</string>
 
-    <string name="update_section_updates">ОБНОВЛЕНИЯ</string>
-    <string name="update_section_channel">КАНАЛ</string>
 
     <string name="misc_section_app">ПРИЛОЖЕНИЕ</string>
     <string name="misc_section_setup">НАСТРОЙКА</string>
@@ -1683,8 +1631,6 @@
 
     <string name="website_blocker_title">Блокировщик сайтов</string>
     <string name="website_blocker_settings_summary">Блокировка порнографии, азартных игр и других сайтов.</string>
-    <string name="website_blocker_status_working">Обработка…</string>
-    <string name="website_blocker_status_active">Защита от %d известных доменов</string>
     <string name="website_blocker_fab_save_desc">Сохранить и применить изменения</string>
     <string name="website_blocker_compile_failed">Не удалось обновить список блокировки. Попробуйте снова.</string>
     <string name="website_blocker_delete_confirm_title">Сбросить категорию?</string>
@@ -1765,7 +1711,6 @@
     <string name="additional_websites_invalid_host">Введите корректный домен, например example.com</string>
     <string name="additional_websites_delete_confirm_title">Удалить сайт?</string>
     <string name="additional_websites_delete_confirm_message">Это удалит выбранные сайты (%d) из дополнительных сайтов.</string>
-    <string name="select_picker_default_title">Выберите вариант</string>
 
     <string name="menu_media_capture">Медиа</string>
     <string name="media_capture_dialog_title">Обнаруженные медиа</string>
@@ -1779,14 +1724,12 @@
     <string name="media_capture_section_video">ВИДЕО</string>
     <string name="media_capture_section_audio">АУДИО</string>
     <string name="media_capture_section_subtitles">СУБТИТРЫ</string>
-    <string name="media_capture_downloads_not_supported_yet">Загрузка обнаруженных потоков пока не поддерживается. Скопируйте ссылку, чтобы открыть её в другом месте.</string>
     <string name="media_capture_live_badge">В ЭФИРЕ</string>
     <string name="media_capture_no_audio_badge">БЕЗ ЗВУКА</string>
     <string name="media_capture_best_badge">ЛУЧШЕЕ</string>
     <string name="media_capture_sort_quality">Качество</string>
     <string name="media_capture_sort_newest">Сначала новые</string>
     <string name="media_capture_sort_oldest">Сначала старые</string>
-    <string name="media_capture_copy_link">Скопировать ссылку</string>
     <string name="media_capture_download">Скачать</string>
     <string name="media_capture_duplicate_link_updated">Ссылка на загрузку обновлена</string>
     <string name="media_capture_link_clip_label">URL медиа</string>
@@ -1802,7 +1745,6 @@
     <string name="media_capture_menu_preview">Предпросмотр</string>
     <string name="media_capture_subtitle_preview_title">Предпросмотр субтитров</string>
     <string name="media_capture_subtitle_preview_error">Не удалось загрузить субтитры.\nПроверьте подключение к интернету и повторите попытку.</string>
-    <string name="media_capture_video_preview_title">Просмотр видео</string>
     <string name="media_capture_video_preview_error">Не удалось воспроизвести видео.\nПроверьте подключение к интернету и повторите попытку.</string>
     <string name="media_capture_audio_preview_title">Просмотр аудио</string>
     <string name="media_capture_audio_preview_error">Не удалось воспроизвести аудио.\nПроверьте подключение к интернету и повторите попытку.</string>

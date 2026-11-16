@@ -4,7 +4,6 @@ import com.simplefox.browser.R
 import com.simplefox.browser.browser.MainActivity
 import com.simplefox.browser.browser.home.isClintHomeUrl
 import com.simplefox.browser.tabs.TabGroup
-import com.simplefox.browser.tabs.TabGroupBarState
 import com.simplefox.browser.tabs.TabGroupPrefs
 import com.simplefox.browser.ui.UNDO_SNACKBAR_TIMEOUT_MS
 import com.simplefox.browser.ui.showClintSnackbar

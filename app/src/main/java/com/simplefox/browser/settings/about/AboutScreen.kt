@@ -162,7 +162,7 @@ fun AboutScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Image(
-                painterResource(R.drawable.ic_clint_logo),
+                painterResource(R.drawable.ic_setup_logo),
                 contentDescription = stringResource(R.string.app_name),
                 modifier = Modifier.size(80.dp)
             )

@@ -3,7 +3,6 @@ package com.simplefox.browser.browser.webview
 import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
-import android.util.Base64
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
@@ -300,13 +299,6 @@ class ClintWebView(
         dispatchToPage(JSONObject().put("k", "videoSize").put("id", id))
     }
 
-    fun extractReaderContent(callback: (String?) -> Unit) {
-        val id = evalSeq.incrementAndGet().toString()
-        pendingEval[id] = callback
-        ClintGecko.main.postDelayed({ pendingEval.remove(id)?.invoke(null) }, 8000)
-        dispatchToPage(JSONObject().put("k", "reader").put("id", id))
-    }
-
     private fun dispatchToPage(msg: JSONObject) {
         val port = topPort
         if (port != null) {
@@ -325,15 +317,6 @@ class ClintWebView(
 
     fun loadUrlDeferred(url: String) {
         ClintGecko.main.post { loadUrl(url) }
-    }
-
-    fun loadHtml(html: String) {
-        ClintGecko.whenReady {
-            if (destroyed) return@whenReady
-            ensureOpen()
-            val encoded = Base64.encodeToString(html.toByteArray(Charsets.UTF_8), Base64.NO_WRAP)
-            session.load(GeckoSession.Loader().uri(ERROR_PAGE_PREFIX + encoded))
-        }
     }
 
     private fun doLoad(url: String) {

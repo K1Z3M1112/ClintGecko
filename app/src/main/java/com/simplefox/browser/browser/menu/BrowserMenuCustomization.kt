@@ -2,7 +2,6 @@ package com.simplefox.browser.browser.menu
 
 import android.content.SharedPreferences
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ChromeReaderMode
 import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material.icons.automirrored.filled.VolumeOff
 import androidx.compose.material.icons.filled.Add
@@ -15,8 +14,6 @@ import androidx.compose.material.icons.filled.DesktopWindows
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Extension
 import androidx.compose.material.icons.filled.History
-import androidx.compose.material.icons.filled.PhotoLibrary
-import androidx.compose.material.icons.filled.Security
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Shield
 import androidx.compose.material.icons.filled.Translate
@@ -38,8 +35,6 @@ enum class CustomizableMenuItem(val id: String) {
     WEBSITE_BLOCKER("website_blocker"),
     BOOKMARKS("bookmarks"),
     HISTORY("history"),
-    READER_MODE("reader_mode"),
-    IMAGE_READER("image_reader"),
     TRANSLATE("translate"),
     DESKTOP_MODE("desktop_mode"),
     DATA_SAVER("data_saver"),
@@ -66,8 +61,6 @@ fun CustomizableMenuItem.icon(): ImageVector = when (this) {
     CustomizableMenuItem.WEBSITE_BLOCKER -> Icons.Filled.Shield
     CustomizableMenuItem.BOOKMARKS -> Icons.Filled.BookmarkBorder
     CustomizableMenuItem.HISTORY -> Icons.Filled.History
-    CustomizableMenuItem.READER_MODE -> Icons.AutoMirrored.Filled.ChromeReaderMode
-    CustomizableMenuItem.IMAGE_READER -> Icons.Filled.PhotoLibrary
     CustomizableMenuItem.TRANSLATE -> Icons.Filled.Translate
     CustomizableMenuItem.DESKTOP_MODE -> Icons.Filled.DesktopWindows
     CustomizableMenuItem.DATA_SAVER -> Icons.Filled.DataSaverOn
@@ -89,8 +82,6 @@ fun CustomizableMenuItem.titleRes(): Int = when (this) {
     CustomizableMenuItem.WEBSITE_BLOCKER -> R.string.menu_website_blocker
     CustomizableMenuItem.BOOKMARKS -> R.string.menu_bookmarks
     CustomizableMenuItem.HISTORY -> R.string.menu_history
-    CustomizableMenuItem.READER_MODE -> R.string.reader_mode
-    CustomizableMenuItem.IMAGE_READER -> R.string.image_reader_mode
     CustomizableMenuItem.TRANSLATE -> R.string.translation_menu_translate
     CustomizableMenuItem.DESKTOP_MODE -> R.string.desktop_mode
     CustomizableMenuItem.DATA_SAVER -> R.string.menu_data_saver

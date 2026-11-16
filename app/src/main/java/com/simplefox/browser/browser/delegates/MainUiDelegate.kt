@@ -1,5 +1,4 @@
 package com.simplefox.browser.browser.delegates
-import androidx.compose.ui.graphics.toArgb
 import com.simplefox.browser.browser.webview.ClintWebView
 import com.simplefox.browser.browser.webview.ClintGecko
 import com.simplefox.browser.browser.home.isClintHomeUrl
@@ -13,7 +12,6 @@ import com.simplefox.browser.settings.datasaver.DataSaverMode
 import com.simplefox.browser.browser.webview.loadJsAsset
 import android.content.Context
 import android.Manifest
-import android.util.TypedValue
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import com.simplefox.browser.R
@@ -316,7 +314,6 @@ internal fun MainActivity.onPageStarted(url: String) {
         animateBottomBarTo(0f, animated = true)
     }
 
-
     if (url.startsWith("http") && !isClintHomeUrl(url)) {
         if (url == autoDesktopPendingReload) {
             autoDesktopPendingReload = null
@@ -348,10 +345,6 @@ internal fun MainActivity.onPageFinished(url: String) {
     }
     nestedScrollActive = false
     canvasTouchActive = false
-    if (com.simplefox.browser.browser.imagereader.ImageReaderState.autoOpenAfterLoad) {
-        com.simplefox.browser.browser.imagereader.ImageReaderState.autoOpenAfterLoad = false
-        onMenuImageReader()
-    }
     updateBookmarkIcon()
 
     tabManager.activeTab?.let { tab ->
@@ -430,20 +423,10 @@ internal fun MainActivity.updateSwipeRefreshColors(isIncognito: Boolean) {
     swipeRefreshView.setColorSchemeColors(chrome.primary)
 }
 
-internal fun MainActivity.hideKeyboard() {
-    hideKeyboardOnly()
-}
-
 private fun MainActivity.hideKeyboardOnly() {
     if (uiState.searchOverlayOpen) closeSearchOverlay()
     val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager
     imm.hideSoftInputFromWindow(window.decorView.windowToken, 0)
-}
-
-internal fun MainActivity.getThemeColor(attrId: Int): Int {
-    val typedValue = TypedValue()
-    theme.resolveAttribute(attrId, typedValue, true)
-    return typedValue.data
 }
 
 internal fun MainActivity.handleVoiceSearchTap() {

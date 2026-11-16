@@ -93,15 +93,6 @@ class TabManager {
         TabPreview(it.id, it.title.ifBlank { "New Tab" }, if (com.simplefox.browser.browser.home.isClintHomeUrl(it.url)) "" else it.url, it.isIncognito, it.profileId, it.webView.audioState, it.groupId)
     }
 
-    fun moveTab(fromIndex: Int, toIndex: Int) {
-        if (fromIndex !in tabs.indices || toIndex !in tabs.indices || fromIndex == toIndex) return
-        val activeTabId = activeTab?.id
-        val tab = tabs.removeAt(fromIndex)
-        tabs.add(toIndex, tab)
-        if (activeTabId != null) activeIndex = tabs.indexOfFirst { it.id == activeTabId }
-        normalizeGroups()
-    }
-
     fun reorderTo(orderedIds: List<String>) {
         val activeTabId = activeTab?.id
         val byId = tabs.associateBy { it.id }

@@ -23,8 +23,4 @@ class ClintWebSettings(private val view: ClintWebView) {
             view.applyUserAgentOverride(if (value.isEmpty() || value == ClintGecko.nativeUserAgent()) null else value)
         }
 
-    fun setSupportMultipleWindows(enabled: Boolean) {}
-    fun setSupportZoom(enabled: Boolean) {}
-    fun setBuiltInZoomControls(enabled: Boolean) {}
-    fun setDisplayZoomControls(enabled: Boolean) {}
 }

@@ -27,7 +27,6 @@ import androidx.compose.material.icons.filled.Accessibility
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Headphones
 import androidx.compose.material.icons.filled.Apps
-import androidx.compose.material.icons.filled.ArrowDropDownCircle
 import androidx.compose.material.icons.filled.Backup
 import androidx.compose.material.icons.filled.CloudDownload
 import androidx.compose.material.icons.filled.Tab
@@ -39,7 +38,6 @@ import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.Brush
 import androidx.compose.material.icons.filled.BugReport
 import androidx.compose.material.icons.filled.Category
-import androidx.compose.material.icons.filled.ChatBubble
 import androidx.compose.material.icons.filled.Code
 import androidx.compose.material.icons.filled.Extension
 import androidx.compose.material.icons.filled.Style
@@ -99,7 +97,6 @@ import androidx.compose.material.icons.filled.ZoomIn
 import androidx.compose.material.icons.filled.Translate
 import androidx.compose.material.icons.filled.Dns
 import androidx.compose.material.icons.filled.Tune
-import androidx.compose.material.icons.filled.Update
 import androidx.compose.material.icons.filled.VerticalAlignCenter
 import androidx.compose.material.icons.filled.VideoSettings
 import androidx.compose.material.icons.filled.Videocam
@@ -107,7 +104,6 @@ import androidx.compose.material.icons.filled.VideocamOff
 import androidx.compose.material.icons.filled.ViewCompact
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.filled.Web
 import androidx.compose.material.icons.filled.WebAsset
 import androidx.compose.material.icons.filled.Wifi

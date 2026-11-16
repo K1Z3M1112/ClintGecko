@@ -1,44 +1,12 @@
 package com.simplefox.browser.ui
 
 import android.content.Context
-import android.graphics.drawable.GradientDrawable
-import android.graphics.drawable.LayerDrawable
 import androidx.compose.ui.graphics.toArgb
 import com.simplefox.browser.ui.theme.resolveClintTheme
 
 internal object ThemeSwatchUtils {
 
     data class SwatchColors(val bg: Int, val surface: Int, val accent: Int)
-
-    fun buildSwatchDrawable(context: Context, bgColor: Int, surfaceColor: Int, accentColor: Int): LayerDrawable {
-        val dp = context.resources.displayMetrics.density
-        val r10 = 10f * dp
-        val r3 = 3f * dp
-        val bgShape = GradientDrawable().apply {
-            shape = GradientDrawable.RECTANGLE
-            setColor(bgColor)
-            cornerRadius = r10
-        }
-        val surfaceShape = GradientDrawable().apply {
-            shape = GradientDrawable.RECTANGLE
-            setColor(surfaceColor)
-            cornerRadii = floatArrayOf(0f, 0f, 0f, 0f, r10, r10, r10, r10)
-        }
-        val accentShape = GradientDrawable().apply {
-            shape = GradientDrawable.RECTANGLE
-            setColor(accentColor)
-            cornerRadius = r3
-        }
-        val top22 = (22f * dp).toInt()
-        val top6 = (6f * dp).toInt()
-        val left6 = (6f * dp).toInt()
-        val right14 = (14f * dp).toInt()
-        val bottom24 = (24f * dp).toInt()
-        return LayerDrawable(arrayOf(bgShape, surfaceShape, accentShape)).also {
-            it.setLayerInset(1, 0, top22, 0, 0)
-            it.setLayerInset(2, left6, top6, right14, bottom24)
-        }
-    }
 
     fun resolveSwatchColors(context: Context, theme: String, accent: String): SwatchColors {
         val resolved = resolveClintTheme(context, theme, accent, "strong_tint")

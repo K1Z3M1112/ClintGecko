@@ -7,7 +7,6 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Contrast
 import androidx.compose.material.icons.filled.Workspaces
 import androidx.compose.material.icons.filled.Fullscreen
-import androidx.compose.material.icons.filled.GridView
 import androidx.compose.material.icons.filled.Layers
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.MoreVert
