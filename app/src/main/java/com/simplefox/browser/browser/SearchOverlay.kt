@@ -69,6 +69,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.layout.layout
+import androidx.compose.ui.unit.offset
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
@@ -245,14 +247,23 @@ internal fun SearchOverlay(
         }
     }
 
-    val bottomInsetPx = maxOf(WindowInsets.ime.getBottom(density), navBarPaddingPx)
+    val imeInsets = WindowInsets.ime
     Surface(color = colors.background, modifier = modifier.fillMaxSize()) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.fillMaxSize().padding(
-                top = with(density) { statusBarPaddingPx.toDp() },
-                bottom = with(density) { bottomInsetPx.toDp() }
-            )
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(top = with(density) { statusBarPaddingPx.toDp() })
+                // The IME height changes every frame while the keyboard animates. Reading it in the
+                // layout phase re-measures only this node instead of recomposing the whole overlay.
+                .layout { measurable, constraints ->
+                    val bottom = maxOf(imeInsets.getBottom(this), navBarPaddingPx)
+                    val placeable = measurable.measure(constraints.offset(vertical = -bottom))
+                    layout(
+                        placeable.width,
+                        (placeable.height + bottom).coerceIn(constraints.minHeight, constraints.maxHeight)
+                    ) { placeable.place(0, 0) }
+                }
         ) {
             if (isBottom) {
                 Box(modifier = Modifier.weight(1f, fill = true), contentAlignment = Alignment.BottomCenter) { suggestionsList() }

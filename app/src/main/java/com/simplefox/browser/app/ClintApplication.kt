@@ -60,7 +60,13 @@ class ClintApplication : Application() {
 
     override fun onTrimMemory(level: Int) {
         super.onTrimMemory(level)
-        if (mainProcess) ClintGecko.trimMemory(level)
+        if (!mainProcess) return
+        ClintGecko.trimMemory(level)
+        com.simplefox.browser.ui.FaviconCache.trimMemory(level)
+        com.simplefox.browser.ui.SharpFavicon.trimMemory(level)
+        com.simplefox.browser.browser.home.HomeTileIconFetcher.trimMemory(level)
+        com.simplefox.browser.tabs.TabThumbnailCache.trimMemory(level)
+        com.simplefox.browser.downloads.DownloadThumbnailLoader.trimMemory(level)
     }
 
     private fun isMainProcess(): Boolean {

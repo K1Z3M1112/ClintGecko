@@ -22,6 +22,7 @@ import com.simplefox.browser.history.SearchHistoryManager
 
 private const val SUGGESTION_HISTORY_LIMIT = 20
 private const val SUGGESTION_BOOKMARK_LIMIT = 10
+private const val SUGGESTION_FETCH_DEBOUNCE_MS = 150L
 
 internal fun MainActivity.applyAddressBarPosition() {
     val position = prefs.getString("address_bar_position", "bottom") ?: "bottom"
@@ -131,6 +132,7 @@ internal fun MainActivity.onSearchQueryChanged(query: String) {
     uiState.searchQuery = query
     val bgHandler = suggestionsBgHandler ?: return
     bgHandler.removeCallbacksAndMessages(null)
+    suggestionFetcher?.cancel()
     bgHandler.post {
         val isIncognito = tabManager.activeTab?.isIncognito == true
         val incognitoHistoryAllowed = prefs.getBoolean("incognito_search_history_enabled", false)
@@ -158,10 +160,14 @@ internal fun MainActivity.onSearchQueryChanged(query: String) {
         val customSuggestionsUrl = if (suggestionsApi == "custom") {
             customSearchSuggestionsApiQueryUrl(prefs, android.net.Uri.encode(query), isIncognito)
         } else null
-        suggestionFetcher?.fetch(query, suggestionsApi, customSuggestionsUrl) { suggestions ->
-            lastOnlineSuggestions = suggestions
-            runOnUiThread { uiState.suggestions = combineSuggestions(pages, bookmarks, history, suggestions) }
-        }
+        // Local results are already on screen; debounce only the network request. The next
+        // keystroke clears this delayed message via removeCallbacksAndMessages above.
+        bgHandler.postDelayed({
+            suggestionFetcher?.fetch(query, suggestionsApi, customSuggestionsUrl) { suggestions ->
+                lastOnlineSuggestions = suggestions
+                runOnUiThread { uiState.suggestions = combineSuggestions(pages, bookmarks, history, suggestions) }
+            }
+        }, SUGGESTION_FETCH_DEBOUNCE_MS)
     }
 }
 
@@ -196,7 +202,7 @@ internal fun MainActivity.onSuggestionChosen(query: String) {
     lastOnlineSuggestions = emptyList()
     uiState.suggestions = emptyList()
     if (tabManager.activeTab?.isIncognito != true) {
-        SearchHistoryManager.add(this, query)
+        Thread { SearchHistoryManager.add(this, query) }.start()
     }
     loadUrl(query)
 }

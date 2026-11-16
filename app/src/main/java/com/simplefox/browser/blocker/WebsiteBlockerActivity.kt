@@ -53,7 +53,7 @@ class WebsiteBlockerActivity : ClintActivity() {
         if (!file.exists()) return@withContext 0L
         val builderPtr = WebsiteBlockerNative.nativeCreateBuilder()
         if (builderPtr == 0L) return@withContext 0L
-        val stats = JSONObject(WebsiteBlockerNative.nativeAddText(builderPtr, file.readText()))
+        val stats = JSONObject(WebsiteBlockerNative.nativeAddFile(builderPtr, file))
         WebsiteBlockerNative.nativeDestroyBuilder(builderPtr)
         stats.optLong("added", 0L)
     }

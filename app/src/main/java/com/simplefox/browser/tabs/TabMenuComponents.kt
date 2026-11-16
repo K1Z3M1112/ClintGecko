@@ -559,13 +559,16 @@ internal fun NewTabButton(text: String, iconRes: androidx.compose.ui.graphics.ve
 @Composable
 internal fun rememberTabFavicon(tab: TabPreview): Bitmap? {
     val context = LocalContext.current
-    var bitmap by remember(tab.url, tab.isIncognito) { mutableStateOf<Bitmap?>(null) }
+    // Seed from the in-memory cache so a cached icon shows on the first frame instead of popping in.
+    var bitmap by remember(tab.url, tab.isIncognito) {
+        mutableStateOf<Bitmap?>(FaviconCache.peek(FaviconCache.faviconUrlFor(tab.url)))
+    }
     var sharp by remember(tab.url, tab.isIncognito) {
         mutableStateOf(if (tab.isIncognito) null else com.simplefox.browser.ui.SharpFavicon.cached(tab.url))
     }
     LaunchedEffect(tab.url, tab.isIncognito) {
         val faviconUrl = FaviconCache.faviconUrlFor(tab.url)
-        if (faviconUrl.isEmpty()) return@LaunchedEffect
+        if (faviconUrl.isEmpty() || bitmap != null) return@LaunchedEffect
         if (tab.isIncognito) {
             FaviconCache.loadMemoryOnly(context, faviconUrl) { bmp -> bitmap = bmp }
         } else {

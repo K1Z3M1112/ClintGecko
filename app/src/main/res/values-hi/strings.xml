@@ -514,8 +514,6 @@
     <string name="download_file_missing">फ़ाइल अब मौजूद नहीं है</string>
     <string name="open_folder_error_title">फ़ोल्डर नहीं खुल सका</string>
     <string name="open_folder_error_message">इस डिवाइस पर ऐसा कोई ऐप नहीं है जो फ़ोल्डर खोल सके. फ़ाइल यहां सेव है:\n\n%1$s</string>
-    <string name="download_menu_update_link">डाउनलोड लिंक अपडेट करें</string>
-    <string name="download_menu_update_link_in_browser">ब्राउज़र में डाउनलोड लिंक अपडेट करें</string>
     <string name="download_update_link_dialog_title">डाउनलोड लिंक अपडेट करें</string>
     <string name="download_update_link_dialog_fetch_failed">लिंक की जानकारी नहीं मिल सकी</string>
     <string name="download_update_link_dialog_size_unverifiable">फ़ाइल के साइज़ की पुष्टि नहीं हो सकी</string>
@@ -523,9 +521,6 @@
     <string name="download_update_link_dialog_not_a_manifest">यह लिंक किसी सही स्ट्रीम प्लेलिस्ट का नहीं है</string>
     <string name="download_update_link_dialog_not_a_file">यह लिंक फ़ाइल की जगह एक वेब पेज खोलता है</string>
     <string name="download_update_link_dialog_positive">अपडेट करें</string>
-    <string name="download_menu_redownload">फिर से डाउनलोड करें</string>
-    <string name="download_menu_redownload_options">ज़्यादा विकल्पों के साथ फिर से डाउनलोड करें</string>
-    <string name="download_menu_change_settings">डाउनलोड सेटिंग बदलें</string>
     <string name="download_change_settings_dialog_title">डाउनलोड सेटिंग बदलें</string>
     <string name="download_change_settings_dialog_info">यहां सिर्फ़ वे सेटिंग दिखाई गई हैं जिन्हें डाउनलोड के चलते समय बदलना सुरक्षित है. बदलाव तुरंत लागू होते हैं.</string>
     <string name="download_change_settings_saved">सेटिंग अपडेट हो गईं</string>
@@ -537,8 +532,6 @@
     <string name="download_rename_positive">नाम बदलें</string>
     <string name="download_rename_exists">इस नाम की फ़ाइल पहले से मौजूद है</string>
     <string name="download_rename_failed">फ़ाइल का नाम नहीं बदला जा सका</string>
-    <string name="download_menu_remove">हटाएं</string>
-    <string name="download_menu_copy_link">डाउनलोड लिंक कॉपी करें</string>
     <string name="download_menu_copy_filename">फ़ाइल का नाम कॉपी करें</string>
     <string name="download_menu_copy_path">फ़ाइल का पाथ कॉपी करें</string>
     <string name="download_menu_properties">प्रॉपर्टी</string>
@@ -1737,7 +1730,6 @@
     <string name="home_folder_rename">फ़ोल्डर का नाम बदलें</string>
     <string name="home_folder_name_hint">फ़ोल्डर का नाम</string>
     <string name="home_folder_ungroup">ग्रुप से अलग करें</string>
-    <string name="home_incognito_message">गुप्त मोड में देखे गए पेज आपकी हिस्ट्री में सेव नहीं होंगे</string>
     <string name="home_normal_mode">सामान्य</string>
     <string name="site_section_data_saver">डेटा सेवर</string>
     <string name="site_settings_data_saver_summary">सेव की गई साइटें</string>

@@ -96,6 +96,19 @@ internal object DownloadThumbnailLoader {
     private val misses: MutableSet<String> = Collections.newSetFromMap(ConcurrentHashMap())
     private val gate = Semaphore(3)
 
+    fun trimMemory(level: Int) {
+        when {
+            level >= 40 || level == 15 -> {
+                cache.evictAll()
+                bundleCache.evictAll()
+            }
+            level >= 10 -> {
+                cache.trimToSize(cache.maxSize() / 2)
+                bundleCache.trimToSize(bundleCache.maxSize() / 2)
+            }
+        }
+    }
+
     fun keyFor(item: DownloadItem): String? {
         if (item.status != DownloadStatus.COMPLETE) return null
         thumbnailSourceFor(item.filename) ?: return null

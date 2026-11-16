@@ -1,5 +1,6 @@
 package com.simplefox.browser.browser.webview
 
+import android.app.ActivityManager
 import android.content.Context
 import android.os.Build
 import android.os.Handler
@@ -217,20 +218,6 @@ object ClintGecko {
         "network.http.speculative-parallel-limit.enabled" to true
     )
 
-    private val speedInts = mapOf(
-        "network.http.speculative-parallel-limit" to 6,
-        "network.http.max-persistent-connections-per-server" to 10,
-        "network.http.max-connections" to 900,
-        "network.dnsCacheEntries" to 800,
-        "network.dnsCacheExpiration" to 300,
-        "network.dnsCacheExpirationGracePeriod" to 120,
-        "network.buffer.cache.count" to 128,
-        "network.buffer.cache.size" to 32768,
-        "browser.cache.disk.capacity" to 262144,
-        "browser.cache.memory.capacity" to 32768,
-        "image.cache.size" to 10485760,
-        "image.mem.surfacecache.max_size_kb" to 65536
-    )
 
     private val securityBooleans = mapOf(
         "network.IDN_show_punycode" to true,
@@ -250,7 +237,30 @@ object ClintGecko {
         speedBooleans.forEach { (pref, value) ->
             runCatching { GeckoPreferenceController.setGeckoPref(pref, value, GeckoPreferenceController.PREF_BRANCH_USER) }
         }
-        speedInts.forEach { (pref, value) ->
+
+        // Gecko's image and connection caches can otherwise reserve far more memory than
+        // a mid-range phone needs. Use Android's normal memory class, not largeMemoryClass,
+        // so the browser remains a good multitasking citizen even when largeHeap is enabled.
+        val memoryClassMb = runCatching {
+            (appContext.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager).memoryClass
+        }.getOrDefault(256)
+        val lowMemory = memoryClassMb <= 256
+        val mediumMemory = memoryClassMb in 257..383
+        val values = mapOf(
+            "network.http.speculative-parallel-limit" to when { lowMemory -> 4; mediumMemory -> 5; else -> 6 },
+            "network.http.max-persistent-connections-per-server" to 8,
+            "network.http.max-connections" to when { lowMemory -> 256; mediumMemory -> 384; else -> 512 },
+            "network.dnsCacheEntries" to when { lowMemory -> 300; mediumMemory -> 500; else -> 700 },
+            "network.dnsCacheExpiration" to 300,
+            "network.dnsCacheExpirationGracePeriod" to 120,
+            "network.buffer.cache.count" to when { lowMemory -> 64; mediumMemory -> 96; else -> 128 },
+            "network.buffer.cache.size" to when { lowMemory -> 16384; mediumMemory -> 24576; else -> 32768 },
+            "browser.cache.disk.capacity" to 262144,
+            "browser.cache.memory.capacity" to when { lowMemory -> 8192; mediumMemory -> 16384; else -> 24576 },
+            "image.cache.size" to when { lowMemory -> 4194304; mediumMemory -> 6291456; else -> 8388608 },
+            "image.mem.surfacecache.max_size_kb" to when { lowMemory -> 32768; mediumMemory -> 49152; else -> 65536 }
+        )
+        values.forEach { (pref, value) ->
             runCatching { GeckoPreferenceController.setGeckoPref(pref, value, GeckoPreferenceController.PREF_BRANCH_USER) }
         }
     }

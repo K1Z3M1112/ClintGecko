@@ -514,8 +514,6 @@
     <string name="download_file_missing">O arquivo não existe mais</string>
     <string name="open_folder_error_title">Não foi possível abrir a pasta</string>
     <string name="open_folder_error_message">Nenhum app deste dispositivo consegue abrir a visualização de pastas. O arquivo está salvo em:\n\n%1$s</string>
-    <string name="download_menu_update_link">Atualizar link de download</string>
-    <string name="download_menu_update_link_in_browser">Atualizar link de download no navegador</string>
     <string name="download_update_link_dialog_title">Atualizar link de download</string>
     <string name="download_update_link_dialog_fetch_failed">Não foi possível buscar o link</string>
     <string name="download_update_link_dialog_size_unverifiable">Não foi possível verificar o tamanho do arquivo</string>
@@ -523,9 +521,6 @@
     <string name="download_update_link_dialog_not_a_manifest">Este link não leva a uma playlist de streaming válida</string>
     <string name="download_update_link_dialog_not_a_file">Este link abre uma página da web, não o arquivo</string>
     <string name="download_update_link_dialog_positive">Atualizar</string>
-    <string name="download_menu_redownload">Baixar de novo</string>
-    <string name="download_menu_redownload_options">Baixar de novo com opções adicionais</string>
-    <string name="download_menu_change_settings">Alterar configurações do download</string>
     <string name="download_change_settings_dialog_title">Alterar configurações do download</string>
     <string name="download_change_settings_dialog_info">Aqui aparecem só as configurações que podem ser alteradas com segurança durante o download. As alterações valem na hora.</string>
     <string name="download_change_settings_saved">Configurações atualizadas</string>
@@ -537,8 +532,6 @@
     <string name="download_rename_positive">Renomear</string>
     <string name="download_rename_exists">Já existe um arquivo com esse nome</string>
     <string name="download_rename_failed">Não foi possível renomear o arquivo</string>
-    <string name="download_menu_remove">Remover</string>
-    <string name="download_menu_copy_link">Copiar link de download</string>
     <string name="download_menu_copy_filename">Copiar nome do arquivo</string>
     <string name="download_menu_copy_path">Copiar caminho do arquivo</string>
     <string name="download_menu_properties">Propriedades</string>
@@ -1737,7 +1730,6 @@
     <string name="home_folder_rename">Renomear pasta</string>
     <string name="home_folder_name_hint">Nome da pasta</string>
     <string name="home_folder_ungroup">Desagrupar</string>
-    <string name="home_incognito_message">As páginas visitadas no modo anônimo não ficam salvas no seu histórico</string>
     <string name="home_normal_mode">Normal</string>
     <string name="site_section_data_saver">ECONOMIA DE DADOS</string>
     <string name="site_settings_data_saver_summary">Sites salvos</string>
