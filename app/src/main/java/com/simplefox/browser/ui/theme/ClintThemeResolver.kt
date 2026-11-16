@@ -45,7 +45,9 @@ private fun androidSystemColor(context: Context, name: String, fallback: Color):
 
 private class DynamicSurfaceScheme(
     val surfaceContainer: Color,
-    val surfaceContainerHighest: Color
+    val surfaceContainerHigh: Color,
+    val surfaceContainerHighest: Color,
+    val primary: Color
 )
 
 private fun dynamicScheme(context: Context, isLight: Boolean): DynamicSurfaceScheme {
@@ -59,7 +61,12 @@ private fun dynamicScheme(context: Context, isLight: Boolean): DynamicSurfaceSch
         if (isLight) "system_neutral1_200" else "system_neutral1_800",
         if (isLight) Color(0xFFE6E0E9) else Color(0xFF36343B)
     )
-    return DynamicSurfaceScheme(container, highest)
+    val primary = androidSystemColor(
+        context,
+        if (isLight) "system_accent1_600" else "system_accent1_200",
+        if (isLight) Color(0xFF6750A4) else Color(0xFFD0BCFF)
+    )
+    return DynamicSurfaceScheme(container, lerp(container, highest, 0.5f), highest, primary)
 }
 
 private fun materialYouBase(context: Context, isLight: Boolean): ClintResolvedTheme {
