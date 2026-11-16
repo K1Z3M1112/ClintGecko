@@ -55,7 +55,7 @@
 
     <application
         android:name=".app.ClintApplication"
-        android:allowBackup="true"
+        android:allowBackup="false"
         android:requestLegacyExternalStorage="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -68,7 +68,7 @@
 
         <activity
             android:name=".setup.SetupActivity"
-            android:exported="true"
+            android:exported="false"
             android:configChanges="uiMode|screenSize|smallestScreenSize|screenLayout|orientation"
             android:windowSoftInputMode="stateHidden" />
 
@@ -232,12 +232,6 @@
             android:configChanges="uiMode|screenSize|smallestScreenSize|screenLayout|orientation"
             android:parentActivityName=".settings.SettingsActivity" />
 
-        <activity
-            android:name=".settings.supportclint.SupportClintActivity"
-            android:exported="false"
-            android:configChanges="uiMode|screenSize|smallestScreenSize|screenLayout|orientation"
-            android:parentActivityName=".settings.SettingsActivity" />
-
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"
@@ -250,7 +244,7 @@
 
         <receiver
             android:name=".downloads.DownloadBootReceiver"
-            android:exported="true">
+            android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
@@ -260,8 +254,8 @@
             android:name=".downloads.DownloadActionReceiver"
             android:exported="false">
             <intent-filter>
-                <action android:name="com.jhaiian.clint.DOWNLOAD_PAUSE" />
-                <action android:name="com.jhaiian.clint.DOWNLOAD_RESUME" />
+                <action android:name="com.simplefox.browser.DOWNLOAD_PAUSE" />
+                <action android:name="com.simplefox.browser.DOWNLOAD_RESUME" />
             </intent-filter>
         </receiver>
 

@@ -4,6 +4,14 @@ name: Build FOSS APK
 
 on:
   workflow_dispatch:
+    inputs:
+      build_type:
+        description: 'Build type'
+        type: choice
+        options:
+          - release
+          - debug
+        default: release
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
@@ -47,18 +55,25 @@ jobs:
         run: chmod +x gradlew
 
       - name: Decode Signing Keystore
+        if: inputs.build_type == 'release'
         run: |
           printf '%s' "${{ secrets.BASE_64_SIGNING_KEY }}" | tr -d '\n' | base64 -d > app/release_keystore.jks
 
       - name: Create local.properties
+        if: inputs.build_type == 'release'
         run: printf '%s\n' "${{ secrets.LOCAL_PROPERTIES }}" > local.properties
 
-      - name: Build FOSS Release APK
-        run: ./gradlew assembleFossRelease
+      - name: Build APK (${{ inputs.build_type }})
+        run: |
+          if [ "${{ inputs.build_type }}" = "debug" ]; then
+            ./gradlew assembleFossDebug
+          else
+            ./gradlew assembleFossRelease
+          fi
 
       - name: Upload FOSS APK
         uses: actions/upload-artifact@v7
         with:
-          name: Clint-FOSS
-          path: app/build/outputs/apk/foss/release/*.apk
+          name: Clint-FOSS-${{ inputs.build_type }}
+          path: app/build/outputs/apk/foss/${{ inputs.build_type }}/*.apk
           if-no-files-found: error

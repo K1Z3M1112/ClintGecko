@@ -1,0 +1,415 @@
+package com.simplefox.browser.settings
+import androidx.compose.material.icons.filled.Tune
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+
+import android.content.Intent
+import android.os.Bundle
+import androidx.activity.compose.setContent
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.width
+import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
+import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.core.view.WindowCompat
+import androidx.preference.PreferenceManager
+import com.simplefox.browser.BuildConfig
+import com.simplefox.browser.R
+import com.simplefox.browser.base.ClintActivity
+import com.simplefox.browser.settings.backuprestore.BackupRestorePane
+import com.simplefox.browser.settings.common.LocalSettingsSearchTarget
+import com.simplefox.browser.settings.common.SettingsSearchTarget
+import com.simplefox.browser.settings.main.MainSettingsEntry
+import com.simplefox.browser.settings.main.MainSettingsScreen
+import com.simplefox.browser.settings.search.SettingsSearchResults
+import com.simplefox.browser.settings.search.SettingsSearchToolbar
+import com.simplefox.browser.ui.DocumentViewer
+import com.simplefox.browser.ui.OverlayHostActivity
+import com.simplefox.browser.ui.theme.ClintComposeTheme
+import com.simplefox.browser.ui.theme.LocalClintColors
+
+internal const val DEST_LOOK_AND_FEEL = "look_and_feel"
+internal const val DEST_BROWSER = "browser"
+internal const val DEST_PRIVACY = "privacy"
+internal const val DEST_SITE_SETTINGS = "site_settings"
+internal const val DEST_DATA_SAVER = "data_saver"
+internal const val DEST_ACCESSIBILITY = "accessibility"
+internal const val DEST_DOWNLOADS = "downloads"
+internal const val DEST_BACKUP_RESTORE = "backup_restore"
+internal const val DEST_MISC = "misc"
+internal const val DEST_TRANSLATIONS = "translations"
+internal const val DEST_DEBUG = "debug"
+internal const val DEST_ABOUT = "about"
+
+class SettingsActivity : ClintActivity(), OverlayHostActivity {
+
+    override var overlayContent by mutableStateOf<(@Composable () -> Unit)?>(null)
+
+    var pendingRestart = false
+
+    var pendingHideStatusBar: Boolean? = null
+    var pendingHideSystemNavigation: Boolean? = null
+
+    private var hideStatusBarAtLaunch = false
+    private var hideSystemNavigationAtLaunch = false
+    private var addressBarPositionAtLaunch = "top"
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+
+        val prefs = PreferenceManager.getDefaultSharedPreferences(this)
+        hideStatusBarAtLaunch = prefs.getBoolean("hide_status_bar", false)
+        hideSystemNavigationAtLaunch = prefs.getBoolean("hide_system_navigation", false)
+        addressBarPositionAtLaunch = prefs.getString("address_bar_position", "top") ?: "top"
+        val theme = prefs.getString("app_theme", "system") ?: "system"
+
+        val initialDestination = when (intent.getStringExtra(EXTRA_OPEN_FRAGMENT)) {
+            "data_saver" -> DEST_DATA_SAVER
+            "download_settings" -> DEST_DOWNLOADS
+            "site_settings" -> DEST_SITE_SETTINGS
+            "translations" -> DEST_TRANSLATIONS
+            else -> null
+        }
+
+        setContent {
+            ClintComposeTheme(theme = theme) {
+                SettingsNavHost(activity = this, initialDestination = initialDestination)
+                overlayContent?.invoke()
+            }
+        }
+    }
+
+    fun scheduleRestartIfChanged() {
+        val prefs = PreferenceManager.getDefaultSharedPreferences(this)
+        val effectiveHideStatusBar = pendingHideStatusBar ?: prefs.getBoolean("hide_status_bar", false)
+        val effectiveHideSystemNavigation = pendingHideSystemNavigation ?: prefs.getBoolean("hide_system_navigation", false)
+        val statusBarChanged = effectiveHideStatusBar != hideStatusBarAtLaunch
+        val navigationChanged = effectiveHideSystemNavigation != hideSystemNavigationAtLaunch
+        val positionChanged = (prefs.getString("address_bar_position", "top") ?: "top") != addressBarPositionAtLaunch
+        pendingRestart = statusBarChanged || navigationChanged || positionChanged
+    }
+
+    fun restartApp() {
+        pendingRestart = false
+        val editor = PreferenceManager.getDefaultSharedPreferences(this).edit()
+        var shouldCommit = false
+        pendingHideStatusBar?.let { pending ->
+            editor.putBoolean("hide_status_bar", pending)
+            pendingHideStatusBar = null
+            shouldCommit = true
+        }
+        pendingHideSystemNavigation?.let { pending ->
+            editor.putBoolean("hide_system_navigation", pending)
+            pendingHideSystemNavigation = null
+            shouldCommit = true
+        }
+        if (shouldCommit) editor.apply()
+        val restartIntent = packageManager.getLaunchIntentForPackage(packageName) ?: return
+        restartIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
+        startActivity(restartIntent)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        if (pendingRestart) restartApp()
+    }
+
+    fun restartAppAfterRestore() {
+        val restartIntent = packageManager.getLaunchIntentForPackage(packageName)
+        restartIntent?.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
+        if (restartIntent != null) startActivity(restartIntent)
+        android.os.Process.killProcess(android.os.Process.myPid())
+    }
+
+    companion object {
+        const val EXTRA_OPEN_FRAGMENT = "extra_open_fragment"
+    }
+}
+
+@OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
+@Composable
+private fun SettingsNavHost(activity: SettingsActivity, initialDestination: String?) {
+    var selectedDestination by rememberSaveable { mutableStateOf(initialDestination) }
+    var hasShownList by rememberSaveable { mutableStateOf(initialDestination == null) }
+    var searchActive by rememberSaveable { mutableStateOf(false) }
+    var searchQuery by rememberSaveable { mutableStateOf("") }
+    var searchTarget by remember { mutableStateOf<SettingsSearchTarget?>(null) }
+    val isTwoPane = calculateWindowSizeClass(activity).widthSizeClass != WindowWidthSizeClass.Compact
+
+    val navigate: (String, String?) -> Unit = { destination, targetTitle ->
+        searchTarget = targetTitle?.let { SettingsSearchTarget(it) }
+        selectedDestination = destination
+    }
+
+    val listPane: @Composable (onNavigate: (String, String?) -> Unit) -> Unit = { onNavigate ->
+        SettingsListPane(
+            activity = activity,
+            selectedDestination = if (isTwoPane) selectedDestination else null,
+            searchActive = searchActive,
+            searchQuery = searchQuery,
+            onSearchActiveChange = { active ->
+                searchActive = active
+                if (!active) searchQuery = ""
+            },
+            onSearchQueryChange = { searchQuery = it },
+            onNavigate = onNavigate
+        )
+    }
+
+    if (isTwoPane) {
+        Row(Modifier.fillMaxSize()) {
+            Box(Modifier.width(360.dp).fillMaxHeight()) {
+                listPane(navigate)
+            }
+            Box(Modifier.width(1.dp).fillMaxHeight().background(LocalClintColors.current.divider))
+            Box(Modifier.weight(1f).fillMaxHeight()) {
+                SettingsDetailPane(
+                    activity = activity,
+                    destination = selectedDestination,
+                    searchTarget = searchTarget,
+                    onNavigate = { navigate(it, null) },
+                    onBack = { selectedDestination = selectedDestination?.let(::parentDestination) }
+                )
+            }
+        }
+    } else {
+        val handleBack: () -> Unit = {
+            if (hasShownList) selectedDestination = selectedDestination?.let(::parentDestination) else activity.finish()
+        }
+        if (selectedDestination != null) {
+            BackHandler(onBack = handleBack)
+        }
+        AnimatedContent(
+            targetState = selectedDestination,
+            transitionSpec = { fadeIn() togetherWith fadeOut() },
+            label = "settings_pane"
+        ) { destination ->
+            if (destination == null) {
+                listPane { newDestination, targetTitle ->
+                    hasShownList = true
+                    navigate(newDestination, targetTitle)
+                }
+            } else {
+                SettingsDetailPane(
+                    activity = activity,
+                    destination = destination,
+                    searchTarget = searchTarget,
+                    onNavigate = { navigate(it, null) },
+                    onBack = handleBack
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun SettingsListPane(
+    activity: SettingsActivity,
+    selectedDestination: String?,
+    searchActive: Boolean,
+    searchQuery: String,
+    onSearchActiveChange: (Boolean) -> Unit,
+    onSearchQueryChange: (String) -> Unit,
+    onNavigate: (String, String?) -> Unit
+) {
+    val versionName = remember {
+        activity.packageManager.getPackageInfo(activity.packageName, 0).versionName ?: ""
+    }
+    BackHandler(enabled = searchActive) { onSearchActiveChange(false) }
+    Column(Modifier.fillMaxSize()) {
+        if (searchActive) {
+            SettingsSearchToolbar(
+                query = searchQuery,
+                onQueryChange = onSearchQueryChange,
+                onClose = { onSearchActiveChange(false) }
+            )
+            Box(Modifier.weight(1f)) {
+                SettingsSearchResults(query = searchQuery) { result ->
+                    onNavigate(result.destination, result.highlightTitle)
+                }
+            }
+        } else {
+            SettingsToolbar(
+                title = stringResource(R.string.settings),
+                onBack = { activity.finish() }
+            )
+            Box(Modifier.weight(1f)) {
+                MainSettingsScreen(
+                    versionName = versionName,
+                    selectedEntry = selectedDestination?.let(::mainEntryFor),
+                    onSearchClick = { onSearchActiveChange(true) },
+                    onLookAndFeelClick = { onNavigate(DEST_LOOK_AND_FEEL, null) },
+                    onAccessibilityClick = { onNavigate(DEST_ACCESSIBILITY, null) },
+                    onBrowserClick = { onNavigate(DEST_BROWSER, null) },
+                    onPrivacyClick = { onNavigate(DEST_PRIVACY, null) },
+                    onSiteSettingsClick = { onNavigate(DEST_SITE_SETTINGS, null) },
+                    onDataSaverClick = { onNavigate(DEST_DATA_SAVER, null) },
+                    onDownloadsClick = { onNavigate(DEST_DOWNLOADS, null) },
+                    onBackupRestoreClick = { onNavigate(DEST_BACKUP_RESTORE, null) },
+                    onMiscClick = { onNavigate(DEST_MISC, null) },
+                    onDebugClick = { onNavigate(DEST_DEBUG, null) },
+                    onAboutClick = { onNavigate(DEST_ABOUT, null) }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun SettingsDetailPane(
+    activity: SettingsActivity,
+    destination: String?,
+    searchTarget: SettingsSearchTarget?,
+    onNavigate: (String) -> Unit,
+    onBack: () -> Unit
+) {
+    if (destination == null) {
+        SettingsEmptyDetailPane()
+        return
+    }
+    Column(Modifier.fillMaxSize()) {
+        SettingsToolbar(title = stringResource(destinationTitleRes(destination)), onBack = onBack)
+        Box(Modifier.weight(1f)) {
+            CompositionLocalProvider(LocalSettingsSearchTarget provides searchTarget) {
+                when (destination) {
+                    DEST_LOOK_AND_FEEL -> LookAndFeelPane(activity)
+                    DEST_ACCESSIBILITY -> AccessibilityPane(activity)
+                    DEST_BROWSER -> BrowserSettingsPane(activity, onTranslationsClick = { onNavigate(DEST_TRANSLATIONS) })
+                    DEST_PRIVACY -> PrivacySettingsPane(activity)
+                    DEST_SITE_SETTINGS -> SiteSettingsPane(activity)
+                    DEST_DATA_SAVER -> DataSaverPane(activity)
+                    DEST_DOWNLOADS -> DownloadSettingsPane(activity)
+                    DEST_BACKUP_RESTORE -> BackupRestorePane(activity)
+                    DEST_MISC -> MiscPane(activity)
+                    DEST_TRANSLATIONS -> com.simplefox.browser.settings.translations.TranslationsSettingsPane(activity)
+                    DEST_DEBUG -> DebugPane(activity)
+                    DEST_ABOUT -> AboutPane(activity)
+                }
+            }
+        }
+    }
+}
+
+private fun mainEntryFor(destination: String): MainSettingsEntry? = when (destination) {
+    DEST_LOOK_AND_FEEL -> MainSettingsEntry.LOOK_AND_FEEL
+    DEST_ACCESSIBILITY -> MainSettingsEntry.ACCESSIBILITY
+    DEST_BROWSER -> MainSettingsEntry.BROWSER
+    DEST_PRIVACY -> MainSettingsEntry.PRIVACY
+    DEST_SITE_SETTINGS -> MainSettingsEntry.SITE_SETTINGS
+    DEST_DATA_SAVER -> MainSettingsEntry.DATA_SAVER
+    DEST_DOWNLOADS -> MainSettingsEntry.DOWNLOADS
+    DEST_BACKUP_RESTORE -> MainSettingsEntry.BACKUP_RESTORE
+    DEST_MISC -> MainSettingsEntry.MISC
+    DEST_TRANSLATIONS -> MainSettingsEntry.BROWSER
+    DEST_DEBUG -> MainSettingsEntry.DEBUG
+    DEST_ABOUT -> MainSettingsEntry.ABOUT
+    else -> null
+}
+
+private fun parentDestination(destination: String): String? = when (destination) {
+    DEST_TRANSLATIONS -> DEST_BROWSER
+    else -> null
+}
+
+private fun destinationTitleRes(destination: String): Int = when (destination) {
+    DEST_LOOK_AND_FEEL -> R.string.look_and_feel
+    DEST_ACCESSIBILITY -> R.string.accessibility_title
+    DEST_BROWSER -> R.string.browser_settings
+    DEST_PRIVACY -> R.string.privacy_settings
+    DEST_SITE_SETTINGS -> R.string.site_settings
+    DEST_DATA_SAVER -> R.string.data_saver_title
+    DEST_DOWNLOADS -> R.string.download_settings_title
+    DEST_BACKUP_RESTORE -> R.string.backup_restore_title
+    DEST_MISC -> R.string.pref_misc_title
+    DEST_TRANSLATIONS -> R.string.translation_settings_title
+    DEST_DEBUG -> R.string.debug_title
+    DEST_ABOUT -> R.string.about
+    else -> R.string.settings
+}
+
+@Composable
+private fun SettingsToolbar(title: String, onBack: () -> Unit, actions: @Composable RowScope.() -> Unit = {}) {
+    val colors = LocalClintColors.current
+    Surface(color = colors.background, modifier = Modifier.statusBarsPadding()) {
+        Row(Modifier.fillMaxWidth().height(64.dp).padding(horizontal = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+            IconButton(onClick = onBack) {
+                Icon(androidx.compose.material.icons.Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back), tint = colors.onSurface)
+            }
+            Text(
+                title,
+                color = colors.onSurface,
+                fontSize = 22.sp,
+                fontWeight = FontWeight.SemiBold,
+                maxLines = 1,
+                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                modifier = Modifier.weight(1f).padding(start = 4.dp)
+            )
+            actions()
+        }
+    }
+}
+
+@Composable
+private fun SettingsEmptyDetailPane() {
+    val colors = LocalClintColors.current
+    Surface(color = colors.background, modifier = Modifier.fillMaxSize()) {
+        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(horizontal = 32.dp)) {
+                Box(
+                    Modifier.size(88.dp).clip(CircleShape).background(colors.primary.copy(alpha = 0.12f)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        androidx.compose.material.icons.Icons.Filled.Tune,
+                        contentDescription = null,
+                        tint = colors.primary,
+                        modifier = Modifier.size(40.dp)
+                    )
+                }
+                Text(
+                    stringResource(R.string.settings_select_category),
+                    color = colors.secondaryText,
+                    fontSize = 15.sp,
+                    textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                    modifier = Modifier.padding(top = 20.dp)
+                )
+            }
+        }
+    }
+}

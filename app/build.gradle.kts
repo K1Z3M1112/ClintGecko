@@ -21,7 +21,7 @@ val ccacheExecutable: String? = (System.getenv("PATH") ?: "")
     ?.absolutePath
 
 android {
-    namespace = "com.jhaiian.clint"
+    namespace = "com.simplefox.browser"
     compileSdk {
         version = release(37) {
             minorApiLevel = 2
@@ -31,7 +31,7 @@ android {
     ndkVersion = "27.2.12479018"
 
     defaultConfig {
-        applicationId = "com.jhaiian.clint.gecko"
+        applicationId = "com.simplefox.browser"
         minSdk = 26
         targetSdk = 37
         versionCode = 6
@@ -192,4 +192,5 @@ dependencies {
     implementation("androidx.compose.material3.adaptive:adaptive-layout")
     implementation("androidx.compose.material3.adaptive:adaptive-navigation")
     implementation("androidx.activity:activity-compose:1.13.0")
+    implementation("androidx.profileinstaller:profileinstaller:1.4.1")
 }
