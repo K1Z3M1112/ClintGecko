@@ -1,0 +1,6 @@
+package com.simplefox.browser.settings.common
+
+import androidx.compose.ui.unit.dp
+
+val SettingsPickerOptionContentPadding = 14.dp
+val SettingsPickerOptionBottomSpacing = 8.dp

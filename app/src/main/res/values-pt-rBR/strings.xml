@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Clint Gecko</string>
-    <string name="clint_downloader_label">Clint Downloader</string>
+    <string name="app_name">SimpleFox</string>
+    <string name="clint_downloader_label">SimpleFox Downloader</string>
     <string name="back">Voltar</string>
     <string name="forward">Avançar</string>
     <string name="refresh">Recarregar</string>
@@ -108,7 +108,7 @@
     <string name="incognito_search_history_title">Mostrar histórico de pesquisa no modo anônimo</string>
     <string name="incognito_search_history_summary">Incluir seu histórico de pesquisa salvo nas sugestões ao navegar no modo anônimo</string>
     <string name="remember_browsing_mode_title">Lembrar o modo de navegação</string>
-    <string name="remember_browsing_mode_summary">Abrir o Clint no modo anônimo ou normal, de acordo com o último que você usou</string>
+    <string name="remember_browsing_mode_summary">Abrir o SimpleFox no modo anônimo ou normal, de acordo com o último que você usou</string>
     <string name="incognito_notification_channel_name">Abas anônimas</string>
     <string name="incognito_notification_channel_desc">Aparece enquanto houver abas anônimas abertas, para você fechar todas com um toque</string>
     <string name="incognito_notification_title">Você tem abas anônimas abertas</string>
@@ -181,7 +181,7 @@
     <string name="suggestions_api_custom_desc">Adicione sua própria API de sugestões</string>
     <string name="suggestions_api_off">Desativado</string>
     <string name="suggestions_api_off_desc">Nenhuma sugestão da web</string>
-    <string name="suggestions_google_warning_message">O Google vai receber cada caractere que você digitar ao pesquisar, associado à sua conta ou ao seu endereço IP. O Clint não tem como impedir isso.\n\nPara ter mais privacidade, continue usando o DuckDuckGo.</string>
+    <string name="suggestions_google_warning_message">O Google vai receber cada caractere que você digitar ao pesquisar, associado à sua conta ou ao seu endereço IP. O SimpleFox não tem como impedir isso.\n\nPara ter mais privacidade, continue usando o DuckDuckGo.</string>
     <string name="custom_search_suggestions_api_dialog_title">API de sugestões de pesquisa personalizada</string>
     <string name="custom_search_suggestions_api_name_hint">Nome</string>
     <string name="custom_search_suggestions_api_name_required">O nome é obrigatório</string>
@@ -198,7 +198,7 @@
     <string name="js_warning_message">Muitos recursos do app dependem do JavaScript, como notificações da web, modo desktop e modo de leitura. Os sites também podem quebrar ou aparecer de forma incorreta.\n\nTem certeza de que quer desativá-lo?</string>
     <string name="action_turn_off_anyway">Desativar mesmo assim</string>
     <string name="google_warning_title">Aviso de privacidade</string>
-    <string name="google_warning_message">O Google vai coletar seus dados de pesquisa e associá-los à sua conta ou ao seu endereço IP. O Clint não tem como impedir isso.\n\nPara ter mais privacidade, considere usar o DuckDuckGo ou o Brave.</string>
+    <string name="google_warning_message">O Google vai coletar seus dados de pesquisa e associá-los à sua conta ou ao seu endereço IP. O SimpleFox não tem como impedir isso.\n\nPara ter mais privacidade, considere usar o DuckDuckGo ou o Brave.</string>
     <string name="use_google_anyway">Usar o Google mesmo assim</string>
     <string name="choose_another">Escolher outro</string>
     <string name="new_tab">Nova aba</string>
@@ -213,22 +213,14 @@
     <string name="about_section_about">SOBRE</string>
     <string name="about_section_version">VERSÃO E DISPOSITIVO</string>
     <string name="about_section_license">LICENÇA</string>
-    <string name="about_section_repository">CÓDIGO-FONTE</string>
     <string name="about_created_by">Criado por</string>
-    <string name="about_description">O Clint Gecko é um navegador de código aberto baseado no Firefox, com ADM (Advanced Download Manager) e captura de mídia integrados. O objetivo do Clint Gecko é ser o seu navegador completo definitivo, sem deixar de ser agradável de usar e altamente personalizável. A cada atualização, o Clint Gecko chega mais perto desse objetivo.\n\nO ecossistema Jhaiian oferece até 500 combinações de tema possíveis, para você deixar a navegação do seu jeito.\n\nA privacidade também é prioridade. O Clint Gecko vem configurado para recusar a telemetria do GeckoView e da Mozilla, impedindo que dados de telemetria sejam enviados à Mozilla por esses serviços. O próprio Clint não coleta seus dados pessoais, porque não tem back-end, ferramentas de análise nem servidores de coleta de dados. Tudo foi pensado para funcionar diretamente no seu dispositivo.</string>
+    <string name="about_description">O SimpleFox é um navegador de código aberto baseado no Firefox, com ADM (Advanced Download Manager) e captura de mídia integrados. O objetivo do SimpleFox é ser o seu navegador completo definitivo, sem deixar de ser agradável de usar e altamente personalizável. A cada atualização, o SimpleFox chega mais perto desse objetivo.\n\nO ecossistema Jhaiian oferece até 500 combinações de tema possíveis, para você deixar a navegação do seu jeito.\n\nA privacidade também é prioridade. O SimpleFox vem configurado para recusar a telemetria do GeckoView e da Mozilla, impedindo que dados de telemetria sejam enviados à Mozilla por esses serviços. O próprio SimpleFox não coleta seus dados pessoais, porque não tem back-end, ferramentas de análise nem servidores de coleta de dados. Tudo foi pensado para funcionar diretamente no seu dispositivo.</string>
     <string name="about_version_info">Versão: %1$s (build %2$d)\nArquitetura do dispositivo: %3$s</string>
     <string name="about_license_text">O código-fonte deste projeto está licenciado sob a GNU General Public License v3.0 (GPLv3).\n\nOs nomes \"Clint\" e \"Clint Gecko\", o logotipo, as capturas de tela e todos os elementos de marca relacionados são marcas registradas ou ativos de propriedade do autor e não são licenciados sob a GPL. O uso desses elementos exige permissão expressa do autor.</string>
     <string name="about_license_link_label">Ver licença GPL v3.0 ↗</string>
-    <string name="about_opensource_text">O código-fonte completo está disponível publicamente no GitHub. Contribuições, relatórios de bugs e pedidos de recursos são bem-vindos.</string>
-    <string name="about_github_url">github.com/jhaiian/ClintGecko ↗</string>
     <string name="about_section_keep_android_open">MANTENHA O ANDROID ABERTO</string>
     <string name="about_keep_android_open_text">O Google está implementando uma verificação obrigatória de identidade de desenvolvedores que ameaça o sideload e os ecossistemas de apps independentes no Android, incluindo apps como este. Saiba mais e faça sua voz ser ouvida.</string>
     <string name="about_keep_android_open_url">keepandroidopen.org ↗</string>
-    <string name="support_clint_title">Apoie o Clint</string>
-    <string name="support_clint_summary">Ajude a manter o Clint gratuito para sempre. Considere fazer uma doação ao desenvolvedor do Clint.</string>
-    <string name="support_clint_view_supporters_title">Ver apoiadores atuais</string>
-    <string name="support_clint_view_supporters_summary">Veja todas as pessoas que ajudaram a apoiar o desenvolvimento do Clint</string>
-    <string name="support_clint_markdown">## Ajude a manter o Clint gratuito para sempre 💜\n\nO Clint é um projeto independente e de código aberto, criado por um único desenvolvedor que acredita que todo mundo merece uma experiência de navegação personalizável, sem anúncios, paywalls ou recursos bloqueados.\n\nSuas doações ajudam a manter o desenvolvimento, a manutenção e as melhorias futuras. Toda contribuição, por menor que seja, faz muita diferença e ajuda o Clint a seguir em frente.\n\nO Clint sempre será gratuito. Obrigado por fazer parte desta jornada. 💜\n\n[![Patreon](https://img.shields.io/badge/Support%20me-Patreon-orange?style=for-the-badge&amp;logo=patreon)](https://patreon.com/Jhaiian)\n[![Ko-fi](https://img.shields.io/badge/Buy%20me%20a%20coffee-Ko--fi-red?style=for-the-badge&amp;logo=ko-fi)](https://ko-fi.com/jhaiian)\n[![PayPal](https://img.shields.io/badge/Donate-PayPal-00457C?style=for-the-badge&amp;logo=paypal)](https://paypal.me/jhaiian)\n[![InstaPay QR](https://img.shields.io/badge/InstaPay%20QR-Philippines%20only-7C3AED?style=for-the-badge)](https://github.com/jhaiian/jhaiian/blob/main/docs/Insta%20Pay.jpg)</string>
     <string name="default_browser_title">Navegador padrão</string>
     <string name="default_browser_none">Nenhum</string>
     <string name="look_and_feel">Aparência e estilo</string>
@@ -295,7 +287,7 @@
     <string name="download_manager_title">Gerenciador de downloads</string>
     <string name="download_manager_summary">Escolha qual app cuida dos novos downloads</string>
     <string name="download_manager_dialog_title">Escolher gerenciador de downloads</string>
-    <string name="download_manager_option_clint">Clint (padrão)</string>
+    <string name="download_manager_option_clint">SimpleFox (padrão)</string>
     <string name="download_manager_option_1dm">1DM</string>
     <string name="download_manager_option_1dm_plus">1DM+</string>
     <string name="download_manager_option_1dm_lite">1DM Lite</string>
@@ -425,7 +417,7 @@
     <string name="crash_copy">Copiar relatório de falha</string>
     <string name="crash_delete">Excluir relatório</string>
     <string name="crash_report_title">RELATAR UM BUG</string>
-    <string name="crash_report_instructions">Ajude a melhorar o Clint relatando bugs no GitHub. Nenhum dado é enviado automaticamente — você escolhe o que compartilhar.</string>
+    <string name="crash_report_instructions">Ajude a melhorar o SimpleFox relatando bugs no GitHub. Nenhum dado é enviado automaticamente — você escolhe o que compartilhar.</string>
     <string name="crash_steps_title">Como fazer um relatório</string>
     <string name="crash_step_reproduce">Reproduza a falha ou o bug</string>
     <string name="crash_step_expand">Toque na entrada da falha para expandi-la</string>
@@ -440,9 +432,6 @@
     <string name="crash_open_github">Abrir GitHub Issues</string>
     <string name="about_section_contact">CONTATO</string>
     <string name="about_contact_email">jhaiian@proton.me</string>
-    <string name="about_section_contributors">COLABORADORES</string>
-    <string name="about_contributors_text">Veja a lista completa de pessoas que contribuíram com o Clint.</string>
-    <string name="about_contributors_link">Contributors.md ↗</string>
     <string name="about_section_libraries">BIBLIOTECAS USADAS</string>
     <string name="about_library_geckoview_label">GeckoView, da Mozilla</string>
     <string name="about_library_geckoview_license">Mozilla Public License 2.0 ↗</string>
@@ -678,7 +667,7 @@
     <string name="download_storage_permission_message">O acesso ao armazenamento é necessário para salvar os arquivos baixados na sua pasta Downloads.</string>
     <string name="voice_search">Pesquisa por voz</string>
     <string name="voice_search_permission_title">Acesso ao microfone</string>
-    <string name="voice_search_permission_message">O Clint precisa de acesso ao microfone para usar a pesquisa por voz.</string>
+    <string name="voice_search_permission_message">O SimpleFox precisa de acesso ao microfone para usar a pesquisa por voz.</string>
     <string name="voice_search_not_available">A pesquisa por voz não está disponível neste dispositivo</string>
 
     <string name="toast_downloading">Baixando %1$s</string>
@@ -689,7 +678,7 @@
     <string name="install_apk_dialog_message">Quer instalar \"%1$s\"?\n\nSó instale APKs de fontes em que você confia.</string>
     <string name="install_apk_dialog_confirm">Instalar</string>
     <string name="install_apk_permission_title">Permissão necessária</string>
-    <string name="install_apk_permission_message">Para instalar arquivos APK, o Clint precisa de permissão para instalar apps desconhecidos. Você será levado às configurações para ativá-la.</string>
+    <string name="install_apk_permission_message">Para instalar arquivos APK, o SimpleFox precisa de permissão para instalar apps desconhecidos. Você será levado às configurações para ativá-la.</string>
 
     <string name="restart_required_title">É necessário reiniciar</string>
     <string name="restart_required_message">O app precisa ser reiniciado para que esta alteração entre em vigor.</string>
@@ -709,7 +698,7 @@
     <string name="update_download_progress_size_known">%1$s / %2$s (%3$d%%)</string>
     <string name="update_download_progress_size_unknown">%1$s baixados</string>
     <string name="update_up_to_date_title">Tudo atualizado</string>
-    <string name="update_up_to_date_message">Você está usando a versão mais recente do Clint Gecko.</string>
+    <string name="update_up_to_date_message">Você está usando a versão mais recente do SimpleFox.</string>
     <string name="update_check_failed_title">Falha ao verificar atualizações</string>
     <string name="update_check_failed_message">Não foi possível acessar o servidor de atualizações. Verifique sua conexão e tente novamente.</string>
 
@@ -721,7 +710,7 @@
     <string name="download_info_with_time">%1$s  •  %2$s</string>
     <string name="download_error_unknown">Erro desconhecido</string>
     <string name="download_error_playlist_unavailable">Não foi possível buscar a playlist do vídeo. Ela pode ter expirado — tente detectar a mídia de novo.</string>
-    <string name="download_error_stream_encryption_unsupported">Este stream usa criptografia %1$s, que o Clint não consegue descriptografar.</string>
+    <string name="download_error_stream_encryption_unsupported">Este stream usa criptografia %1$s, que o SimpleFox não consegue descriptografar.</string>
     <string name="download_error_stream_key_unavailable">Não foi possível obter a chave para descriptografar este stream. Ela pode ter expirado — tente detectar a mídia de novo.</string>
     <string name="download_error_link_expired">O link de download expirou enquanto estava pausado. Reinicie o download para obter um link novo.</string>
     <string name="download_error_mux_failed">Não foi possível juntar o vídeo e o áudio baixados em um único arquivo.</string>
@@ -748,7 +737,7 @@
     <string name="download_eta_seconds">%1$d s</string>
     <string name="download_eta_minutes">%1$d min %2$d s</string>
     <string name="download_eta_hours">%1$d h %2$d min</string>
-    <string name="download_notification_channel_name">Downloads do Clint</string>
+    <string name="download_notification_channel_name">Downloads do SimpleFox</string>
     <string name="download_notification_channel_desc">Progresso dos downloads de arquivos</string>
     <string name="download_event_notification_channel_name">Alertas de download</string>
     <string name="download_event_notification_channel_desc">Notificações de downloads concluídos, com falha e em nova tentativa</string>
@@ -774,7 +763,7 @@
     <string name="download_concurrent_segments_title">Segmentos simultâneos</string>
     <string name="download_concurrent_segments_desc">Número máximo de segmentos de vídeo/áudio baixados ao mesmo tempo ao capturar streams HLS ou DASH. O mecanismo ajusta isso automaticamente conforme a velocidade, até esse limite.</string>
     <string name="download_setting_auto">Automático</string>
-    <string name="download_setting_auto_hint">Deslize até o fim para a direita para usar o modo Automático, e o Clint vai ajustar isso sozinho durante o download.</string>
+    <string name="download_setting_auto_hint">Deslize até o fim para a direita para usar o modo Automático, e o SimpleFox vai ajustar isso sozinho durante o download.</string>
     <string name="downloads_setting_auto_value">Automático · %1$s</string>
     <string name="download_section_speed_limit">LIMITE DE VELOCIDADE</string>
     <string name="download_speed_limit_title">Limite de velocidade</string>
@@ -797,9 +786,9 @@
     <string name="download_resumable_no">Pode retomar: não</string>
 
     <string name="setup_default_browser_title">Navegador padrão</string>
-    <string name="setup_default_browser_description">Defina o Clint Gecko como navegador padrão para que os links de outros apps abram aqui automaticamente. Isso é totalmente opcional, e você pode mudar a qualquer momento nas configurações do dispositivo.</string>
+    <string name="setup_default_browser_description">Defina o SimpleFox como navegador padrão para que os links de outros apps abram aqui automaticamente. Isso é totalmente opcional, e você pode mudar a qualquer momento nas configurações do dispositivo.</string>
     <string name="setup_default_browser_card_title">Definir como navegador padrão</string>
-    <string name="setup_default_browser_card_desc">Toque no botão abaixo para definir o Clint Gecko como seu navegador padrão</string>
+    <string name="setup_default_browser_card_desc">Toque no botão abaixo para definir o SimpleFox como seu navegador padrão</string>
     <string name="setup_default_browser_set_button">Definir como navegador padrão</string>
     <string name="setup_default_browser_skip">Pular</string>
 
@@ -807,7 +796,6 @@
     <string name="document_viewer_privacy_policy_title">Política de Privacidade</string>
     <string name="document_viewer_terms_title">Termos de Serviço</string>
     <string name="document_viewer_changelog_title">Novidades</string>
-    <string name="document_viewer_supporters_title">Apoiadores atuais</string>
     <string name="setup_theme_title">Escolha seu tema</string>
     <string name="setup_theme_subtitle">Escolha o visual que mais combina com você. Dá para mudar depois nas configurações.</string>
 
@@ -935,7 +923,7 @@
     <string name="surface_intensity_amoled_no_tint_dark_desc">Superfícies em preto puro, com a cor de destaque só nos botões e ícones</string>
     <string name="surface_intensity_amoled_no_tint_light_desc">Superfícies em branco puro, com a cor de destaque só nos botões e ícones</string>
     <string name="pref_misc_title">Outros</string>
-    <string name="pref_misc_summary">Defina o Clint como navegador padrão ou execute a configuração inicial de novo</string>
+    <string name="pref_misc_summary">Defina o SimpleFox como navegador padrão ou execute a configuração inicial de novo</string>
     <string name="pref_rerun_setup_title">Executar configuração inicial de novo</string>
     <string name="pref_rerun_setup_summary">Reiniciar o processo de configuração inicial</string>
     <string name="rerun_setup_confirm_title">Executar a configuração inicial de novo?</string>
@@ -960,14 +948,14 @@
     <string name="address_bar_position_split_desc">Barra de endereço em cima e botões de navegação embaixo</string>
     <string name="setup_status_bar_applied_later">Será aplicado quando a configuração terminar.</string>
 
-    <string name="setup_welcome_title">Boas-vindas ao Clint Gecko</string>
+    <string name="setup_welcome_title">Boas-vindas ao SimpleFox</string>
     <string name="setup_welcome_subtitle">Antes de começar, leia nossos termos.</string>
     <string name="setup_terms_read">Ler</string>
     <string name="setup_terms_agree">Li e concordo com a Política de Privacidade e os Termos de Serviço</string>
     <string name="setup_terms_continue">Concordar e continuar</string>
 
     <string name="setup_restore_title">Restaurar backup</string>
-    <string name="setup_restore_subtitle">Tem um backup do Clint Gecko? Restaure agora para recuperar suas configurações e dados, ou pule para configurar como novo.</string>
+    <string name="setup_restore_subtitle">Tem um backup do SimpleFox? Restaure agora para recuperar suas configurações e dados, ou pule para configurar como novo.</string>
     <string name="setup_restore_card_title">Restaurar backup</string>
     <string name="setup_restore_card_desc">Escolha um arquivo .clintbackup do seu dispositivo</string>
     <string name="setup_restore_button">Restaurar backup</string>
@@ -1130,12 +1118,6 @@
 
     <string name="about_section_legal">JURÍDICO</string>
     <string name="about_legal_view">Ver</string>
-    <string name="about_section_community">COMUNIDADE</string>
-    <string name="about_community_discord_text">Entre na comunidade oficial do Clint Gecko no Discord e no Reddit para dar sua opinião, relatar bugs e conversar com outros usuários.</string>
-    <string name="about_community_discord_label">Discord</string>
-    <string name="about_community_discord_url">discord.gg/4kUe4yPQ32</string>
-    <string name="about_community_reddit_label">Reddit</string>
-    <string name="about_community_reddit_url">reddit.com/r/ClintBrowser</string>
     <string name="about_contact_email_label">E-mail</string>
 
     <string name="exit_confirmation_title">Confirmação de saída</string>
@@ -1147,7 +1129,7 @@
     <string name="exit_confirmation_dialog_desc">Mostra uma caixa de confirmação antes de sair</string>
     <string name="exit_tap_again">Toque de novo para sair</string>
     <string name="exit_dialog_title">Sair?</string>
-    <string name="exit_dialog_message">Tem certeza de que quer sair do Clint?</string>
+    <string name="exit_dialog_message">Tem certeza de que quer sair do SimpleFox?</string>
     <string name="exit_dialog_confirm">Sair</string>
 
     <string name="image_open_in_new_tab">Abrir imagem em nova aba</string>
@@ -1231,7 +1213,7 @@
     <string name="history_delete_desc">Remover do histórico</string>
     <string name="suggestion_url_desc">URL da página</string>
     <string name="suggestion_section_search">Sugestões de pesquisa</string>
-    <string name="suggestion_section_clint">Páginas do Clint</string>
+    <string name="suggestion_section_clint">Páginas do SimpleFox</string>
     <string name="history_title">Histórico</string>
     <string name="history_summary">Veja e gerencie o histórico de navegação e de pesquisa</string>
     <string name="history_empty">Nenhum histórico ainda</string>
@@ -1360,7 +1342,7 @@
     <string name="site_info_site_settings_desc">Gerenciar as permissões de todos os sites</string>
 
     <string name="battery_opt_rationale_title">Permitir downloads em segundo plano</string>
-    <string name="battery_opt_rationale_message">Para que os downloads continuem quando você mudar de app, permita que o Clint ignore a otimização de bateria. Sem isso, o sistema pode pausar ou cancelar downloads ativos enquanto o app estiver em segundo plano.</string>
+    <string name="battery_opt_rationale_message">Para que os downloads continuem quando você mudar de app, permita que o SimpleFox ignore a otimização de bateria. Sem isso, o sistema pode pausar ou cancelar downloads ativos enquanto o app estiver em segundo plano.</string>
     <string name="download_metered_warning_title">Rede limitada detectada</string>
     <string name="download_metered_warning_message">A opção Somente em rede ilimitada está ativada, mas você está conectado a uma rede limitada. Quer usar a rede limitada para baixar este arquivo?</string>
     <string name="action_download_anyway">Baixar mesmo assim</string>
@@ -1371,7 +1353,7 @@
     <string name="download_conflict_update_link">Atualizar link</string>
     <string name="download_already_active_title">Já está sendo baixado</string>
     <string name="download_already_active_message">\"%1$s\" já está sendo baixado. Baixar de novo como um arquivo separado?</string>
-    <string name="download_foreground_notification_title">Downloads do Clint</string>
+    <string name="download_foreground_notification_title">Downloads do SimpleFox</string>
     <string name="download_foreground_notification_text">Os downloads estão rodando em segundo plano</string>
     <plurals name="download_notification_group_summary">
         <item quantity="one">%1$d download em andamento</item>
@@ -1616,9 +1598,9 @@
     <string name="restore_action_continue">Continuar</string>
 
     <string name="restore_invalid_title">Arquivo de backup inválido</string>
-    <string name="restore_invalid_message">Este arquivo não é um backup do Clint compatível ou está corrompido.</string>
+    <string name="restore_invalid_message">Este arquivo não é um backup do SimpleFox compatível ou está corrompido.</string>
     <string name="restore_unsupported_title">Versão de backup incompatível</string>
-    <string name="restore_unsupported_message">Este backup foi criado com uma versão mais nova do Clint e não pode ser restaurado aqui.</string>
+    <string name="restore_unsupported_message">Este backup foi criado com uma versão mais nova do SimpleFox e não pode ser restaurado aqui.</string>
     <string name="restore_generic_error_title">Não foi possível abrir o backup</string>
     <string name="restore_generic_error_message">Algo deu errado ao ler o arquivo de backup.</string>
 
@@ -1629,7 +1611,7 @@
     <string name="restore_confirm_message">A restauração vai substituir seus dados atuais das categorias selecionadas. Não será possível desfazer.</string>
 
     <string name="restore_result_success_title">Restauração concluída</string>
-    <string name="restore_result_success_message">Seus dados foram restaurados. O Clint precisa ser reiniciado para aplicar as alterações.</string>
+    <string name="restore_result_success_message">Seus dados foram restaurados. O SimpleFox precisa ser reiniciado para aplicar as alterações.</string>
     <string name="restore_result_partial_note">Não encontrado neste backup: %1$s</string>
     <string name="restore_result_error_title">Falha na restauração</string>
     <string name="restore_result_error_message">Algo deu errado ao restaurar seus dados.</string>
@@ -1772,7 +1754,7 @@
     <string name="open_in_app_mode_open_desc">Abrir os links no app correspondente sem perguntar</string>
     <string name="open_in_app_dont_ask_again">Não perguntar de novo</string>
     <string name="homepage_title">Página inicial</string>
-    <string name="homepage_clint">Página inicial do Clint</string>
+    <string name="homepage_clint">Página inicial do SimpleFox</string>
     <string name="homepage_clint_desc">Uma página inicial limpa com seus favoritos e atalhos</string>
     <string name="homepage_search_engine">Página do mecanismo de pesquisa</string>
     <string name="homepage_search_engine_desc">Abrir a página inicial do mecanismo de pesquisa escolhido</string>
@@ -1796,13 +1778,13 @@
     <string name="homepage_image_full_brightness_title">Imagem sem escurecimento</string>
     <string name="homepage_image_full_brightness_summary">Mostra sua foto do jeito que ela é, sem a camada que escurece</string>
     <string name="homepage_show_favorites_title">Mostrar favoritos</string>
-    <string name="homepage_show_favorites_summary">Mostrar os sites e pastas fixados na página inicial do Clint</string>
+    <string name="homepage_show_favorites_summary">Mostrar os sites e pastas fixados na página inicial do SimpleFox</string>
     <string name="homepage_show_quick_actions_title">Mostrar ações rápidas</string>
-    <string name="homepage_show_quick_actions_summary">Mostrar os botões Favoritos, Histórico, Downloads e Anônimo na página inicial do Clint</string>
+    <string name="homepage_show_quick_actions_summary">Mostrar os botões Favoritos, Histórico, Downloads e Anônimo na página inicial do SimpleFox</string>
     <string name="homepage_show_recent_title">Mostrar visitados recentemente</string>
-    <string name="homepage_show_recent_summary">Mostrar os sites visitados recentemente na página inicial do Clint</string>
+    <string name="homepage_show_recent_summary">Mostrar os sites visitados recentemente na página inicial do SimpleFox</string>
     <string name="homepage_center_content_title">Centralizar conteúdo</string>
-    <string name="homepage_center_content_summary">Centralizar verticalmente o conteúdo da página inicial do Clint na tela</string>
+    <string name="homepage_center_content_summary">Centralizar verticalmente o conteúdo da página inicial do SimpleFox na tela</string>
     <string name="homepage_image_error">Não foi possível usar essa imagem. Tente outra.</string>
     <string name="home_greeting_morning">Bom dia</string>
     <string name="home_greeting_afternoon">Boa tarde</string>
@@ -1897,7 +1879,7 @@
     <string name="shared_compile_action_retry">Tentar de novo</string>
     <string name="ext_title">Extensões</string>
     <string name="ext_settings_summary">Complementos, permissões e atualizações</string>
-    <string name="ext_hero_tagline">Deixe o Clint do seu jeito com complementos da comunidade do Firefox.</string>
+    <string name="ext_hero_tagline">Deixe o SimpleFox do seu jeito com complementos da comunidade do Firefox.</string>
     <string name="ext_hero_summary">%1$d ativadas · %2$d desativadas</string>
     <string name="ext_get_addons">Explorar complementos</string>
     <string name="ext_install_file">Do arquivo</string>
@@ -1954,7 +1936,7 @@
     <string name="ext_sites_some">Ler e alterar dados nestes sites</string>
     <string name="ext_sites_more">+%1$d outros</string>
     <string name="ext_remove_title">Remover %1$s?</string>
-    <string name="ext_remove_message">A extensão e os dados dela serão excluídos do Clint.</string>
+    <string name="ext_remove_message">A extensão e os dados dela serão excluídos do SimpleFox.</string>
     <string name="ext_remove_action">Remover</string>
     <string name="ext_link_title">Instalar pelo link</string>
     <string name="ext_link_message">Cole um link direto para um pacote de extensão. Só instale extensões de fontes em que você confia.</string>
@@ -1991,16 +1973,16 @@
     <string name="ext_toast_no_extensions">Nenhuma extensão para atualizar</string>
     <string name="ext_err_network">Falha no download. Verifique sua conexão e tente novamente.</string>
     <string name="ext_err_corrupt">O arquivo da extensão está corrompido.</string>
-    <string name="ext_err_file">O Clint não conseguiu abrir o arquivo da extensão.</string>
+    <string name="ext_err_file">O SimpleFox não conseguiu abrir o arquivo da extensão.</string>
     <string name="ext_err_unsigned">Esta extensão não é assinada pela Mozilla, por isso não pode ser instalada.</string>
     <string name="ext_err_unsupported">Este tipo de extensão não é compatível.</string>
     <string name="ext_err_blocked">Esta extensão está bloqueada porque é conhecida por ser prejudicial.</string>
-    <string name="ext_err_incompatible">Esta extensão não é compatível com esta versão do Clint.</string>
+    <string name="ext_err_incompatible">Esta extensão não é compatível com esta versão do SimpleFox.</string>
     <string name="ext_err_insecure">Só é possível instalar extensões a partir de links seguros (https).</string>
     <string name="ext_err_generic">Não foi possível instalar a extensão.</string>
     <string name="ext_unsigned_title">Instalar extensão não verificada?</string>
     <string name="ext_unsigned_message">A Mozilla não revisou nem assinou esta extensão. Ela pode ver ou alterar o que você faz nos sites, então só instale se confiar na origem dela.</string>
-    <string name="ext_unsigned_note">Extensões não verificadas não são atualizadas automaticamente. O Clint as carrega de novo sempre que é iniciado.</string>
+    <string name="ext_unsigned_note">Extensões não verificadas não são atualizadas automaticamente. O SimpleFox as carrega de novo sempre que é iniciado.</string>
     <string name="ext_unsigned_install_anyway">Instalar mesmo assim</string>
     <string name="ext_unsigned_failed">Não foi possível instalar esta extensão não verificada.</string>
     <string name="ext_perm_unknown">Usar o recurso “%1$s”</string>
@@ -2024,13 +2006,13 @@
     <string name="ext_perm_nativeMessaging">Se comunicar com outros apps do seu dispositivo</string>
     <string name="ext_perm_notifications">Mostrar notificações</string>
     <string name="ext_perm_privacy">Alterar configurações de privacidade</string>
-    <string name="ext_perm_proxy">Controlar como o Clint se conecta à internet</string>
+    <string name="ext_perm_proxy">Controlar como o SimpleFox se conecta à internet</string>
     <string name="ext_perm_scripting">Executar scripts nos sites</string>
     <string name="ext_perm_search">Usar mecanismos de pesquisa</string>
     <string name="ext_perm_sessions">Ver abas fechadas recentemente</string>
     <string name="ext_perm_storage">Salvar os próprios dados</string>
     <string name="ext_perm_tabs">Ver os títulos e endereços das suas abas</string>
-    <string name="ext_perm_theme">Mudar a aparência do Clint</string>
+    <string name="ext_perm_theme">Mudar a aparência do SimpleFox</string>
     <string name="ext_perm_topSites">Ver os sites que você mais visita</string>
     <string name="ext_perm_unlimitedStorage">Armazenar uma grande quantidade de dados</string>
     <string name="ext_perm_userScripts">Executar scripts de usuário nos sites</string>
@@ -2079,7 +2061,7 @@
     <string name="custom_themes_intro">Monte um tema escolhendo cada cor você mesmo. Cada tema tem uma paleta clara e uma escura, e é usada a que combina com o tema do app.</string>
     <string name="custom_theme_create">Criar tema</string>
     <string name="custom_theme_empty_title">Nenhum tema personalizado ainda</string>
-    <string name="custom_theme_empty_message">Crie seu primeiro tema e deixe o Clint Browser exatamente do jeito que você gosta.</string>
+    <string name="custom_theme_empty_message">Crie seu primeiro tema e deixe o SimpleFox exatamente do jeito que você gosta.</string>
     <string name="custom_theme_active">Em uso</string>
     <string name="custom_theme_tap_to_apply">Toque para usar este tema</string>
     <string name="custom_theme_edit">Editar</string>
@@ -2407,7 +2389,7 @@
     <string name="mega_error_blocked">O MEGA bloqueou o acesso a este link</string>
     <string name="mega_error_quota">Você atingiu o limite de transferência do MEGA por enquanto. Tente de novo mais tarde.</string>
     <string name="mega_error_invalid_key">A chave de descriptografia deste link está errada ou incompleta</string>
-    <string name="mega_error_unsupported">O Clint ainda não consegue baixar este arquivo do MEGA</string>
+    <string name="mega_error_unsupported">O SimpleFox ainda não consegue baixar este arquivo do MEGA</string>
     <string name="mega_error_busy">O MEGA está sobrecarregado agora. Tente de novo daqui a pouco.</string>
     <string name="mega_error_generic">O MEGA não conseguiu abrir este link (erro %d)</string>
     <string name="mega_error_network">Não foi possível conectar ao MEGA. Verifique sua conexão e tente de novo.</string>

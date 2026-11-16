@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Clint Gecko</string>
-    <string name="clint_downloader_label">Clint Downloader</string>
+    <string name="app_name">SimpleFox</string>
+    <string name="clint_downloader_label">SimpleFox Downloader</string>
     <string name="back">Kembali</string>
     <string name="forward">Maju</string>
     <string name="refresh">Muat ulang</string>
@@ -105,7 +105,7 @@
     <string name="incognito_search_history_title">Tampilkan histori penelusuran di Mode Samaran</string>
     <string name="incognito_search_history_summary">Sertakan histori penelusuran yang tersimpan sebagai saran saat menjelajah dalam mode Samaran</string>
     <string name="remember_browsing_mode_title">Ingat mode penjelajahan</string>
-    <string name="remember_browsing_mode_summary">Buka kembali Clint dalam mode Samaran atau biasa, sesuai yang terakhir Anda gunakan</string>
+    <string name="remember_browsing_mode_summary">Buka kembali SimpleFox dalam mode Samaran atau biasa, sesuai yang terakhir Anda gunakan</string>
     <string name="incognito_notification_channel_name">Tab Samaran</string>
     <string name="incognito_notification_channel_desc">Muncul saat ada tab Samaran yang terbuka agar Anda bisa menutup semuanya dengan sekali ketuk</string>
     <string name="incognito_notification_title">Ada tab Samaran yang terbuka</string>
@@ -177,7 +177,7 @@
     <string name="suggestions_api_custom_desc">Tambahkan API saran Anda sendiri</string>
     <string name="suggestions_api_off">Nonaktif</string>
     <string name="suggestions_api_off_desc">Tidak ada saran dari web</string>
-    <string name="suggestions_google_warning_message">Google akan menerima setiap karakter yang Anda ketik saat menelusuri, lalu mengaitkannya dengan akun atau alamat IP Anda. Clint tidak dapat mencegah hal ini.\n\nUntuk privasi yang lebih baik, tetap gunakan DuckDuckGo.</string>
+    <string name="suggestions_google_warning_message">Google akan menerima setiap karakter yang Anda ketik saat menelusuri, lalu mengaitkannya dengan akun atau alamat IP Anda. SimpleFox tidak dapat mencegah hal ini.\n\nUntuk privasi yang lebih baik, tetap gunakan DuckDuckGo.</string>
     <string name="custom_search_suggestions_api_dialog_title">API Saran Penelusuran Kustom</string>
     <string name="custom_search_suggestions_api_name_hint">Nama</string>
     <string name="custom_search_suggestions_api_name_required">Nama wajib diisi</string>
@@ -194,7 +194,7 @@
     <string name="js_warning_message">Banyak fitur aplikasi yang bergantung pada JavaScript, termasuk notifikasi web, mode desktop, dan mode baca. Situs juga bisa rusak atau tampil tidak benar.\n\nYakin ingin menonaktifkannya?</string>
     <string name="action_turn_off_anyway">Tetap nonaktifkan</string>
     <string name="google_warning_title">Pemberitahuan privasi</string>
-    <string name="google_warning_message">Google akan mengumpulkan data penelusuran Anda dan mengaitkannya dengan akun atau alamat IP Anda. Clint tidak dapat mencegah hal ini.\n\nUntuk privasi yang lebih baik, pertimbangkan DuckDuckGo atau Brave.</string>
+    <string name="google_warning_message">Google akan mengumpulkan data penelusuran Anda dan mengaitkannya dengan akun atau alamat IP Anda. SimpleFox tidak dapat mencegah hal ini.\n\nUntuk privasi yang lebih baik, pertimbangkan DuckDuckGo atau Brave.</string>
     <string name="use_google_anyway">Tetap gunakan Google</string>
     <string name="choose_another">Pilih yang lain</string>
     <string name="new_tab">Tab Baru</string>
@@ -209,22 +209,14 @@
     <string name="about_section_about">TENTANG</string>
     <string name="about_section_version">VERSI &amp; PERANGKAT</string>
     <string name="about_section_license">LISENSI</string>
-    <string name="about_section_repository">KODE SUMBER</string>
     <string name="about_created_by">Dibuat oleh</string>
-    <string name="about_description">Clint Gecko adalah browser open source berbasis Firefox dengan ADM (Advanced Download Manager) dan Perekam Media bawaan. Tujuan Clint Gecko adalah menjadi browser serba ada terbaik bagi Anda, sekaligus tetap nyaman digunakan dan bisa disesuaikan sepenuhnya. Di setiap pembaruan, Clint Gecko terus semakin dekat dengan tujuan itu.\n\nEkosistem Jhaiian menyediakan hingga 500 kombinasi tema, sehingga Anda bisa menyesuaikan pengalaman menjelajah sesuai selera.\n\nPrivasi juga menjadi prioritas. Clint Gecko dikonfigurasi untuk menolak telemetri GeckoView dan Mozilla, sehingga data telemetri tidak dikirim ke Mozilla melalui layanan tersebut. Clint sendiri tidak mengumpulkan data pribadi Anda karena tidak memiliki backend, analitik, ataupun server pengumpul data. Semuanya dirancang untuk berjalan langsung di perangkat Anda.</string>
+    <string name="about_description">SimpleFox adalah browser open source berbasis Firefox dengan ADM (Advanced Download Manager) dan Perekam Media bawaan. Tujuan SimpleFox adalah menjadi browser serba ada terbaik bagi Anda, sekaligus tetap nyaman digunakan dan bisa disesuaikan sepenuhnya. Di setiap pembaruan, SimpleFox terus semakin dekat dengan tujuan itu.\n\nEkosistem Jhaiian menyediakan hingga 500 kombinasi tema, sehingga Anda bisa menyesuaikan pengalaman menjelajah sesuai selera.\n\nPrivasi juga menjadi prioritas. SimpleFox dikonfigurasi untuk menolak telemetri GeckoView dan Mozilla, sehingga data telemetri tidak dikirim ke Mozilla melalui layanan tersebut. SimpleFox sendiri tidak mengumpulkan data pribadi Anda karena tidak memiliki backend, analitik, ataupun server pengumpul data. Semuanya dirancang untuk berjalan langsung di perangkat Anda.</string>
     <string name="about_version_info">Versi: %1$s (build %2$d)\nArsitektur perangkat: %3$s</string>
     <string name="about_license_text">Kode sumber proyek ini dilisensikan di bawah GNU General Public License v3.0 (GPLv3).\n\nNama \"Clint\" dan \"Clint Gecko\", logo, screenshot, serta semua aset merek terkait adalah merek dagang atau aset milik pembuatnya dan tidak dilisensikan di bawah GPL. Penggunaan aset tersebut memerlukan izin tertulis dari pembuatnya.</string>
     <string name="about_license_link_label">Lihat lisensi GPL v3.0 ↗</string>
-    <string name="about_opensource_text">Seluruh kode sumber tersedia untuk umum di GitHub. Kontribusi, laporan bug, dan permintaan fitur sangat kami sambut.</string>
-    <string name="about_github_url">github.com/jhaiian/ClintGecko ↗</string>
     <string name="about_section_keep_android_open">BIARKAN ANDROID TETAP TERBUKA</string>
     <string name="about_keep_android_open_text">Google sedang menerapkan kewajiban verifikasi identitas developer yang mengancam sideload dan ekosistem aplikasi independen di Android, termasuk aplikasi seperti ini. Pelajari lebih lanjut dan sampaikan suara Anda.</string>
     <string name="about_keep_android_open_url">keepandroidopen.org ↗</string>
-    <string name="support_clint_title">Dukung Clint</string>
-    <string name="support_clint_summary">Bantu Clint tetap gratis selamanya. Pertimbangkan untuk berdonasi kepada developer Clint.</string>
-    <string name="support_clint_view_supporters_title">Lihat Pendukung Saat Ini</string>
-    <string name="support_clint_view_supporters_summary">Lihat semua orang yang telah membantu mendukung pengembangan Clint</string>
-    <string name="support_clint_markdown">## Bantu Clint Tetap Gratis Selamanya 💜\n\nClint adalah proyek open source independen yang dibuat oleh satu developer yang percaya bahwa setiap orang berhak mendapatkan pengalaman menjelajah yang bisa disesuaikan, tanpa iklan, paywall, atau fitur terkunci.\n\nDonasi Anda membantu pengembangan, pemeliharaan, dan peningkatan Clint ke depannya. Setiap kontribusi, sekecil apa pun, sangat berarti dan membantu Clint terus berkembang.\n\nClint akan selalu gratis. Terima kasih sudah menjadi bagian dari perjalanan ini. 💜\n\n[![Patreon](https://img.shields.io/badge/Support%20me-Patreon-orange?style=for-the-badge&amp;logo=patreon)](https://patreon.com/Jhaiian)\n[![Ko-fi](https://img.shields.io/badge/Buy%20me%20a%20coffee-Ko--fi-red?style=for-the-badge&amp;logo=ko-fi)](https://ko-fi.com/jhaiian)\n[![PayPal](https://img.shields.io/badge/Donate-PayPal-00457C?style=for-the-badge&amp;logo=paypal)](https://paypal.me/jhaiian)\n[![InstaPay QR](https://img.shields.io/badge/InstaPay%20QR-Philippines%20only-7C3AED?style=for-the-badge)](https://github.com/jhaiian/jhaiian/blob/main/docs/Insta%20Pay.jpg)</string>
     <string name="default_browser_title">Browser Default</string>
     <string name="default_browser_none">Tidak ada</string>
     <string name="look_and_feel">Tampilan &amp; Nuansa</string>
@@ -291,7 +283,7 @@
     <string name="download_manager_title">Pengelola Download</string>
     <string name="download_manager_summary">Pilih aplikasi yang menangani download baru</string>
     <string name="download_manager_dialog_title">Pilih pengelola download</string>
-    <string name="download_manager_option_clint">Clint (Default)</string>
+    <string name="download_manager_option_clint">SimpleFox (Default)</string>
     <string name="download_manager_option_1dm">1DM</string>
     <string name="download_manager_option_1dm_plus">1DM+</string>
     <string name="download_manager_option_1dm_lite">1DM Lite</string>
@@ -421,7 +413,7 @@
     <string name="crash_copy">Salin laporan error</string>
     <string name="crash_delete">Hapus laporan</string>
     <string name="crash_report_title">LAPORKAN BUG</string>
-    <string name="crash_report_instructions">Bantu tingkatkan Clint dengan melaporkan bug di GitHub. Tidak ada data yang dikirim otomatis — Anda sendiri yang memilih apa yang dibagikan.</string>
+    <string name="crash_report_instructions">Bantu tingkatkan SimpleFox dengan melaporkan bug di GitHub. Tidak ada data yang dikirim otomatis — Anda sendiri yang memilih apa yang dibagikan.</string>
     <string name="crash_steps_title">Cara membuat laporan</string>
     <string name="crash_step_reproduce">Ulangi langkah yang menyebabkan error atau bug</string>
     <string name="crash_step_expand">Buka entri error untuk meluaskannya</string>
@@ -436,9 +428,6 @@
     <string name="crash_open_github">Buka GitHub Issues</string>
     <string name="about_section_contact">KONTAK</string>
     <string name="about_contact_email">jhaiian@proton.me</string>
-    <string name="about_section_contributors">KONTRIBUTOR</string>
-    <string name="about_contributors_text">Lihat daftar lengkap orang-orang yang telah berkontribusi untuk Clint.</string>
-    <string name="about_contributors_link">Contributors.md ↗</string>
     <string name="about_section_libraries">LIBRARY YANG DIGUNAKAN</string>
     <string name="about_library_geckoview_label">GeckoView oleh Mozilla</string>
     <string name="about_library_geckoview_license">Mozilla Public License 2.0 ↗</string>
@@ -674,7 +663,7 @@
     <string name="download_storage_permission_message">Akses penyimpanan diperlukan untuk menyimpan file yang didownload ke folder Download Anda.</string>
     <string name="voice_search">Penelusuran suara</string>
     <string name="voice_search_permission_title">Akses mikrofon</string>
-    <string name="voice_search_permission_message">Clint memerlukan akses mikrofon untuk menggunakan penelusuran suara.</string>
+    <string name="voice_search_permission_message">SimpleFox memerlukan akses mikrofon untuk menggunakan penelusuran suara.</string>
     <string name="voice_search_not_available">Penelusuran suara tidak tersedia di perangkat ini</string>
 
     <string name="toast_downloading">Mendownload %1$s</string>
@@ -685,7 +674,7 @@
     <string name="install_apk_dialog_message">Instal \"%1$s\"?\n\nHanya instal APK dari sumber yang Anda percayai.</string>
     <string name="install_apk_dialog_confirm">Instal</string>
     <string name="install_apk_permission_title">Izin diperlukan</string>
-    <string name="install_apk_permission_message">Untuk menginstal file APK, Clint memerlukan izin untuk menginstal aplikasi tidak dikenal. Anda akan diarahkan ke Setelan untuk mengaktifkannya.</string>
+    <string name="install_apk_permission_message">Untuk menginstal file APK, SimpleFox memerlukan izin untuk menginstal aplikasi tidak dikenal. Anda akan diarahkan ke Setelan untuk mengaktifkannya.</string>
 
     <string name="restart_required_title">Perlu dimulai ulang</string>
     <string name="restart_required_message">Aplikasi perlu dimulai ulang agar perubahan ini berlaku.</string>
@@ -705,7 +694,7 @@
     <string name="update_download_progress_size_known">%1$s / %2$s (%3$d%%)</string>
     <string name="update_download_progress_size_unknown">%1$s terdownload</string>
     <string name="update_up_to_date_title">Aplikasi sudah versi terbaru</string>
-    <string name="update_up_to_date_message">Clint Gecko yang Anda gunakan sudah versi terbaru.</string>
+    <string name="update_up_to_date_message">SimpleFox yang Anda gunakan sudah versi terbaru.</string>
     <string name="update_check_failed_title">Gagal memeriksa pembaruan</string>
     <string name="update_check_failed_message">Server pembaruan tidak dapat dijangkau. Periksa koneksi Anda, lalu coba lagi.</string>
 
@@ -717,7 +706,7 @@
     <string name="download_info_with_time">%1$s  •  %2$s</string>
     <string name="download_error_unknown">Error tidak diketahui</string>
     <string name="download_error_playlist_unavailable">Tidak dapat mengambil playlist video. Mungkin sudah kedaluwarsa — coba deteksi ulang medianya.</string>
-    <string name="download_error_stream_encryption_unsupported">Streaming ini menggunakan enkripsi %1$s yang tidak dapat didekripsi oleh Clint.</string>
+    <string name="download_error_stream_encryption_unsupported">Streaming ini menggunakan enkripsi %1$s yang tidak dapat didekripsi oleh SimpleFox.</string>
     <string name="download_error_stream_key_unavailable">Tidak dapat memperoleh kunci untuk mendekripsi streaming ini. Mungkin sudah kedaluwarsa — coba deteksi ulang medianya.</string>
     <string name="download_error_link_expired">Link download kedaluwarsa saat dijeda. Mulai ulang download untuk mendapatkan link baru.</string>
     <string name="download_error_mux_failed">Gagal menggabungkan video dan audio yang didownload menjadi satu file.</string>
@@ -744,7 +733,7 @@
     <string name="download_eta_seconds">%1$d dtk</string>
     <string name="download_eta_minutes">%1$d mnt %2$d dtk</string>
     <string name="download_eta_hours">%1$d j %2$d mnt</string>
-    <string name="download_notification_channel_name">Download Clint</string>
+    <string name="download_notification_channel_name">Download SimpleFox</string>
     <string name="download_notification_channel_desc">Progres download file</string>
     <string name="download_event_notification_channel_name">Pemberitahuan Download</string>
     <string name="download_event_notification_channel_desc">Notifikasi untuk download yang selesai, gagal, dan sedang dicoba ulang</string>
@@ -770,7 +759,7 @@
     <string name="download_concurrent_segments_title">Segmen Bersamaan</string>
     <string name="download_concurrent_segments_desc">Jumlah maksimum segmen video/audio yang didownload secara bersamaan saat merekam streaming HLS atau DASH. Mesin download menyesuaikannya secara otomatis berdasarkan kecepatan, hingga batas ini.</string>
     <string name="download_setting_auto">Otomatis</string>
-    <string name="download_setting_auto_hint">Geser sampai ujung kanan untuk Otomatis, lalu Clint akan menyesuaikannya sendiri selama mendownload.</string>
+    <string name="download_setting_auto_hint">Geser sampai ujung kanan untuk Otomatis, lalu SimpleFox akan menyesuaikannya sendiri selama mendownload.</string>
     <string name="downloads_setting_auto_value">Otomatis · %1$s</string>
     <string name="download_section_speed_limit">BATAS KECEPATAN</string>
     <string name="download_speed_limit_title">Batas Kecepatan</string>
@@ -793,9 +782,9 @@
     <string name="download_resumable_no">Bisa dilanjutkan: Tidak</string>
 
     <string name="setup_default_browser_title">Browser Default</string>
-    <string name="setup_default_browser_description">Jadikan Clint Gecko sebagai browser default agar link dari aplikasi lain otomatis terbuka di sini. Langkah ini sepenuhnya opsional, dan Anda bisa mengubahnya kapan saja di setelan perangkat.</string>
+    <string name="setup_default_browser_description">Jadikan SimpleFox sebagai browser default agar link dari aplikasi lain otomatis terbuka di sini. Langkah ini sepenuhnya opsional, dan Anda bisa mengubahnya kapan saja di setelan perangkat.</string>
     <string name="setup_default_browser_card_title">Jadikan Browser Default</string>
-    <string name="setup_default_browser_card_desc">Ketuk tombol di bawah untuk menjadikan Clint Gecko sebagai browser default Anda</string>
+    <string name="setup_default_browser_card_desc">Ketuk tombol di bawah untuk menjadikan SimpleFox sebagai browser default Anda</string>
     <string name="setup_default_browser_set_button">Jadikan Browser Default</string>
     <string name="setup_default_browser_skip">Lewati</string>
 
@@ -803,7 +792,6 @@
     <string name="document_viewer_privacy_policy_title">Kebijakan Privasi</string>
     <string name="document_viewer_terms_title">Persyaratan Layanan</string>
     <string name="document_viewer_changelog_title">Log Perubahan</string>
-    <string name="document_viewer_supporters_title">Pendukung Saat Ini</string>
     <string name="setup_theme_title">Pilih Tema Anda</string>
     <string name="setup_theme_subtitle">Pilih tampilan yang cocok untuk Anda. Anda bisa mengubahnya nanti di Setelan.</string>
 
@@ -931,7 +919,7 @@
     <string name="surface_intensity_amoled_no_tint_dark_desc">Permukaan hitam pekat, hanya tombol dan ikon yang berwarna aksen</string>
     <string name="surface_intensity_amoled_no_tint_light_desc">Permukaan putih bersih, hanya tombol dan ikon yang berwarna aksen</string>
     <string name="pref_misc_title">Lain-lain</string>
-    <string name="pref_misc_summary">Jadikan Clint browser default atau jalankan ulang wizard penyiapan</string>
+    <string name="pref_misc_summary">Jadikan SimpleFox browser default atau jalankan ulang wizard penyiapan</string>
     <string name="pref_rerun_setup_title">Jalankan Ulang Wizard Penyiapan</string>
     <string name="pref_rerun_setup_summary">Mulai ulang proses penyiapan awal</string>
     <string name="rerun_setup_confirm_title">Jalankan ulang wizard penyiapan?</string>
@@ -956,14 +944,14 @@
     <string name="address_bar_position_split_desc">Kolom alamat di atas dengan tombol navigasi di bawah</string>
     <string name="setup_status_bar_applied_later">Akan diterapkan setelah penyiapan selesai.</string>
 
-    <string name="setup_welcome_title">Selamat datang di Clint Gecko</string>
+    <string name="setup_welcome_title">Selamat datang di SimpleFox</string>
     <string name="setup_welcome_subtitle">Sebelum memulai, harap baca persyaratan kami.</string>
     <string name="setup_terms_read">Baca</string>
     <string name="setup_terms_agree">Saya telah membaca dan menyetujui Kebijakan Privasi dan Persyaratan Layanan</string>
     <string name="setup_terms_continue">Setuju &amp; Lanjutkan</string>
 
     <string name="setup_restore_title">Pulihkan dari Cadangan</string>
-    <string name="setup_restore_subtitle">Punya cadangan Clint Gecko? Pulihkan sekarang untuk mengembalikan setelan dan data Anda, atau lewati untuk menyiapkan sebagai baru.</string>
+    <string name="setup_restore_subtitle">Punya cadangan SimpleFox? Pulihkan sekarang untuk mengembalikan setelan dan data Anda, atau lewati untuk menyiapkan sebagai baru.</string>
     <string name="setup_restore_card_title">Pulihkan Cadangan</string>
     <string name="setup_restore_card_desc">Pilih file .clintbackup dari perangkat Anda</string>
     <string name="setup_restore_button">Pulihkan Cadangan</string>
@@ -1121,12 +1109,6 @@
 
     <string name="about_section_legal">HUKUM</string>
     <string name="about_legal_view">Lihat</string>
-    <string name="about_section_community">KOMUNITAS</string>
-    <string name="about_community_discord_text">Gabung dengan komunitas resmi Clint Gecko di Discord dan Reddit untuk berbagi masukan, melaporkan bug, dan terhubung dengan pengguna lain.</string>
-    <string name="about_community_discord_label">Discord</string>
-    <string name="about_community_discord_url">discord.gg/4kUe4yPQ32</string>
-    <string name="about_community_reddit_label">Reddit</string>
-    <string name="about_community_reddit_url">reddit.com/r/ClintBrowser</string>
     <string name="about_contact_email_label">Email</string>
 
     <string name="exit_confirmation_title">Konfirmasi Keluar</string>
@@ -1138,7 +1120,7 @@
     <string name="exit_confirmation_dialog_desc">Menampilkan dialog konfirmasi sebelum keluar</string>
     <string name="exit_tap_again">Ketuk lagi untuk keluar</string>
     <string name="exit_dialog_title">Keluar?</string>
-    <string name="exit_dialog_message">Yakin ingin keluar dari Clint?</string>
+    <string name="exit_dialog_message">Yakin ingin keluar dari SimpleFox?</string>
     <string name="exit_dialog_confirm">Keluar</string>
 
     <string name="image_open_in_new_tab">Buka gambar di tab baru</string>
@@ -1222,7 +1204,7 @@
     <string name="history_delete_desc">Hapus dari histori</string>
     <string name="suggestion_url_desc">URL halaman</string>
     <string name="suggestion_section_search">Saran penelusuran</string>
-    <string name="suggestion_section_clint">Halaman Clint</string>
+    <string name="suggestion_section_clint">Halaman SimpleFox</string>
     <string name="history_title">Histori</string>
     <string name="history_summary">Lihat dan kelola histori penjelajahan dan penelusuran</string>
     <string name="history_empty">Belum ada histori</string>
@@ -1347,7 +1329,7 @@
     <string name="site_info_site_settings_desc">Kelola izin untuk semua situs</string>
 
     <string name="battery_opt_rationale_title">Izinkan download di latar belakang</string>
-    <string name="battery_opt_rationale_message">Agar download tetap berjalan saat Anda beralih ke aplikasi lain, izinkan Clint mengabaikan pengoptimalan baterai. Tanpa izin ini, sistem bisa menjeda atau membatalkan download yang sedang berjalan saat aplikasi berada di latar belakang.</string>
+    <string name="battery_opt_rationale_message">Agar download tetap berjalan saat Anda beralih ke aplikasi lain, izinkan SimpleFox mengabaikan pengoptimalan baterai. Tanpa izin ini, sistem bisa menjeda atau membatalkan download yang sedang berjalan saat aplikasi berada di latar belakang.</string>
     <string name="download_metered_warning_title">Jaringan berkuota terdeteksi</string>
     <string name="download_metered_warning_message">Opsi Hanya Jaringan Tanpa Kuota aktif, tetapi Anda terhubung ke jaringan berkuota. Tetap download file ini menggunakan jaringan berkuota?</string>
     <string name="action_download_anyway">Tetap download</string>
@@ -1358,7 +1340,7 @@
     <string name="download_conflict_update_link">Perbarui Link</string>
     <string name="download_already_active_title">Sedang didownload</string>
     <string name="download_already_active_message">\"%1$s\" sedang didownload. Download lagi sebagai file terpisah?</string>
-    <string name="download_foreground_notification_title">Download Clint</string>
+    <string name="download_foreground_notification_title">Download SimpleFox</string>
     <string name="download_foreground_notification_text">Download sedang berjalan di latar belakang</string>
     <plurals name="download_notification_group_summary">
         <item quantity="other">%1$d download sedang berjalan</item>
@@ -1594,9 +1576,9 @@
     <string name="restore_action_continue">Lanjutkan</string>
 
     <string name="restore_invalid_title">File Cadangan Tidak Valid</string>
-    <string name="restore_invalid_message">File ini bukan cadangan Clint yang didukung, atau file sudah rusak.</string>
+    <string name="restore_invalid_message">File ini bukan cadangan SimpleFox yang didukung, atau file sudah rusak.</string>
     <string name="restore_unsupported_title">Versi Cadangan Tidak Didukung</string>
-    <string name="restore_unsupported_message">Cadangan ini dibuat dengan versi Clint yang lebih baru dan tidak dapat dipulihkan di sini.</string>
+    <string name="restore_unsupported_message">Cadangan ini dibuat dengan versi SimpleFox yang lebih baru dan tidak dapat dipulihkan di sini.</string>
     <string name="restore_generic_error_title">Tidak Dapat Membuka Cadangan</string>
     <string name="restore_generic_error_message">Terjadi masalah saat membaca file cadangan.</string>
 
@@ -1607,7 +1589,7 @@
     <string name="restore_confirm_message">Pemulihan akan menimpa data Anda saat ini untuk kategori yang dipilih. Tindakan ini tidak bisa diurungkan.</string>
 
     <string name="restore_result_success_title">Pemulihan Selesai</string>
-    <string name="restore_result_success_message">Data Anda telah dipulihkan. Clint perlu dimulai ulang agar perubahan diterapkan.</string>
+    <string name="restore_result_success_message">Data Anda telah dipulihkan. SimpleFox perlu dimulai ulang agar perubahan diterapkan.</string>
     <string name="restore_result_partial_note">Tidak ditemukan di cadangan ini: %1$s</string>
     <string name="restore_result_error_title">Pemulihan Gagal</string>
     <string name="restore_result_error_message">Terjadi masalah saat memulihkan data Anda.</string>
@@ -1750,7 +1732,7 @@
     <string name="open_in_app_mode_open_desc">Buka link di aplikasinya tanpa bertanya</string>
     <string name="open_in_app_dont_ask_again">Jangan tanya lagi</string>
     <string name="homepage_title">Halaman Beranda</string>
-    <string name="homepage_clint">Beranda Clint</string>
+    <string name="homepage_clint">Beranda SimpleFox</string>
     <string name="homepage_clint_desc">Halaman awal yang bersih berisi favorit dan pintasan Anda</string>
     <string name="homepage_search_engine">Beranda Mesin Pencari</string>
     <string name="homepage_search_engine_desc">Buka halaman beranda mesin pencari yang Anda pilih</string>
@@ -1774,13 +1756,13 @@
     <string name="homepage_image_full_brightness_title">Gambar Tanpa Peredupan</string>
     <string name="homepage_image_full_brightness_summary">Tampilkan foto Anda apa adanya, tanpa lapisan peredup</string>
     <string name="homepage_show_favorites_title">Tampilkan Favorit</string>
-    <string name="homepage_show_favorites_summary">Tampilkan situs dan folder yang Anda sematkan di beranda Clint</string>
+    <string name="homepage_show_favorites_summary">Tampilkan situs dan folder yang Anda sematkan di beranda SimpleFox</string>
     <string name="homepage_show_quick_actions_title">Tampilkan Tindakan Cepat</string>
-    <string name="homepage_show_quick_actions_summary">Tampilkan tombol Bookmark, Histori, Download, dan Samaran di beranda Clint</string>
+    <string name="homepage_show_quick_actions_summary">Tampilkan tombol Bookmark, Histori, Download, dan Samaran di beranda SimpleFox</string>
     <string name="homepage_show_recent_title">Tampilkan Baru Dikunjungi</string>
-    <string name="homepage_show_recent_summary">Tampilkan situs yang baru-baru ini Anda kunjungi di beranda Clint</string>
+    <string name="homepage_show_recent_summary">Tampilkan situs yang baru-baru ini Anda kunjungi di beranda SimpleFox</string>
     <string name="homepage_center_content_title">Posisikan Konten di Tengah</string>
-    <string name="homepage_center_content_summary">Letakkan konten beranda Clint di tengah layar secara vertikal</string>
+    <string name="homepage_center_content_summary">Letakkan konten beranda SimpleFox di tengah layar secara vertikal</string>
     <string name="homepage_image_error">Gambar tersebut tidak dapat digunakan. Silakan coba gambar lain.</string>
     <string name="home_greeting_morning">Selamat pagi</string>
     <string name="home_greeting_afternoon">Selamat siang</string>
@@ -1875,7 +1857,7 @@
     <string name="shared_compile_action_retry">Coba lagi</string>
     <string name="ext_title">Ekstensi</string>
     <string name="ext_settings_summary">Add-on, izin, dan pembaruan</string>
-    <string name="ext_hero_tagline">Jadikan Clint milik Anda dengan add-on dari komunitas Firefox.</string>
+    <string name="ext_hero_tagline">Jadikan SimpleFox milik Anda dengan add-on dari komunitas Firefox.</string>
     <string name="ext_hero_summary">%1$d aktif · %2$d nonaktif</string>
     <string name="ext_get_addons">Jelajahi add-on</string>
     <string name="ext_install_file">Dari file</string>
@@ -1932,7 +1914,7 @@
     <string name="ext_sites_some">Membaca dan mengubah data di situs berikut</string>
     <string name="ext_sites_more">+%1$d lainnya</string>
     <string name="ext_remove_title">Hapus %1$s?</string>
-    <string name="ext_remove_message">Ekstensi beserta datanya akan dihapus dari Clint.</string>
+    <string name="ext_remove_message">Ekstensi beserta datanya akan dihapus dari SimpleFox.</string>
     <string name="ext_remove_action">Hapus</string>
     <string name="ext_link_title">Instal dari link</string>
     <string name="ext_link_message">Tempel link langsung ke paket ekstensi. Hanya instal ekstensi dari sumber yang Anda percayai.</string>
@@ -1969,16 +1951,16 @@
     <string name="ext_toast_no_extensions">Tidak ada ekstensi untuk diperbarui</string>
     <string name="ext_err_network">Download gagal. Periksa koneksi Anda, lalu coba lagi.</string>
     <string name="ext_err_corrupt">File ekstensi rusak.</string>
-    <string name="ext_err_file">Clint tidak dapat membuka file ekstensi.</string>
+    <string name="ext_err_file">SimpleFox tidak dapat membuka file ekstensi.</string>
     <string name="ext_err_unsigned">Ekstensi ini tidak ditandatangani oleh Mozilla, jadi tidak dapat diinstal.</string>
     <string name="ext_err_unsupported">Jenis ekstensi ini tidak didukung.</string>
     <string name="ext_err_blocked">Ekstensi ini diblokir karena diketahui berbahaya.</string>
-    <string name="ext_err_incompatible">Ekstensi ini tidak kompatibel dengan versi Clint ini.</string>
+    <string name="ext_err_incompatible">Ekstensi ini tidak kompatibel dengan versi SimpleFox ini.</string>
     <string name="ext_err_insecure">Ekstensi hanya bisa diinstal dari link yang aman (https).</string>
     <string name="ext_err_generic">Tidak dapat menginstal ekstensi.</string>
     <string name="ext_unsigned_title">Instal ekstensi yang belum diverifikasi?</string>
     <string name="ext_unsigned_message">Ekstensi ini belum ditinjau atau ditandatangani oleh Mozilla. Ekstensi ini bisa melihat atau mengubah aktivitas Anda di situs web, jadi instal hanya jika Anda memercayai sumbernya.</string>
-    <string name="ext_unsigned_note">Ekstensi yang belum diverifikasi tidak diperbarui otomatis. Clint akan memuatnya ulang setiap kali dibuka.</string>
+    <string name="ext_unsigned_note">Ekstensi yang belum diverifikasi tidak diperbarui otomatis. SimpleFox akan memuatnya ulang setiap kali dibuka.</string>
     <string name="ext_unsigned_install_anyway">Tetap instal</string>
     <string name="ext_unsigned_failed">Tidak dapat menginstal ekstensi yang belum diverifikasi ini.</string>
     <string name="ext_perm_unknown">Menggunakan fitur “%1$s”</string>
@@ -2002,13 +1984,13 @@
     <string name="ext_perm_nativeMessaging">Berkomunikasi dengan aplikasi lain di perangkat Anda</string>
     <string name="ext_perm_notifications">Menampilkan notifikasi</string>
     <string name="ext_perm_privacy">Mengubah setelan privasi</string>
-    <string name="ext_perm_proxy">Mengatur cara Clint terhubung ke internet</string>
+    <string name="ext_perm_proxy">Mengatur cara SimpleFox terhubung ke internet</string>
     <string name="ext_perm_scripting">Menjalankan skrip di situs</string>
     <string name="ext_perm_search">Menggunakan mesin pencari</string>
     <string name="ext_perm_sessions">Melihat tab yang baru ditutup</string>
     <string name="ext_perm_storage">Menyimpan datanya sendiri</string>
     <string name="ext_perm_tabs">Melihat judul dan alamat tab Anda</string>
-    <string name="ext_perm_theme">Mengubah tampilan Clint</string>
+    <string name="ext_perm_theme">Mengubah tampilan SimpleFox</string>
     <string name="ext_perm_topSites">Melihat situs yang paling sering Anda kunjungi</string>
     <string name="ext_perm_unlimitedStorage">Menyimpan data dalam jumlah besar</string>
     <string name="ext_perm_userScripts">Menjalankan skrip pengguna di situs</string>
@@ -2057,7 +2039,7 @@
     <string name="custom_themes_intro">Buat tema dengan memilih sendiri setiap warnanya. Setiap tema punya palet terang dan gelap, dan yang digunakan adalah palet yang sesuai dengan tema aplikasi Anda.</string>
     <string name="custom_theme_create">Buat tema</string>
     <string name="custom_theme_empty_title">Belum ada tema kustom</string>
-    <string name="custom_theme_empty_message">Buat tema pertama Anda dan atur tampilan Clint Browser persis seperti yang Anda suka.</string>
+    <string name="custom_theme_empty_message">Buat tema pertama Anda dan atur tampilan SimpleFox persis seperti yang Anda suka.</string>
     <string name="custom_theme_active">Sedang digunakan</string>
     <string name="custom_theme_tap_to_apply">Ketuk untuk menggunakan tema ini</string>
     <string name="custom_theme_edit">Edit</string>
@@ -2383,7 +2365,7 @@
     <string name="mega_error_blocked">MEGA memblokir akses ke link ini</string>
     <string name="mega_error_quota">Batas transfer MEGA Anda sudah habis untuk saat ini. Coba lagi nanti.</string>
     <string name="mega_error_invalid_key">Kunci dekripsi di link ini salah atau tidak lengkap</string>
-    <string name="mega_error_unsupported">Clint belum bisa mendownload file MEGA ini</string>
+    <string name="mega_error_unsupported">SimpleFox belum bisa mendownload file MEGA ini</string>
     <string name="mega_error_busy">MEGA sedang sibuk. Coba lagi sebentar lagi.</string>
     <string name="mega_error_generic">MEGA tidak dapat membuka link ini (error %d)</string>
     <string name="mega_error_network">Tidak dapat terhubung ke MEGA. Periksa koneksi Anda, lalu coba lagi.</string>

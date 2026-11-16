@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Clint Gecko</string>
-    <string name="clint_downloader_label">Clint Downloader</string>
+    <string name="app_name">SimpleFox</string>
+    <string name="clint_downloader_label">SimpleFox Downloader</string>
     <string name="back">Bumalik</string>
     <string name="forward">Pasulong</string>
     <string name="refresh">I-refresh</string>
@@ -108,7 +108,7 @@
     <string name="incognito_search_history_title">Ipakita ang history ng paghahanap sa Incognito Mode</string>
     <string name="incognito_search_history_summary">Isama ang naka-save mong history ng paghahanap bilang mga suggestion habang nagba-browse sa Incognito</string>
     <string name="remember_browsing_mode_title">Tandaan ang browsing mode</string>
-    <string name="remember_browsing_mode_summary">Buksan ulit ang Clint sa Incognito o normal na mode, kung alin ang huli mong ginamit</string>
+    <string name="remember_browsing_mode_summary">Buksan ulit ang SimpleFox sa Incognito o normal na mode, kung alin ang huli mong ginamit</string>
     <string name="incognito_notification_channel_name">Mga Incognito tab</string>
     <string name="incognito_notification_channel_desc">Lumalabas habang may bukas na Incognito tab para maisara mo lahat sa isang tap</string>
     <string name="incognito_notification_title">May bukas na Incognito tab</string>
@@ -181,7 +181,7 @@
     <string name="suggestions_api_custom_desc">Magdagdag ng sarili mong suggestions API</string>
     <string name="suggestions_api_off">Naka-off</string>
     <string name="suggestions_api_off_desc">Walang suggestion mula sa web</string>
-    <string name="suggestions_google_warning_message">Makikita ng Google ang bawat letrang tina-type mo habang naghahanap, at maiuugnay ito sa account o IP address mo. Hindi ito kayang pigilan ng Clint.\n\nPara mas protektado ang privacy mo, manatili na lang sa DuckDuckGo.</string>
+    <string name="suggestions_google_warning_message">Makikita ng Google ang bawat letrang tina-type mo habang naghahanap, at maiuugnay ito sa account o IP address mo. Hindi ito kayang pigilan ng SimpleFox.\n\nPara mas protektado ang privacy mo, manatili na lang sa DuckDuckGo.</string>
     <string name="custom_search_suggestions_api_dialog_title">Custom na Search Suggestions API</string>
     <string name="custom_search_suggestions_api_name_hint">Pangalan</string>
     <string name="custom_search_suggestions_api_name_required">Kailangan ng pangalan</string>
@@ -198,7 +198,7 @@
     <string name="js_warning_message">Maraming feature ng app ang umaasa sa JavaScript, gaya ng web notifications, desktop mode, at reader mode. Puwede ring masira o hindi maayos na lumabas ang mga website.\n\nSigurado ka bang gusto mong i-off ito?</string>
     <string name="action_turn_off_anyway">I-off pa rin</string>
     <string name="google_warning_title">Paalala sa privacy</string>
-    <string name="google_warning_message">Kokolektahin ng Google ang search data mo at iuugnay ito sa account o IP address mo. Hindi ito kayang pigilan ng Clint.\n\nPara mas protektado ang privacy mo, subukan na lang ang DuckDuckGo o Brave.</string>
+    <string name="google_warning_message">Kokolektahin ng Google ang search data mo at iuugnay ito sa account o IP address mo. Hindi ito kayang pigilan ng SimpleFox.\n\nPara mas protektado ang privacy mo, subukan na lang ang DuckDuckGo o Brave.</string>
     <string name="use_google_anyway">Gamitin pa rin ang Google</string>
     <string name="choose_another">Pumili ng iba</string>
     <string name="new_tab">Bagong Tab</string>
@@ -213,22 +213,14 @@
     <string name="about_section_about">TUNGKOL</string>
     <string name="about_section_version">BERSYON AT DEVICE</string>
     <string name="about_section_license">LISENSYA</string>
-    <string name="about_section_repository">SOURCE CODE</string>
     <string name="about_created_by">Ginawa ni</string>
-    <string name="about_description">Ang Clint Gecko ay isang open-source na browser na batay sa Firefox, na may built-in na ADM (Advanced Download Manager) at Media Capture. Layunin ng Clint Gecko na maging all-in-one mong browser habang nananatiling kaaya-aya gamitin at lubos na customizable. Sa bawat update, palapit nang palapit ang Clint Gecko sa layuning iyon.\n\nAng Jhaiian ecosystem ay may hanggang 500 posibleng kombinasyon ng theme para maiayon mo ang iyong karanasan sa pagba-browse sa gusto mo.\n\nPrayoridad din ang privacy. Naka-opt out ang Clint Gecko sa telemetry ng GeckoView at Mozilla, kaya walang telemetry data na naipapadala sa Mozilla sa pamamagitan ng mga serbisyong iyon. Hindi kumokolekta ng personal mong data ang Clint dahil wala itong backend, analytics, o server para sa pangongolekta ng data. Idinisenyo ang lahat para gumana mismo sa iyong device.</string>
+    <string name="about_description">Ang SimpleFox ay isang open-source na browser na batay sa Firefox, na may built-in na ADM (Advanced Download Manager) at Media Capture. Layunin ng SimpleFox na maging all-in-one mong browser habang nananatiling kaaya-aya gamitin at lubos na customizable. Sa bawat update, palapit nang palapit ang SimpleFox sa layuning iyon.\n\nAng Jhaiian ecosystem ay may hanggang 500 posibleng kombinasyon ng theme para maiayon mo ang iyong karanasan sa pagba-browse sa gusto mo.\n\nPrayoridad din ang privacy. Naka-opt out ang SimpleFox sa telemetry ng GeckoView at Mozilla, kaya walang telemetry data na naipapadala sa Mozilla sa pamamagitan ng mga serbisyong iyon. Hindi kumokolekta ng personal mong data ang SimpleFox dahil wala itong backend, analytics, o server para sa pangongolekta ng data. Idinisenyo ang lahat para gumana mismo sa iyong device.</string>
     <string name="about_version_info">Bersyon: %1$s (build %2$d)\nDevice architecture: %3$s</string>
     <string name="about_license_text">Ang source code ng proyektong ito ay lisensyado sa ilalim ng GNU General Public License v3.0 (GPLv3).\n\nAng mga pangalang \"Clint\" at \"Clint Gecko,\" ang logo, mga screenshot, at lahat ng kaugnay na branding asset ay mga trademark o proprietary asset ng may-akda at hindi sakop ng GPL license. Kailangan ng malinaw na pahintulot mula sa may-akda para magamit ang mga asset na ito.</string>
     <string name="about_license_link_label">Tingnan ang GPL v3.0 license \u2197</string>
-    <string name="about_opensource_text">Nasa GitHub ang kumpletong source code. Welcome ang mga kontribusyon, bug report, at feature request.</string>
-    <string name="about_github_url">github.com/jhaiian/ClintGecko \u2197</string>
     <string name="about_section_keep_android_open">KEEP ANDROID OPEN</string>
     <string name="about_keep_android_open_text">Ipinapatupad ng Google ang sapilitang pag-verify ng pagkakakilanlan ng mga developer, na banta sa sideloading at sa malayang app ecosystem ng Android, pati na sa mga app na tulad nito. Alamin ang higit pa at iparinig ang boses mo.</string>
     <string name="about_keep_android_open_url">keepandroidopen.org \u2197</string>
-    <string name="support_clint_title">Suportahan ang Clint</string>
-    <string name="support_clint_summary">Tulungang manatiling libre ang Clint habambuhay. Pag-isipang mag-donate sa developer ng Clint.</string>
-    <string name="support_clint_view_supporters_title">Tingnan ang mga Kasalukuyang Supporter</string>
-    <string name="support_clint_view_supporters_summary">Tingnan ang lahat ng sumusuporta sa development ng Clint</string>
-    <string name="support_clint_markdown">## Tulungan Mong Manatiling Libre ang Clint Magpakailanman 💜\n\nAng Clint ay isang independent at open-source na proyekto na ginawa ng nag-iisang developer na naniniwalang karapat-dapat ang lahat sa customizable na karanasan sa pagba-browse nang walang ads, paywall, o naka-lock na features.\n\nAng mga donasyon mo ay nakakatulong sa patuloy na development, maintenance, at mga pagpapabuti sa hinaharap. Malaking bagay ang bawat ambag, gaano man kaliit, at nakakatulong itong panatilihing sumusulong ang Clint.\n\nPalaging libre ang Clint. Salamat sa pagiging bahagi ng paglalakbay na ito. 💜\n\n[![Patreon](https://img.shields.io/badge/Support%20me-Patreon-orange?style=for-the-badge&amp;logo=patreon)](https://patreon.com/Jhaiian)\n[![Ko-fi](https://img.shields.io/badge/Buy%20me%20a%20coffee-Ko--fi-red?style=for-the-badge&amp;logo=ko-fi)](https://ko-fi.com/jhaiian)\n[![PayPal](https://img.shields.io/badge/Donate-PayPal-00457C?style=for-the-badge&amp;logo=paypal)](https://paypal.me/jhaiian)\n[![InstaPay QR](https://img.shields.io/badge/InstaPay%20QR-Philippines%20only-7C3AED?style=for-the-badge)](https://github.com/jhaiian/jhaiian/blob/main/docs/Insta%20Pay.jpg)</string>
     <string name="default_browser_title">Default na Browser</string>
     <string name="default_browser_none">Wala</string>
     <string name="look_and_feel">Hitsura</string>
@@ -294,7 +286,7 @@
     <string name="download_manager_title">Download Manager</string>
     <string name="download_manager_summary">Piliin kung aling app ang hahawak sa mga bagong download</string>
     <string name="download_manager_dialog_title">Piliin ang download manager</string>
-    <string name="download_manager_option_clint">Clint (Default)</string>
+    <string name="download_manager_option_clint">SimpleFox (Default)</string>
     <string name="download_manager_option_1dm">1DM</string>
     <string name="download_manager_option_1dm_plus">1DM+</string>
     <string name="download_manager_option_1dm_lite">1DM Lite</string>
@@ -424,7 +416,7 @@
     <string name="crash_copy">Kopyahin ang crash report</string>
     <string name="crash_delete">Burahin ang report</string>
     <string name="crash_report_title">MAGSUMITE NG BUG REPORT</string>
-    <string name="crash_report_instructions">Tulungang pagandahin ang Clint sa pag-report ng mga bug sa GitHub. Walang data na awtomatikong ipinapadala \u2014 ikaw ang pipili kung ano ang ibabahagi.</string>
+    <string name="crash_report_instructions">Tulungang pagandahin ang SimpleFox sa pag-report ng mga bug sa GitHub. Walang data na awtomatikong ipinapadala \u2014 ikaw ang pipili kung ano ang ibabahagi.</string>
     <string name="crash_steps_title">Paano magsumite ng report</string>
     <string name="crash_step_reproduce">I-reproduce ang crash o bug</string>
     <string name="crash_step_expand">Buksan ang crash entry para i-expand ito</string>
@@ -439,9 +431,6 @@
     <string name="crash_open_github">Buksan ang GitHub Issues</string>
     <string name="about_section_contact">CONTACT</string>
     <string name="about_contact_email">jhaiian@proton.me</string>
-    <string name="about_section_contributors">MGA CONTRIBUTOR</string>
-    <string name="about_contributors_text">Tingnan ang kumpletong listahan ng mga taong nag-contribute sa Clint.</string>
-    <string name="about_contributors_link">Contributors.md \u2197</string>
     <string name="about_section_libraries">MGA GINAMIT NA LIBRARY</string>
     <string name="about_library_geckoview_label">GeckoView by Mozilla</string>
     <string name="about_library_geckoview_license">Mozilla Public License 2.0 \u2197</string>
@@ -677,7 +666,7 @@
     <string name="download_storage_permission_message">Kailangan ang access sa storage para i-save ang mga na-download na file sa iyong Downloads folder.</string>
     <string name="voice_search">Voice search</string>
     <string name="voice_search_permission_title">Access sa microphone</string>
-    <string name="voice_search_permission_message">Kailangan ng Clint ng access sa microphone para gamitin ang voice search.</string>
+    <string name="voice_search_permission_message">Kailangan ng SimpleFox ng access sa microphone para gamitin ang voice search.</string>
     <string name="voice_search_not_available">Hindi available ang voice search sa device na ito</string>
 
     <string name="toast_downloading">Dina-download ang %1$s</string>
@@ -688,7 +677,7 @@
     <string name="install_apk_dialog_message">Gusto mo bang i-install ang \"%1$s\"?\n\nMag-install lang ng APK mula sa mga source na pinagkakatiwalaan mo.</string>
     <string name="install_apk_dialog_confirm">I-install</string>
     <string name="install_apk_permission_title">Kailangan ng permission</string>
-    <string name="install_apk_permission_message">Para makapag-install ng APK, kailangan ng Clint ng permission na mag-install ng mga app mula sa hindi kilalang source. Dadalhin ka sa Settings para i-enable ito.</string>
+    <string name="install_apk_permission_message">Para makapag-install ng APK, kailangan ng SimpleFox ng permission na mag-install ng mga app mula sa hindi kilalang source. Dadalhin ka sa Settings para i-enable ito.</string>
 
     <string name="restart_required_title">Kailangan ng restart</string>
     <string name="restart_required_message">Kailangang mag-restart ang app para mailapat ang pagbabagong ito.</string>
@@ -708,7 +697,7 @@
     <string name="update_download_progress_size_known">%1$s / %2$s (%3$d%%)</string>
     <string name="update_download_progress_size_unknown">%1$s na-download</string>
     <string name="update_up_to_date_title">Updated ka na</string>
-    <string name="update_up_to_date_message">Pinakabagong bersyon na ng Clint Gecko ang gamit mo.</string>
+    <string name="update_up_to_date_message">Pinakabagong bersyon na ng SimpleFox ang gamit mo.</string>
     <string name="update_check_failed_title">Nabigong mag-check ng update</string>
     <string name="update_check_failed_message">Hindi makakonekta sa update server. Paki-check ang koneksyon mo at subukan ulit.</string>
 
@@ -720,7 +709,7 @@
     <string name="download_info_with_time">%1$s  \u2022  %2$s</string>
     <string name="download_error_unknown">Hindi kilalang error</string>
     <string name="download_error_playlist_unavailable">Hindi makuha ang playlist ng video. Baka expired na ito — subukang i-detect ulit ang media.</string>
-    <string name="download_error_stream_encryption_unsupported">Gumagamit ang stream na ito ng %1$s encryption, na hindi kayang i-decrypt ng Clint.</string>
+    <string name="download_error_stream_encryption_unsupported">Gumagamit ang stream na ito ng %1$s encryption, na hindi kayang i-decrypt ng SimpleFox.</string>
     <string name="download_error_stream_key_unavailable">Hindi makuha ang key na kailangan para i-decrypt ang stream na ito. Baka expired na ito — subukang i-detect ulit ang media.</string>
     <string name="download_error_link_expired">Nag-expire ang download link habang naka-pause. I-restart ang download para makakuha ng bagong link.</string>
     <string name="download_error_mux_failed">Hindi napagsama ang na-download na video at audio sa isang file.</string>
@@ -747,7 +736,7 @@
     <string name="download_eta_seconds">%1$ds</string>
     <string name="download_eta_minutes">%1$dm %2$ds</string>
     <string name="download_eta_hours">%1$dh %2$dm</string>
-    <string name="download_notification_channel_name">Mga Download ng Clint</string>
+    <string name="download_notification_channel_name">Mga Download ng SimpleFox</string>
     <string name="download_notification_channel_desc">Progress ng pag-download ng file</string>
     <string name="download_event_notification_channel_name">Mga Alerto sa Download</string>
     <string name="download_event_notification_channel_desc">Mga notification kapag natapos, nabigo, o nire-retry ang isang download</string>
@@ -773,7 +762,7 @@
     <string name="download_concurrent_segments_title">Sabay-sabay na Segments</string>
     <string name="download_concurrent_segments_desc">Pinakamataas na bilang ng video/audio segments na ida-download nang sabay-sabay kapag kumukuha ng HLS o DASH streams. Awtomatikong inaayos ito ng engine batay sa bilis, hanggang sa limitasyong ito.</string>
     <string name="download_setting_auto">Awtomatiko</string>
-    <string name="download_setting_auto_hint">I-slide hanggang dulo pakanan para sa Awtomatiko, at kusa itong aayusin ng Clint habang nagda-download.</string>
+    <string name="download_setting_auto_hint">I-slide hanggang dulo pakanan para sa Awtomatiko, at kusa itong aayusin ng SimpleFox habang nagda-download.</string>
     <string name="downloads_setting_auto_value">Awtomatiko · %1$s</string>
     <string name="download_section_speed_limit">SPEED LIMIT</string>
     <string name="download_speed_limit_title">Speed Limit</string>
@@ -796,9 +785,9 @@
     <string name="download_resumable_no">Puwedeng ituloy: Hindi</string>
 
     <string name="setup_default_browser_title">Default na Browser</string>
-    <string name="setup_default_browser_description">Gawing default browser mo ang Clint Gecko para awtomatikong dito magbukas ang mga link mula sa ibang app. Opsyonal lang ito, puwede mo itong baguhin anumang oras sa settings ng iyong device.</string>
+    <string name="setup_default_browser_description">Gawing default browser mo ang SimpleFox para awtomatikong dito magbukas ang mga link mula sa ibang app. Opsyonal lang ito, puwede mo itong baguhin anumang oras sa settings ng iyong device.</string>
     <string name="setup_default_browser_card_title">Itakda bilang Default na Browser</string>
-    <string name="setup_default_browser_card_desc">Pindutin ang button sa ibaba para itakda ang Clint Gecko bilang default mong browser</string>
+    <string name="setup_default_browser_card_desc">Pindutin ang button sa ibaba para itakda ang SimpleFox bilang default mong browser</string>
     <string name="setup_default_browser_set_button">Itakda bilang Default na Browser</string>
     <string name="setup_default_browser_skip">Laktawan</string>
 
@@ -806,7 +795,6 @@
     <string name="document_viewer_privacy_policy_title">Patakaran sa Privacy</string>
     <string name="document_viewer_terms_title">Mga Tuntunin ng Serbisyo</string>
     <string name="document_viewer_changelog_title">Changelog</string>
-    <string name="document_viewer_supporters_title">Mga Kasalukuyang Supporter</string>
     <string name="setup_theme_title">Piliin ang Iyong Tema</string>
     <string name="setup_theme_subtitle">Pumili ng hitsurang bagay sa iyo. Puwede mo itong baguhin anumang oras sa Settings.</string>
 
@@ -934,7 +922,7 @@
     <string name="surface_intensity_amoled_no_tint_dark_desc">Purong itim na surface, accent color lang sa mga button at icon</string>
     <string name="surface_intensity_amoled_no_tint_light_desc">Purong puting surface, accent color lang sa mga button at icon</string>
     <string name="pref_misc_title">Miscellaneous</string>
-    <string name="pref_misc_summary">Gawing default browser ang Clint o ulitin ang setup wizard</string>
+    <string name="pref_misc_summary">Gawing default browser ang SimpleFox o ulitin ang setup wizard</string>
     <string name="pref_rerun_setup_title">Ulitin ang Setup Wizard</string>
     <string name="pref_rerun_setup_summary">Ulitin ang unang setup ng app</string>
     <string name="rerun_setup_confirm_title">Ulitin ang Setup Wizard?</string>
@@ -959,14 +947,14 @@
     <string name="address_bar_position_split_desc">Address bar sa taas na may mga navigation button sa ibaba</string>
     <string name="setup_status_bar_applied_later">Ilalapat ito pagkatapos ng setup.</string>
 
-    <string name="setup_welcome_title">Welcome sa Clint Gecko</string>
+    <string name="setup_welcome_title">Welcome sa SimpleFox</string>
     <string name="setup_welcome_subtitle">Bago tayo magsimula, basahin muna ang aming mga tuntunin.</string>
     <string name="setup_terms_read">Basahin</string>
     <string name="setup_terms_agree">Nabasa ko at sumasang-ayon ako sa Patakaran sa Privacy at Mga Tuntunin ng Serbisyo</string>
     <string name="setup_terms_continue">Sumang-ayon at Magpatuloy</string>
 
     <string name="setup_restore_title">I-restore mula sa Backup</string>
-    <string name="setup_restore_subtitle">May backup ka ba ng Clint Gecko? I-restore ito ngayon para maibalik ang mga setting at data mo, o laktawan para mag-set up mula sa simula.</string>
+    <string name="setup_restore_subtitle">May backup ka ba ng SimpleFox? I-restore ito ngayon para maibalik ang mga setting at data mo, o laktawan para mag-set up mula sa simula.</string>
     <string name="setup_restore_card_title">I-restore ang Backup</string>
     <string name="setup_restore_card_desc">Pumili ng .clintbackup file mula sa iyong device</string>
     <string name="setup_restore_button">I-restore ang Backup</string>
@@ -1129,12 +1117,6 @@
 
     <string name="about_section_legal">LEGAL</string>
     <string name="about_legal_view">Tingnan</string>
-    <string name="about_section_community">KOMUNIDAD</string>
-    <string name="about_community_discord_text">Sumali sa opisyal na komunidad ng Clint Gecko sa Discord at Reddit para magbahagi ng feedback, mag-report ng bug, at makipag-ugnayan sa iba pang user.</string>
-    <string name="about_community_discord_label">Discord</string>
-    <string name="about_community_discord_url">discord.gg/4kUe4yPQ32</string>
-    <string name="about_community_reddit_label">Reddit</string>
-    <string name="about_community_reddit_url">reddit.com/r/ClintBrowser</string>
     <string name="about_contact_email_label">Email</string>
 
     <string name="exit_confirmation_title">Kumpirmasyon sa Pag-exit</string>
@@ -1146,7 +1128,7 @@
     <string name="exit_confirmation_dialog_desc">Magpapakita ng dialog ng kumpirmasyon bago mag-exit</string>
     <string name="exit_tap_again">Pindutin ulit para mag-exit</string>
     <string name="exit_dialog_title">Mag-exit?</string>
-    <string name="exit_dialog_message">Sigurado ka bang gusto mong mag-exit sa Clint?</string>
+    <string name="exit_dialog_message">Sigurado ka bang gusto mong mag-exit sa SimpleFox?</string>
     <string name="exit_dialog_confirm">Mag-exit</string>
 
     <string name="image_open_in_new_tab">Buksan ang larawan sa bagong tab</string>
@@ -1230,7 +1212,7 @@
     <string name="history_delete_desc">Alisin sa history</string>
     <string name="suggestion_url_desc">URL ng pahina</string>
     <string name="suggestion_section_search">Mga search suggestion</string>
-    <string name="suggestion_section_clint">Mga page ng Clint</string>
+    <string name="suggestion_section_clint">Mga page ng SimpleFox</string>
     <string name="history_title">History</string>
     <string name="history_summary">Tingnan at i-manage ang history ng pag-browse at paghahanap</string>
     <string name="history_empty">Wala pang history</string>
@@ -1359,7 +1341,7 @@
     <string name="site_info_site_settings_desc">Pamahalaan ang mga permiso ng lahat ng website</string>
 
     <string name="battery_opt_rationale_title">Payagan ang pag-download sa background</string>
-    <string name="battery_opt_rationale_message">Para magpatuloy ang mga download kapag lumipat ka sa ibang app, payagan ang Clint na i-ignore ang battery optimization. Kung hindi, maaaring i-pause o i-cancel ng system ang mga aktibong download habang nasa background ang app.</string>
+    <string name="battery_opt_rationale_message">Para magpatuloy ang mga download kapag lumipat ka sa ibang app, payagan ang SimpleFox na i-ignore ang battery optimization. Kung hindi, maaaring i-pause o i-cancel ng system ang mga aktibong download habang nasa background ang app.</string>
     <string name="download_metered_warning_title">May nakitang metered na network</string>
     <string name="download_metered_warning_message">Naka-enable ang \u201cUnmetered lang\u201d, pero nakakonekta ka sa metered na network. Gusto mo bang gamitin ang metered na network para i-download ang file na ito?</string>
     <string name="action_download_anyway">I-download pa rin</string>
@@ -1370,7 +1352,7 @@
     <string name="download_conflict_update_link">I-update ang Link</string>
     <string name="download_already_active_title">Dina-download na</string>
     <string name="download_already_active_message">Dina-download na ang \"%1$s\". I-download ulit ito bilang hiwalay na file?</string>
-    <string name="download_foreground_notification_title">Mga Download ng Clint</string>
+    <string name="download_foreground_notification_title">Mga Download ng SimpleFox</string>
     <string name="download_foreground_notification_text">Tumatakbo ang mga download sa background</string>
     <plurals name="download_notification_group_summary">
         <item quantity="other">%1$d download ang isinasagawa</item>
@@ -1624,9 +1606,9 @@
     <string name="restore_action_continue">Magpatuloy</string>
 
     <string name="restore_invalid_title">Hindi Wastong Backup File</string>
-    <string name="restore_invalid_message">Hindi ito wastong Clint backup file, o sira ito.</string>
+    <string name="restore_invalid_message">Hindi ito wastong SimpleFox backup file, o sira ito.</string>
     <string name="restore_unsupported_title">Hindi Suportadong Bersyon ng Backup</string>
-    <string name="restore_unsupported_message">Ginawa ang backup na ito gamit ang mas bagong bersyon ng Clint at hindi ito maibabalik dito.</string>
+    <string name="restore_unsupported_message">Ginawa ang backup na ito gamit ang mas bagong bersyon ng SimpleFox at hindi ito maibabalik dito.</string>
     <string name="restore_generic_error_title">Hindi Mabuksan ang Backup</string>
     <string name="restore_generic_error_message">May naganap na error habang binabasa ang backup file.</string>
 
@@ -1637,7 +1619,7 @@
     <string name="restore_confirm_message">Papalitan ng restore ang kasalukuyan mong data sa mga napiling kategorya. Hindi na ito mababawi.</string>
 
     <string name="restore_result_success_title">Kumpleto na ang Restore</string>
-    <string name="restore_result_success_message">Naibalik na ang data mo. Kailangang mag-restart ng Clint para mailapat ang mga pagbabago.</string>
+    <string name="restore_result_success_message">Naibalik na ang data mo. Kailangang mag-restart ng SimpleFox para mailapat ang mga pagbabago.</string>
     <string name="restore_result_partial_note">Hindi nakita sa backup na ito: %1$s</string>
     <string name="restore_result_error_title">Nabigo ang Restore</string>
     <string name="restore_result_error_message">May naganap na error habang ibinabalik ang iyong data.</string>
@@ -1780,7 +1762,7 @@
     <string name="open_in_app_mode_open_desc">Buksan agad ang mga link sa kanilang app nang hindi nagtatanong</string>
     <string name="open_in_app_dont_ask_again">Huwag nang itanong ulit</string>
     <string name="homepage_title">Homepage</string>
-    <string name="homepage_clint">Homepage ng Clint</string>
+    <string name="homepage_clint">Homepage ng SimpleFox</string>
     <string name="homepage_clint_desc">Malinis na panimulang pahina na may mga paborito at shortcut mo</string>
     <string name="homepage_search_engine">Homepage ng Search Engine</string>
     <string name="homepage_search_engine_desc">Buksan ang homepage ng napili mong search engine</string>
@@ -1804,13 +1786,13 @@
     <string name="homepage_image_full_brightness_title">Larawan sa Buong Liwanag</string>
     <string name="homepage_image_full_brightness_summary">Ipakita ang larawan mo kung ano talaga ito, nang walang pampadilim na overlay</string>
     <string name="homepage_show_favorites_title">Ipakita ang mga paborito</string>
-    <string name="homepage_show_favorites_summary">Ipakita ang mga naka-pin mong site at folder sa homepage ng Clint</string>
+    <string name="homepage_show_favorites_summary">Ipakita ang mga naka-pin mong site at folder sa homepage ng SimpleFox</string>
     <string name="homepage_show_quick_actions_title">Ipakita ang mga mabilisang shortcut</string>
-    <string name="homepage_show_quick_actions_summary">Ipakita ang mga button ng Mga Bookmark, History, Mga Download, at Incognito sa homepage ng Clint</string>
+    <string name="homepage_show_quick_actions_summary">Ipakita ang mga button ng Mga Bookmark, History, Mga Download, at Incognito sa homepage ng SimpleFox</string>
     <string name="homepage_show_recent_title">Ipakita ang kamakailang binisita</string>
-    <string name="homepage_show_recent_summary">Ipakita ang mga site na kamakailan mong binisita sa homepage ng Clint</string>
+    <string name="homepage_show_recent_summary">Ipakita ang mga site na kamakailan mong binisita sa homepage ng SimpleFox</string>
     <string name="homepage_center_content_title">I-center ang nilalaman</string>
-    <string name="homepage_center_content_summary">I-center nang patayo ang nilalaman ng homepage ng Clint sa screen</string>
+    <string name="homepage_center_content_summary">I-center nang patayo ang nilalaman ng homepage ng SimpleFox sa screen</string>
     <string name="homepage_image_error">Hindi magamit ang larawang iyon. Subukan ang iba.</string>
     <string name="home_greeting_morning">Magandang umaga</string>
     <string name="home_greeting_afternoon">Magandang hapon</string>
@@ -1905,7 +1887,7 @@
     <string name="shared_compile_action_retry">Subukan ulit</string>
     <string name="ext_title">Mga Extension</string>
     <string name="ext_settings_summary">Mga add-on, pahintulot, at update</string>
-    <string name="ext_hero_tagline">Gawing sa iyo ang Clint gamit ang mga add-on mula sa Firefox community.</string>
+    <string name="ext_hero_tagline">Gawing sa iyo ang SimpleFox gamit ang mga add-on mula sa Firefox community.</string>
     <string name="ext_hero_summary">%1$d naka-on · %2$d naka-off</string>
     <string name="ext_get_addons">Mag-browse ng mga add-on</string>
     <string name="ext_install_file">Mula sa file</string>
@@ -1962,7 +1944,7 @@
     <string name="ext_sites_some">Magbasa at magbago ng data sa mga website na ito</string>
     <string name="ext_sites_more">+%1$d pa</string>
     <string name="ext_remove_title">Alisin ang %1$s?</string>
-    <string name="ext_remove_message">Mabubura sa Clint ang extension at ang data nito.</string>
+    <string name="ext_remove_message">Mabubura sa SimpleFox ang extension at ang data nito.</string>
     <string name="ext_remove_action">Alisin</string>
     <string name="ext_link_title">Mag-install mula sa link</string>
     <string name="ext_link_message">I-paste ang direktang link sa package ng extension. Mag-install lang ng mga extension mula sa mga source na pinagkakatiwalaan mo.</string>
@@ -1999,16 +1981,16 @@
     <string name="ext_toast_no_extensions">Walang extension na ia-update</string>
     <string name="ext_err_network">Nabigo ang download. Tingnan ang koneksyon mo at subukan ulit.</string>
     <string name="ext_err_corrupt">Sira ang file ng extension.</string>
-    <string name="ext_err_file">Hindi mabuksan ng Clint ang file ng extension.</string>
+    <string name="ext_err_file">Hindi mabuksan ng SimpleFox ang file ng extension.</string>
     <string name="ext_err_unsigned">Hindi pirmado ng Mozilla ang extension na ito kaya hindi ito mai-install.</string>
     <string name="ext_err_unsupported">Hindi ito sinusuportahang uri ng extension.</string>
     <string name="ext_err_blocked">Naka-block ang extension na ito dahil kilala itong mapanganib.</string>
-    <string name="ext_err_incompatible">Hindi compatible ang extension na ito sa bersyong ito ng Clint.</string>
+    <string name="ext_err_incompatible">Hindi compatible ang extension na ito sa bersyong ito ng SimpleFox.</string>
     <string name="ext_err_insecure">Sa mga secure na link (https) lang puwedeng mag-install ng extension.</string>
     <string name="ext_err_generic">Hindi ma-install ang extension.</string>
     <string name="ext_unsigned_title">I-install ang hindi beripikadong extension?</string>
     <string name="ext_unsigned_message">Hindi pa ito nire-review o pinipirmahan ng Mozilla. Puwede nitong makita o baguhin ang ginagawa mo sa mga website, kaya i-install lang kung tiwala ka sa pinanggalingan nito.</string>
-    <string name="ext_unsigned_note">Hindi kusang nag-a-update ang mga hindi beripikadong extension. Nilo-load ulit ito ng Clint tuwing magbubukas ito.</string>
+    <string name="ext_unsigned_note">Hindi kusang nag-a-update ang mga hindi beripikadong extension. Nilo-load ulit ito ng SimpleFox tuwing magbubukas ito.</string>
     <string name="ext_unsigned_install_anyway">I-install pa rin</string>
     <string name="ext_unsigned_failed">Hindi ma-install ang hindi beripikadong extension na ito.</string>
     <string name="ext_perm_unknown">Gamitin ang feature na “%1$s”</string>
@@ -2032,13 +2014,13 @@
     <string name="ext_perm_nativeMessaging">Makipag-usap sa ibang app sa device mo</string>
     <string name="ext_perm_notifications">Magpakita ng mga notification</string>
     <string name="ext_perm_privacy">Magpalit ng mga setting ng privacy</string>
-    <string name="ext_perm_proxy">Kontrolin kung paano kumokonekta ang Clint sa internet</string>
+    <string name="ext_perm_proxy">Kontrolin kung paano kumokonekta ang SimpleFox sa internet</string>
     <string name="ext_perm_scripting">Magpatakbo ng mga script sa mga website</string>
     <string name="ext_perm_search">Gumamit ng mga search engine</string>
     <string name="ext_perm_sessions">Makita ang mga kamakailang isinarang tab</string>
     <string name="ext_perm_storage">Mag-save ng sarili nitong data</string>
     <string name="ext_perm_tabs">Makita ang mga pamagat at address ng mga tab mo</string>
-    <string name="ext_perm_theme">Baguhin ang itsura ng Clint</string>
+    <string name="ext_perm_theme">Baguhin ang itsura ng SimpleFox</string>
     <string name="ext_perm_topSites">Makita ang mga pinakamadalas mong binibisita</string>
     <string name="ext_perm_unlimitedStorage">Mag-imbak ng maraming data</string>
     <string name="ext_perm_userScripts">Magpatakbo ng mga user script sa mga website</string>
@@ -2087,7 +2069,7 @@
     <string name="custom_themes_intro">Bumuo ng tema sa pamamagitan ng pagpili ng bawat kulay. May light at dark na palette ang bawat tema, at ang tumutugma sa tema ng app ang gagamitin.</string>
     <string name="custom_theme_create">Gumawa ng tema</string>
     <string name="custom_theme_empty_title">Wala ka pang custom na tema</string>
-    <string name="custom_theme_empty_message">Gawin ang una mong tema at ayusin ang Clint Browser ayon sa gusto mo.</string>
+    <string name="custom_theme_empty_message">Gawin ang una mong tema at ayusin ang SimpleFox ayon sa gusto mo.</string>
     <string name="custom_theme_active">Ginagamit</string>
     <string name="custom_theme_tap_to_apply">I-tap para gamitin ang temang ito</string>
     <string name="custom_theme_edit">I-edit</string>
@@ -2415,7 +2397,7 @@
     <string name="mega_error_blocked">Hinarangan ng MEGA ang access sa link na ito</string>
     <string name="mega_error_quota">Naabot mo na ang transfer limit ng MEGA sa ngayon. Subukan ulit mamaya.</string>
     <string name="mega_error_invalid_key">Mali o kulang ang decryption key sa link na ito</string>
-    <string name="mega_error_unsupported">Hindi pa kayang i-download ng Clint ang MEGA file na ito</string>
+    <string name="mega_error_unsupported">Hindi pa kayang i-download ng SimpleFox ang MEGA file na ito</string>
     <string name="mega_error_busy">Abala ang MEGA ngayon. Subukan ulit maya-maya.</string>
     <string name="mega_error_generic">Hindi mabuksan ng MEGA ang link na ito (error %d)</string>
     <string name="mega_error_network">Hindi maabot ang MEGA. Tingnan ang koneksyon mo at subukan ulit.</string>

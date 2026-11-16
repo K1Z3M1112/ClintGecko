@@ -1,4 +1,4 @@
--keep class com.jhaiian.clint.** { *; }
+-keep class com.simplefox.browser.** { *; }
 -keepattributes SourceFile,LineNumberTable
 -keep class android.webkit.** { *; }
 -keep class org.mozilla.geckoview.** { *; }

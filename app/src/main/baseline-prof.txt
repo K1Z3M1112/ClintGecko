@@ -1,0 +1,24 @@
+# Hand-written baseline profile: pre-compiles Compose runtime/UI and the app's main UI paths
+# so first launch, tab switching and settings scrolling run as compiled code instead of interpreted.
+HSPLandroidx/compose/runtime/**;->**(**)**
+HSPLandroidx/compose/ui/**;->**(**)**
+HSPLandroidx/compose/foundation/**;->**(**)**
+HSPLandroidx/compose/animation/**;->**(**)**
+HSPLandroidx/compose/material3/**;->**(**)**
+HSPLandroidx/activity/compose/**;->**(**)**
+HSPLandroidx/lifecycle/**;->**(**)**
+Landroidx/compose/runtime/**;
+Landroidx/compose/ui/**;
+Landroidx/compose/foundation/**;
+Landroidx/compose/animation/**;
+Landroidx/compose/material3/**;
+HSPLcom/simplefox/browser/browser/**;->**(**)**
+HSPLcom/simplefox/browser/tabs/**;->**(**)**
+HSPLcom/simplefox/browser/ui/**;->**(**)**
+HSPLcom/simplefox/browser/settings/**;->**(**)**
+HSPLcom/simplefox/browser/app/**;->**(**)**
+Lcom/simplefox/browser/browser/**;
+Lcom/simplefox/browser/tabs/**;
+Lcom/simplefox/browser/ui/**;
+Lcom/simplefox/browser/settings/**;
+Lcom/simplefox/browser/app/**;

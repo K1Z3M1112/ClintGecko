@@ -140,23 +140,6 @@ Clint Gecko is built with **Material 3** and **Jetpack Compose**, with a highly 
 
 ---
 
-## Donations
-
-### Help Keep Clint Free Forever 💜
-
-Clint is an independent, open-source project built by one developer who believes everyone deserves a customizable browsing experience without ads, paywalls, or locked features.
-
-Your donations help support continued development, maintenance, and future improvements. Every contribution, no matter how small, means a lot and helps keep Clint moving forward.
-
-Clint will always remain free. Thank you for being part of this journey. 💜
-
-[![Patreon](https://img.shields.io/badge/Support%20me-Patreon-orange?style=for-the-badge&logo=patreon)](https://patreon.com/Jhaiian)
-[![Ko-fi](https://img.shields.io/badge/Buy%20me%20a%20coffee-Ko--fi-red?style=for-the-badge&logo=ko-fi)](https://ko-fi.com/jhaiian)
-[![PayPal](https://img.shields.io/badge/Donate-PayPal-00457C?style=for-the-badge&logo=paypal)](https://paypal.me/jhaiian)
-[![InstaPay QR](https://img.shields.io/badge/InstaPay%20QR-Philippines%20only-7C3AED?style=for-the-badge)](https://github.com/jhaiian/jhaiian/blob/main/docs/Insta%20Pay.jpg)
-
----
-
 ## Requirements
 
 - Android 8.0 (API 26) or higher
@@ -178,15 +161,6 @@ Contributions, bug reports, and feature requests are welcome.
 3. Submit a pull request with a clear description.
 
 To report a crash, use the built‑in **Debug & Crash Reports** screen. It generates a pre‑filled GitHub issue template with your device info and crash log. For more details, see [Contributing.md](https://github.com/jhaiian/ClintGecko/blob/main/Contributing.md).
-
----
-
-## Community
-
-Join the official Clint Gecko community on Discord and Reddit to share feedback, report bugs, and connect with other users.
-
-- **Discord** – [discord.gg/4kUe4yPQ32](https://discord.gg/4kUe4yPQ32)
-- **Reddit** – [reddit.com/r/ClintBrowser](https://reddit.com/r/ClintBrowser)
 
 ---
 
