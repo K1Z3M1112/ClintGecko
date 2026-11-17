@@ -3,6 +3,7 @@ package com.simplefox.browser.browser.webview
 import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
+import android.os.Looper
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
@@ -296,8 +297,20 @@ class ClintWebView(
         }
     }
 
+    /**
+     * Start navigation as soon as the Gecko runtime/session is available.
+     * Extension bundle registration is optional page instrumentation and must not
+     * hold the document request behind its asynchronous startup handshake.
+     */
     fun loadUrl(url: String) {
-        ClintGecko.whenReady { if (!destroyed) doLoad(url) }
+        if (destroyed) return
+        if (Looper.myLooper() == Looper.getMainLooper()) {
+            doLoad(url)
+        } else {
+            ClintGecko.main.post {
+                if (!destroyed) doLoad(url)
+            }
+        }
     }
 
     fun loadUrl(url: String, headers: Map<String, String>) = loadUrl(url)
