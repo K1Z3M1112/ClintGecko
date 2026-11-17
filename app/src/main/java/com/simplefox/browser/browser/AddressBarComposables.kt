@@ -60,6 +60,11 @@ import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntRect
 import androidx.compose.ui.unit.IntSize
@@ -168,10 +173,14 @@ internal fun AddressBarRow(
             Box(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
-                    .padding(end = 6.dp)
-                    .size(36.dp)
+                    .padding(end = 4.dp)
+                    .size(40.dp)
                     .clip(CircleShape)
-                    .clickable(onClick = onHomeClick)
+                    .clickable(
+                        onClickLabel = stringResource(R.string.home),
+                        role = Role.Button,
+                        onClick = onHomeClick
+                    )
             ) {
                 Icon(
                     imageVector = androidx.compose.material.icons.Icons.Filled.Home,
@@ -313,14 +322,18 @@ internal fun AddressBarRow(
                 }
             }
         }
+        val tabCountDescription = tabCountText.toIntOrNull()
+            ?.let { pluralStringResource(R.plurals.tab_menu_tab_count, it, it) }
+            ?: tabCountText
+        // Outer box is the 48dp touch target; the inner box keeps the original compact visual.
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
-                .padding(start = 10.dp)
-                .defaultMinSize(minWidth = 34.dp, minHeight = 26.dp)
-                .clip(RoundedCornerShape(5.dp))
-                .border(2.dp, colors.primary, RoundedCornerShape(5.dp))
+                .padding(start = 2.dp)
+                .defaultMinSize(minWidth = 48.dp, minHeight = 48.dp)
+                .clip(RoundedCornerShape(12.dp))
                 .combinedClickable(
+                    onClickLabel = tabCountDescription,
                     onClick = onTabCountClick,
                     onLongClickLabel = stringResource(if (isIncognito) R.string.new_incognito_tab else R.string.new_tab),
                     onLongClick = {
@@ -328,6 +341,17 @@ internal fun AddressBarRow(
                         if (isIncognito) activity.onNewIncognitoTab() else activity.onNewTab()
                     }
                 )
+                .semantics(mergeDescendants = true) {
+                    contentDescription = tabCountDescription
+                    role = Role.Button
+                }
+        ) {
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .defaultMinSize(minWidth = 30.dp, minHeight = 26.dp)
+                .clip(RoundedCornerShape(7.dp))
+                .border(2.dp, colors.primary, RoundedCornerShape(7.dp))
                 .padding(horizontal = 5.dp, vertical = 4.dp)
         ) {
             Text(
@@ -349,7 +373,8 @@ internal fun AddressBarRow(
                 )
             )
         }
-        Box(modifier = Modifier.padding(start = 4.dp).size(36.dp), contentAlignment = Alignment.Center) {
+        }
+        Box(modifier = Modifier.size(40.dp), contentAlignment = Alignment.Center) {
             com.simplefox.browser.browser.menu.MenuTriggerButton(activity)
         }
     }

@@ -346,7 +346,7 @@
     if (m.k === "bundle") {
       registerBundle(m.code).then(function () { port.postMessage({ k: "bundleOk", seq: m.seq }); });
     } else if (m.k === "cfg") {
-      if (m.cfg) cfg = m.cfg;
+      if (m.cfg) { cfg = m.cfg; syncListeners(); }
     } else if (m.k === "cookies") {
       cookiesFor(m);
     } else if (m.k === "ck") {
@@ -379,18 +379,33 @@
     }
   });
 
-  browser.webRequest.onBeforeRequest.addListener(decide, { urls: ["<all_urls>"] }, ["blocking"]);
-
-  browser.webRequest.onBeforeSendHeaders.addListener(function (d) {
-    var dnt = cfg.dnt && isWeb(d.url);
-    var save = wantsSaveData(d);
-    if (!dnt && !save) return {};
+  // Blocking webRequest listeners force every network request through this background
+  // page (an extra process hop). Only keep them registered while a feature needs them.
+  function onSendHeaders(d) {
+    if (!wantsSaveData(d)) return {};
     var headers = d.requestHeaders || [];
-    var changed = false;
-    if (dnt && !hasHeader(headers, "DNT")) { headers.push({ name: "DNT", value: "1" }); changed = true; }
-    if (save && !hasHeader(headers, "Save-Data")) { headers.push({ name: "Save-Data", value: "on" }); changed = true; }
-    return changed ? { requestHeaders: headers } : {};
-  }, { urls: ["<all_urls>"] }, ["blocking", "requestHeaders"]);
+    if (hasHeader(headers, "Save-Data")) return {};
+    headers.push({ name: "Save-Data", value: "on" });
+    return { requestHeaders: headers };
+  }
 
-  browser.webRequest.onHeadersReceived.addListener(extendFreshness, { urls: ["<all_urls>"] }, ["blocking", "responseHeaders"]);
+  function toggle(event, fn, filter, extra, wanted) {
+    var has = event.hasListener(fn);
+    if (wanted && !has) event.addListener(fn, filter, extra);
+    else if (!wanted && has) event.removeListener(fn);
+  }
+
+  function syncListeners() {
+    var ds = cfg.ds;
+    var saverOn = !!(ds && ds.on);
+    var anyBlock = saverOn && !!(ds.images || ds.fonts || ds.video || ds.scripts || ds.css || ds.frames);
+    var needHeaders = saverOn && !!ds.header;
+    var needCache = saverOn && !!ds.cache;
+    toggle(browser.webRequest.onBeforeRequest, decide, { urls: ["http://*/*", "https://*/*"] }, ["blocking"], anyBlock);
+    toggle(browser.webRequest.onBeforeSendHeaders, onSendHeaders, { urls: ["<all_urls>"] }, ["blocking", "requestHeaders"], needHeaders);
+    toggle(browser.webRequest.onHeadersReceived, extendFreshness,
+      { urls: ["http://*/*", "https://*/*"], types: ["image", "imageset", "font"] }, ["blocking", "responseHeaders"], needCache);
+  }
+
+  syncListeners();
 })();

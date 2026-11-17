@@ -103,7 +103,7 @@ private val CellPadding = 5.dp
 private val CellMinWidth = 160.dp
 private val ListCellMinWidth = 340.dp
 private const val PREF_TAB_MENU_LIST_VIEW = "tab_menu_list_view"
-private const val PREF_TAB_MENU_BUTTONS_AT_BOTTOM = "tab_menu_buttons_at_bottom"
+private const val PREF_TAB_MENU_BUTTONS_AT_BOTTOM = "tab_menu_buttons_at_bottom_v2"
 private const val PREF_TAB_MENU_TABS_AT_BOTTOM = "tab_menu_tabs_at_bottom"
 private val GroupCorner = 18.dp
 
@@ -259,7 +259,7 @@ fun TabMenuScreen(activity: MainActivity, onDismiss: () -> Unit) {
     var searchActive by remember { mutableStateOf(false) }
     var searchQuery by remember { mutableStateOf("") }
     var listView by remember { mutableStateOf(prefs.getBoolean(PREF_TAB_MENU_LIST_VIEW, false)) }
-    var buttonsAtBottom by remember { mutableStateOf(prefs.getBoolean(PREF_TAB_MENU_BUTTONS_AT_BOTTOM, true)) }
+    var buttonsAtBottom by remember { mutableStateOf(prefs.getBoolean(PREF_TAB_MENU_BUTTONS_AT_BOTTOM, false)) }
     var tabsAtBottom by remember { mutableStateOf(prefs.getBoolean(PREF_TAB_MENU_TABS_AT_BOTTOM, true)) }
     val hasDuplicates by remember { derivedStateOf { duplicateTabIds(tabs, activeTabId).isNotEmpty() } }
 

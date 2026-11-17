@@ -236,30 +236,34 @@ object ClintGecko {
             runCatching { GeckoPreferenceController.setGeckoPref(pref, value, GeckoPreferenceController.PREF_BRANCH_USER) }
         }
 
-        // Gecko's image and connection caches can otherwise reserve far more memory than
-        // a mid-range phone needs. Use Android's normal memory class, not largeMemoryClass,
-        // so the browser remains a good multitasking citizen even when largeHeap is enabled.
-        val memoryClassMb = runCatching {
-            (appContext.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager).memoryClass
-        }.getOrDefault(256)
-        val lowMemory = memoryClassMb <= 256
-        val mediumMemory = memoryClassMb in 257..383
+        // Size caches from physical device RAM, not only the app's Java heap class. GeckoView
+        // keeps most page/rendering data in native memory, so memoryClass alone badly
+        // underestimates what a modern 4–6 GB phone can safely use for reusable page assets.
+        val activityManager = appContext.getSystemService(Context.ACTIVITY_SERVICE) as? ActivityManager
+        val memoryInfo = ActivityManager.MemoryInfo()
+        runCatching { activityManager?.getMemoryInfo(memoryInfo) }
+        val totalRamMb = memoryInfo.totalMem / (1024L * 1024L)
+        val memoryClassMb = runCatching { activityManager?.memoryClass ?: 256 }.getOrDefault(256)
+        val lowMemory = activityManager?.isLowRamDevice == true || totalRamMb < 3584L || memoryClassMb <= 192
+        val mediumMemory = !lowMemory && totalRamMb < 6144L
+
+        // More cache reuse helps repeat visits and image-heavy pages. Keep connection fan-out
+        // moderate on phones so dozens of parallel requests do not compete for CPU/network radio.
         val values = mapOf(
-            // Keep enough concurrent connections for modern pages with many origins,
-            // without using desktop-sized limits on phones.
             "network.http.speculative-parallel-limit" to when { lowMemory -> 6; mediumMemory -> 8; else -> 10 },
             "network.http.max-persistent-connections-per-server" to 8,
-            "network.http.max-connections" to when { lowMemory -> 384; mediumMemory -> 512; else -> 768 },
-            "network.dnsCacheEntries" to when { lowMemory -> 400; mediumMemory -> 600; else -> 800 },
-            "network.dnsCacheExpiration" to 300,
+            "network.http.max-connections" to when { lowMemory -> 256; mediumMemory -> 384; else -> 512 },
+            "network.dnsCacheEntries" to when { lowMemory -> 500; mediumMemory -> 800; else -> 1200 },
+            "network.dnsCacheExpiration" to 600,
             "network.dnsCacheExpirationGracePeriod" to 120,
-            // Larger reusable buffers reduce churn on image-heavy and script-heavy pages.
             "network.buffer.cache.count" to when { lowMemory -> 96; mediumMemory -> 128; else -> 160 },
             "network.buffer.cache.size" to 32768,
-            "browser.cache.disk.capacity" to 262144,
-            "browser.cache.memory.capacity" to when { lowMemory -> 12288; mediumMemory -> 20480; else -> 28672 },
-            "image.cache.size" to when { lowMemory -> 8388608; mediumMemory -> 16777216; else -> 25165824 },
-            "image.mem.surfacecache.max_size_kb" to when { lowMemory -> 49152; mediumMemory -> 65536; else -> 98304 }
+            // Disk cache capacity is a ceiling; it is not allocated up front.
+            "browser.cache.disk.capacity" to when { lowMemory -> 262144; mediumMemory -> 393216; else -> 524288 },
+            // Gecko cache capacities use KB; image.cache.size uses bytes.
+            "browser.cache.memory.capacity" to when { lowMemory -> 16384; mediumMemory -> 32768; else -> 49152 },
+            "image.cache.size" to when { lowMemory -> 16777216; mediumMemory -> 25165824; else -> 33554432 },
+            "image.mem.surfacecache.max_size_kb" to when { lowMemory -> 65536; mediumMemory -> 98304; else -> 131072 }
         )
         values.forEach { (pref, value) ->
             runCatching { GeckoPreferenceController.setGeckoPref(pref, value, GeckoPreferenceController.PREF_BRANCH_USER) }
@@ -432,6 +436,12 @@ object ClintGecko {
 
     fun pushConfig() {
         val cfg = runCatching { configProvider?.invoke() }.getOrNull() ?: return
+        // Send DNT natively so the background page needs no blocking header listener.
+        runCatching {
+            GeckoPreferenceController.setGeckoPref(
+                "privacy.donottrackheader.enabled", cfg.optBoolean("dnt", false), GeckoPreferenceController.PREF_BRANCH_USER
+            )
+        }
         postToBackground(JSONObject().put("k", "cfg").put("cfg", cfg))
     }
 

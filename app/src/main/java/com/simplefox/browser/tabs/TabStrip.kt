@@ -132,7 +132,7 @@ internal fun TabStrip(
             visible.offset + visible.size <= info.viewportEndOffset
         if (!fullyVisible) listState.scrollToItem((activeIndex - 1).coerceAtLeast(0))
     }
-    BoxWithConstraints(modifier.fillMaxWidth().height(34.dp)) {
+    BoxWithConstraints(modifier.fillMaxWidth().height(40.dp)) {
         val tabCount = items.count { it is TabStripItem.Tab }.coerceAtLeast(1)
         val tabWidth = ((maxWidth - 40.dp) / tabCount).coerceIn(104.dp, 196.dp)
         Row(Modifier.fillMaxSize(), verticalAlignment = Alignment.CenterVertically) {
@@ -174,7 +174,7 @@ internal fun TabStrip(
                     }
                 }
             }
-            IconButton(onClick = onNewTab, modifier = Modifier.size(34.dp)) {
+            IconButton(onClick = onNewTab, modifier = Modifier.size(40.dp)) {
                 Icon(
                     Icons.Filled.Add,
                     contentDescription = stringResource(if (state.isIncognito) R.string.new_incognito_tab else R.string.new_tab),
@@ -299,7 +299,7 @@ private fun TabStripTab(
                 modifier = Modifier.weight(1f).padding(start = 8.dp)
             )
             if (active || width >= 128.dp) {
-                IconButton(onClick = onClose, modifier = Modifier.size(28.dp)) {
+                IconButton(onClick = onClose, modifier = Modifier.size(32.dp)) {
                     Icon(
                         Icons.Filled.Close,
                         contentDescription = stringResource(R.string.close_tab),

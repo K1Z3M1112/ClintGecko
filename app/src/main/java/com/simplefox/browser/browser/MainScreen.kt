@@ -132,8 +132,19 @@ internal fun MainScreen(activity: MainActivity, state: MainUiState) {
             factory = { activity.swipeRefreshView },
             modifier = Modifier.fillMaxSize(),
             update = { view ->
-                view.visibility = if (webViewHidden) android.view.View.INVISIBLE else android.view.View.VISIBLE
-                view.setPadding(0, state.contentPaddingTopPx, 0, if (state.isFullscreen) 0 else maxOf(state.contentPaddingBottomPx, state.imeInsetPx))
+                // MainScreen also recomposes for small browser chrome updates (for example, load progress).
+                // Avoid re-applying identical View properties: setPadding can trigger a full Android
+                // measure/layout pass that reaches the Gecko surface even when the insets did not move.
+                val targetVisibility = if (webViewHidden) android.view.View.INVISIBLE else android.view.View.VISIBLE
+                if (view.visibility != targetVisibility) view.visibility = targetVisibility
+
+                val targetTop = state.contentPaddingTopPx
+                val targetBottom = if (state.isFullscreen) 0 else maxOf(state.contentPaddingBottomPx, state.imeInsetPx)
+                if (view.paddingLeft != 0 || view.paddingTop != targetTop ||
+                    view.paddingRight != 0 || view.paddingBottom != targetBottom
+                ) {
+                    view.setPadding(0, targetTop, 0, targetBottom)
+                }
             }
         )
 
