@@ -185,14 +185,14 @@ object TabThumbnailCache {
 
     fun clear() {
         cache.evictAll()
-        incognitoCache.clear()
+        incognitoCache.evictAll()
     }
 
     fun trimMemory(level: Int) {
         when {
             level >= 40 || level == 15 -> {
                 cache.evictAll()
-                incognitoCache.clear()
+                incognitoCache.evictAll()
             }
             level >= 10 -> cache.trimToSize(cache.maxSize() / 2)
         }
