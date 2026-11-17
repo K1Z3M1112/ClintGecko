@@ -13,6 +13,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggableState
@@ -124,6 +125,7 @@ internal fun TabMenuCard(
             .then(dragHandleModifier)
             .border(if (selected || isActive || mergeHighlighted) 2.dp else 0.8.dp, borderColor, shape)
             .combinedClickable(
+                interactionSource = remember { MutableInteractionSource() },
                 indication = null,
                 onClick = { if (selectionMode) onToggleSelect() else onOpen() },
                 onLongClick = if (!disableLongPressSelection) ({ if (!selectionMode) onEnterSelection() }) else null
@@ -306,6 +308,7 @@ internal fun TabMenuListRow(
             .background(rowBg)
             .border(borderWidth, accentColor, shape)
             .combinedClickable(
+                interactionSource = remember { MutableInteractionSource() },
                 indication = null,
                 onClick = { if (selectionMode) onToggleSelect() else onOpen() },
                 onLongClick = if (!disableLongPressSelection) ({ if (!selectionMode) onEnterSelection() }) else null
