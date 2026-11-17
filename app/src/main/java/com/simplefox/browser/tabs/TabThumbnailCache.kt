@@ -19,7 +19,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 
 object TabThumbnailCache {
-    private const val MAX_DIMENSION_PX = 240
+    private const val MAX_DIMENSION_PX = 512
     const val DIR_NAME = "tab_thumbnails"
     private const val WEBP_QUALITY = 72
     private const val MEMORY_CACHE_BYTES = 4 * 1024 * 1024

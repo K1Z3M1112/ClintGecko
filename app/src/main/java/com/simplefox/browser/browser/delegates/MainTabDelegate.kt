@@ -115,6 +115,7 @@ internal fun MainActivity.restoreTabs(): Boolean {
         tabManager.tabs.firstOrNull { it.id == saved.tabId }?.lastActiveAt = saved.lastActiveAt
     }
     attachActiveWebView()
+    scheduleBackgroundTabLoads(savedTabs.filter { it.tabId != activeTabId }.map { it.tabId })
     TabThumbnailCache.pruneDisk(this, savedTabs.map { it.tabId }.toSet())
     return true
 }
@@ -259,7 +260,7 @@ internal fun MainActivity.openNewTabInBackground(url: String, openerTabId: Strin
     }
     val sourceTab = openerTabId?.let { id -> tabManager.tabs.firstOrNull { it.id == id } } ?: tabManager.activeTab
     val sourceProfile = sourceTab?.takeIf { !it.isIncognito }?.profileId ?: WebProfiles.DEFAULT_ID
-    val webView = createClintWebView(false, WebProfiles.resolve(this, sourceProfile))
+    val webView = createClintWebView(false, WebProfiles.resolve(this, sourceProfile), deferOpen = true)
     val inheritedGroupId = sourceTab?.takeIf { !it.isIncognito }?.groupId
     val tab = BrowserTab(url = url, openerTabId = openerTabId, profileId = WebProfiles.profileOf(webView), groupId = inheritedGroupId, webView = webView)
     tabManager.addInBackground(tab)
@@ -300,7 +301,8 @@ internal fun MainActivity.openNewTabInBackground(url: String, openerTabId: Strin
             showPopupAlertDialog(newUrl, false, tab.id)
         }
     )
-    webView.loadUrl(url)
+    tab.pendingUrl = url
+    scheduleBackgroundTabLoads(listOf(tab.id))
     updateTabCount()
 }
 
@@ -432,6 +434,7 @@ internal fun MainActivity.syncTabPlayback() {
         }
     }
     trimBackgroundTabs(if (singleTab) 0 else MAX_LIVE_BACKGROUND_TABS)
+    scheduleBackgroundTabLoads(emptyList())
 }
 
 internal fun MainActivity.focusTabById(tabId: String) {

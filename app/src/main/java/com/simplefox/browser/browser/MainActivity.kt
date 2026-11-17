@@ -518,6 +518,7 @@ class MainActivity : ClintActivity(), OverlayHostActivity, SnackbarHostActivity,
     override fun onStart() {
         super.onStart()
         tabManager.activeTab?.webView?.onResume()
+        scheduleBackgroundTabLoads(emptyList())
     }
 
     override fun onUserLeaveHint() {
@@ -532,6 +533,7 @@ class MainActivity : ClintActivity(), OverlayHostActivity, SnackbarHostActivity,
 
     override fun onStop() {
         super.onStop()
+        cancelScheduledBackgroundTabLoad()
         recordBrowsingMode()
         if (isFinishing && com.simplefox.browser.privacy.PrivacyPrefs.closesTabsOnExit(prefs)) {
             discardSavedTabsAsync()
@@ -555,6 +557,7 @@ class MainActivity : ClintActivity(), OverlayHostActivity, SnackbarHostActivity,
             level >= TRIM_MEMORY_BACKGROUND_LEVEL -> trimBackgroundTabs(BACKGROUND_TRIM_KEEP_LIVE)
             level == 10 || level == 15 -> trimBackgroundTabs(0)
         }
+        scheduleBackgroundTabLoads(emptyList())
     }
 
     override fun onSystemThemeChanged() {
@@ -563,6 +566,7 @@ class MainActivity : ClintActivity(), OverlayHostActivity, SnackbarHostActivity,
     }
 
     override fun onDestroy() {
+        cancelScheduledBackgroundTabLoad()
         teardownExtensions()
         teardownTranslations()
         prefs.unregisterOnSharedPreferenceChangeListener(prefsListener)
@@ -682,6 +686,49 @@ class MainActivity : ClintActivity(), OverlayHostActivity, SnackbarHostActivity,
     }
 
     private var pendingTabSwitchId: String? = null
+    private val backgroundTabLoadHandler = Handler(Looper.getMainLooper())
+    private val backgroundTabLoadIds = LinkedHashSet<String>()
+    private var backgroundTabLoadScheduled = false
+    private val backgroundTabLoadRunnable = Runnable {
+        backgroundTabLoadScheduled = false
+        if (!lifecycle.currentState.isAtLeast(androidx.lifecycle.Lifecycle.State.STARTED)) return@Runnable
+        if (DataSaverMode.isSingleTabActive(prefs)) return@Runnable
+        val budget = liveBackgroundTabBudget()
+        if (budget == 0) return@Runnable
+        val activeId = tabManager.activeTab?.id
+        val liveBackgroundCount = tabManager.tabs.count { it.id != activeId && it.webView.isSessionOpen }
+        if (liveBackgroundCount >= budget) return@Runnable
+        val tabId = backgroundTabLoadIds.firstOrNull() ?: return@Runnable
+        backgroundTabLoadIds.remove(tabId)
+        val tab = tabManager.tabs.firstOrNull { it.id == tabId } ?: run {
+            scheduleNextBackgroundTabLoad()
+            return@Runnable
+        }
+        val url = tab.pendingUrl?.takeIf { tab.id != activeId && !tab.isIncognito } ?: run {
+            scheduleNextBackgroundTabLoad()
+            return@Runnable
+        }
+        tab.pendingUrl = null
+        tab.webView.loadUrl(url)
+        trimBackgroundTabs()
+        scheduleNextBackgroundTabLoad()
+    }
+
+    internal fun scheduleBackgroundTabLoads(tabIds: Iterable<String>) {
+        backgroundTabLoadIds.addAll(tabIds)
+        scheduleNextBackgroundTabLoad()
+    }
+
+    private fun scheduleNextBackgroundTabLoad() {
+        if (backgroundTabLoadScheduled || backgroundTabLoadIds.isEmpty()) return
+        backgroundTabLoadScheduled = true
+        backgroundTabLoadHandler.postDelayed(backgroundTabLoadRunnable, 1_000L)
+    }
+
+    private fun cancelScheduledBackgroundTabLoad() {
+        backgroundTabLoadHandler.removeCallbacks(backgroundTabLoadRunnable)
+        backgroundTabLoadScheduled = false
+    }
 
     /** Snapshots the tab being left first, then switches, so its preview shows the page as it was when you left it. */
     fun onTabSelected(index: Int) {
