@@ -208,6 +208,8 @@ object ClintGecko {
         "network.early-hints.enabled" to true,
         "network.early-hints.preconnect.enabled" to true,
         "network.preload" to true,
+        "network.prefetch-next" to true,
+        "network.dns.disablePrefetch" to false,
         "network.http.rcwn.enabled" to true,
         "network.http.pacing.requests.enabled" to false,
         "network.dns.disableIPv6" to false,
@@ -243,18 +245,21 @@ object ClintGecko {
         val lowMemory = memoryClassMb <= 256
         val mediumMemory = memoryClassMb in 257..383
         val values = mapOf(
-            "network.http.speculative-parallel-limit" to when { lowMemory -> 4; mediumMemory -> 5; else -> 6 },
+            // Keep enough concurrent connections for modern pages with many origins,
+            // without using desktop-sized limits on phones.
+            "network.http.speculative-parallel-limit" to when { lowMemory -> 6; mediumMemory -> 8; else -> 10 },
             "network.http.max-persistent-connections-per-server" to 8,
-            "network.http.max-connections" to when { lowMemory -> 256; mediumMemory -> 384; else -> 512 },
-            "network.dnsCacheEntries" to when { lowMemory -> 300; mediumMemory -> 500; else -> 700 },
+            "network.http.max-connections" to when { lowMemory -> 384; mediumMemory -> 512; else -> 768 },
+            "network.dnsCacheEntries" to when { lowMemory -> 400; mediumMemory -> 600; else -> 800 },
             "network.dnsCacheExpiration" to 300,
             "network.dnsCacheExpirationGracePeriod" to 120,
-            "network.buffer.cache.count" to when { lowMemory -> 64; mediumMemory -> 96; else -> 128 },
-            "network.buffer.cache.size" to when { lowMemory -> 16384; mediumMemory -> 24576; else -> 32768 },
+            // Larger reusable buffers reduce churn on image-heavy and script-heavy pages.
+            "network.buffer.cache.count" to when { lowMemory -> 96; mediumMemory -> 128; else -> 160 },
+            "network.buffer.cache.size" to 32768,
             "browser.cache.disk.capacity" to 262144,
-            "browser.cache.memory.capacity" to when { lowMemory -> 8192; mediumMemory -> 16384; else -> 24576 },
-            "image.cache.size" to when { lowMemory -> 4194304; mediumMemory -> 6291456; else -> 8388608 },
-            "image.mem.surfacecache.max_size_kb" to when { lowMemory -> 32768; mediumMemory -> 49152; else -> 65536 }
+            "browser.cache.memory.capacity" to when { lowMemory -> 12288; mediumMemory -> 20480; else -> 28672 },
+            "image.cache.size" to when { lowMemory -> 8388608; mediumMemory -> 16777216; else -> 25165824 },
+            "image.mem.surfacecache.max_size_kb" to when { lowMemory -> 49152; mediumMemory -> 65536; else -> 98304 }
         )
         values.forEach { (pref, value) ->
             runCatching { GeckoPreferenceController.setGeckoPref(pref, value, GeckoPreferenceController.PREF_BRANCH_USER) }
