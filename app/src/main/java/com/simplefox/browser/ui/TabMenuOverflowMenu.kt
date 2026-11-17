@@ -9,6 +9,7 @@ import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.Tab
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.DragIndicator
 import androidx.compose.material.icons.filled.FilterNone
 import androidx.compose.material.icons.filled.KeyboardDoubleArrowDown
 import androidx.compose.material.icons.automirrored.filled.ViewList
@@ -46,7 +47,9 @@ fun TabMenuOverflowMenu(
     buttonsAtBottom: Boolean = false,
     onToggleButtonsAtBottom: (() -> Unit)? = null,
     tabsAtBottom: Boolean = false,
-    onToggleTabsAtBottom: (() -> Unit)? = null
+    onToggleTabsAtBottom: (() -> Unit)? = null,
+    reorderMode: Boolean = false,
+    onToggleReorderMode: (() -> Unit)? = null
 ) {
     val colors = LocalClintColors.current
     DropdownMenu(
@@ -83,7 +86,12 @@ fun TabMenuOverflowMenu(
         ListMenuItem(Icons.Filled.SelectAll, stringResource(R.string.tab_menu_select_mode_desc), checked = false) {
             onDismiss(); onSelectTabs()
         }
-        if (onCollapseAllGroups != null || onExpandAllGroups != null || onToggleGroupBar != null || onToggleListView != null || onToggleButtonsAtBottom != null || onToggleTabsAtBottom != null) {
+        onToggleReorderMode?.let { action ->
+            ListMenuItem(Icons.Filled.DragIndicator, stringResource(R.string.tab_menu_reorder_mode), checked = reorderMode) {
+                onDismiss(); action()
+            }
+        }
+        if (onToggleReorderMode != null || onCollapseAllGroups != null || onExpandAllGroups != null || onToggleGroupBar != null || onToggleListView != null || onToggleButtonsAtBottom != null || onToggleTabsAtBottom != null) {
             HorizontalDivider(color = colors.divider)
         }
         onCollapseAllGroups?.let { action ->

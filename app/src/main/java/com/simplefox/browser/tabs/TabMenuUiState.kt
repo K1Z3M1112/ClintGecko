@@ -7,6 +7,7 @@ import androidx.compose.runtime.setValue
 
 class TabMenuUiState {
     var selectionMode by mutableStateOf(false)
+    var reorderMode by mutableStateOf(false)
     val selectedIds = mutableStateListOf<String>()
 
     fun toggleSelected(tabId: String) {
@@ -15,6 +16,7 @@ class TabMenuUiState {
     }
 
     fun enterSelectionMode(tabId: String) {
+        reorderMode = false
         selectionMode = true
         if (!selectedIds.contains(tabId)) selectedIds.add(tabId)
     }
@@ -33,6 +35,7 @@ class TabMenuUiState {
 
     fun setSelected(tabIds: List<String>, selected: Boolean) {
         if (selected) {
+            reorderMode = false
             selectionMode = true
             tabIds.forEach { if (!selectedIds.contains(it)) selectedIds.add(it) }
         } else {

@@ -141,6 +141,7 @@ internal fun TabGroupChipsRow(
     counts: Map<String, Int>,
     activeGroupId: String?,
     hoverKey: Any?,
+    trackBounds: Boolean,
     onChipClick: (TabGroup) -> Unit,
     onNewGroup: () -> Unit,
     onChipBounds: (String, Rect?) -> Unit,
@@ -157,10 +158,15 @@ internal fun TabGroupChipsRow(
             val hovered = hoverKey == groupChipKey(group.id)
             val highlighted = hovered || group.id == activeGroupId
             val scale by animateFloatAsState(if (hovered) 1.08f else 1f, tween(140), label = "chipScale")
-            DisposableEffect(group.id) { onDispose { onChipBounds(group.id, null) } }
+            DisposableEffect(group.id, trackBounds) {
+                onDispose { if (trackBounds) onChipBounds(group.id, null) }
+            }
             Row(
                 Modifier
-                    .onGloballyPositioned { onChipBounds(group.id, it.boundsInRoot()) }
+                    .then(
+                        if (trackBounds) Modifier.onGloballyPositioned { onChipBounds(group.id, it.boundsInRoot()) }
+                        else Modifier
+                    )
                     .widthIn(max = 200.dp)
                     .height(36.dp)
                     .graphicsLayer { scaleX = scale; scaleY = scale }
@@ -229,7 +235,7 @@ internal fun TabGroupHeader(
     onCloseGroup: () -> Unit,
     modifier: Modifier = Modifier,
     dragHandleModifier: Modifier? = null,
-    longPressDragModifier: Modifier? = null
+    disableLongPressSelection: Boolean = false
 ) {
     val colors = LocalClintColors.current
     val dragHandle = dragHandleModifier?.takeIf { !selectionMode }
@@ -245,9 +251,8 @@ internal fun TabGroupHeader(
             .border(if (highlighted) 2.dp else 0.dp, if (highlighted) Color(group.color) else Color.Transparent, shape)
             .combinedClickable(
                 onClick = { if (selectionMode) onToggleSelection() else onToggleCollapsed() },
-                onLongClick = if (longPressDragModifier == null) ({ if (!selectionMode) onLongPress() }) else null
+                onLongClick = if (!disableLongPressSelection) ({ if (!selectionMode) onLongPress() }) else null
             )
-            .then(longPressDragModifier ?: Modifier)
             .padding(start = if (dragHandle != null) 6.dp else 14.dp, end = 4.dp, top = 8.dp, bottom = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {

@@ -106,7 +106,7 @@ internal fun TabMenuCard(
     onToggleMute: () -> Unit = {},
     mergeHighlighted: Boolean = false,
     showDragHandle: Boolean = true,
-    longPressDragModifier: Modifier? = null
+    disableLongPressSelection: Boolean = false
 ) {
     val colors = LocalClintColors.current
     val favicon = rememberTabFavicon(preview)
@@ -129,9 +129,8 @@ internal fun TabMenuCard(
                 interactionSource = interactionSource,
                 indication = null,
                 onClick = { if (selectionMode) onToggleSelect() else onOpen() },
-                onLongClick = if (longPressDragModifier == null) ({ if (!selectionMode) onEnterSelection() }) else null
-            )
-            .then(longPressDragModifier ?: Modifier),
+                onLongClick = if (!disableLongPressSelection) ({ if (!selectionMode) onEnterSelection() }) else null
+            ),
         colors = CardDefaults.cardColors(containerColor = cardBg),
         shape = RoundedCornerShape(16.dp)
     ) {
@@ -293,7 +292,7 @@ internal fun TabMenuListRow(
     onToggleMute: () -> Unit = {},
     mergeHighlighted: Boolean = false,
     showDragHandle: Boolean = true,
-    longPressDragModifier: Modifier? = null
+    disableLongPressSelection: Boolean = false
 ) {
     val colors = LocalClintColors.current
     val favicon = rememberTabFavicon(preview)
@@ -322,9 +321,8 @@ internal fun TabMenuListRow(
                 interactionSource = interactionSource,
                 indication = null,
                 onClick = { if (selectionMode) onToggleSelect() else onOpen() },
-                onLongClick = if (longPressDragModifier == null) ({ if (!selectionMode) onEnterSelection() }) else null
+                onLongClick = if (!disableLongPressSelection) ({ if (!selectionMode) onEnterSelection() }) else null
             )
-            .then(longPressDragModifier ?: Modifier)
             .padding(start = 12.dp, end = 4.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -447,28 +445,33 @@ internal fun SwipeToCloseContainer(
     }
 
     val draggableState = rememberDraggableState { delta -> offset += delta }
+    val swipeGestureModifier = if (enabled) {
+        Modifier.draggable(
+            state = draggableState,
+            orientation = Orientation.Horizontal,
+            onDragStarted = { settleJob?.cancel() },
+            onDragStopped = { velocity ->
+                val direction = if (offset != 0f) sign(offset) else sign(velocity)
+                val flung = abs(velocity) > flingThreshold && sign(velocity) == direction
+                if (width > 0 && direction != 0f && (abs(offset) > width * 0.4f || flung)) {
+                    settleTo(direction * width, onClose)
+                } else {
+                    settleTo(0f)
+                }
+            }
+        )
+    } else {
+        Modifier
+    }
     Box(
         modifier
+            // Keep the measured width current in every mode; only the swipe pointer handler is conditional.
             .onSizeChanged { width = it.width }
             .graphicsLayer {
                 translationX = offset
                 alpha = if (width > 0) (1f - abs(offset) / width).coerceIn(0f, 1f) else 1f
             }
-            .draggable(
-                state = draggableState,
-                orientation = Orientation.Horizontal,
-                enabled = enabled,
-                onDragStarted = { settleJob?.cancel() },
-                onDragStopped = { velocity ->
-                    val direction = if (offset != 0f) sign(offset) else sign(velocity)
-                    val flung = abs(velocity) > flingThreshold && sign(velocity) == direction
-                    if (width > 0 && direction != 0f && (abs(offset) > width * 0.4f || flung)) {
-                        settleTo(direction * width, onClose)
-                    } else {
-                        settleTo(0f)
-                    }
-                }
-            )
+            .then(swipeGestureModifier)
     ) {
         content()
     }

@@ -1319,6 +1319,7 @@
         <item quantity="other">%1$d selected</item>
     </plurals>
     <string name="tab_menu_select_mode_desc">Select tabs</string>
+    <string name="tab_menu_reorder_mode">Reorder tabs</string>
     <string name="tab_menu_overflow_desc">More options</string>
     <string name="tab_menu_close_all_tabs">Close All Tabs</string>
     <string name="tab_menu_select_all">Select All</string>

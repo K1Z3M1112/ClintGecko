@@ -8,14 +8,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.layout.LayoutCoordinates
-import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.unit.IntSize
 
 internal fun tabItemKey(tabId: String): String = "tab:$tabId"
 internal fun groupHeaderKey(groupId: String): String = "group:$groupId"
-internal fun tabCardOriginKey(tabId: String): String = "card:$tabId"
-internal fun groupCardOriginKey(groupId: String): String = "groupCard:$groupId"
 internal fun groupChipKey(groupId: String): String = "chip:$groupId"
 internal fun groupFillerKey(groupId: String, slot: Int): String = "filler:$groupId:$slot"
 internal fun groupFooterKey(groupId: String): String = "footer:$groupId"
@@ -59,38 +55,32 @@ internal class TabDragState(private val gridState: LazyGridState) {
 
     var gridOriginInRoot: Offset = Offset.Zero
     val chipBounds = mutableMapOf<String, Rect>()
-    val handleOrigins = mutableMapOf<String, Offset>()
-    // Only the coordinates are kept while scrolling; positionInRoot() is resolved once, when a drag starts.
-    private val handleCoords = mutableMapOf<String, LayoutCoordinates>()
-
-    fun registerHandle(key: String, coordinates: LayoutCoordinates) {
-        if (handleCoords[key] !== coordinates) handleCoords[key] = coordinates
-    }
-
-    private fun handleOrigin(key: String): Offset? =
-        handleCoords[key]?.takeIf { it.isAttached }?.positionInRoot() ?: handleOrigins[key]
     var collapsedGroupIds: Set<String> = emptySet()
     var columns: Int = 1
     var mergeEnabled: Boolean = true
     private var pointerStartInRoot: Offset = Offset.Zero
 
-    fun start(tabId: String, touchOffset: Offset, originKey: String = tabId) {
-        if (!begin(tabItemKey(tabId), originKey, touchOffset)) return
+    /** Starts a drag from a handle without retaining per-item LayoutCoordinates during scrolling. */
+    fun start(tabId: String, anchorFraction: Offset = Offset(0.9f, 0.12f)) {
+        if (!begin(tabItemKey(tabId), anchorFraction)) return
         draggingId = tabId
     }
 
-    fun startGroup(groupId: String, touchOffset: Offset, originKey: String = groupHeaderKey(groupId)) {
-        if (!begin(groupHeaderKey(groupId), originKey, touchOffset)) return
+    fun startGroup(groupId: String, anchorFraction: Offset = Offset(0.08f, 0.5f)) {
+        if (!begin(groupHeaderKey(groupId), anchorFraction)) return
         draggingGroupId = groupId
     }
 
-    private fun begin(itemKey: String, handleKey: String, touchOffset: Offset): Boolean {
+    private fun begin(itemKey: String, anchorFraction: Offset): Boolean {
         val info = gridState.layoutInfo.visibleItemsInfo.find { it.key == itemKey } ?: return false
         dragOffset = Offset.Zero
         originOffset = Offset(info.offset.x.toFloat(), info.offset.y.toFloat())
         originSize = info.size
-        pointerStartInRoot = handleOrigin(handleKey)?.plus(touchOffset)
-            ?: (gridOriginInRoot + originOffset + Offset(originSize.width / 2f, originSize.height / 2f))
+        val anchorInItem = Offset(
+            originSize.width * anchorFraction.x.coerceIn(0f, 1f),
+            originSize.height * anchorFraction.y.coerceIn(0f, 1f)
+        )
+        pointerStartInRoot = gridOriginInRoot + originOffset + anchorInItem
         hoverKey = null
         return true
     }
@@ -198,5 +188,7 @@ internal class TabDragState(private val gridState: LazyGridState) {
         draggingGroupId = null
         dragOffset = Offset.Zero
         hoverKey = null
+        // Chip bounds are collected only while a drag is active; release them with the drag session.
+        chipBounds.clear()
     }
 }

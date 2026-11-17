@@ -49,8 +49,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.preference.PreferenceManager
 import com.simplefox.browser.R
-import com.simplefox.browser.backup.AuthGateResult
-import com.simplefox.browser.backup.BackupAuthGate
 import com.simplefox.browser.backup.BackupCategory
 import com.simplefox.browser.backup.BackupManager
 import com.simplefox.browser.backup.RestoreManager
@@ -153,11 +151,6 @@ fun BackupRestorePane(activity: SettingsActivity) {
 
     val okLabel = stringResource(R.string.backup_generic_ok)
     val cancelLabel = stringResource(R.string.action_cancel)
-    val authTitle = stringResource(R.string.backup_auth_title)
-    val authSubtitleBackup = stringResource(R.string.backup_auth_subtitle_backup)
-    val authSubtitleRestore = stringResource(R.string.backup_auth_subtitle_restore)
-    val authUnavailableTitle = stringResource(R.string.backup_auth_unavailable_title)
-    val authUnavailableMessage = stringResource(R.string.backup_auth_unavailable_message)
     val backupResultSuccessTitle = stringResource(R.string.backup_result_success_title)
     val backupResultSuccessMessage = stringResource(R.string.backup_result_success_message)
     val backupResultSkippedNote = stringResource(R.string.backup_result_skipped_note)
@@ -178,33 +171,8 @@ fun BackupRestorePane(activity: SettingsActivity) {
     val restoreResultErrorTitle = stringResource(R.string.restore_result_error_title)
     val restoreResultErrorMessage = stringResource(R.string.restore_result_error_message)
     val restoreActionRestartNow = stringResource(R.string.restore_action_restart_now)
-    val backupPasswordTooShort = stringResource(R.string.backup_password_too_short)
-    val backupPasswordMismatch = stringResource(R.string.backup_password_mismatch)
     val restorePasswordWrong = stringResource(R.string.restore_password_wrong)
 
-    fun requireAuthThen(subtitle: String, onSuccess: () -> Unit) {
-        if (!BackupAuthGate.isAuthenticationAvailable(activity)) {
-            simpleDialog = ConfirmDialogConfig(
-                title = authUnavailableTitle,
-                message = authUnavailableMessage,
-                positiveLabel = okLabel
-            )
-            return
-        }
-        scope.launch {
-            when (BackupAuthGate.authenticate(activity, authTitle, subtitle)) {
-                is AuthGateResult.Success -> onSuccess()
-                is AuthGateResult.NotAvailable -> {
-                    simpleDialog = ConfirmDialogConfig(
-                        title = authUnavailableTitle,
-                        message = authUnavailableMessage,
-                        positiveLabel = okLabel
-                    )
-                }
-                else -> Unit
-            }
-        }
-    }
 
     fun performRestoreNow() {
         val zipFile = uiState.plainZipFile.value ?: return
@@ -336,50 +304,38 @@ fun BackupRestorePane(activity: SettingsActivity) {
                     onPositive = { uiState.resetBackupFlow() }
                 )
             }.onFailure {
-                uiState.stage.value = BackupRestoreStage.SELECT_BACKUP_CATEGORIES
+                uiState.stage.value = BackupRestoreStage.IDLE
                 simpleDialog = ConfirmDialogConfig(
                     title = backupResultErrorTitle,
                     message = backupResultErrorMessage,
-                    positiveLabel = okLabel
+                    positiveLabel = okLabel,
+                    onPositive = { uiState.resetBackupFlow() }
                 )
             }
         }
     }
 
+    // Backup opens Android's system file picker immediately so the user can
+    // choose the destination (device storage, SD card, or a document provider).
+    // By default, include every supported category and create an unencrypted file.
     fun startBackupFlow() {
-        requireAuthThen(authSubtitleBackup) {
-            uiState.resetBackupFlow()
-            uiState.stage.value = BackupRestoreStage.SELECT_BACKUP_CATEGORIES
-        }
+        uiState.resetBackupFlow()
+        createDocumentLauncher.launch("clint_backup_${SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())}.clintbackup")
     }
 
+    // Restore opens the system document picker; the selected backup is staged,
+    // validated, and then offered for category selection before any data is changed.
     fun startRestoreFlow() {
-        requireAuthThen(authSubtitleRestore) {
-            openDocumentLauncher.launch(arrayOf("*/*"))
-        }
+        uiState.stagedFile.value?.let { RestoreManager.discard(it) }
+        uiState.plainZipFile.value?.let { RestoreManager.discardPlain(it) }
+        uiState.resetRestoreFlow()
+        openDocumentLauncher.launch(arrayOf("*/*"))
     }
 
-    fun launchBackupCreation() {
-        if (uiState.encryptBackup.value) {
-            val error = when {
-                uiState.backupPassword.value.length < 6 -> backupPasswordTooShort
-                uiState.backupPassword.value != uiState.backupPasswordConfirm.value -> backupPasswordMismatch
-                else -> null
-            }
-            uiState.passwordError.value = error
-            if (error != null) return
-        }
-        val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
-        createDocumentLauncher.launch("clint_backup_$timestamp.clintbackup")
-    }
 
     SettingsScreenScaffold(
         overlay = {
             ConfirmDialogHost(config = simpleDialog, hideStatusBar = hideStatusBar, hideSystemNavigation = hideSystemNavigation, onDismiss = { simpleDialog = null })
-
-            if (uiState.stage.value == BackupRestoreStage.SELECT_BACKUP_CATEGORIES) {
-                BackupCategoryDialog(uiState, hideStatusBar, hideSystemNavigation, onDismiss = { uiState.resetBackupFlow() }, onCreate = { launchBackupCreation() })
-            }
 
             if (uiState.stage.value == BackupRestoreStage.RESTORE_PASSWORD) {
                 RestorePasswordDialog(
