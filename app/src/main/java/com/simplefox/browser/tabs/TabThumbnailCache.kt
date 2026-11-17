@@ -13,6 +13,7 @@ import android.os.Looper
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicInteger
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -20,7 +21,11 @@ import kotlinx.coroutines.flow.SharedFlow
 object TabThumbnailCache {
     private const val MAX_DIMENSION_PX = 240
     const val DIR_NAME = "tab_thumbnails"
-    private const val WEBP_QUALITY = 75
+    private const val WEBP_QUALITY = 72
+    private const val MEMORY_CACHE_BYTES = 4 * 1024 * 1024
+    private const val INCOGNITO_CACHE_BYTES = 1024 * 1024
+    private const val MAX_PRELOAD_THUMBNAILS = 9
+    private const val MAX_PENDING_CAPTURES = 2
 
     // Disk I/O and bitmap processing use separate threads so a slow disk write never delays a fresh thumbnail.
     private val ioExecutor = Executors.newSingleThreadExecutor { runnable ->
@@ -37,14 +42,16 @@ object TabThumbnailCache {
 
     // Latest bitmap waiting to be written to disk per tab, so rapid captures collapse into a single write.
     private val pendingDisk = ConcurrentHashMap<String, Bitmap>()
+    private val pendingCaptureCount = AtomicInteger(0)
 
-    private val cache = object : LruCache<String, Bitmap>(
-        (Runtime.getRuntime().maxMemory() / 10L).coerceAtMost(Int.MAX_VALUE.toLong()).toInt()
-    ) {
+    // Keep thumbnail memory predictable even on devices with a large Java heap.
+    private val cache = object : LruCache<String, Bitmap>(MEMORY_CACHE_BYTES) {
         override fun sizeOf(key: String, value: Bitmap): Int = value.allocationByteCount
     }
-
-    private val incognitoCache = ConcurrentHashMap<String, Bitmap>()
+    // Private thumbnails are memory-only and have a much smaller independent budget.
+    private val incognitoCache = object : LruCache<String, Bitmap>(INCOGNITO_CACHE_BYTES) {
+        override fun sizeOf(key: String, value: Bitmap): Int = value.allocationByteCount
+    }
 
     fun capture(tabId: String, webView: ClintWebView, isIncognito: Boolean = false) {
         captureThen(tabId, webView, isIncognito) {}
@@ -73,12 +80,25 @@ object TabThumbnailCache {
         webView.captureBitmap { bitmap ->
             if (bitmap != null) {
                 // Raw capture is screen-sized (~10 MB): process and release it off the main thread.
-                processExecutor.execute {
-                    try {
-                        put(context, tabId, bitmap, isIncognito)
-                    } finally {
+                // Rapid tab switching must not queue dozens of full-screen bitmaps.
+                // Keep at most one running capture and two waiting captures.
+                if (pendingCaptureCount.incrementAndGet() <= MAX_PENDING_CAPTURES + 1) {
+                    runCatching {
+                        processExecutor.execute {
+                            try {
+                                put(context, tabId, bitmap, isIncognito)
+                            } finally {
+                                if (!bitmap.isRecycled) bitmap.recycle()
+                                pendingCaptureCount.decrementAndGet()
+                            }
+                        }
+                    }.onFailure {
+                        pendingCaptureCount.decrementAndGet()
                         if (!bitmap.isRecycled) bitmap.recycle()
                     }
+                } else {
+                    pendingCaptureCount.decrementAndGet()
+                    if (!bitmap.isRecycled) bitmap.recycle()
                 }
             }
             mainHandler.post {
@@ -121,7 +141,7 @@ object TabThumbnailCache {
         return if (current === source) source.copy(Bitmap.Config.ARGB_8888, false) else current
     }
 
-    fun peek(tabId: String): Bitmap? = incognitoCache[tabId] ?: cache.get(tabId)
+    fun peek(tabId: String): Bitmap? = incognitoCache.get(tabId) ?: cache.get(tabId)
 
     fun get(context: Context, tabId: String): Bitmap? {
         peek(tabId)?.let { return it }
@@ -130,11 +150,20 @@ object TabThumbnailCache {
         return fromDisk
     }
 
-    /** Decodes saved thumbnails into memory ahead of time so the tab switcher's first frame already has them. */
-    fun preload(context: Context, tabIds: List<String>) {
-        val appContext = context.applicationContext
-        val missing = tabIds.filter { peek(it) == null }
+    /**
+     * Preloads only a small window around the active tab. Loading every thumbnail here used to
+     * decode and retain images for the entire session before the lazy grid was even visible.
+     */
+    fun preload(context: Context, tabIds: List<String>, focusedTabId: String? = null) {
+        if (tabIds.isEmpty()) return
+        val focusIndex = focusedTabId?.let { tabIds.indexOf(it) }?.takeIf { it >= 0 } ?: 0
+        val halfWindow = MAX_PRELOAD_THUMBNAILS / 2
+        val start = (focusIndex - halfWindow).coerceAtLeast(0)
+            .coerceAtMost((tabIds.size - MAX_PRELOAD_THUMBNAILS).coerceAtLeast(0))
+        val end = (start + MAX_PRELOAD_THUMBNAILS).coerceAtMost(tabIds.size)
+        val missing = tabIds.subList(start, end).filter { peek(it) == null }
         if (missing.isEmpty()) return
+        val appContext = context.applicationContext
         ioExecutor.execute {
             missing.forEach { id ->
                 if (peek(id) == null) readFromDisk(appContext, id)?.let { cache.put(id, it) }
@@ -182,7 +211,7 @@ object TabThumbnailCache {
 
     private fun store(context: Context, tabId: String, bitmap: Bitmap, isIncognito: Boolean) {
         if (isIncognito) {
-            incognitoCache[tabId] = bitmap
+            incognitoCache.put(tabId, bitmap)
             _updates.tryEmit(tabId)
             return
         }
