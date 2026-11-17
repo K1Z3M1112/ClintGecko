@@ -120,7 +120,7 @@ internal fun TabStrip(
     modifier: Modifier = Modifier
 ) {
     val colors = LocalClintColors.current
-    val items = buildTabStripItems(state)
+    val items = remember(state) { buildTabStripItems(state) }
     val listState = rememberLazyListState()
     val activeIndex = items.indexOfFirst { it is TabStripItem.Tab && it.preview.id == state.activeTabId }
     LaunchedEffect(state.activeTabId, items.size) {

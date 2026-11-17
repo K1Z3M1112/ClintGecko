@@ -136,7 +136,6 @@ internal fun MainActivity.closeInactiveTabs() {
     if (expired.isEmpty()) return
     expired.forEach { tab ->
         removeDesktopScript(tab)
-        com.simplefox.browser.mediacapture.MediaCaptureStore.removeTab(tab.id)
         if (!tab.isIncognito) com.simplefox.browser.ui.FaviconCache.evict(this, tab.url)
         TabThumbnailCache.evict(this, tab.id)
         val index = tabManager.tabs.indexOfFirst { it.id == tab.id }
@@ -152,6 +151,16 @@ internal fun MainActivity.captureActiveTabThumbnail() {
     if (uiState.isHomePage) return
     val tab = tabManager.activeTab ?: return
     TabThumbnailCache.capture(tab.id, tab.webView, tab.isIncognito)
+}
+
+/** Captures the active tab's thumbnail and runs [then] as soon as the frame is grabbed (immediately if it can't be). */
+internal fun MainActivity.captureActiveTabThen(then: () -> Unit) {
+    val tab = tabManager.activeTab
+    if (tab == null || uiState.isHomePage) {
+        then()
+        return
+    }
+    TabThumbnailCache.captureThen(tab.id, tab.webView, tab.isIncognito, then = then)
 }
 
 private fun MainActivity.migrateTabsFromPrefsIfNeeded() {
@@ -366,9 +375,14 @@ internal fun MainActivity.switchToTabMode(incognito: Boolean) {
         openNewTab(isIncognito = incognito)
         return
     }
-    captureActiveTabThumbnail()
-    tabManager.switchTo(index)
-    attachActiveWebView()
+    val targetId = tabManager.tabs[index].id
+    captureActiveTabThen {
+        val newIndex = tabManager.tabs.indexOfFirst { it.id == targetId }
+        if (newIndex != -1) {
+            tabManager.switchTo(newIndex)
+            attachActiveWebView()
+        }
+    }
 }
 
 internal fun MainActivity.attachActiveWebView() {
@@ -506,7 +520,6 @@ internal fun MainActivity.closePopupTabToOpener(tab: BrowserTab): Boolean {
     if (closingIndex !in tabManager.tabs.indices) return false
 
     removeDesktopScript(tab)
-    com.simplefox.browser.mediacapture.MediaCaptureStore.removeTab(tab.id)
     if (!tab.isIncognito) com.simplefox.browser.ui.FaviconCache.evict(this, tab.url)
     TabThumbnailCache.evict(this, tab.id)
     tabManager.closeTab(closingIndex)

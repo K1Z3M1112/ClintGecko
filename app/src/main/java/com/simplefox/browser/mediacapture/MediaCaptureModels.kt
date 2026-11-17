@@ -1,18 +1,11 @@
 package com.simplefox.browser.mediacapture
 
-const val MEDIA_CAPTURE_ENABLED_PREF = "media_capture_enabled"
 const val MEDIA_CAPTURE_CONVERT_TS_TO_MP4_PREF = "media_capture_convert_ts_to_mp4"
 const val MEDIA_CAPTURE_CONVERT_TS_TO_MP4_DEFAULT = true
 
 enum class MediaKind { VIDEO, AUDIO, SUBTITLE }
 
 enum class ManifestType { HLS, DASH }
-
-data class PageMediaCandidate(
-    val url: String,
-    val label: String?,
-    val language: String?
-)
 
 data class HlsSegmentEstimate(
     val segmentCount: Int,

@@ -68,6 +68,8 @@ import com.simplefox.browser.ui.ClintSwitch
 import com.simplefox.browser.ui.scrollToSelection
 import com.simplefox.browser.ui.theme.LocalClintColors
 import com.simplefox.browser.util.formatFileSize
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 
 private sealed interface TranslationsSettingsDialog {
@@ -103,10 +105,16 @@ fun TranslationsSettingsPane(activity: SettingsActivity) {
         ClintGecko.init(activity)
         engineSupported = ClintTranslations.isEngineSupported()
         if (engineSupported) {
-            models = ClintTranslations.models(locale)
-            supportedLanguages = ClintTranslations.supportedLanguages(locale)?.fromLanguages.orEmpty()
-            languageSettings = ClintTranslations.languageSettings().orEmpty()
-            neverSites = ClintTranslations.neverTranslateSites().orEmpty()
+            coroutineScope {
+                val modelsJob = async { ClintTranslations.models(locale) }
+                val languagesJob = async { ClintTranslations.supportedLanguages(locale)?.fromLanguages.orEmpty() }
+                val settingsJob = async { ClintTranslations.languageSettings().orEmpty() }
+                val sitesJob = async { ClintTranslations.neverTranslateSites().orEmpty() }
+                models = modelsJob.await()
+                supportedLanguages = languagesJob.await()
+                languageSettings = settingsJob.await()
+                neverSites = sitesJob.await()
+            }
         }
         loading = false
     }

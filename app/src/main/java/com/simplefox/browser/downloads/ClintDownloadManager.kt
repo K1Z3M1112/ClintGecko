@@ -3,7 +3,7 @@ package com.simplefox.browser.downloads
 import android.app.NotificationManager
 import android.content.Context
 import android.net.Uri
-import androidx.documentfile.provider.DocumentFile
+import com.simplefox.browser.util.DocumentFile
 import androidx.preference.PreferenceManager
 import com.simplefox.browser.R
 import com.simplefox.browser.downloads.mega.MegaPaths

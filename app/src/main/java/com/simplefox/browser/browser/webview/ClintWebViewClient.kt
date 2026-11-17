@@ -14,8 +14,6 @@ import com.simplefox.browser.browser.dialogs.HttpsOnlyRequest
 import com.simplefox.browser.browser.dialogs.SslWarningRequest
 import com.simplefox.browser.blocker.engine.WebsiteBlockerEngine
 import com.simplefox.browser.blocker.engine.WebsiteBlockerWebIntegration
-import com.simplefox.browser.mediacapture.MediaCaptureDetector
-import com.simplefox.browser.mediacapture.MediaCaptureStore
 import com.simplefox.browser.settings.sitepermissions.SitePermissionActivity
 import com.simplefox.browser.settings.sitepermissions.SitePermissionDatabase
 import com.simplefox.browser.settings.sitepermissions.SitePermissionManager
@@ -86,25 +84,19 @@ class ClintWebViewClient(
 
     fun onPageStarted(view: ClintWebView, url: String) {
         cachedPageUrl = url
-        MediaCaptureStore.updatePageUrl(getTabId(), url)
         exceptionCacheValid = false
-        MediaCaptureStore.clearForTab(getTabId())
         if (isActive()) onPageStartedCallback(url)
     }
 
     fun onPageFinished(view: ClintWebView, url: String) {
         if (url.startsWith("https://", ignoreCase = true)) Uri.parse(url).host?.lowercase()?.let { upgradedHostOrigins.remove(it) }
         cachedPageUrl = url
-        MediaCaptureStore.updatePageUrl(getTabId(), url)
         if (url.isNotEmpty()) onTabUrlUpdatedCallback(view, url)
         if (isActive()) onPageFinishedCallback(url) else if (!view.isMediaPlaying) view.evaluateJavascript(TabMediaControl.PAUSE_SCRIPT, null)
     }
 
     fun doUpdateVisitedHistory(view: ClintWebView, url: String) {
-        val changed = cachedPageUrl?.substringBefore('#') != url.substringBefore('#')
         cachedPageUrl = url
-        MediaCaptureStore.updatePageUrl(getTabId(), url)
-        if (changed) MediaCaptureStore.clearForTab(getTabId())
         onTabUrlUpdatedCallback(view, url)
     }
 
@@ -142,7 +134,7 @@ class ClintWebViewClient(
         if (tryOpenInApp(view, uri)) return true
 
         val websiteBlockerEnabled = prefs.getBoolean("website_blocker_enabled", false)
-        if (websiteBlockerEnabled && WebsiteBlockerEngine.isActive && WebsiteBlockerWebIntegration.isHostBlocked(uri.host)) {
+        if (websiteBlockerEnabled && WebsiteBlockerEngine.awaitActive() && WebsiteBlockerWebIntegration.isHostBlocked(uri.host)) {
             onWebsiteBlockedCallback(uri.toString())
             return true
         }
@@ -372,37 +364,6 @@ class ClintWebViewClient(
             )
         }
         return true
-    }
-
-    fun isMediaCaptureEnabled(): Boolean =
-        prefs.getBoolean(com.simplefox.browser.mediacapture.MEDIA_CAPTURE_ENABLED_PREF, true)
-
-    fun onMediaObserved(request: ClintRequest, pageUrl: String?) {
-        if (isMediaCaptureEnabled()) {
-            MediaCaptureDetector.onRequestObserved(getTabId(), pageUrl ?: cachedPageUrl, request)
-        }
-    }
-
-    fun onPageMediaFound(message: org.json.JSONObject) {
-        if (!isMediaCaptureEnabled()) return
-        val items = message.optJSONArray("items") ?: return
-        val candidates = (0 until minOf(items.length(), 200)).mapNotNull { index ->
-            val item = items.optJSONObject(index) ?: return@mapNotNull null
-            val url = item.optString("u").takeIf { it.isNotBlank() } ?: return@mapNotNull null
-            com.simplefox.browser.mediacapture.PageMediaCandidate(
-                url = url,
-                label = item.optString("l").takeIf { it.isNotBlank() },
-                language = item.optString("g").takeIf { it.isNotBlank() }
-            )
-        }
-        if (candidates.isEmpty()) return
-        MediaCaptureDetector.onPageMediaFound(
-            getTabId(),
-            MediaCaptureStore.pageUrlFor(getTabId()) ?: cachedPageUrl,
-            message.optString("f").takeIf { it.isNotBlank() },
-            message.optString("ua").takeIf { it.isNotBlank() },
-            candidates
-        )
     }
 
     fun onAuthRequest(

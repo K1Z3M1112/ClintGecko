@@ -8,7 +8,7 @@ import android.os.Build
 import android.os.Environment
 import android.webkit.MimeTypeMap
 import androidx.core.content.ContextCompat
-import androidx.documentfile.provider.DocumentFile
+import com.simplefox.browser.util.DocumentFile
 import androidx.preference.PreferenceManager
 import com.simplefox.browser.BuildConfig
 import com.simplefox.browser.settings.downloads.DownloadSettingsKeys
@@ -114,7 +114,7 @@ internal object DownloadFileHelper {
 
     internal fun sanitizeFileName(name: String): String {
         var cleaned = name.substringAfterLast('/').substringAfterLast('\\').trim()
-        cleaned = cleaned.replace(Regex("[\\\\/:*?\"<>|\\x00-\\x1F]"), "_")
+        cleaned = cleaned.replace(FILENAME_ILLEGAL_REGEX, "_")
         if (cleaned.isBlank() || cleaned.all { it == '.' }) cleaned = "download"
         return cleaned.take(200)
     }
@@ -303,3 +303,5 @@ internal object DownloadFileHelper {
         } catch (_: Throwable) { null }
     }
 }
+
+private val FILENAME_ILLEGAL_REGEX = Regex("[\\\\/:*?\"<>|\\x00-\\x1F]")

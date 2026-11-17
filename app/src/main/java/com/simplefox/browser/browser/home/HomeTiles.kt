@@ -281,6 +281,13 @@ internal object HomeTileIconFetcher {
 
     private class Candidate(val url: String, val size: Int, val vector: Boolean = false)
 
+    fun trimMemory(level: Int) {
+        when {
+            level >= 40 || level == 15 -> memory.evictAll()
+            level >= 10 -> memory.trimToSize(memory.maxSize() / 2)
+        }
+    }
+
     private fun originOf(pageUrl: String): String? = runCatching {
         val url = URL(pageUrl)
         if (url.protocol != "http" && url.protocol != "https") return@runCatching null
@@ -416,7 +423,7 @@ internal object HomeTileIconFetcher {
                         candidates.add(Candidate(url, if (vector) 512 else declared ?: 32, vector))
                 }
             }
-            Regex("<meta\\b[^>]*>", RegexOption.IGNORE_CASE).findAll(head).forEach { match ->
+            HOME_META_TAG_REGEX.findAll(head).forEach { match ->
                 val tag = match.value
                 val name = (attr(tag, "property") ?: attr(tag, "name"))?.lowercase() ?: return@forEach
                 if (name == "msapplication-tileimage") {
@@ -541,3 +548,5 @@ internal fun rememberHomeTileIcon(site: HomeSiteTile, iconVersion: Int): HomeTil
             ?: favicon?.takeIf { hd == null }?.let { HomeTileIconImage(it.asImageBitmap(), minOf(it.width, it.height) >= 96) }
     }
 }
+
+private val HOME_META_TAG_REGEX = Regex("<meta\\b[^>]*>", RegexOption.IGNORE_CASE)

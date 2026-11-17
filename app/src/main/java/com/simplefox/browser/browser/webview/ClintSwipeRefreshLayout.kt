@@ -4,13 +4,12 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.ViewConfiguration
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import kotlin.math.abs
 
 class ClintSwipeRefreshLayout @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null
-) : SwipeRefreshLayout(context, attrs) {
+) : SimplePullRefreshLayout(context, attrs) {
 
     var canChildScrollUpCallback: (() -> Boolean)? = null
     var touchVerdictCallback: ((Long) -> Boolean?)? = null

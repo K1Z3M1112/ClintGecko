@@ -6,7 +6,7 @@
 
 **Customizable Layered Internet Navigation Tool**
 
-Android Firefox-based browser with ADM, media capture, and extensions.
+Android Firefox-based browser with ADM and extensions.
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blueviolet.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/Platform-Android%208.0%2B-blueviolet.svg)](https://developer.android.com)
@@ -22,7 +22,7 @@ Android Firefox-based browser with ADM, media capture, and extensions.
 ---
 
 ## What is Clint Gecko?
-Clint Gecko is an open-source Firefox-based browser with a built-in ADM (Advanced Download Manager) and Media Capture. The goal of Clint Gecko is to be your ultimate all-in-one browser while remaining pleasant to use and highly customizable. With every update, Clint Gecko continues to get closer to that goal.
+Clint Gecko is an open-source Firefox-based browser with a built-in ADM (Advanced Download Manager). The goal of Clint Gecko is to be your ultimate all-in-one browser while remaining pleasant to use and highly customizable. With every update, Clint Gecko continues to get closer to that goal.
 
 The Jhaiian ecosystem offers up to 500 possible theme combinations, allowing you to personalize your browsing experience to your liking.
 
@@ -43,7 +43,6 @@ Built and maintained by **[@jhaiian](https://github.com/jhaiian)** — a solo de
     <tr>
       <td align="center"><img src="docs/screenshots/01_extension_support.png" width="180" alt="Extension Support" /></td>
       <td align="center"><img src="docs/screenshots/02_extension_popup.png" width="180" alt="Extension Pop up" /></td>
-      <td align="center"><img src="docs/screenshots/03_media_capture.png" width="180" alt="Media Capture" /></td>
       <td align="center"><img src="docs/screenshots/04_advance_download_manager.png" width="180" alt="Advanced Download Manager" /></td>
       <td align="center"><img src="docs/screenshots/05_extension_in_the_menu.png" width="180" alt="Extension In the menu" /></td>
     </tr>
@@ -71,12 +70,6 @@ Built and maintained by **[@jhaiian](https://github.com/jhaiian)** — a solo de
 - Keep audio and video playing when you switch apps or lock your screen
 - Control playback from the media notification
 - Can be turned on or off in the browser settings
-
-### 🎬 Media Capture
-
-- Detects video, audio, and subtitle streams on webpages you visit
-- Supports normal video, HLS/M3U8, and DASH streams
-- Download detected media directly from the browser
 
 ### ⬇️ ADM (Advanced Download Manager)
 

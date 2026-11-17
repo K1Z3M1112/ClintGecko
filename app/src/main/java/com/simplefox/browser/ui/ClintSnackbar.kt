@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -20,9 +21,11 @@ import com.simplefox.browser.ui.foundation.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.LifecycleOwner
@@ -135,8 +138,9 @@ fun <T> T.showClintDestinationSnackbar(
 }
 
 @Composable
-fun ClintSnackbarHost(hostState: SnackbarHostState) {
+fun ClintSnackbarHost(hostState: SnackbarHostState, bottomBarVisiblePx: () -> Int = { 0 }) {
     val colors = LocalClintColors.current
+    val navBarPx = WindowInsets.navigationBars.getBottom(LocalDensity.current)
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -144,7 +148,10 @@ fun ClintSnackbarHost(hostState: SnackbarHostState) {
             .padding(16.dp),
         contentAlignment = Alignment.BottomCenter
     ) {
-        SnackbarHost(hostState) { data ->
+        SnackbarHost(
+            hostState,
+            modifier = Modifier.offset { IntOffset(0, -(bottomBarVisiblePx() - navBarPx).coerceAtLeast(0)) }
+        ) { data ->
             val visuals = data.visuals
             if (visuals is ClintDestinationSnackbarVisuals) {
                 Snackbar(

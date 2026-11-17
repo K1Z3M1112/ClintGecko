@@ -22,6 +22,8 @@ import com.simplefox.browser.history.SearchHistoryManager
 
 private const val SUGGESTION_HISTORY_LIMIT = 20
 private const val SUGGESTION_BOOKMARK_LIMIT = 10
+private const val SUGGESTION_FETCH_DEBOUNCE_MS = 150L
+private const val SUGGESTION_LOCAL_DEBOUNCE_MS = 45L
 
 internal fun MainActivity.applyAddressBarPosition() {
     val position = prefs.getString("address_bar_position", "bottom") ?: "bottom"
@@ -101,7 +103,7 @@ private fun MainActivity.clipboardText(): String? {
     val clip = clipboard.primaryClip ?: return null
     if (clip.itemCount == 0) return null
     return clip.getItemAt(0).coerceToText(this)?.toString()
-        ?.replace(Regex("\\s*[\\r\\n]+\\s*"), " ")
+        ?.replace(CLIPBOARD_NEWLINES_REGEX, " ")
         ?.trim()
         ?.takeIf { it.isNotEmpty() }
 }
@@ -123,7 +125,7 @@ internal fun MainActivity.closeSearchOverlay() {
     uiState.searchOverlayOpen = false
     suggestionFetcher?.cancel()
     lastOnlineSuggestions = emptyList()
-    uiState.suggestions = emptyList()
+    clearSuggestionsAfterOverlayExit()
     updateAddressBar(tabManager.activeTab?.url ?: "")
 }
 
@@ -131,7 +133,9 @@ internal fun MainActivity.onSearchQueryChanged(query: String) {
     uiState.searchQuery = query
     val bgHandler = suggestionsBgHandler ?: return
     bgHandler.removeCallbacksAndMessages(null)
-    bgHandler.post {
+    suggestionFetcher?.cancel()
+    // Wait a beat so a burst of keystrokes runs one lookup and one list update instead of one per key.
+    bgHandler.postDelayed({
         val isIncognito = tabManager.activeTab?.isIncognito == true
         val incognitoHistoryAllowed = prefs.getBoolean("incognito_search_history_enabled", false)
         val historyAllowed = prefs.getBoolean(PREF_SUGGESTIONS_SHOW_HISTORY, true) && (!isIncognito || incognitoHistoryAllowed)
@@ -141,8 +145,8 @@ internal fun MainActivity.onSearchQueryChanged(query: String) {
             lastOnlineSuggestions = emptyList()
             val history = if (historyAllowed) SearchHistoryManager.getAll(this).take(SUGGESTION_HISTORY_LIMIT) else emptyList()
             val bookmarks = if (bookmarksAllowed) BookmarkManager.getAll(this).take(SUGGESTION_BOOKMARK_LIMIT) else emptyList()
-            runOnUiThread { uiState.suggestions = combineSuggestions(emptyList(), bookmarks, history, emptyList()) }
-            return@post
+            publishSuggestions(combineSuggestions(emptyList(), bookmarks, history, emptyList()))
+            return@postDelayed
         }
         val suggestionsApi = com.simplefox.browser.browser.searchSuggestionsApiFor(prefs, isIncognito)
         val onlineBlocked = suggestionsApi == "off" || (DataSaverMode.isActive(prefs) && prefs.getBoolean("data_saver_disable_suggestions", true))
@@ -153,16 +157,25 @@ internal fun MainActivity.onSearchQueryChanged(query: String) {
         val history = if (historyAllowed) SearchHistoryManager.search(this, query).take(SUGGESTION_HISTORY_LIMIT) else emptyList()
         val bookmarks = if (bookmarksAllowed) BookmarkManager.search(this, query).take(SUGGESTION_BOOKMARK_LIMIT) else emptyList()
         val pages = clintPageSuggestions(query)
-        runOnUiThread { uiState.suggestions = combineSuggestions(pages, bookmarks, history, lastOnlineSuggestions) }
-        if (onlineBlocked) return@post
+        publishSuggestions(combineSuggestions(pages, bookmarks, history, lastOnlineSuggestions))
+        if (onlineBlocked) return@postDelayed
         val customSuggestionsUrl = if (suggestionsApi == "custom") {
             customSearchSuggestionsApiQueryUrl(prefs, android.net.Uri.encode(query), isIncognito)
         } else null
-        suggestionFetcher?.fetch(query, suggestionsApi, customSuggestionsUrl) { suggestions ->
-            lastOnlineSuggestions = suggestions
-            runOnUiThread { uiState.suggestions = combineSuggestions(pages, bookmarks, history, suggestions) }
-        }
-    }
+        // Local results are already on screen; debounce only the network request. The next
+        // keystroke clears this delayed message via removeCallbacksAndMessages above.
+        bgHandler.postDelayed({
+            suggestionFetcher?.fetch(query, suggestionsApi, customSuggestionsUrl) { suggestions ->
+                lastOnlineSuggestions = suggestions
+                publishSuggestions(combineSuggestions(pages, bookmarks, history, suggestions))
+            }
+        }, SUGGESTION_FETCH_DEBOUNCE_MS)
+    }, if (query.isBlank()) 0L else SUGGESTION_LOCAL_DEBOUNCE_MS)
+}
+
+// An identical list would still recompose the suggestion list (and re-measure every row); skip it.
+private fun MainActivity.publishSuggestions(items: List<SuggestionItem>) {
+    runOnUiThread { if (uiState.suggestions != items) uiState.suggestions = items }
 }
 
 internal fun MainActivity.onSuggestionHistoryDelete(query: String) {
@@ -181,11 +194,12 @@ internal fun MainActivity.onSearchSubmitted(input: String) {
     uiState.searchOverlayOpen = false
     suggestionFetcher?.cancel()
     lastOnlineSuggestions = emptyList()
-    uiState.suggestions = emptyList()
+    clearSuggestionsAfterOverlayExit()
     if (tabManager.activeTab?.isIncognito != true) {
         Thread { SearchHistoryManager.add(this, trimmed) }.start()
     }
-    loadUrl(trimmed)
+    hideKeyboardOnly()
+    loadUrlAfterOverlayExit(trimmed)
 }
 
 internal fun MainActivity.onSuggestionChosen(query: String) {
@@ -194,11 +208,30 @@ internal fun MainActivity.onSuggestionChosen(query: String) {
     uiState.searchOverlayOpen = false
     suggestionFetcher?.cancel()
     lastOnlineSuggestions = emptyList()
-    uiState.suggestions = emptyList()
+    clearSuggestionsAfterOverlayExit()
     if (tabManager.activeTab?.isIncognito != true) {
-        SearchHistoryManager.add(this, query)
+        Thread { SearchHistoryManager.add(this, query) }.start()
     }
-    loadUrl(query)
+    hideKeyboardOnly()
+    loadUrlAfterOverlayExit(query)
+}
+
+// The overlay fades out over ~100 ms. Clearing its rows or starting the page load inside those frames
+// makes the fade (and the keyboard hiding with it) stutter, so both wait until it is gone.
+private const val OVERLAY_EXIT_MS = 110L
+
+private fun MainActivity.clearSuggestionsAfterOverlayExit() {
+    window.decorView.postDelayed({
+        if (!uiState.searchOverlayOpen) uiState.suggestions = emptyList()
+    }, OVERLAY_EXIT_MS)
+}
+
+private fun MainActivity.loadUrlAfterOverlayExit(input: String) {
+    val tab = tabManager.activeTab
+    window.decorView.postDelayed({
+        if (isFinishing || isDestroyed) return@postDelayed
+        if (tabManager.activeTab === tab) loadUrl(input)
+    }, OVERLAY_EXIT_MS)
 }
 
 private fun isSecureAddress(url: String): Boolean =
@@ -275,7 +308,7 @@ internal fun MainActivity.formatUrl(input: String): String {
         t.startsWith("http://") || t.startsWith("https://") || t.startsWith("moz-extension://") -> t
         t.contains(".") && !t.contains(" ") -> {
             val host = t.substringBefore("/").substringBefore(":")
-            val isIpAddress = host.matches(Regex("""^(\d{1,3}\.){3}\d{1,3}$"""))
+            val isIpAddress = host.matches(IPV4_REGEX)
             if (isIpAddress) "http://$t" else "https://$t"
         }
         else -> getSearchQueryUrl(t)
@@ -347,10 +380,6 @@ internal fun MainActivity.onPageFinished(url: String) {
     canvasTouchActive = false
     updateBookmarkIcon()
 
-    tabManager.activeTab?.let { tab ->
-        com.simplefox.browser.tabs.TabThumbnailCache.capture(tab.id, tab.webView, tab.isIncognito)
-    }
-
     val activeTab = tabManager.activeTab
     if (activeTab?.isIncognito != true && url.startsWith("http") && !isClintHomeUrl(url) && !SearchHistoryManager.isSearchEngineUrl(applicationContext, url)) {
         val title = activeTab?.webView?.title ?: ""
@@ -373,10 +402,26 @@ internal fun MainActivity.resetProgressBar() {
     uiState.isPageLoading = false
 }
 
+// One thread, so lookups finish in the order they were asked and the newest answer wins.
+private val bookmarkIconExecutor = java.util.concurrent.Executors.newSingleThreadExecutor { runnable ->
+    Thread(runnable, "bookmark-icon").apply { priority = Thread.MIN_PRIORITY }
+}
+
 internal fun MainActivity.updateBookmarkIcon() {
     val url = tabManager.activeTab?.webView?.url?.takeUnless { isClintHomeUrl(it) } ?: ""
     uiState.hasActiveUrl = url.isNotEmpty()
-    uiState.isBookmarked = url.isNotEmpty() && BookmarkManager.isBookmarked(this, url)
+    if (url.isEmpty()) {
+        uiState.isBookmarked = false
+        return
+    }
+    // This runs on every page start/finish and tab switch; the database lookup must not block the UI thread.
+    bookmarkIconExecutor.execute {
+        val bookmarked = BookmarkManager.isBookmarked(applicationContext, url)
+        runOnUiThread {
+            val current = tabManager.activeTab?.webView?.url?.takeUnless { isClintHomeUrl(it) } ?: ""
+            if (!isDestroyed && current == url) uiState.isBookmarked = bookmarked
+        }
+    }
 }
 
 internal fun MainActivity.updateNavigationState() {
@@ -386,7 +431,7 @@ internal fun MainActivity.updateNavigationState() {
 }
 
 internal fun MainActivity.updateTabCount() {
-    val count = tabManager.previews().size
+    val count = tabManager.tabs.count { !tabManager.isGhostTab(it) }
     uiState.tabCountText = if (count > 99) ":D" else count.toString()
     val activeTabId = tabManager.activeTab?.id
     com.simplefox.browser.privacy.BrowsingDataCleaner.openTabs = tabManager.tabs
@@ -400,12 +445,6 @@ internal fun MainActivity.updateTabCount() {
 internal fun MainActivity.updateIncognitoState(isIncognito: Boolean) {
 
     uiState.isIncognito = isIncognito
-}
-
-internal fun MainActivity.updateMediaCaptureEnabledState() {
-    uiState.isMediaCaptureEnabled = prefs.getBoolean(
-        com.simplefox.browser.mediacapture.MEDIA_CAPTURE_ENABLED_PREF, true
-    )
 }
 
 internal fun MainActivity.updateHomeButtonState() {
@@ -453,3 +492,6 @@ internal fun MainActivity.launchVoiceSearch() {
         Toast.makeText(this, getString(R.string.voice_search_not_available), Toast.LENGTH_SHORT).show()
     }
 }
+
+private val CLIPBOARD_NEWLINES_REGEX = Regex("\\s*[\\r\\n]+\\s*")
+private val IPV4_REGEX = Regex("""^(\d{1,3}\.){3}\d{1,3}$""")

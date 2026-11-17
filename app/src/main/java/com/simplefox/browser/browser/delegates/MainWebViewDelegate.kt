@@ -7,7 +7,6 @@ import com.simplefox.browser.browser.MainActivity
 
 import android.annotation.SuppressLint
 import com.simplefox.browser.downloads.DownloadFilenameResolver
-import com.simplefox.browser.mediacapture.MEDIA_CAPTURE_ENABLED_PREF
 import com.simplefox.browser.tabs.BrowserTab
 import com.simplefox.browser.profiles.WebProfiles
 import com.simplefox.browser.util.registeredDomain
@@ -116,12 +115,9 @@ internal fun MainActivity.buildRequestConfig(): org.json.JSONObject {
         .put("cache", prefs.getBoolean("data_saver_cache_first", false))
         .put("skip", skip)
     return org.json.JSONObject()
-        .put("media", prefs.getBoolean(MEDIA_CAPTURE_ENABLED_PREF, true))
         .put("dnt", isDoNotTrackActive())
         .put("ds", dataSaver)
 }
-
-internal fun MainActivity.installServiceWorkerMediaCapture() {}
 
 internal fun MainActivity.buildDesktopHeaders(): Map<String, String>? = null
 

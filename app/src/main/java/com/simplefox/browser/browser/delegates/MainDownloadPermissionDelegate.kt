@@ -8,7 +8,7 @@ import android.os.Build
 import android.os.PowerManager
 import android.provider.Settings
 import androidx.core.content.ContextCompat
-import androidx.documentfile.provider.DocumentFile
+import com.simplefox.browser.util.DocumentFile
 import androidx.preference.PreferenceManager
 import com.simplefox.browser.R
 import com.simplefox.browser.browser.MainActivity

@@ -33,6 +33,7 @@ import com.simplefox.browser.ui.foundation.LinearProgressIndicator
 import com.simplefox.browser.ui.foundation.Text
 import com.simplefox.browser.ui.foundation.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -140,6 +141,14 @@ fun BackupRestorePane(activity: SettingsActivity) {
     val hideSystemNavigation = remember { PreferenceManager.getDefaultSharedPreferences(activity).getBoolean("hide_system_navigation", false) }
     val uiState = remember { BackupRestoreUiState(hideStatusBar, hideSystemNavigation) }
 
+    // Leaving this page mid-restore must not leave the picked file or its decrypted copy in the cache.
+    DisposableEffect(Unit) {
+        onDispose {
+            uiState.stagedFile.value?.let { RestoreManager.discard(it) }
+            uiState.plainZipFile.value?.let { RestoreManager.discardPlain(it) }
+        }
+    }
+
     var simpleDialog by remember { mutableStateOf<ConfirmDialogConfig?>(null) }
 
     val okLabel = stringResource(R.string.backup_generic_ok)
@@ -226,6 +235,7 @@ fun BackupRestorePane(activity: SettingsActivity) {
                     cancelable = false
                 )
             }.onFailure {
+                uiState.plainZipFile.value?.let { RestoreManager.discardPlain(it) }
                 uiState.stage.value = BackupRestoreStage.IDLE
                 simpleDialog = ConfirmDialogConfig(
                     title = restoreResultErrorTitle,

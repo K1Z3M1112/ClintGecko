@@ -4,11 +4,11 @@ import android.content.Context
 
 object WebsiteBlockerWebIntegration {
     fun initialize(context: Context) {
-        WebsiteBlockerEngine.activate(context)
+        WebsiteBlockerEngine.activateAsync(context)
     }
 
     fun onCompileComplete(context: Context) {
-        WebsiteBlockerEngine.activate(context)
+        WebsiteBlockerEngine.activateAsync(context)
     }
 
     fun isHostBlocked(host: String?): Boolean {

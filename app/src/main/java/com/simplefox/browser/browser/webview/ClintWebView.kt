@@ -180,7 +180,6 @@ class ClintWebView(
             val top = runCatching { port.sender.isTopLevel }.getOrDefault(false)
             ports.add(port)
             if (audioState.muted) port.postMessage(muteMessage(true))
-            if (webViewClient?.isMediaCaptureEnabled() == true) port.postMessage(mediaScanMessage(false))
             port.setDelegate(object : WebExtension.PortDelegate {
                 override fun onPortMessage(message: Any, port: WebExtension.Port) {}
                 override fun onDisconnect(port: WebExtension.Port) {
@@ -202,10 +201,6 @@ class ClintWebView(
                 "call" -> handleCall(msg)
                 "evalRes" -> {
                     pendingEval.remove(msg.optString("id"))?.invoke(msg.optString("v"))
-                    null
-                }
-                "media" -> {
-                    webViewClient?.onPageMediaFound(msg)
                     null
                 }
                 "nonce" -> {
@@ -259,14 +254,6 @@ class ClintWebView(
 
     private fun muteMessage(muted: Boolean): JSONObject =
         JSONObject().put("k", "eval").put("code", TabMediaControl.muteScript(muted)).put("id", "")
-
-    private fun mediaScanMessage(full: Boolean): JSONObject =
-        JSONObject().put("k", "mediaScan").put("full", full)
-
-    fun rescanMedia() {
-        val message = mediaScanMessage(true)
-        ArrayList(ports).forEach { runCatching { it.postMessage(message) } }
-    }
 
     fun setAudioMuted(muted: Boolean) {
         audioState.muted = muted
@@ -505,6 +492,11 @@ class ClintWebView(
         session.settings.viewportMode =
             if (enabled) GeckoSessionSettings.VIEWPORT_MODE_DESKTOP else GeckoSessionSettings.VIEWPORT_MODE_MOBILE
     }
+
+    /** True only when the page is really on screen and painted, so a capture will not return a blank/stale frame. */
+    val canCaptureThumbnail: Boolean
+        get() = !destroyed && session.isOpen && !sessionDeactivated && !paused &&
+            isAttachedToWindow && pagePainted && width > 0 && height > 0
 
     fun captureBitmap(callback: (Bitmap?) -> Unit) {
         val result = runCatching { geckoView.capturePixels() }.getOrNull()

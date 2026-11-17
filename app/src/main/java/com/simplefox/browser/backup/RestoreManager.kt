@@ -40,6 +40,9 @@ object RestoreManager {
 
     suspend fun stageFromUri(context: Context, uri: Uri): StageResult = withContext(Dispatchers.IO) {
         val appContext = context.applicationContext
+        // Earlier attempts that were abandoned (app killed, screen left, restore failed) can leave the picked
+        // file and a decrypted copy of the backup in the cache. Remove them before staging a new one.
+        appContext.cacheDir.listFiles { f -> f.name.startsWith("clint_restore_") }?.forEach { it.delete() }
         val tempRaw = File.createTempFile("clint_restore_", ".raw", appContext.cacheDir)
         try {
             appContext.contentResolver.openInputStream(uri)?.use { input ->

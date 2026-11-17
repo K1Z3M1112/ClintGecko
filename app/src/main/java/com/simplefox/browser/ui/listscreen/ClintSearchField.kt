@@ -38,7 +38,7 @@ fun RowScope.ClintSearchField(
     val colors = LocalClintColors.current
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusRequester = remember { FocusRequester() }
-    val state = rememberSyncedTextFieldState(query, onQueryChange)
+    val state = rememberSyncedTextFieldState(query, onQueryChange, debounceMs = 120L)
 
     LaunchedEffect(Unit) {
         if (autoFocus) {

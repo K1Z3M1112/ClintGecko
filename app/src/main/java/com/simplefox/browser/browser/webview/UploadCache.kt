@@ -40,7 +40,7 @@ internal object UploadCache {
         }.getOrNull()
         var name = (queried ?: uri.lastPathSegment ?: "")
             .substringAfterLast('/')
-            .replace(Regex("[\\\\:*?\"<>|\\u0000-\\u001f]"), "_")
+            .replace(UPLOAD_NAME_ILLEGAL_REGEX, "_")
             .trim()
             .trimStart('.')
         if (name.isEmpty()) name = "upload"
@@ -57,3 +57,5 @@ internal object UploadCache {
         root.listFiles()?.forEach { if (it.lastModified() < cutoff) it.deleteRecursively() }
     }
 }
+
+private val UPLOAD_NAME_ILLEGAL_REGEX = Regex("[\\\\:*?\"<>|\\u0000-\\u001f]")

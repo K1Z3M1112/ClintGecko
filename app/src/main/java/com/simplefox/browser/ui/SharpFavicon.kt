@@ -30,6 +30,13 @@ object SharpFavicon {
 
     fun cached(pageUrl: String): Bitmap? = originOf(pageUrl)?.let { memory.get(it) }
 
+    fun trimMemory(level: Int) {
+        when {
+            level >= 40 || level == 15 -> memory.evictAll()
+            level >= 10 -> memory.trimToSize(memory.maxSize() / 2)
+        }
+    }
+
     suspend fun load(context: Context, pageUrl: String): Bitmap? {
         val origin = originOf(pageUrl) ?: return null
         memory.get(origin)?.let { return it }

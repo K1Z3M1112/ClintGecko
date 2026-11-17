@@ -74,6 +74,7 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.layout.LocalPinnableContainer
+import androidx.compose.ui.layout.findRootCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.LocalDensity
@@ -268,8 +269,12 @@ fun TabMenuScreen(activity: MainActivity, onDismiss: () -> Unit) {
     }
 
     fun syncFromManager() {
-        tabs.clear(); tabs.addAll(tabManager.previews())
-        groups.clear(); groups.addAll(tabManager.groups)
+        // Skip the rewrite when nothing changed: the first sync right after opening used to clear and refill the
+        // whole list, which rebuilt the grid a second time on the opening frames.
+        val freshTabs = tabManager.previews()
+        if (freshTabs != tabs.toList()) { tabs.clear(); tabs.addAll(freshTabs) }
+        val freshGroups = tabManager.groups
+        if (freshGroups != groups.toList()) { groups.clear(); groups.addAll(freshGroups) }
         activeTabId = tabManager.activeTab?.id
         uiState.retainExisting(tabs.map { it.id })
         if (uiState.selectionMode && uiState.selectedIds.isEmpty() && tabs.isEmpty()) uiState.exitSelectionMode()
@@ -657,7 +662,7 @@ fun TabMenuScreen(activity: MainActivity, onDismiss: () -> Unit) {
             onMove: () -> Unit,
             onDrop: () -> Unit,
             onLongPress: () -> Unit
-        ): Modifier = onGloballyPositioned { dragState.handleOrigins[originKey] = it.positionInRoot() }
+        ): Modifier = onGloballyPositioned { dragState.registerHandle(originKey, it) }
             .pointerInput(originKey) {
                 var touchStart = Offset.Zero
                 var pending = Offset.Zero
@@ -801,6 +806,15 @@ fun TabMenuScreen(activity: MainActivity, onDismiss: () -> Unit) {
             }
         }
 
+        DisposableEffect(Unit) {
+            activity.uiState.tabMenuOpen = true
+            onDispose {
+                activity.uiState.tabMenuOpen = false
+                activity.uiState.tabMenuBottomBarPx = 0
+            }
+        }
+        LaunchedEffect(buttonsAtBottom) { if (!buttonsAtBottom) activity.uiState.tabMenuBottomBarPx = 0 }
+
         Column(Modifier.fillMaxSize()) {
             if (!buttonsAtBottom) {
                 topBar()
@@ -850,12 +864,15 @@ fun TabMenuScreen(activity: MainActivity, onDismiss: () -> Unit) {
                                             val pinHandle = if (isDraggingGroup) pinnableContainer?.pin() else null
                                             onDispose { pinHandle?.release() }
                                         }
-                                        val headerAlpha by animateFloatAsState(if (isDraggingGroup) 0.25f else 1f, label = "groupGhostAlpha")
+                                        val headerAlpha = animateFloatAsState(if (isDraggingGroup) 0.25f else 1f, label = "groupGhostAlpha")
+                                        val groupHighlighted by remember(group.id) {
+                                            derivedStateOf { dragState.draggingId != null && dropTargetGroupId(dragState.hoverKey) == group.id }
+                                        }
                                         TabGroupHeader(
                                             group = group,
                                             tabs = item.tabs,
                                             containsActive = groupTabIds.contains(activeTabId),
-                                            highlighted = dragState.draggingId != null && dropTargetGroupId(dragState.hoverKey) == group.id,
+                                            highlighted = groupHighlighted,
                                             selectionMode = uiState.selectionMode,
                                             allSelected = groupTabIds.isNotEmpty() && groupTabIds.all { uiState.selectedIds.contains(it) },
                                             onToggleCollapsed = { toggleCollapsed(group) },
@@ -875,9 +892,9 @@ fun TabMenuScreen(activity: MainActivity, onDismiss: () -> Unit) {
                                             },
                                             modifier = Modifier
                                                 .padding(top = 6.dp, bottom = if (group.collapsed) 6.dp else 0.dp)
-                                                .alpha(headerAlpha),
+                                                .graphicsLayer { alpha = headerAlpha.value },
                                             dragHandleModifier = if (searching) null else Modifier
-                                                .onGloballyPositioned { dragState.handleOrigins[groupHeaderKey(group.id)] = it.positionInRoot() }
+                                                .onGloballyPositioned { dragState.registerHandle(groupHeaderKey(group.id), it) }
                                                 .pointerInput(group.id) {
                                                     detectDragGestures(
                                                         onDragStart = { offset -> dragState.startGroup(group.id, offset) },
@@ -928,12 +945,16 @@ fun TabMenuScreen(activity: MainActivity, onDismiss: () -> Unit) {
                                             val pinHandle = if (isDragging) pinnableContainer?.pin() else null
                                             onDispose { pinHandle?.release() }
                                         }
-                                        val ghostAlpha by animateFloatAsState(if (isDragging) 0.25f else 1f, label = "ghostAlpha")
-                                        val mergeHighlighted = draggingPreview != null &&
-                                            mergeTargetTabId(dragState.hoverKey) == preview.id &&
-                                            canMergeTabs(draggingPreview, preview)
+                                        val ghostAlpha = animateFloatAsState(if (isDragging) 0.25f else 1f, label = "ghostAlpha")
+                                        val mergeHighlighted by remember(preview, draggingPreview) {
+                                            derivedStateOf {
+                                                draggingPreview != null &&
+                                                    mergeTargetTabId(dragState.hoverKey) == preview.id &&
+                                                    canMergeTabs(draggingPreview, preview)
+                                            }
+                                        }
                                         val handleModifier = Modifier
-                                            .onGloballyPositioned { dragState.handleOrigins[preview.id] = it.positionInRoot() }
+                                            .onGloballyPositioned { dragState.registerHandle(preview.id, it) }
                                             .pointerInput(preview.id) {
                                                 detectDragGestures(
                                                     onDragStart = { offset -> dragState.start(preview.id, offset) },
@@ -980,11 +1001,14 @@ fun TabMenuScreen(activity: MainActivity, onDismiss: () -> Unit) {
                                                         mergeHighlighted = mergeHighlighted,
                                                         showDragHandle = !searching,
                                                         longPressDragModifier = cardDragModifier,
-                                                        modifier = Modifier.alpha(ghostAlpha)
+                                                        modifier = Modifier.graphicsLayer { alpha = ghostAlpha.value }
                                                     )
                                                 } else {
                                                     val thumbnail by produceState(TabThumbnailCache.peek(preview.id), preview.id) {
                                                         if (value == null) value = withContext(Dispatchers.IO) { TabThumbnailCache.get(activity, preview.id) }
+                                                        TabThumbnailCache.updates.collect { updatedId ->
+                                                            if (updatedId == preview.id) value = TabThumbnailCache.peek(preview.id) ?: value
+                                                        }
                                                     }
                                                     TabMenuCard(
                                                         preview = preview,
@@ -1001,7 +1025,7 @@ fun TabMenuScreen(activity: MainActivity, onDismiss: () -> Unit) {
                                                         mergeHighlighted = mergeHighlighted,
                                                         showDragHandle = !searching,
                                                         longPressDragModifier = cardDragModifier,
-                                                        modifier = Modifier.alpha(ghostAlpha)
+                                                        modifier = Modifier.graphicsLayer { alpha = ghostAlpha.value }
                                                     )
                                                 }
                                             }
@@ -1014,14 +1038,12 @@ fun TabMenuScreen(activity: MainActivity, onDismiss: () -> Unit) {
 
                     val draggedPreview = draggingPreview
                     if (draggedPreview != null) {
-                        val offsetX = with(density) { (dragState.originOffset.x + dragState.dragOffset.x).toDp() }
-                        val offsetY = with(density) { (dragState.originOffset.y + dragState.dragOffset.y).toDp() }
                         val cardWidth = with(density) { dragState.originSize.width.toDp() }
                         val cardHeight = with(density) { dragState.originSize.height.toDp() }
                         val liftScale by animateFloatAsState(1.06f, animationSpec = spring(dampingRatio = 0.5f), label = "dragLiftScale")
                         Box(
                             Modifier
-                                .offset(x = offsetX, y = offsetY)
+                                .offset { androidx.compose.ui.unit.IntOffset((dragState.originOffset.x + dragState.dragOffset.x).toInt(), (dragState.originOffset.y + dragState.dragOffset.y).toInt()) }
                                 .size(cardWidth, cardHeight)
                                 .padding(CellPadding)
                                 .graphicsLayer { scaleX = liftScale; scaleY = liftScale }
@@ -1043,6 +1065,9 @@ fun TabMenuScreen(activity: MainActivity, onDismiss: () -> Unit) {
                             } else {
                                 val thumbnail by produceState(TabThumbnailCache.peek(draggedPreview.id), draggedPreview.id) {
                                     if (value == null) value = withContext(Dispatchers.IO) { TabThumbnailCache.get(activity, draggedPreview.id) }
+                                    TabThumbnailCache.updates.collect { updatedId ->
+                                        if (updatedId == draggedPreview.id) value = TabThumbnailCache.peek(draggedPreview.id) ?: value
+                                    }
                                 }
                                 TabMenuCard(
                                     preview = draggedPreview,
@@ -1063,13 +1088,11 @@ fun TabMenuScreen(activity: MainActivity, onDismiss: () -> Unit) {
                     val draggedGroup = dragState.draggingGroupId?.let { id -> groups.find { it.id == id } }
                     if (draggedGroup != null) {
                         val members = tabs.filter { it.groupId == draggedGroup.id }
-                        val offsetX = with(density) { (dragState.originOffset.x + dragState.dragOffset.x).toDp() }
-                        val offsetY = with(density) { (dragState.originOffset.y + dragState.dragOffset.y).toDp() }
                         val headerWidth = with(density) { dragState.originSize.width.toDp() }
                         val liftScale by animateFloatAsState(1.03f, animationSpec = spring(dampingRatio = 0.5f), label = "groupDragLiftScale")
                         Box(
                             Modifier
-                                .offset(x = offsetX, y = offsetY)
+                                .offset { androidx.compose.ui.unit.IntOffset((dragState.originOffset.x + dragState.dragOffset.x).toInt(), (dragState.originOffset.y + dragState.dragOffset.y).toInt()) }
                                 .width(headerWidth)
                                 .padding(vertical = 6.dp)
                                 .graphicsLayer { scaleX = liftScale; scaleY = liftScale }
@@ -1122,8 +1145,15 @@ fun TabMenuScreen(activity: MainActivity, onDismiss: () -> Unit) {
             }
 
             if (buttonsAtBottom) {
-                quickActions()
-                topBar()
+                Column(
+                    Modifier.fillMaxWidth().onGloballyPositioned { coords ->
+                        val rootHeight = coords.findRootCoordinates().size.height
+                        activity.uiState.tabMenuBottomBarPx = (rootHeight - coords.positionInRoot().y).toInt()
+                    }
+                ) {
+                    quickActions()
+                    topBar()
+                }
             }
         }
     }

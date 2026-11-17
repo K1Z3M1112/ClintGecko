@@ -3,6 +3,7 @@ package com.simplefox.browser.ui
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.runtime.Composable
+import kotlinx.coroutines.flow.debounce
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -11,13 +12,15 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 
+@OptIn(kotlinx.coroutines.FlowPreview::class)
 @Composable
-fun rememberSyncedTextFieldState(value: String, onValueChange: (String) -> Unit): TextFieldState {
+fun rememberSyncedTextFieldState(value: String, onValueChange: (String) -> Unit, debounceMs: Long = 0L): TextFieldState {
     val state = remember { TextFieldState(value) }
     val currentOnValueChange by rememberUpdatedState(onValueChange)
     var synced by remember { mutableStateOf(value) }
     LaunchedEffect(state) {
-        snapshotFlow { state.text.toString() }.collect { text ->
+        val texts = snapshotFlow { state.text.toString() }
+        (if (debounceMs > 0L) texts.debounce(debounceMs) else texts).collect { text ->
             if (text != synced) {
                 synced = text
                 currentOnValueChange(text)

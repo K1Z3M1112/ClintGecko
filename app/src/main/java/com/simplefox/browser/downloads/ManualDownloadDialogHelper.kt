@@ -2,7 +2,7 @@ package com.simplefox.browser.downloads
 
 import android.content.Intent
 import android.net.Uri
-import androidx.documentfile.provider.DocumentFile
+import com.simplefox.browser.util.DocumentFile
 import androidx.preference.PreferenceManager
 import com.simplefox.browser.R
 import com.simplefox.browser.browser.delegates.PREF_BATTERY_OPT_ASKED

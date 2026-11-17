@@ -1,5 +1,6 @@
 package com.simplefox.browser.browser.webview
 
+import android.app.ActivityManager
 import android.content.Context
 import android.os.Build
 import android.os.Handler
@@ -44,9 +45,6 @@ object ClintGecko {
     private const val TRIM_DEBOUNCE_MS = 5000L
     private const val COOKIE_OP_TIMEOUT_MS = 8000L
     private const val UNSIGNED_INSTALL_TIMEOUT_MS = 30000L
-    private const val MAX_QUEUED_OBSERVATION_TABS = 16
-    private const val MAX_QUEUED_OBSERVATIONS = 48
-    private const val OBSERVATION_BIND_GRACE_MS = 4000L
     const val PREF_WEBSITE_ISOLATION = "website_isolation_enabled"
     const val DEFAULT_WEBSITE_ISOLATION = false
 
@@ -74,7 +72,6 @@ object ClintGecko {
     private val pendingNonces = ConcurrentHashMap<String, WeakReference<ClintWebView>>()
     private val pendingTabs = ConcurrentHashMap<String, Pair<Int, String>>()
     private val tabByExt = ConcurrentHashMap<Int, WeakReference<ClintWebView>>()
-    private val queuedObservations = LinkedHashMap<Int, MutableList<JSONObject>>()
     private val storeByProfile = ConcurrentHashMap<String, String>()
     private val cookieWaiters = ConcurrentHashMap<Int, (String) -> Unit>()
     private val cookieSeq = AtomicInteger()
@@ -217,20 +214,6 @@ object ClintGecko {
         "network.http.speculative-parallel-limit.enabled" to true
     )
 
-    private val speedInts = mapOf(
-        "network.http.speculative-parallel-limit" to 6,
-        "network.http.max-persistent-connections-per-server" to 10,
-        "network.http.max-connections" to 900,
-        "network.dnsCacheEntries" to 800,
-        "network.dnsCacheExpiration" to 300,
-        "network.dnsCacheExpirationGracePeriod" to 120,
-        "network.buffer.cache.count" to 128,
-        "network.buffer.cache.size" to 32768,
-        "browser.cache.disk.capacity" to 262144,
-        "browser.cache.memory.capacity" to 32768,
-        "image.cache.size" to 10485760,
-        "image.mem.surfacecache.max_size_kb" to 65536
-    )
 
     private val securityBooleans = mapOf(
         "network.IDN_show_punycode" to true,
@@ -250,7 +233,30 @@ object ClintGecko {
         speedBooleans.forEach { (pref, value) ->
             runCatching { GeckoPreferenceController.setGeckoPref(pref, value, GeckoPreferenceController.PREF_BRANCH_USER) }
         }
-        speedInts.forEach { (pref, value) ->
+
+        // Gecko's image and connection caches can otherwise reserve far more memory than
+        // a mid-range phone needs. Use Android's normal memory class, not largeMemoryClass,
+        // so the browser remains a good multitasking citizen even when largeHeap is enabled.
+        val memoryClassMb = runCatching {
+            (appContext.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager).memoryClass
+        }.getOrDefault(256)
+        val lowMemory = memoryClassMb <= 256
+        val mediumMemory = memoryClassMb in 257..383
+        val values = mapOf(
+            "network.http.speculative-parallel-limit" to when { lowMemory -> 4; mediumMemory -> 5; else -> 6 },
+            "network.http.max-persistent-connections-per-server" to 8,
+            "network.http.max-connections" to when { lowMemory -> 256; mediumMemory -> 384; else -> 512 },
+            "network.dnsCacheEntries" to when { lowMemory -> 300; mediumMemory -> 500; else -> 700 },
+            "network.dnsCacheExpiration" to 300,
+            "network.dnsCacheExpirationGracePeriod" to 120,
+            "network.buffer.cache.count" to when { lowMemory -> 64; mediumMemory -> 96; else -> 128 },
+            "network.buffer.cache.size" to when { lowMemory -> 16384; mediumMemory -> 24576; else -> 32768 },
+            "browser.cache.disk.capacity" to 262144,
+            "browser.cache.memory.capacity" to when { lowMemory -> 8192; mediumMemory -> 16384; else -> 24576 },
+            "image.cache.size" to when { lowMemory -> 4194304; mediumMemory -> 6291456; else -> 8388608 },
+            "image.mem.surfacecache.max_size_kb" to when { lowMemory -> 32768; mediumMemory -> 49152; else -> 65536 }
+        )
+        values.forEach { (pref, value) ->
             runCatching { GeckoPreferenceController.setGeckoPref(pref, value, GeckoPreferenceController.PREF_BRANCH_USER) }
         }
     }
@@ -311,10 +317,6 @@ object ClintGecko {
         override fun onMessage(nativeApp: String, message: Any, sender: WebExtension.MessageSender): GeckoResult<Any>? {
             val msg = message as? JSONObject ?: return null
             return when (msg.optString("k")) {
-                "obs" -> {
-                    handleObservation(msg)
-                    null
-                }
                 "tab" -> {
                     onTabInfo(msg.optString("n"), msg.optInt("tabId", -1), msg.optString("storeId"))
                     null
@@ -415,85 +417,11 @@ object ClintGecko {
 
     private fun bindTab(tabId: Int, storeId: String, view: ClintWebView) {
         if (tabId >= 0) {
-            val queued = synchronized(queuedObservations) {
-                tabByExt[tabId] = WeakReference(view)
-                queuedObservations.remove(tabId)
-            }
-            queued?.forEach { handleObservation(it) }
+            tabByExt[tabId] = WeakReference(view)
         }
         if (storeId.isNotEmpty()) {
             view.cookieStoreId = storeId
             storeByProfile[view.profileId ?: ""] = storeId
-        }
-    }
-
-    private fun viewForPage(pageUrl: String): ClintWebView? {
-        if (pageUrl.isEmpty()) return null
-        val matches = synchronized(views) {
-            views.values.mapNotNull { ref -> ref.get()?.takeIf { it.url == pageUrl || it.rawUrl == pageUrl } }
-        }
-        val foreground = foregroundView?.get()
-        return matches.firstOrNull { it === foreground } ?: matches.singleOrNull()
-    }
-
-    private fun siteOf(url: String?): String? =
-        url?.toHttpUrlOrNull()?.let { it.topPrivateDomain() ?: it.host }
-
-    private fun viewForSite(pageUrl: String): ClintWebView? {
-        viewForPage(pageUrl)?.let { return it }
-        val site = siteOf(pageUrl) ?: return null
-        return foregroundView?.get()?.takeIf { siteOf(it.url) == site }
-    }
-
-    private fun resolveObservation(msg: JSONObject): ClintWebView? {
-        val tabId = msg.optInt("tab", -1)
-        if (tabId < 0) return viewForSite(msg.optString("page"))
-        synchronized(queuedObservations) {
-            tabByExt[tabId]?.get()?.let { return it }
-            val queue = queuedObservations[tabId]
-            if (queue != null) {
-                if (queue.size < MAX_QUEUED_OBSERVATIONS) queue.add(msg)
-                return null
-            }
-            if (queuedObservations.size >= MAX_QUEUED_OBSERVATION_TABS) {
-                queuedObservations.remove(queuedObservations.keys.first())
-            }
-            queuedObservations[tabId] = mutableListOf(msg)
-        }
-        main.postDelayed({ releaseQueuedObservations(tabId) }, OBSERVATION_BIND_GRACE_MS)
-        return null
-    }
-
-    private fun releaseQueuedObservations(tabId: Int) {
-        val queued = synchronized(queuedObservations) { queuedObservations.remove(tabId) } ?: return
-        io.execute {
-            queued.forEach { msg ->
-                runCatching {
-                    val view = tabByExt[tabId]?.get() ?: viewForPage(msg.optString("page"))
-                    if (view != null) deliverObservation(view, msg)
-                }
-            }
-        }
-    }
-
-    private fun deliverObservation(view: ClintWebView, msg: JSONObject) {
-        val client = view.webViewClient ?: return
-        val headers = LinkedHashMap<String, String>()
-        msg.optJSONObject("h")?.let { h -> h.keys().forEach { k -> headers[k] = h.optString(k) } }
-        val request = ClintRequest.fromExtension(
-            msg.optString("u"),
-            msg.optString("mt", "GET"),
-            msg.optString("t", "other"),
-            headers,
-            msg.optString("ct").takeIf { it.isNotBlank() }
-        )
-        val page = msg.optString("page").takeIf { it.isNotEmpty() && msg.optInt("tab", -1) >= 0 }
-        client.onMediaObserved(request, page)
-    }
-
-    private fun handleObservation(msg: JSONObject) {
-        io.execute {
-            runCatching { resolveObservation(msg)?.let { deliverObservation(it, msg) } }
         }
     }
 
@@ -575,8 +503,7 @@ object ClintGecko {
 
     private fun loadRuntime(): String =
         runtimeJs ?: (
-            appContext.assets.open("JavaScript/clint_runtime.js").bufferedReader().use { it.readText() } + "\n" +
-                appContext.assets.open("JavaScript/media_scanner.js").bufferedReader().use { it.readText() }
+            appContext.assets.open("JavaScript/clint_runtime.js").bufferedReader().use { it.readText() }
             ).also { runtimeJs = it }
 
     private fun buildBundle(): String {

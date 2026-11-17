@@ -36,6 +36,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import com.simplefox.browser.tabs.TabMenuScreen
 import androidx.compose.ui.Alignment
@@ -65,16 +66,34 @@ internal fun MainScreen(activity: MainActivity, state: MainUiState) {
     val hideSystemNavigation = state.hideSystemNavigation
     val rawStatusBarPx = WindowInsets.statusBars.getTop(density)
     val rawNavBarPx = WindowInsets.navigationBars.getBottom(density)
-    val rawImePx = WindowInsets.ime.getBottom(density)
     @OptIn(ExperimentalLayoutApi::class)
     val imeTargetPx = WindowInsets.imeAnimationTarget.getBottom(density)
 
     LaunchedEffect(rawStatusBarPx) {
         if (rawStatusBarPx > 0) state.cachedStatusBarInsetPx = rawStatusBarPx
     }
-    LaunchedEffect(imeTargetPx, state.searchOverlayOpen) {
-        state.imeInsetPx = if (state.searchOverlayOpen) 0 else imeTargetPx
-        activity.updateMainContentInsets()
+    // While the search overlay is open, and for a moment after it closes, the keyboard height must not become the
+    // web view's bottom padding: that relayouts the page twice (up, then back down) while the keyboard animates.
+    // A plain holder is used on purpose; a state flag here would recompose all of MainScreen on open and close.
+    val suppressIme = remember { booleanArrayOf(false) }
+    val latestImeTargetPx by rememberUpdatedState(imeTargetPx)
+    LaunchedEffect(imeTargetPx) {
+        if (!state.searchOverlayOpen && !suppressIme[0]) {
+            state.imeInsetPx = imeTargetPx
+            activity.updateMainContentInsets()
+        }
+    }
+    LaunchedEffect(state.searchOverlayOpen) {
+        if (state.searchOverlayOpen) {
+            suppressIme[0] = true
+            state.imeInsetPx = 0
+            activity.updateMainContentInsets()
+        } else if (suppressIme[0]) {
+            kotlinx.coroutines.delay(350)
+            suppressIme[0] = false
+            state.imeInsetPx = latestImeTargetPx
+            activity.updateMainContentInsets()
+        }
     }
     LaunchedEffect(rawNavBarPx) {
         if (rawNavBarPx > 0) state.navBarInsetPx = rawNavBarPx
@@ -95,12 +114,25 @@ internal fun MainScreen(activity: MainActivity, state: MainUiState) {
         activity.updateMainContentInsets()
     }
 
+    // The tab switcher is opaque, but the live GeckoView underneath kept rendering and being composited on every
+    // frame while the grid scrolled. Hide it once the switcher has finished fading in, show it again right away.
+    var webViewHidden by remember { mutableStateOf(false) }
+    LaunchedEffect(tabSwitcherOpen) {
+        if (tabSwitcherOpen) {
+            kotlinx.coroutines.delay(260)
+            webViewHidden = true
+        } else {
+            webViewHidden = false
+        }
+    }
+
     Box(modifier = Modifier.fillMaxSize().background(colors.surface)) {
 
         AndroidView(
             factory = { activity.swipeRefreshView },
             modifier = Modifier.fillMaxSize(),
             update = { view ->
+                view.visibility = if (webViewHidden) android.view.View.INVISIBLE else android.view.View.VISIBLE
                 view.setPadding(0, state.contentPaddingTopPx, 0, if (state.isFullscreen) 0 else maxOf(state.contentPaddingBottomPx, state.imeInsetPx))
             }
         )
@@ -119,8 +151,8 @@ internal fun MainScreen(activity: MainActivity, state: MainUiState) {
         }
 
         val openTabSwitcher: () -> Unit = {
-            activity.captureActiveTabThumbnail()
-            tabSwitcherOpen = true
+            com.simplefox.browser.tabs.TabThumbnailCache.preload(activity, activity.tabManager.tabs.map { it.id })
+            activity.captureActiveTabThen { tabSwitcherOpen = true }
         }
         val openTabGroup: (String) -> Unit = { groupId ->
             state.tabMenuFocusGroupId = groupId
@@ -156,7 +188,7 @@ internal fun MainScreen(activity: MainActivity, state: MainUiState) {
             BottomToolbar(
                 activity = activity,
                 state = state,
-                bottomPaddingPx = maxOf(rawImePx, effectiveNavBarPx),
+                bottomPaddingPx = effectiveNavBarPx,
                 onTabCountClick = openTabSwitcher,
                 onOpenTabGroup = openTabGroup,
                 showTabStrip = !tabStripAtTop,
@@ -205,19 +237,16 @@ internal fun MainScreen(activity: MainActivity, state: MainUiState) {
 
         AnimatedVisibility(
             visible = state.searchOverlayOpen,
-            enter = fadeIn(tween(200)) + expandVertically(
-                animationSpec = tween(300),
-                expandFrom = if (state.searchOverlayIsBottom) Alignment.Bottom else Alignment.Top
-            ),
-            exit = fadeOut(tween(150)) + shrinkVertically(
-                animationSpec = tween(250),
-                shrinkTowards = if (state.searchOverlayIsBottom) Alignment.Bottom else Alignment.Top
-            ),
-            modifier = Modifier.align(if (state.searchOverlayIsBottom) Alignment.BottomStart else Alignment.TopStart)
+            // Fade only: expand/shrink re-measures the whole overlay every frame while the keyboard is also animating.
+            enter = fadeIn(tween(150)),
+            exit = fadeOut(tween(100)),
+            // The field is always at the top while typing, whichever bar was tapped, so the keyboard never pushes it around.
+            modifier = Modifier.align(Alignment.TopStart)
         ) {
             SearchOverlay(
-                initialText = state.searchQuery,
-                isBottom = state.searchOverlayIsBottom,
+                // Read once per open. Observing it would recompose this whole scope on every keystroke.
+                initialText = remember { androidx.compose.runtime.snapshots.Snapshot.withoutReadObservation { state.searchQuery } },
+                isBottom = false,
                 hint = stringResource(
                     R.string.search_bar_hint,
                     engineDisplayName(
@@ -421,11 +450,9 @@ private fun TopToolbar(
             addressBarText = state.addressBarTextTop,
             isSecure = state.addressBarSecureTop,
             tabCountText = state.tabCountText,
-            isMediaCaptureEnabled = state.isMediaCaptureEnabled,
             activeTabId = state.activeTabId,
             onAddressBarClick = { activity.openSearchOverlay(isBottom = false) },
             onTabCountClick = onTabCountClick,
-            onMediaCaptureClick = { activity.mountMediaCaptureDialog() },
             showHomeButton = state.showHomeButton,
             onHomeClick = { activity.navGoHome() },
             onSwipeTabChange = { direction -> activity.onSwipeTabChange(direction) },
@@ -576,6 +603,7 @@ private fun BottomToolbar(
 ) {
     val colors = LocalClintColors.current
     val density = LocalDensity.current
+    // The bar stays put when the keyboard opens (the keyboard just covers it), so nothing here depends on the IME.
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -598,11 +626,9 @@ private fun BottomToolbar(
             addressBarText = state.addressBarTextBottom,
             isSecure = state.addressBarSecureBottom,
             tabCountText = state.tabCountText,
-            isMediaCaptureEnabled = state.isMediaCaptureEnabled,
             activeTabId = state.activeTabId,
             onAddressBarClick = { activity.openSearchOverlay(isBottom = true) },
             onTabCountClick = onTabCountClick,
-            onMediaCaptureClick = { activity.mountMediaCaptureDialog() },
             showHomeButton = state.showHomeButton,
             onHomeClick = { activity.navGoHome() },
             onSwipeTabChange = { direction -> activity.onSwipeTabChange(direction) },

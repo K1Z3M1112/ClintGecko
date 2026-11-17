@@ -293,7 +293,6 @@ class MainActivity : ClintActivity(), OverlayHostActivity, SnackbarHostActivity,
             "do_not_track" -> applyDoNotTrackSettings()
             com.simplefox.browser.browser.webview.ClintAutofill.PREF_AUTOFILL_ENABLED -> applyAutofillSettings()
             "custom_user_agent" -> applyUserAgent()
-            com.simplefox.browser.mediacapture.MEDIA_CAPTURE_ENABLED_PREF -> updateMediaCaptureEnabledState()
             "show_home_button" -> updateHomeButtonState()
             com.simplefox.browser.tabs.TabGroupPrefs.PREF_SHOW_GROUP_BAR, com.simplefox.browser.tabs.TabStripPrefs.PREF_SHOW_TAB_STRIP -> updateTabCount()
             com.simplefox.browser.tabs.TabGroupPrefs.PREF_TAB_GROUPS_ENABLED -> applyTabGroupsSetting()
@@ -312,7 +311,9 @@ class MainActivity : ClintActivity(), OverlayHostActivity, SnackbarHostActivity,
             }
         }
         onTranslationPrefChanged(key)
-        com.simplefox.browser.browser.webview.ClintGecko.pushConfig()
+        if (key == null || key == "do_not_track" || key.startsWith("data_saver_")) {
+            com.simplefox.browser.browser.webview.ClintGecko.pushConfig()
+        }
     }
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -342,7 +343,6 @@ class MainActivity : ClintActivity(), OverlayHostActivity, SnackbarHostActivity,
         syncBaseScripts()
         syncGlobalScripts()
         DataSaverMode.onActiveChanged = { applyDataSaverSettings() }
-        updateMediaCaptureEnabledState()
         updateHomeButtonState()
         updateTabBarPositions()
         setupTranslations()
@@ -356,14 +356,22 @@ class MainActivity : ClintActivity(), OverlayHostActivity, SnackbarHostActivity,
                 MainScreen(activity = this, state = uiState)
                 overlayContent?.invoke()
                 com.simplefox.browser.extensions.ExtensionHost()
-                ClintSnackbarHost(hostState = snackbarHostState)
+                ClintSnackbarHost(
+                    hostState = snackbarHostState,
+                    bottomBarVisiblePx = {
+                        when {
+                            uiState.tabMenuOpen -> uiState.tabMenuBottomBarPx
+                            uiState.isFullscreen -> 0
+                            else -> (uiState.bottomBarFullHeightPx * (1f - uiState.bottomBarFraction)).toInt()
+                        }
+                    }
+                )
             }
         }
 
         ClintDownloadManager.createNotificationChannel(this)
         ClintDownloadManager.init(this)
         initializeWebsiteBlockerEngine()
-        installServiceWorkerMediaCapture()
         createWebNotificationChannel()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
             ContextCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS)
@@ -517,6 +525,11 @@ class MainActivity : ClintActivity(), OverlayHostActivity, SnackbarHostActivity,
         enterVideoPictureInPicture()
     }
 
+    override fun onPause() {
+        super.onPause()
+        captureActiveTabThumbnail()
+    }
+
     override fun onStop() {
         super.onStop()
         recordBrowsingMode()
@@ -668,7 +681,24 @@ class MainActivity : ClintActivity(), OverlayHostActivity, SnackbarHostActivity,
         )
     }
 
-    fun onTabSelected(index: Int) { captureActiveTabThumbnail(); tabManager.switchTo(index); attachActiveWebView() }
+    private var pendingTabSwitchId: String? = null
+
+    /** Snapshots the tab being left first, then switches, so its preview shows the page as it was when you left it. */
+    fun onTabSelected(index: Int) {
+        val targetId = tabManager.tabs.getOrNull(index)?.id ?: return
+        val alreadyPending = pendingTabSwitchId != null
+        pendingTabSwitchId = targetId // a newer tap just retargets the switch that is already waiting
+        if (alreadyPending) return
+        captureActiveTabThen {
+            val id = pendingTabSwitchId
+            pendingTabSwitchId = null
+            val newIndex = tabManager.tabs.indexOfFirst { it.id == id }
+            if (newIndex != -1) {
+                tabManager.switchTo(newIndex)
+                attachActiveWebView()
+            }
+        }
+    }
     fun onSwipeTabChange(direction: Int): Boolean {
         // direction: 1 = swipe right (previous tab), -1 = swipe left (next tab).
         // Only moves through tabs of the current mode (normal / incognito); no wrap-around at the ends.
@@ -690,7 +720,6 @@ class MainActivity : ClintActivity(), OverlayHostActivity, SnackbarHostActivity,
             val index = tabManager.tabs.indexOfFirst { it.id == id }
             val tab = tabManager.tabs.getOrNull(index) ?: return@forEach
             removeDesktopScript(tab)
-            com.simplefox.browser.mediacapture.MediaCaptureStore.removeTab(tab.id)
             com.simplefox.browser.ui.FaviconCache.evict(this, tab.url)
             com.simplefox.browser.tabs.TabThumbnailCache.evict(this, tab.id)
             tabManager.closeTab(index)
@@ -701,7 +730,6 @@ class MainActivity : ClintActivity(), OverlayHostActivity, SnackbarHostActivity,
         val tab = tabManager.tabs.getOrNull(index)
         tab?.let {
             removeDesktopScript(it)
-            com.simplefox.browser.mediacapture.MediaCaptureStore.removeTab(it.id)
             if (!it.isIncognito) com.simplefox.browser.ui.FaviconCache.evict(this, it.url)
             com.simplefox.browser.tabs.TabThumbnailCache.evict(this, it.id)
         }
@@ -845,10 +873,6 @@ class MainActivity : ClintActivity(), OverlayHostActivity, SnackbarHostActivity,
     }
     fun onMenuOpenExtensionsSettings() {
         com.simplefox.browser.extensions.ExtensionsActivity.launch(this)
-    }
-    fun onMenuMediaCapture() {
-        val enabled = !prefs.getBoolean(com.simplefox.browser.mediacapture.MEDIA_CAPTURE_ENABLED_PREF, true)
-        prefs.edit().putBoolean(com.simplefox.browser.mediacapture.MEDIA_CAPTURE_ENABLED_PREF, enabled).apply()
     }
     fun onMenuDisableDataSaverForSite() {
         val tab = tabManager.activeTab ?: return

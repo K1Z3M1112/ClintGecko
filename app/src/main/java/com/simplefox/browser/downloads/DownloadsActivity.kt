@@ -21,7 +21,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.core.content.FileProvider
-import androidx.documentfile.provider.DocumentFile
+import com.simplefox.browser.util.DocumentFile
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager

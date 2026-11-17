@@ -4,7 +4,6 @@ import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.LockOpen
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Translate
-import androidx.compose.material.icons.filled.VideoLibrary
 import androidx.compose.material.icons.filled.VisibilityOff
 
 import com.simplefox.browser.ui.AnimatedContent
@@ -85,11 +84,9 @@ internal fun AddressBarRow(
     addressBarText: String,
     isSecure: Boolean,
     tabCountText: String,
-    isMediaCaptureEnabled: Boolean,
     activeTabId: String?,
     onAddressBarClick: () -> Unit,
     onTabCountClick: () -> Unit,
-    onMediaCaptureClick: () -> Unit,
     onSwipeTabChange: (Int) -> Boolean,
     onSiteInfoClick: () -> Unit = {},
     showHomeButton: Boolean = false,
@@ -100,10 +97,6 @@ internal fun AddressBarRow(
 ) {
     val colors = LocalClintColors.current
     val density = LocalDensity.current
-    val mediaCaptureCount = if (isMediaCaptureEnabled && activeTabId != null) {
-        val items by com.simplefox.browser.mediacapture.MediaCaptureStore.observe(activeTabId).collectAsState()
-        items.size
-    } else 0
     val addressBarHint = stringResource(
         R.string.search_bar_hint,
         engineDisplayName(
@@ -316,50 +309,6 @@ internal fun AddressBarRow(
                                 modifier = Modifier.size(20.dp)
                             )
                         }
-                    }
-                }
-            }
-        }
-        if (isMediaCaptureEnabled) {
-            Box(
-                modifier = Modifier
-                    .padding(start = 8.dp)
-                    .size(30.dp)
-            ) {
-                Box(
-                    contentAlignment = Alignment.Center,
-                    modifier = Modifier
-                        .matchParentSize()
-                        .clip(RoundedCornerShape(8.dp))
-                        .clickable(onClick = onMediaCaptureClick)
-                ) {
-                    Icon(
-                        imageVector = androidx.compose.material.icons.Icons.Filled.VideoLibrary,
-                        contentDescription = stringResource(R.string.menu_media_capture),
-                        tint = colors.iconTint,
-                        modifier = Modifier.size(20.dp)
-                    )
-                }
-                if (mediaCaptureCount > 0) {
-                    Box(
-                        contentAlignment = Alignment.Center,
-                        modifier = Modifier
-                            .align(Alignment.TopEnd)
-                            .offset(x = 2.dp, y = (-2).dp)
-                            .defaultMinSize(minWidth = 13.dp)
-                            .height(13.dp)
-                            .clip(RoundedCornerShape(6.5.dp))
-                            .background(colors.primary)
-                            .padding(horizontal = 3.dp)
-                    ) {
-                        Text(
-                            text = com.simplefox.browser.ui.status.formatCompactCount(mediaCaptureCount.toLong()),
-                            color = colors.onPrimary,
-                            fontSize = 9.sp,
-                            lineHeight = 9.sp,
-                            fontWeight = FontWeight.Medium,
-                            textAlign = TextAlign.Center
-                        )
                     }
                 }
             }
