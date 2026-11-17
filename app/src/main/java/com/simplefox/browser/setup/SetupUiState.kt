@@ -35,7 +35,6 @@ class SetupUiState(
     var customEngineName by mutableStateOf(initialCustomEngineName)
     var customEngineUrl by mutableStateOf(initialCustomEngineUrl)
 
-    var isDefaultBrowser by mutableStateOf(false)
 
     var confirmDialogConfig by mutableStateOf<com.simplefox.browser.ui.listscreen.ConfirmDialogConfig?>(null)
 

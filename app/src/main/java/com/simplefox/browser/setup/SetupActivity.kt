@@ -1,16 +1,10 @@
 package com.simplefox.browser.setup
 
-import android.app.role.RoleManager
 import androidx.activity.addCallback
 import android.content.Intent
-import android.content.pm.PackageManager
-import android.net.Uri
-import android.os.Build
 import android.os.Bundle
-import android.provider.Settings
 import android.widget.Toast
 import androidx.activity.compose.setContent
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -30,12 +24,6 @@ class SetupActivity : ClintActivity(), OverlayHostActivity {
     private lateinit var uiState: SetupUiState
 
     override var overlayContent by mutableStateOf<(@Composable () -> Unit)?>(null)
-
-    private val browserRoleLauncher = registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) {
-        refreshDefaultBrowserState()
-    }
 
     companion object {
         const val PRIVACY_POLICY_URL = "https://github.com/jhaiian/ClintGecko/blob/main/PRIVACY_POLICY.md"
@@ -105,16 +93,15 @@ class SetupActivity : ClintActivity(), OverlayHostActivity {
             initialAddressBarPosition = prefs.getString("address_bar_position", "bottom") ?: "bottom",
             initialScrollHideMode = prefs.getString("scroll_hide_mode", "off") ?: "off",
             initialHideStatusBar = hideStatusBar, initialHideSystemNavigation = hideSystemNavigation,
-            initialEngine = "duckduckgo",
-            initialCustomEngineName = "", initialCustomEngineUrl = ""
+            initialEngine = prefs.getString("search_engine", "duckduckgo") ?: "duckduckgo",
+            initialCustomEngineName = prefs.getString(com.simplefox.browser.browser.CustomSearchEngineNameKey, "") ?: "",
+            initialCustomEngineUrl = prefs.getString(com.simplefox.browser.browser.CustomSearchEngineUrlKey, "") ?: ""
         )
         uiState.consentChecked = consentChecked
-        if (uiState.currentPage == 5) refreshDefaultBrowserState()
 
         setContent {
           com.simplefox.browser.ui.theme.ClintComposeTheme(theme = uiState.theme) {
             SetupScreen(
-                activity = this,
                 state = uiState,
                 onPrivacyClick = {
                     DocumentViewer.show(this, getString(R.string.document_viewer_privacy_policy_title), DocumentViewer.PRIVACY_POLICY_URL)
@@ -146,14 +133,8 @@ class SetupActivity : ClintActivity(), OverlayHostActivity {
                     uiState.engine = "custom"
                 },
                 onContinueFromWelcome = { uiState.currentPage = 1 },
-                onSkipRestore = { uiState.currentPage = 2 },
-                onRestoreComplete = { restartAppAfterRestore() },
                 onNextFromLayoutPage = { onNextFromLayoutPage() },
-                onNextFromEnginePage = { onNextFromEnginePage() },
-                onSetDefaultBrowser = {
-                    if (uiState.isDefaultBrowser) saveAndProceed() else openDefaultBrowserPicker()
-                },
-                onSkipDefaultBrowser = { saveAndProceed() }
+                onNextFromEnginePage = { onNextFromEnginePage() }
             )
             com.simplefox.browser.ui.listscreen.ConfirmDialogHost(uiState.confirmDialogConfig, uiState.hideStatusBar, uiState.hideSystemNavigation) { uiState.confirmDialogConfig = null }
             overlayContent?.invoke()
@@ -161,44 +142,8 @@ class SetupActivity : ClintActivity(), OverlayHostActivity {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        if (::uiState.isInitialized && uiState.currentPage == 5) refreshDefaultBrowserState()
-    }
-
-    fun restartAppAfterRestore() {
-        val restartIntent = packageManager.getLaunchIntentForPackage(packageName)
-        restartIntent?.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
-        if (restartIntent != null) startActivity(restartIntent)
-        android.os.Process.killProcess(android.os.Process.myPid())
-    }
-
-    private fun refreshDefaultBrowserState() {
-        uiState.isDefaultBrowser = isClintDefaultBrowser()
-    }
-
-    private fun isClintDefaultBrowser(): Boolean {
-        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://"))
-        val info = packageManager.resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY)
-        return info?.activityInfo?.packageName == packageName
-    }
-
-    private fun openDefaultBrowserPicker() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            try {
-                val roleManager = getSystemService(RoleManager::class.java)
-                if (!roleManager.isRoleHeld(RoleManager.ROLE_BROWSER)) {
-                    val intent = roleManager.createRequestRoleIntent(RoleManager.ROLE_BROWSER)
-                    browserRoleLauncher.launch(intent)
-                    return
-                }
-            } catch (_: Exception) {}
-        }
-        startActivity(Intent(Settings.ACTION_MANAGE_DEFAULT_APPS_SETTINGS))
-    }
-
     private fun onNextFromLayoutPage() {
-        uiState.currentPage = 4
+        uiState.currentPage = 3
     }
 
     private fun onNextFromEnginePage() {
@@ -207,21 +152,16 @@ class SetupActivity : ClintActivity(), OverlayHostActivity {
                 title = getString(R.string.google_warning_title),
                 message = getString(R.string.google_warning_message),
                 positiveLabel = getString(R.string.use_google_anyway),
-                onPositive = { goToDefaultBrowserPage() },
+                onPositive = { saveAndProceed() },
                 negativeLabel = getString(R.string.choose_another)
             )
         } else {
-            goToDefaultBrowserPage()
+            saveAndProceed()
         }
     }
 
-    private fun goToDefaultBrowserPage() {
-        uiState.currentPage = 5
-        refreshDefaultBrowserState()
-    }
-
     private fun onSetupThemeSelected(theme: String) {
-        if (theme == uiState.theme) { uiState.currentPage = 3; return }
+        if (theme == uiState.theme) { uiState.currentPage = 2; return }
         savePendingNavigationState()
         captureAndRecreate(theme)
     }
@@ -244,11 +184,11 @@ class SetupActivity : ClintActivity(), OverlayHostActivity {
         captureAndApplyLanguage(language)
     }
 
-    private fun savePendingNavigationState(page: Int = 2) {
+    private fun savePendingNavigationState(page: Int = 1) {
         val prefs = PreferenceManager.getDefaultSharedPreferences(this)
         prefs.edit()
             .putInt(KEY_PENDING_PAGE, page)
-            .putInt(KEY_PENDING_SCROLL, if (page == 2) uiState.themePageScrollState.value else 0)
+            .putInt(KEY_PENDING_SCROLL, if (page == 1) uiState.themePageScrollState.value else 0)
             .putBoolean(KEY_PENDING_CONSENT, uiState.consentChecked)
             .putBoolean(KEY_PENDING_HIDE_STATUS_BAR, uiState.hideStatusBar)
             .putBoolean(KEY_PENDING_HIDE_SYSTEM_NAVIGATION, uiState.hideSystemNavigation)

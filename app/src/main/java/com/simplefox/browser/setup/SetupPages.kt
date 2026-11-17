@@ -435,12 +435,12 @@ fun SetupEnginePage(
             subtitle = stringResource(R.string.setup_subtitle)
         )
 
-        data class EngineOption(val key: String, val titleRes: Int, val descRes: Int, val showDefault: Boolean)
+        data class EngineOption(val key: String, val titleRes: Int, val descRes: Int)
         listOf(
-            EngineOption("duckduckgo", R.string.engine_duckduckgo, R.string.engine_duckduckgo_desc, true),
-            EngineOption("brave", R.string.engine_brave, R.string.engine_brave_desc, false),
-            EngineOption("ecosia", R.string.engine_ecosia, R.string.engine_ecosia_desc, false),
-            EngineOption("google", R.string.engine_google, R.string.engine_google_desc, false)
+            EngineOption("duckduckgo", R.string.engine_duckduckgo, R.string.engine_duckduckgo_desc),
+            EngineOption("brave", R.string.engine_brave, R.string.engine_brave_desc),
+            EngineOption("ecosia", R.string.engine_ecosia, R.string.engine_ecosia_desc),
+            EngineOption("google", R.string.engine_google, R.string.engine_google_desc)
         ).forEach { option ->
             val sel = engine == option.key
             SelectableCard(selected = sel, onClick = { onEngineSelected(option.key) }, cardBackground = colors.cardBackground, primary = colors.primary) {
@@ -449,7 +449,6 @@ fun SetupEnginePage(
                     Text(stringResource(option.titleRes), color = colors.onSurface, fontSize = 16.sp, fontWeight = FontWeight.Medium)
                     Text(stringResource(option.descRes), color = colors.secondaryText, fontSize = 13.sp, modifier = Modifier.padding(top = 2.dp))
                 }
-                if (option.showDefault) DefaultChip(stringResource(R.string.default_label), colors.primary)
             }
         }
         val customSel = engine == "custom"

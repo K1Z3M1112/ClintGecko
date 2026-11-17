@@ -168,13 +168,13 @@ internal fun TabGroupChipsRow(
                         else Modifier
                     )
                     .widthIn(max = 200.dp)
-                    .height(36.dp)
+                    .height(40.dp)
                     .graphicsLayer { scaleX = scale; scaleY = scale }
                     .clip(RoundedCornerShape(18.dp))
                     .background(tabGroupTint(group.color, colors.isLight, strong = hovered))
                     .border(1.5.dp, if (highlighted) Color(group.color) else Color.Transparent, RoundedCornerShape(18.dp))
                     .clickable { onChipClick(group) }
-                    .padding(horizontal = 12.dp),
+                    .padding(horizontal = 13.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 TabGroupDot(group.color, 10.dp)
@@ -198,8 +198,9 @@ internal fun TabGroupChipsRow(
         item(key = "chip:new") {
             Row(
                 Modifier
-                    .height(36.dp)
+                    .height(40.dp)
                     .clip(RoundedCornerShape(18.dp))
+                    .background(colors.surfaceVariant)
                     .border(1.dp, colors.divider, RoundedCornerShape(18.dp))
                     .clickable(onClick = onNewGroup)
                     .padding(horizontal = 12.dp),
@@ -238,7 +239,7 @@ internal fun TabGroupHeader(
     disableLongPressSelection: Boolean = false
 ) {
     val colors = LocalClintColors.current
-    val dragHandle = dragHandleModifier?.takeIf { !selectionMode }
+    val dragHandle = dragHandleModifier
     val shape: Shape = if (group.collapsed) RoundedCornerShape(18.dp) else RoundedCornerShape(topStart = 18.dp, topEnd = 18.dp)
     val chevronRotation by animateFloatAsState(if (group.collapsed) 0f else 180f, tween(200), label = "groupChevron")
     var menuExpanded by remember { mutableStateOf(false) }
@@ -248,6 +249,7 @@ internal fun TabGroupHeader(
             .heightIn(min = 56.dp)
             .clip(shape)
             .background(tabGroupTint(group.color, colors.isLight, strong = highlighted))
+            .then(dragHandle ?: Modifier)
             .border(if (highlighted) 2.dp else 0.dp, if (highlighted) Color(group.color) else Color.Transparent, shape)
             .combinedClickable(
                 onClick = { if (selectionMode) onToggleSelection() else onToggleCollapsed() },
@@ -261,7 +263,7 @@ internal fun TabGroupHeader(
                 Icons.Filled.DragIndicator,
                 contentDescription = stringResource(R.string.tab_menu_drag_handle_desc),
                 tint = colors.iconTint,
-                modifier = dragHandle.padding(end = 6.dp).size(24.dp).padding(2.dp)
+                modifier = Modifier.padding(end = 6.dp).size(24.dp).padding(2.dp)
             )
         }
         if (selectionMode) {

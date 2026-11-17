@@ -29,11 +29,10 @@ import com.simplefox.browser.ui.theme.LocalClintColors
 
 private val WideScreenBreakpointDp = 600
 private val CenteredContentMaxWidth = 480.dp
-private const val SetupPageCount = 6
+private const val SetupPageCount = 4
 
 @Composable
 fun SetupScreen(
-    activity: SetupActivity,
     state: SetupUiState,
     onPrivacyClick: () -> Unit,
     onTermsClick: () -> Unit,
@@ -48,12 +47,8 @@ fun SetupScreen(
     onEngineSelected: (String) -> Unit,
     onCustomEngineSaved: (name: String, url: String) -> Unit,
     onContinueFromWelcome: () -> Unit,
-    onSkipRestore: () -> Unit,
-    onRestoreComplete: () -> Unit,
     onNextFromLayoutPage: () -> Unit,
     onNextFromEnginePage: () -> Unit,
-    onSetDefaultBrowser: () -> Unit,
-    onSkipDefaultBrowser: () -> Unit
 ) {
     ClintComposeTheme(theme = state.theme) {
         val colors = LocalClintColors.current
@@ -113,13 +108,7 @@ fun SetupScreen(
                                         onTermsClick = onTermsClick,
                                         onContinue = onContinueFromWelcome
                                     )
-                                    1 -> SetupRestorePage(
-                                        activity = activity,
-                                        hideStatusBar = state.hideStatusBar, hideSystemNavigation = state.hideSystemNavigation,
-                                        onSkip = onSkipRestore,
-                                        onRestoreComplete = onRestoreComplete
-                                    )
-                                    2 -> SetupThemePage(
+                                    1 -> SetupThemePage(
                                         scrollState = state.themePageScrollState,
                                         theme = state.theme,
                                         accent = state.accent,
@@ -127,9 +116,9 @@ fun SetupScreen(
                                         onThemeSelected = onThemeSelected,
                                         onAccentSelected = onAccentSelected,
                                         onIntensitySelected = onIntensitySelected,
-                                        onNext = { state.currentPage = 3 }
+                                        onNext = { state.currentPage = 2 }
                                     )
-                                    3 -> SetupLayoutPage(
+                                    2 -> SetupLayoutPage(
                                         addressBarPosition = state.addressBarPosition,
                                         scrollHideMode = state.scrollHideMode,
                                         hideStatusBar = state.hideStatusBar, hideSystemNavigation = state.hideSystemNavigation,
@@ -140,7 +129,7 @@ fun SetupScreen(
                                         onHideStatusBarToggled = onHideStatusBarToggled, onHideSystemNavigationToggled = onHideSystemNavigationToggled,
                                         onNext = onNextFromLayoutPage
                                     )
-                                    4 -> SetupEnginePage(
+                                    else -> SetupEnginePage(
                                         engine = state.engine,
                                         customName = state.customEngineName,
                                         customUrl = state.customEngineUrl,
@@ -148,11 +137,6 @@ fun SetupScreen(
                                         onEngineSelected = onEngineSelected,
                                         onCustomEngineSaved = onCustomEngineSaved,
                                         onNext = onNextFromEnginePage
-                                    )
-                                    else -> SetupDefaultBrowserPage(
-                                        isDefaultBrowser = state.isDefaultBrowser,
-                                        onSetDefault = onSetDefaultBrowser,
-                                        onSkip = onSkipDefaultBrowser
                                     )
                                 }
                             }

@@ -16,6 +16,7 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
@@ -72,6 +73,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -117,7 +119,7 @@ private sealed class TabMenuItem {
     abstract val key: String
     open val fullSpan: Boolean = false
 
-    data class SectionHeader(val isIncognitoSection: Boolean) : TabMenuItem() {
+    data class SectionHeader(val isIncognitoSection: Boolean, val count: Int) : TabMenuItem() {
         override val key: String get() = "section:$isIncognitoSection"
         override val fullSpan: Boolean get() = true
     }
@@ -164,13 +166,14 @@ private fun buildRenderList(
     forceExpanded: Boolean = false,
     reversed: Boolean = false
 ): List<TabMenuItem> {
-    val hasBothSections = tabs.any { !it.isIncognito } && tabs.any { it.isIncognito }
     val groupsById = groups.associateBy { it.id }
     val result = mutableListOf<TabMenuItem>()
     for (incognitoSection in if (reversed) listOf(true, false) else listOf(false, true)) {
         val sectionTabs = tabs.filter { it.isIncognito == incognitoSection }.let { if (reversed) it.asReversed() else it }
         if (sectionTabs.isEmpty()) continue
-        if (hasBothSections) result.add(TabMenuItem.SectionHeader(incognitoSection))
+        // Render an explicit header for every non-empty browsing mode. Regular and
+        // Incognito tabs remain visually separated even when only one mode has tabs.
+        result.add(TabMenuItem.SectionHeader(incognitoSection, sectionTabs.size))
         val emitted = mutableSetOf<String>()
         val membersByGroup = sectionTabs.groupBy { it.groupId }
         val looseRun = mutableListOf<TabMenuItem>()
@@ -341,8 +344,8 @@ fun TabMenuScreen(activity: MainActivity, onDismiss: () -> Unit) {
 
     BackHandler {
         when {
+            uiState.reorderMode -> uiState.endReorder()
             uiState.selectionMode -> uiState.exitSelectionMode()
-            uiState.reorderMode -> uiState.reorderMode = false
             searchActive -> closeSearch()
             else -> onDismiss()
         }
@@ -457,7 +460,9 @@ fun TabMenuScreen(activity: MainActivity, onDismiss: () -> Unit) {
             }
         }
         val searching = searchQuery.isNotBlank()
-        val dragAllowed = uiState.reorderMode && !uiState.selectionMode && !searching
+        // Normal mode is read-only; selection mode enables the long-press reorder gesture.
+        // Search remains isolated from both selection and reorder interactions.
+        val dragAllowed = uiState.selectionMode && !searching
         val draggingPreview = dragState.draggingId?.let { id -> tabs.find { it.id == id } }
 
         // One screen-level loader replaces one producer/Flow collector per card. Only the visible range
@@ -733,6 +738,7 @@ fun TabMenuScreen(activity: MainActivity, onDismiss: () -> Unit) {
         }
 
         fun cancelDrag() {
+            uiState.endReorder()
             dragState.end()
             syncFromManager()
         }
@@ -749,7 +755,7 @@ fun TabMenuScreen(activity: MainActivity, onDismiss: () -> Unit) {
                 searchActive = searchActive,
                 searchQuery = searchQuery,
                 onSearchQueryChange = { searchQuery = it },
-                onOpenSearch = { uiState.reorderMode = false; searchActive = true },
+                onOpenSearch = { uiState.endReorder(); searchActive = true },
                 onCloseSearch = { closeSearch() },
                 listView = listView,
                 onToggleListView = {
@@ -761,8 +767,8 @@ fun TabMenuScreen(activity: MainActivity, onDismiss: () -> Unit) {
                     closeTabs(ids, activity.resources.getQuantityString(R.plurals.tab_menu_closed_duplicates, ids.size, ids.size))
                 }) else null,
                 reorderMode = uiState.reorderMode,
-                onToggleReorderMode = { uiState.reorderMode = !uiState.reorderMode },
-                onToggleSelectionMode = { uiState.reorderMode = false; uiState.selectionMode = true },
+                onToggleReorderMode = {},
+                onToggleSelectionMode = { uiState.endReorder(); uiState.selectionMode = true },
                 onSelectAll = { uiState.selectAll(tabs.map { it.id }) },
                 onInvertSelection = { uiState.invertSelection(tabs.map { it.id }) },
                 onDeleteSelected = { closeTabs(uiState.selectedIds.toList()); uiState.exitSelectionMode() },
@@ -900,6 +906,7 @@ fun TabMenuScreen(activity: MainActivity, onDismiss: () -> Unit) {
                                 when (item) {
                                     is TabMenuItem.SectionHeader -> TabMenuSectionHeader(
                                         isIncognitoSection = item.isIncognitoSection,
+                                        count = item.count,
                                         modifier = Modifier.padding(horizontal = CellPadding)
                                     )
                                     is TabMenuItem.GroupHeader -> {
@@ -952,11 +959,11 @@ fun TabMenuScreen(activity: MainActivity, onDismiss: () -> Unit) {
                                                 .padding(top = 6.dp, bottom = if (group.collapsed) 6.dp else 0.dp)
                                                 .then(headerGhostModifier),
                                             dragHandleModifier = if (dragAllowed) Modifier.pointerInput(group.id) {
-                                                    detectDragGestures(
-                                                        onDragStart = { dragState.startGroup(group.id) },
+                                                    detectDragGesturesAfterLongPress(
+                                                        onDragStart = { uiState.beginReorder(); dragState.startGroup(group.id) },
                                                         onDrag = { change, amount -> change.consume(); dragState.drag(amount); onGroupDragMoved() },
-                                                        onDragEnd = { commitGroupDrag() },
-                                                        onDragCancel = { cancelDrag() }
+                                                        onDragEnd = { commitGroupDrag(); uiState.endReorder() },
+                                                        onDragCancel = { cancelDrag(); uiState.endReorder() }
                                                     )
                                                 } else null,
                                             disableLongPressSelection = uiState.reorderMode
@@ -1008,19 +1015,23 @@ fun TabMenuScreen(activity: MainActivity, onDismiss: () -> Unit) {
                                                     canMergeTabs(draggingPreview, preview)
                                             }
                                         }
-                                        val handleModifier = if (dragAllowed) Modifier.pointerInput(preview.id, listView) {
-                                                detectDragGestures(
-                                                    onDragStart = {
-                                                        dragState.start(
-                                                            preview.id,
-                                                            Offset(if (listView) 0.94f else 0.9f, if (listView) 0.5f else 0.12f)
-                                                        )
-                                                    },
-                                                    onDrag = { change, amount -> change.consume(); dragState.drag(amount); onDragMoved() },
-                                                    onDragEnd = { commitDrag() },
-                                                    onDragCancel = { cancelDrag() }
-                                                )
-                                            } else Modifier
+                                        // In normal mode the card only opens. In selection mode a long-press
+                                        // on the card itself starts reordering; taps still toggle selection.
+                                        val cardDragHandleModifier = if (dragAllowed) Modifier.pointerInput(preview.id, listView) {
+                                            detectDragGesturesAfterLongPress(
+                                                onDragStart = {
+                                                    uiState.beginReorder()
+                                                    dragState.start(preview.id, Offset(0.5f, 0.5f))
+                                                },
+                                                onDrag = { change, amount ->
+                                                    change.consume()
+                                                    dragState.drag(amount)
+                                                    onDragMoved()
+                                                },
+                                                onDragEnd = { commitDrag(); uiState.endReorder() },
+                                                onDragCancel = { cancelDrag(); uiState.endReorder() }
+                                            )
+                                        } else Modifier
                                         Box(
                                             Modifier
                                                 .fillMaxWidth()
@@ -1037,7 +1048,7 @@ fun TabMenuScreen(activity: MainActivity, onDismiss: () -> Unit) {
                                                         isActive = isActive,
                                                         selectionMode = uiState.selectionMode,
                                                         selected = isSelected,
-                                                        dragHandleModifier = handleModifier,
+                                                        dragHandleModifier = cardDragHandleModifier,
                                                         onOpen = { openTab(preview.id) },
                                                         onEnterSelection = { uiState.enterSelectionMode(preview.id) },
                                                         onToggleSelect = { uiState.toggleSelected(preview.id) },
@@ -1045,7 +1056,7 @@ fun TabMenuScreen(activity: MainActivity, onDismiss: () -> Unit) {
                                                         onToggleMute = { activity.toggleTabMute(preview.id) },
                                                         mergeHighlighted = mergeHighlighted,
                                                         showDragHandle = dragAllowed,
-                                                        disableLongPressSelection = uiState.reorderMode,
+                                                        disableLongPressSelection = false,
                                                         modifier = ghostModifier
                                                     )
                                                 } else {
@@ -1055,7 +1066,7 @@ fun TabMenuScreen(activity: MainActivity, onDismiss: () -> Unit) {
                                                         thumbnail = thumbnailBitmaps[preview.id],
                                                         selectionMode = uiState.selectionMode,
                                                         selected = isSelected,
-                                                        dragHandleModifier = handleModifier,
+                                                        dragHandleModifier = cardDragHandleModifier,
                                                         onOpen = { openTab(preview.id) },
                                                         onEnterSelection = { uiState.enterSelectionMode(preview.id) },
                                                         onToggleSelect = { uiState.toggleSelected(preview.id) },
@@ -1063,7 +1074,7 @@ fun TabMenuScreen(activity: MainActivity, onDismiss: () -> Unit) {
                                                         onToggleMute = { activity.toggleTabMute(preview.id) },
                                                         mergeHighlighted = mergeHighlighted,
                                                         showDragHandle = dragAllowed,
-                                                        disableLongPressSelection = uiState.reorderMode,
+                                                        disableLongPressSelection = false,
                                                         modifier = ghostModifier
                                                     )
                                                 }
@@ -1240,12 +1251,15 @@ private fun TabMenuTopBar(
     val colors = LocalClintColors.current
     var overflowMenuExpanded by remember { mutableStateOf(false) }
     Row(
-        Modifier.fillMaxWidth().padding(
-            start = 20.dp,
-            end = 8.dp,
-            top = if (buttonsAtBottom) 4.dp else 8.dp,
-            bottom = if (buttonsAtBottom) 8.dp else 4.dp
-        ),
+        Modifier
+            .fillMaxWidth()
+            .padding(
+                horizontal = 14.dp,
+                vertical = if (buttonsAtBottom) 4.dp else 8.dp
+            )
+            .clip(RoundedCornerShape(18.dp))
+            .background(colors.surfaceVariant)
+            .padding(start = 16.dp, end = 8.dp, top = 5.dp, bottom = 5.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         if (searchActive && !selectionMode) {
@@ -1275,7 +1289,8 @@ private fun TabMenuTopBar(
                     },
                     color = colors.onSurface,
                     fontSize = 16.sp,
-                    fontWeight = FontWeight.Medium
+                    fontWeight = FontWeight.SemiBold,
+                    maxLines = 1
                 )
             }
             if (!selectionMode) {
@@ -1323,7 +1338,7 @@ private fun TabMenuTopBar(
                             tabsAtBottom = tabsAtBottom,
                             onToggleTabsAtBottom = onToggleTabsAtBottom,
                             reorderMode = reorderMode,
-                            onToggleReorderMode = onToggleReorderMode.takeIf { tabCount > 1 }
+                            onToggleReorderMode = null
                         )
                     }
                 }
