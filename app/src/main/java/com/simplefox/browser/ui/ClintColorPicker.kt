@@ -205,7 +205,10 @@ fun ClintColorPickerDialog(
                         Box(Modifier.weight(1f).fillMaxHeight().background(current))
                     }
                     OutlinedTextField(
-                        state = rememberSyncedTextFieldState(hexText) { onHexChanged(it) },
+                        state = rememberSyncedTextFieldState(
+                            value = hexText,
+                            onValueChange = { value -> onHexChanged(value) }
+                        ),
                         modifier = Modifier.weight(1f),
                         lineLimits = TextFieldLineLimits.SingleLine,
                         label = { Text(stringResource(R.string.color_picker_hex_label)) },
