@@ -3,8 +3,8 @@ package com.simplefox.browser.browser.delegates
 import android.app.ActivityManager
 import com.simplefox.browser.browser.MainActivity
 
-internal const val MAX_LIVE_BACKGROUND_TABS = 6
-internal const val BACKGROUND_TRIM_KEEP_LIVE = 2
+internal const val MAX_LIVE_BACKGROUND_TABS = 3
+internal const val BACKGROUND_TRIM_KEEP_LIVE = 1
 private const val GIB = 1024L * 1024L * 1024L
 
 private var cachedLiveTabBudget = -1
@@ -15,10 +15,10 @@ internal fun MainActivity.liveBackgroundTabBudget(): Int {
         val memory = ActivityManager.MemoryInfo()
         manager?.getMemoryInfo(memory)
         cachedLiveTabBudget = when {
-            manager == null -> MAX_LIVE_BACKGROUND_TABS
-            manager.isLowRamDevice -> 1
-            memory.totalMem < 3 * GIB -> 2
-            memory.totalMem < 5 * GIB -> 4
+            manager == null -> 2
+            manager.isLowRamDevice -> 0
+            memory.totalMem < 3 * GIB -> 1
+            memory.totalMem < 5 * GIB -> 2
             else -> MAX_LIVE_BACKGROUND_TABS
         }
     }
