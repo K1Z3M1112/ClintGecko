@@ -608,7 +608,7 @@ private fun HomeSearchPill(
         color = colors.addressBarColor,
         shape = RoundedCornerShape(28.dp),
         border = BorderStroke(1.dp, colors.divider),
-        shadowElevation = if (colors.isLight) 2.dp else 0.dp,
+        shadowElevation = 0.dp,
         modifier = modifier
             .fillMaxWidth()
             .height(height)

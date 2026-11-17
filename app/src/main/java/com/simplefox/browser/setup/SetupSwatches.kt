@@ -2,14 +2,7 @@ package com.simplefox.browser.setup
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.runtime.getValue
 
-import androidx.compose.animation.core.Easing
-import androidx.compose.animation.core.InfiniteRepeatableSpec
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateFloat
 import com.simplefox.browser.ui.animateFloatAsState
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -38,18 +31,6 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import kotlin.math.PI
-import kotlin.math.cos
-
-val AccelerateDecelerateEasing = Easing { fraction ->
-    (cos((fraction + 1) * PI) / 2.0 + 0.5).toFloat()
-}
-
-private fun loopSpec(): InfiniteRepeatableSpec<Float> = infiniteRepeatable(
-    animation = tween(durationMillis = 1100, easing = AccelerateDecelerateEasing),
-    repeatMode = RepeatMode.Reverse
-)
-
 @Composable
 fun AccentSwatch(bg: Color, surface: Color, accent: Color, modifier: Modifier = Modifier) {
     Box(
@@ -207,13 +188,8 @@ fun ScrollHidePreview(
     val pillAtTop = addressBarPosition != "bottom"
     val navDotsVisible = addressBarPosition == "split"
 
-    // The animated value is only read inside graphicsLayer lambdas (draw phase), so the
-    // preview is never recomposed per frame.
-    val fState: androidx.compose.runtime.State<Float>? = if (animate) {
-        rememberInfiniteTransition(label = "scrollHide")
-            .animateFloat(initialValue = 0f, targetValue = 1f, animationSpec = loopSpec(), label = "f")
-    } else null
-    val f: () -> Float = { fState?.value ?: 0f }
+    val fraction = if (animate) 1f else 0f
+    val f: () -> Float = { fraction }
 
     val moveTop = kind == "search_bar" || kind == "both"
     val moveBottom = kind == "navigation_bar" || kind == "both"

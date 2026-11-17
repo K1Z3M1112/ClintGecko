@@ -66,7 +66,7 @@ internal fun ThemeTopBar(
     val colors = LocalClintColors.current
     Surface(
         color = colors.surface,
-        shadowElevation = 4.dp,
+        shadowElevation = 0.dp,
         modifier = Modifier.statusBarsPadding()
     ) {
         Row(

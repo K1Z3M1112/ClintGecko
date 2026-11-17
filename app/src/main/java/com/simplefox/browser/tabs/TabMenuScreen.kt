@@ -2,18 +2,7 @@ package com.simplefox.browser.tabs
 
 import android.graphics.Bitmap
 import androidx.activity.compose.BackHandler
-import com.simplefox.browser.ui.AnimatedContent
-import com.simplefox.browser.ui.AnimatedVisibility
 import com.simplefox.browser.ui.animateFloatAsState
-import androidx.compose.animation.core.spring
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkVertically
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
-import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
@@ -76,7 +65,6 @@ import kotlinx.coroutines.withContext
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
@@ -842,11 +830,7 @@ fun TabMenuScreen(activity: MainActivity, onDismiss: () -> Unit) {
         }
 
         val quickActions: @Composable ColumnScope.() -> Unit = {
-            AnimatedVisibility(
-                visible = !uiState.selectionMode && !searchActive,
-                enter = fadeIn(tween(180)) + expandVertically(spring(dampingRatio = 0.85f)),
-                exit = fadeOut(tween(120)) + shrinkVertically(tween(150))
-            ) {
+            if (!uiState.selectionMode && !searchActive) {
                 Column {
                     if (buttonsAtBottom) {
                         if (groupsEnabled) groupChips()
@@ -966,7 +950,7 @@ fun TabMenuScreen(activity: MainActivity, onDismiss: () -> Unit) {
                                                         onDragCancel = { cancelDrag(); uiState.endReorder() }
                                                     )
                                                 } else null,
-                                            disableLongPressSelection = uiState.reorderMode
+                                            disableLongPressSelection = uiState.selectionMode
                                         )
                                     }
                                     is TabMenuItem.GroupFiller -> Box(
@@ -1056,7 +1040,7 @@ fun TabMenuScreen(activity: MainActivity, onDismiss: () -> Unit) {
                                                         onToggleMute = { activity.toggleTabMute(preview.id) },
                                                         mergeHighlighted = mergeHighlighted,
                                                         showDragHandle = dragAllowed,
-                                                        disableLongPressSelection = false,
+                                                        disableLongPressSelection = uiState.selectionMode,
                                                         modifier = ghostModifier
                                                     )
                                                 } else {
@@ -1074,7 +1058,7 @@ fun TabMenuScreen(activity: MainActivity, onDismiss: () -> Unit) {
                                                         onToggleMute = { activity.toggleTabMute(preview.id) },
                                                         mergeHighlighted = mergeHighlighted,
                                                         showDragHandle = dragAllowed,
-                                                        disableLongPressSelection = false,
+                                                        disableLongPressSelection = uiState.selectionMode,
                                                         modifier = ghostModifier
                                                     )
                                                 }
@@ -1090,15 +1074,12 @@ fun TabMenuScreen(activity: MainActivity, onDismiss: () -> Unit) {
                     if (draggedPreview != null) {
                         val cardWidth = with(density) { dragState.originSize.width.toDp() }
                         val cardHeight = with(density) { dragState.originSize.height.toDp() }
-                        val liftScale by animateFloatAsState(1.06f, animationSpec = spring(dampingRatio = 0.5f), label = "dragLiftScale")
                         Box(
                             Modifier
                                 .offset { androidx.compose.ui.unit.IntOffset((dragState.originOffset.x + dragState.dragOffset.x).toInt(), (dragState.originOffset.y + dragState.dragOffset.y).toInt()) }
                                 .size(cardWidth, cardHeight)
                                 .padding(CellPadding)
-                                .graphicsLayer { scaleX = liftScale; scaleY = liftScale }
                                 .zIndex(10f)
-                                .shadow(12.dp, RoundedCornerShape(if (listView) 14.dp else 16.dp))
                         ) {
                             if (listView) {
                                 TabMenuListRow(
@@ -1133,15 +1114,12 @@ fun TabMenuScreen(activity: MainActivity, onDismiss: () -> Unit) {
                     if (draggedGroup != null) {
                         val members = tabs.filter { it.groupId == draggedGroup.id }
                         val headerWidth = with(density) { dragState.originSize.width.toDp() }
-                        val liftScale by animateFloatAsState(1.03f, animationSpec = spring(dampingRatio = 0.5f), label = "groupDragLiftScale")
                         Box(
                             Modifier
                                 .offset { androidx.compose.ui.unit.IntOffset((dragState.originOffset.x + dragState.dragOffset.x).toInt(), (dragState.originOffset.y + dragState.dragOffset.y).toInt()) }
                                 .width(headerWidth)
                                 .padding(vertical = 6.dp)
-                                .graphicsLayer { scaleX = liftScale; scaleY = liftScale }
                                 .zIndex(10f)
-                                .shadow(12.dp, RoundedCornerShape(18.dp))
                         ) {
                             TabGroupHeader(
                                 group = draggedGroup.copy(collapsed = true),
@@ -1165,11 +1143,7 @@ fun TabMenuScreen(activity: MainActivity, onDismiss: () -> Unit) {
                 }
             }
 
-            AnimatedVisibility(
-                visible = uiState.selectionMode,
-                enter = fadeIn(tween(180)) + expandVertically(spring(dampingRatio = 0.85f)),
-                exit = fadeOut(tween(120)) + shrinkVertically(tween(150))
-            ) {
+            if (uiState.selectionMode) {
                 val selectedIds = uiState.selectedIds.toList()
                 TabSelectionActionBar(
                     hasSelection = selectedIds.isNotEmpty(),
@@ -1270,77 +1244,62 @@ private fun TabMenuTopBar(
                 onClose = onCloseSearch
             )
         } else {
-            AnimatedContent(
-                targetState = selectionMode,
-                modifier = Modifier.weight(1f),
-                transitionSpec = {
-                    (fadeIn(tween(180)) + slideInVertically(tween(180)) { it / 3 }) togetherWith
-                        (fadeOut(tween(120)) + slideOutVertically(tween(120)) { -it / 3 })
+            Text(
+                if (selectionMode) {
+                    pluralStringResource(R.plurals.tab_menu_selected_count, selectedCount, selectedCount)
+                } else if (tabCount == 0) {
+                    stringResource(R.string.no_tabs)
+                } else {
+                    pluralStringResource(R.plurals.tab_menu_tab_count, tabCount, tabCount)
                 },
-                label = "tabMenuTitle"
-            ) { inSelectionMode ->
-                Text(
-                    if (inSelectionMode) {
-                        pluralStringResource(R.plurals.tab_menu_selected_count, selectedCount, selectedCount)
-                    } else if (tabCount == 0) {
-                        stringResource(R.string.no_tabs)
-                    } else {
-                        pluralStringResource(R.plurals.tab_menu_tab_count, tabCount, tabCount)
-                    },
-                    color = colors.onSurface,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    maxLines = 1
-                )
-            }
+                modifier = Modifier.weight(1f),
+                color = colors.onSurface,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.SemiBold,
+                maxLines = 1
+            )
             if (!selectionMode) {
                 IconButton(onClick = onOpenSearch) {
                     Icon(Icons.Filled.Search, contentDescription = stringResource(R.string.tab_menu_search_hint), tint = colors.primary)
                 }
             }
-            AnimatedContent(
-                targetState = selectionMode,
-                transitionSpec = { fadeIn(tween(180)) togetherWith fadeOut(tween(120)) },
-                label = "tabMenuActions"
-            ) { inSelectionMode ->
-                Box {
-                    IconButton(onClick = { overflowMenuExpanded = true }) {
-                        Icon(Icons.Filled.MoreVert, contentDescription = stringResource(R.string.tab_menu_overflow_desc), tint = colors.primary)
-                    }
-                    if (inSelectionMode) {
-                        TabSelectionOverflowMenu(
-                            expanded = overflowMenuExpanded,
-                            onDismiss = { overflowMenuExpanded = false },
-                            onSelectAll = onSelectAll,
-                            onInvertSelection = onInvertSelection,
-                            onDeleteSelected = onDeleteSelected
-                        )
-                    } else {
-                        TabMenuOverflowMenu(
-                            expanded = overflowMenuExpanded,
-                            onDismiss = { overflowMenuExpanded = false },
-                            onNewTab = onNewTab,
-                            onNewIncognitoTab = onNewIncognitoTab,
-                            onCloseAllTabs = onCloseAllTabs,
-                            onSelectTabs = onToggleSelectionMode,
-                            showProfileTab = com.simplefox.browser.profiles.WebProfiles.isSupported(),
-                            onNewProfileTab = onNewProfileTab,
-                            onNewTabGroup = if (groupsEnabled) onNewTabGroup else null,
-                            showGroupBar = showGroupBar,
-                            onToggleGroupBar = null,
-                            onCollapseAllGroups = if (hasGroups && !allGroupsCollapsed) onCollapseAllGroups else null,
-                            onExpandAllGroups = if (hasGroups && allGroupsCollapsed) onExpandAllGroups else null,
-                            onCloseDuplicates = onCloseDuplicates,
-                            listView = listView,
-                            onToggleListView = onToggleListView,
-                            buttonsAtBottom = buttonsAtBottom,
-                            onToggleButtonsAtBottom = onToggleButtonsAtBottom,
-                            tabsAtBottom = tabsAtBottom,
-                            onToggleTabsAtBottom = onToggleTabsAtBottom,
-                            reorderMode = reorderMode,
-                            onToggleReorderMode = null
-                        )
-                    }
+            Box {
+                IconButton(onClick = { overflowMenuExpanded = true }) {
+                    Icon(Icons.Filled.MoreVert, contentDescription = stringResource(R.string.tab_menu_overflow_desc), tint = colors.primary)
+                }
+                if (selectionMode) {
+                    TabSelectionOverflowMenu(
+                        expanded = overflowMenuExpanded,
+                        onDismiss = { overflowMenuExpanded = false },
+                        onSelectAll = onSelectAll,
+                        onInvertSelection = onInvertSelection,
+                        onDeleteSelected = onDeleteSelected
+                    )
+                } else {
+                    TabMenuOverflowMenu(
+                        expanded = overflowMenuExpanded,
+                        onDismiss = { overflowMenuExpanded = false },
+                        onNewTab = onNewTab,
+                        onNewIncognitoTab = onNewIncognitoTab,
+                        onCloseAllTabs = onCloseAllTabs,
+                        onSelectTabs = onToggleSelectionMode,
+                        showProfileTab = com.simplefox.browser.profiles.WebProfiles.isSupported(),
+                        onNewProfileTab = onNewProfileTab,
+                        onNewTabGroup = if (groupsEnabled) onNewTabGroup else null,
+                        showGroupBar = showGroupBar,
+                        onToggleGroupBar = null,
+                        onCollapseAllGroups = if (hasGroups && !allGroupsCollapsed) onCollapseAllGroups else null,
+                        onExpandAllGroups = if (hasGroups && allGroupsCollapsed) onExpandAllGroups else null,
+                        onCloseDuplicates = onCloseDuplicates,
+                        listView = listView,
+                        onToggleListView = onToggleListView,
+                        buttonsAtBottom = buttonsAtBottom,
+                        onToggleButtonsAtBottom = onToggleButtonsAtBottom,
+                        tabsAtBottom = tabsAtBottom,
+                        onToggleTabsAtBottom = onToggleTabsAtBottom,
+                        reorderMode = reorderMode,
+                        onToggleReorderMode = null
+                    )
                 }
             }
         }

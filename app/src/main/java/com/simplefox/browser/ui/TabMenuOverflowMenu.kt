@@ -57,7 +57,8 @@ fun TabMenuOverflowMenu(
         onDismissRequest = onDismiss,
         shape = PopupShape,
         containerColor = colors.popupBackground,
-        border = null
+        border = null,
+        shadowElevation = 0.dp
     ) {
         ListMenuItem(Icons.Filled.Add, stringResource(R.string.new_tab), checked = false) {
             onDismiss(); onNewTab()
@@ -141,7 +142,8 @@ fun TabSelectionOverflowMenu(
         onDismissRequest = onDismiss,
         shape = PopupShape,
         containerColor = colors.popupBackground,
-        border = null
+        border = null,
+        shadowElevation = 0.dp
     ) {
         ListMenuItem(Icons.Filled.SelectAll, stringResource(R.string.tab_menu_select_all), checked = false) {
             onDismiss(); onSelectAll()

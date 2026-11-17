@@ -362,7 +362,7 @@ private fun BookmarksToolbar(
     val colors = LocalClintColors.current
     val showToolbarIcons = !state.isInSelectionMode && !state.isSearchMode
 
-    Surface(color = colors.surface, shadowElevation = 4.dp, modifier = Modifier.statusBarsPadding()) {
+    Surface(color = colors.surface, modifier = Modifier.statusBarsPadding()) {
         Row(Modifier.fillMaxWidth().height(56.dp).padding(horizontal = 4.dp), verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = onBack) {
                 Icon(

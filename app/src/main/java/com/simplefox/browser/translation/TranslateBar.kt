@@ -267,7 +267,7 @@ private fun TranslateBarContent(
         shape = RoundedCornerShape(18.dp),
         color = colors.popupBackground,
         border = null,
-        shadowElevation = 8.dp,
+        shadowElevation = 0.dp,
         modifier = Modifier
             .fillMaxWidth()
             .widthIn(max = TranslateBarMaxWidth)

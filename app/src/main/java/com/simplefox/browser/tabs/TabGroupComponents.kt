@@ -1,7 +1,5 @@
 package com.simplefox.browser.tabs
 
-import com.simplefox.browser.ui.animateFloatAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -55,12 +53,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -157,7 +153,6 @@ internal fun TabGroupChipsRow(
         items(groups, key = { it.id }) { group ->
             val hovered = hoverKey == groupChipKey(group.id)
             val highlighted = hovered || group.id == activeGroupId
-            val scale by animateFloatAsState(if (hovered) 1.08f else 1f, tween(140), label = "chipScale")
             DisposableEffect(group.id, trackBounds) {
                 onDispose { if (trackBounds) onChipBounds(group.id, null) }
             }
@@ -169,7 +164,6 @@ internal fun TabGroupChipsRow(
                     )
                     .widthIn(max = 200.dp)
                     .height(40.dp)
-                    .graphicsLayer { scaleX = scale; scaleY = scale }
                     .clip(RoundedCornerShape(18.dp))
                     .background(tabGroupTint(group.color, colors.isLight, strong = hovered))
                     .border(1.5.dp, if (highlighted) Color(group.color) else Color.Transparent, RoundedCornerShape(18.dp))
@@ -241,7 +235,6 @@ internal fun TabGroupHeader(
     val colors = LocalClintColors.current
     val dragHandle = dragHandleModifier
     val shape: Shape = if (group.collapsed) RoundedCornerShape(18.dp) else RoundedCornerShape(topStart = 18.dp, topEnd = 18.dp)
-    val chevronRotation by animateFloatAsState(if (group.collapsed) 0f else 180f, tween(200), label = "groupChevron")
     var menuExpanded by remember { mutableStateOf(false) }
     Row(
         modifier
@@ -308,10 +301,10 @@ internal fun TabGroupHeader(
             }
         }
         Icon(
-            Icons.Filled.ExpandMore,
+            if (group.collapsed) Icons.Filled.ExpandMore else Icons.Filled.ExpandLess,
             contentDescription = stringResource(if (group.collapsed) R.string.tab_group_expand else R.string.tab_group_collapse),
             tint = colors.iconTint,
-            modifier = Modifier.size(22.dp).rotate(chevronRotation)
+            modifier = Modifier.size(22.dp)
         )
         if (!selectionMode) {
             Box {
@@ -388,7 +381,8 @@ private fun TabGroupMenu(
         onDismissRequest = onDismiss,
         shape = PopupShape,
         containerColor = colors.popupBackground,
-        border = null
+        border = null,
+        shadowElevation = 0.dp
     ) {
         ListMenuItem(Icons.Filled.Add, stringResource(R.string.tab_group_new_tab_in_group), checked = false) { onDismiss(); onNewTab() }
         ListMenuItem(Icons.Filled.Edit, stringResource(R.string.tab_group_edit), checked = false) { onDismiss(); onEdit() }
@@ -419,7 +413,7 @@ internal fun TabSelectionActionBar(
         modifier = modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 8.dp),
         shape = RoundedCornerShape(22.dp),
         color = colors.cardBackground,
-        shadowElevation = 6.dp
+        shadowElevation = 0.dp
     ) {
         Row(Modifier.fillMaxWidth().padding(vertical = 4.dp), horizontalArrangement = Arrangement.SpaceEvenly) {
             if (groupsEnabled) {

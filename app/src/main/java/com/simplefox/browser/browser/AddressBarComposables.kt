@@ -431,7 +431,7 @@ private fun AddressBarEditMenu(
             contentColor = colors.popupText,
             shape = RoundedCornerShape(12.dp),
             border = null,
-            shadowElevation = 6.dp
+            shadowElevation = 0.dp
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,

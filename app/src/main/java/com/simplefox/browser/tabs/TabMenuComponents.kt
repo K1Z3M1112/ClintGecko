@@ -3,8 +3,6 @@ package com.simplefox.browser.tabs
 import android.graphics.Bitmap
 import com.simplefox.browser.ui.AnimatedVisibility
 import androidx.compose.animation.core.animate
-import com.simplefox.browser.ui.animateDpAsState
-import com.simplefox.browser.ui.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -18,8 +16,6 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggableState
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -50,7 +46,6 @@ import com.simplefox.browser.ui.foundation.IconButton
 import com.simplefox.browser.ui.foundation.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
@@ -72,7 +67,6 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.simplefox.browser.R
@@ -111,8 +105,6 @@ internal fun TabMenuCard(
     val colors = LocalClintColors.current
     val favicon = rememberTabFavicon(preview)
     val profile = rememberTabProfile(preview)
-    val interactionSource = remember { MutableInteractionSource() }
-    val pressScale = rememberTabPressScale(interactionSource, mergeHighlighted)
     val accentColor = if (preview.isIncognito) IncognitoAccent else colors.primary
     val cardBg = if (preview.isIncognito) IncognitoCardBackground else colors.cardBackground
     val onCard = if (preview.isIncognito) IncognitoOnCard else colors.onSurface
@@ -129,11 +121,9 @@ internal fun TabMenuCard(
         modifier = modifier
             .fillMaxWidth()
             .aspectRatio(0.72f)
-            .graphicsLayer { val scale = pressScale.value; scaleX = scale; scaleY = scale }
             .then(dragHandleModifier)
             .border(if (selected || isActive || mergeHighlighted) 2.dp else 0.8.dp, borderColor, shape)
             .combinedClickable(
-                interactionSource = interactionSource,
                 indication = null,
                 onClick = { if (selectionMode) onToggleSelect() else onOpen() },
                 onLongClick = if (!disableLongPressSelection) ({ if (!selectionMode) onEnterSelection() }) else null
@@ -293,9 +283,11 @@ internal fun TabMenuListRow(
     val colors = LocalClintColors.current
     val favicon = rememberTabFavicon(preview)
     val profile = rememberTabProfile(preview)
-    val interactionSource = remember { MutableInteractionSource() }
-    val pressScale = rememberTabPressScale(interactionSource, mergeHighlighted)
-    val borderWidth = rememberTabBorderWidth(isActive, mergeHighlighted)
+    val borderWidth = when {
+        mergeHighlighted -> 3.dp
+        isActive -> 2.5.dp
+        else -> 0.dp
+    }
     val accentColor = if (preview.isIncognito) IncognitoAccent else colors.primary
     val rowBg = if (preview.isIncognito) IncognitoCardBackground else colors.cardBackground
     val onRow = if (preview.isIncognito) IncognitoOnCard else colors.onSurface
@@ -309,13 +301,11 @@ internal fun TabMenuListRow(
         modifier
             .fillMaxWidth()
             .height(TabListRowHeight)
-            .graphicsLayer { val scale = pressScale.value; scaleX = scale; scaleY = scale }
             .then(dragHandleModifier)
             .clip(shape)
             .background(rowBg)
             .border(borderWidth, accentColor, shape)
             .combinedClickable(
-                interactionSource = interactionSource,
                 indication = null,
                 onClick = { if (selectionMode) onToggleSelect() else onOpen() },
                 onLongClick = if (!disableLongPressSelection) ({ if (!selectionMode) onEnterSelection() }) else null
@@ -481,42 +471,6 @@ private fun rememberTabProfile(preview: TabPreview): com.simplefox.browser.profi
         if (preview.profileId == com.simplefox.browser.profiles.WebProfiles.DEFAULT_ID) null
         else com.simplefox.browser.profiles.ProfileRepository.get(appContext, preview.profileId)
     }
-}
-
-@Composable
-private fun rememberTabPressScale(interactionSource: MutableInteractionSource, mergeHighlighted: Boolean): State<Float> {
-    var pressed by remember { mutableStateOf(false) }
-    LaunchedEffect(interactionSource) {
-        interactionSource.interactions.collect { interaction ->
-            when (interaction) {
-                is PressInteraction.Press -> pressed = true
-                is PressInteraction.Release, is PressInteraction.Cancel -> pressed = false
-            }
-        }
-    }
-    val scale = animateFloatAsState(
-        when {
-            mergeHighlighted -> 0.9f
-            pressed -> 0.95f
-            else -> 1f
-        },
-        animationSpec = spring(dampingRatio = 0.6f),
-        label = "cardPressScale"
-    )
-    return scale
-}
-
-@Composable
-private fun rememberTabBorderWidth(isActive: Boolean, mergeHighlighted: Boolean): Dp {
-    val width by animateDpAsState(
-        when {
-            mergeHighlighted -> 3.dp
-            isActive -> 2.5.dp
-            else -> 0.dp
-        },
-        label = "cardBorderWidth"
-    )
-    return width
 }
 
 @Composable

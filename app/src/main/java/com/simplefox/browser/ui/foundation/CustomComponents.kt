@@ -314,7 +314,7 @@ object CardDefaults {
         disabledContainerColor: Color = containerColor,
         disabledContentColor: Color = contentColor
     ) = CardColors(containerColor, contentColor, disabledContainerColor, disabledContentColor)
-    fun cardElevation(defaultElevation: Dp = 1.dp) = CardElevation(defaultElevation)
+    fun cardElevation(defaultElevation: Dp = 0.dp) = CardElevation(defaultElevation)
 }
 
 @Composable
@@ -445,6 +445,7 @@ fun DropdownMenu(
     shape: Shape = RoundedCornerShape(16.dp),
     containerColor: Color = LocalClintColors.current.popupBackground,
     border: BorderStroke? = null,
+    shadowElevation: Dp = 0.dp,
     content: @Composable ColumnScope.() -> Unit
 ) {
     if (expanded) {
@@ -483,7 +484,7 @@ fun DropdownMenu(
                 modifier = modifier,
                 shape = shape,
                 color = containerColor,
-                shadowElevation = 8.dp,
+                shadowElevation = shadowElevation,
                 border = border
             ) {
                 CompositionLocalProvider(LocalCustomContentColor provides LocalClintColors.current.popupText) {
@@ -529,7 +530,7 @@ fun FloatingActionButton(
         shape = shape,
         color = containerColor,
         contentColor = contentColor,
-        shadowElevation = 6.dp
+        shadowElevation = 0.dp
     ) { Box(Modifier.padding(16.dp), contentAlignment = Alignment.Center) { content() } }
 }
 
@@ -544,7 +545,7 @@ fun ExtendedFloatingActionButton(
     contentColor: Color = LocalClintColors.current.onPrimary,
     shape: Shape = RoundedCornerShape(18.dp)
 ) {
-    Surface(modifier = modifier.clickable(onClick = onClick), shape = shape, color = containerColor, contentColor = contentColor, shadowElevation = 6.dp) {
+    Surface(modifier = modifier.clickable(onClick = onClick), shape = shape, color = containerColor, contentColor = contentColor) {
         Row(Modifier.padding(horizontal = 18.dp, vertical = 14.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             icon()
             if (expanded) text()
@@ -966,7 +967,7 @@ fun ModalBottomSheet(
                 shape = shape,
                 color = containerColor,
                 contentColor = contentColor,
-                shadowElevation = 12.dp
+                shadowElevation = 0.dp
             ) {
                 Column {
                     if (dragHandle != null) {

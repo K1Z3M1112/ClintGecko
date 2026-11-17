@@ -99,7 +99,7 @@ fun ProfilesScreen(
 
     Surface(color = colors.background, modifier = Modifier.fillMaxSize()) {
         Column(Modifier.fillMaxSize()) {
-            Surface(color = colors.surface, shadowElevation = 4.dp, modifier = Modifier.statusBarsPadding()) {
+            Surface(color = colors.surface, modifier = Modifier.statusBarsPadding()) {
                 Row(
                     Modifier.fillMaxWidth().height(56.dp).padding(start = 4.dp, end = 8.dp),
                     verticalAlignment = Alignment.CenterVertically

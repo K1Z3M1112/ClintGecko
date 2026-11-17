@@ -39,14 +39,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.MutableTransitionState
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
-import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.foundation.verticalScroll
@@ -268,14 +260,10 @@ internal fun MenuTriggerButton(activity: MainActivity, modifier: Modifier = Modi
         }
 
         val currentSnapshot = snapshot
-        // Keep the popup composed until its exit animation finishes, otherwise it vanishes instantly.
-        val visibleState = remember { MutableTransitionState(false) }
-        visibleState.targetState = expanded && currentSnapshot != null
-        if (currentSnapshot != null && (visibleState.currentState || visibleState.targetState)) {
+        if (expanded && currentSnapshot != null) {
             val density = androidx.compose.ui.platform.LocalDensity.current
             val gapPx = with(density) { MenuBarClearance.roundToPx() }
             val edgePx = with(density) { 8.dp.roundToPx() }
-            val originY = if (activity.prefs.getString("address_bar_position", "bottom") == "top") 0f else 1f
             val positionProvider = remember(gapPx, edgePx) {
                 object : androidx.compose.ui.window.PopupPositionProvider {
                     override fun calculatePosition(
@@ -302,21 +290,14 @@ internal fun MenuTriggerButton(activity: MainActivity, modifier: Modifier = Modi
                 onDismissRequest = { expanded = false },
                 properties = androidx.compose.ui.window.PopupProperties(focusable = true)
             ) {
-                val origin = TransformOrigin(0.9f, originY)
-                AnimatedVisibility(
-                    visibleState = visibleState,
-                    enter = fadeIn(tween(120)) + scaleIn(tween(160), initialScale = 0.92f, transformOrigin = origin),
-                    exit = fadeOut(tween(90)) + scaleOut(tween(110), targetScale = 0.96f, transformOrigin = origin)
+                com.simplefox.browser.ui.foundation.Surface(
+                    color = colors.popupBackground,
+                    shape = PopupShape,
+                    shadowElevation = 0.dp,
+                    modifier = Modifier.width(menuWidth).heightIn(max = maxMenuHeight)
                 ) {
-                    com.simplefox.browser.ui.foundation.Surface(
-                        color = colors.popupBackground,
-                        shape = PopupShape,
-                        shadowElevation = 8.dp,
-                        modifier = Modifier.width(menuWidth).heightIn(max = maxMenuHeight)
-                    ) {
-                        Column(Modifier.verticalScroll(androidx.compose.foundation.rememberScrollState())) {
-                            BrowserMenuContent(currentSnapshot, actions)
-                        }
+                    Column(Modifier.verticalScroll(androidx.compose.foundation.rememberScrollState())) {
+                        BrowserMenuContent(currentSnapshot, actions)
                     }
                 }
             }

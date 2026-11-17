@@ -1,7 +1,6 @@
 package com.simplefox.browser.settings.menucustomization
 
 import com.simplefox.browser.ui.animateFloatAsState
-import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
@@ -38,7 +37,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
@@ -143,7 +141,6 @@ fun MenuCustomizationScreen(
                             if (draggedEntry != null) {
                                 val density = LocalDensity.current
                                 val rowHeight = with(density) { dragState.originHeight.toDp() }
-                                val liftScale by animateFloatAsState(1.03f, animationSpec = spring(dampingRatio = 0.5f), label = "menuItemDragLiftScale")
                                 Box(
                                     Modifier
                                         .padding(horizontal = 12.dp)
@@ -151,11 +148,8 @@ fun MenuCustomizationScreen(
                                         .height(rowHeight)
                                         .graphicsLayer {
                                             translationY = dragState.originOffsetY + dragState.dragOffsetY
-                                            scaleX = liftScale
-                                            scaleY = liftScale
                                         }
                                         .zIndex(10f)
-                                        .shadow(10.dp, RoundedCornerShape(16.dp))
                                 ) {
                                     MenuCustomizeRow(
                                         entry = draggedEntry,

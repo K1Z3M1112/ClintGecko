@@ -149,7 +149,7 @@ fun ExtensionsScreen(
                 }
             }
             HorizontalDivider(color = colors.divider, thickness = 1.dp)
-            Surface(color = colors.surface, shadowElevation = 4.dp, modifier = Modifier.navigationBarsPadding()) {
+            Surface(color = colors.surface, modifier = Modifier.navigationBarsPadding()) {
                 Row(
                     Modifier.fillMaxWidth().height(56.dp).padding(start = 4.dp, end = 8.dp),
                     verticalAlignment = Alignment.CenterVertically
