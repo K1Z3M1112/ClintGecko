@@ -142,6 +142,9 @@ internal object HomeTileStore {
     @Volatile
     private var cache: List<HomeTile>? = null
 
+    // Last JSON written to disk; an unchanged layout is not rewritten. Guarded by the save() lock.
+    private var lastWrittenJson: String? = null
+
     private fun dataFile(context: Context): File = File(homepageImageDir(context), FILE_NAME)
 
     private fun iconFile(context: Context, id: String): File = File(homepageImageDir(context), "$ICON_PREFIX$id.png")
@@ -174,14 +177,18 @@ internal object HomeTileStore {
         runCatching {
             val dir = homepageImageDir(context)
             dir.mkdirs()
+            val json = serialize(tiles).toString()
+            if (json == lastWrittenJson && dataFile(context).exists()) return@runCatching
+            lastWrittenJson = null
             val temp = File(dir, "$FILE_NAME.tmp")
-            temp.writeText(serialize(tiles).toString())
+            temp.writeText(json)
             if (!temp.renameTo(dataFile(context))) {
                 temp.copyTo(dataFile(context), overwrite = true)
                 temp.delete()
             }
             val keep = tiles.allSites().filter { it.customIcon }.map { "$ICON_PREFIX${it.id}.png" }.toSet()
             dir.listFiles()?.forEach { if (it.name.startsWith(ICON_PREFIX) && it.name !in keep) it.delete() }
+            lastWrittenJson = json
         }
     }
 

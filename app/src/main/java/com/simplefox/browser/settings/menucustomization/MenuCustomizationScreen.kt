@@ -237,7 +237,7 @@ private fun MenuCustomizeRow(
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.weight(1f).padding(start = 14.dp)
             )
-            ClintSwitch(checked = entry.visible)
+            ClintSwitch(checked = entry.visible, onCheckedChange = { onToggleVisible() })
         }
         Icon(
             imageVector = Icons.Filled.DragHandle,

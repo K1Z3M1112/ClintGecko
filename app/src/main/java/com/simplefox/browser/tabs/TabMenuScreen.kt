@@ -9,6 +9,8 @@ import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.ui.draw.alpha
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -33,6 +35,9 @@ import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Tab
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.VisibilityOff
@@ -54,6 +59,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.runtime.structuralEqualityPolicy
+import kotlinx.coroutines.delay
 import androidx.compose.runtime.setValue
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -102,6 +109,8 @@ private const val PREF_TAB_MENU_LIST_VIEW = "tab_menu_list_view"
 private const val PREF_TAB_MENU_BUTTONS_AT_BOTTOM = "tab_menu_buttons_at_bottom_v2"
 private const val PREF_TAB_MENU_TABS_AT_BOTTOM = "tab_menu_tabs_at_bottom"
 private val GroupCorner = 18.dp
+// Background tabs (loading, title/favicon/audio updates) bump tabsRevision constantly; sync at most this often.
+private const val TAB_SYNC_THROTTLE_MS = 120L
 
 private sealed class TabMenuItem {
     abstract val key: String
@@ -115,6 +124,11 @@ private sealed class TabMenuItem {
     data class GroupHeader(val group: TabGroup, val tabs: List<TabPreview>) : TabMenuItem() {
         override val key: String get() = groupHeaderKey(group.id)
         override val fullSpan: Boolean get() = true
+    }
+
+    /** Grid view: the whole group collapsed into one Chrome-style tile. */
+    data class GroupCard(val group: TabGroup, val tabs: List<TabPreview>) : TabMenuItem() {
+        override val key: String get() = groupHeaderKey(group.id)
     }
 
     data class Tab(val preview: TabPreview, val group: TabGroup?) : TabMenuItem() {
@@ -152,8 +166,22 @@ private fun buildRenderList(
     columns: Int,
     forceCollapsed: Boolean = false,
     forceExpanded: Boolean = false,
-    reversed: Boolean = false
+    reversed: Boolean = false,
+    groupAsCard: Boolean = false,
+    onlyGroupId: String? = null
 ): List<TabMenuItem> {
+    if (onlyGroupId != null) {
+        // Group detail page: just this group's header and all of its tabs.
+        val group = groups.find { it.id == onlyGroupId } ?: return emptyList()
+        val members = tabs.filter { it.groupId == onlyGroupId }
+        if (members.isEmpty()) return emptyList()
+        val ordered = if (reversed) members.asReversed() else members
+        return listOf<TabMenuItem>(TabMenuItem.GroupHeader(group.copy(collapsed = false), members)) +
+            padPartialRow(ordered.map<TabPreview, TabMenuItem> { TabMenuItem.Tab(it, group) }, columns, partialRowFirst = reversed) { slot ->
+                TabMenuItem.GroupFiller(group, slot)
+            } +
+            TabMenuItem.GroupFooter(group)
+    }
     val groupsById = groups.associateBy { it.id }
     val result = mutableListOf<TabMenuItem>()
     for (incognitoSection in if (reversed) listOf(true, false) else listOf(false, true)) {
@@ -184,6 +212,10 @@ private fun buildRenderList(
             val group = preview.groupId?.let { groupsById[it] }?.takeIf { it.isIncognito == incognitoSection }
             if (group == null) {
                 looseRun.add(TabMenuItem.Tab(preview, null))
+            } else if (groupAsCard) {
+                if (emitted.add(group.id)) {
+                    looseRun.add(TabMenuItem.GroupCard(group, membersByGroup[group.id].orEmpty()))
+                }
             } else if (emitted.add(group.id)) {
                 flushLooseRun()
                 val members = membersByGroup[group.id].orEmpty()
@@ -269,7 +301,15 @@ fun TabMenuScreen(activity: MainActivity, onDismiss: () -> Unit) {
         // Skip the rewrite when nothing changed: the first sync right after opening used to clear and refill the
         // whole list, which rebuilt the grid a second time on the opening frames.
         val freshTabs = tabManager.previews()
-        if (freshTabs != tabs.toList()) { tabs.clear(); tabs.addAll(freshTabs) }
+        // Reuse the existing instance for every unchanged preview so its card is not recomposed, and when only
+        // some previews changed (same ids, same order) write just those rows instead of rebuilding the list.
+        val oldById = tabs.associateBy { it.id }
+        val merged = freshTabs.map { fresh -> oldById[fresh.id]?.takeIf { it == fresh } ?: fresh }
+        if (merged.size == tabs.size && merged.indices.all { merged[it].id == tabs[it].id }) {
+            merged.forEachIndexed { index, preview -> if (tabs[index] !== preview) tabs[index] = preview }
+        } else if (merged != tabs.toList()) {
+            tabs.clear(); tabs.addAll(merged)
+        }
         val freshGroups = tabManager.groups
         if (freshGroups != groups.toList()) { groups.clear(); groups.addAll(freshGroups) }
         activeTabId = tabManager.activeTab?.id
@@ -294,7 +334,28 @@ fun TabMenuScreen(activity: MainActivity, onDismiss: () -> Unit) {
         requested
     }
 
-    LaunchedEffect(activity.uiState.tabsRevision) { syncFromManager() }
+    // Grid view only: the group whose full tab list is open (Chrome-style group page).
+    var openedGroupId by remember { mutableStateOf(if (listView) null else focusGroupId) }
+    fun closeGroupDetail() {
+        scrollToGroupId = openedGroupId
+        openedGroupId = null
+    }
+    LaunchedEffect(listView) { if (listView) openedGroupId = null }
+    LaunchedEffect(Unit) {
+        snapshotFlow { openedGroupId?.let { id -> tabs.none { it.groupId == id } } == true }
+            .collect { gone -> if (gone) openedGroupId = null }
+    }
+
+    // Observe the revision outside composition: a background page updating no longer recomposes this screen,
+    // bursts are coalesced (snapshotFlow conflates while we delay), and the local drag order is not clobbered.
+    LaunchedEffect(activity) {
+        snapshotFlow { activity.uiState.tabsRevision }
+            .distinctUntilChanged()
+            .collect {
+                if (!uiState.reorderMode) syncFromManager()
+                delay(TAB_SYNC_THROTTLE_MS)
+            }
+    }
 
     fun openTab(tabId: String) {
         val idx = tabManager.tabs.indexOfFirst { it.id == tabId }
@@ -319,6 +380,7 @@ fun TabMenuScreen(activity: MainActivity, onDismiss: () -> Unit) {
     }
 
     fun revealGroup(groupId: String) {
+        if (!listView) { openedGroupId = groupId; return }
         if (tabManager.group(groupId)?.collapsed == true) {
             commitGroups { updateGroup(groupId) { it.copy(collapsed = false) } }
         }
@@ -335,6 +397,7 @@ fun TabMenuScreen(activity: MainActivity, onDismiss: () -> Unit) {
             uiState.reorderMode -> uiState.endReorder()
             uiState.selectionMode -> uiState.exitSelectionMode()
             searchActive -> closeSearch()
+            openedGroupId != null -> closeGroupDetail()
             else -> onDismiss()
         }
     }
@@ -421,7 +484,7 @@ fun TabMenuScreen(activity: MainActivity, onDismiss: () -> Unit) {
     BoxWithConstraints(Modifier.fillMaxSize().background(colors.surface).statusBarsPadding().navigationBarsPadding()) {
         val columns = ((maxWidth - GridEdgePadding * 2) / if (listView) ListCellMinWidth else CellMinWidth).toInt().coerceAtLeast(1)
         val initialIndex = remember {
-            val renderList = buildRenderList(tabs, groups, columns, reversed = tabsAtBottom)
+            val renderList = buildRenderList(tabs, groups, columns, reversed = tabsAtBottom, groupAsCard = !listView, onlyGroupId = if (listView) null else openedGroupId)
             val activeGroupId = tabs.firstOrNull { it.id == activeTabId }?.groupId
             val focusIndex = focusGroupId?.let { id -> renderList.indexOfFirst { it.key == groupHeaderKey(id) } } ?: -1
             val activeIndex = renderList.indexOfFirst { it is TabMenuItem.Tab && it.preview.id == activeTabId }
@@ -435,7 +498,7 @@ fun TabMenuScreen(activity: MainActivity, onDismiss: () -> Unit) {
         val gridState = rememberLazyGridState(initialFirstVisibleItemIndex = initialIndex)
         val dragState = remember(gridState) { TabDragState(gridState) }
         val renderList by remember(columns, tabsAtBottom) {
-            derivedStateOf {
+            derivedStateOf(structuralEqualityPolicy()) {
                 val query = searchQuery.trim()
                 buildRenderList(
                     if (query.isEmpty()) tabs.toList() else tabs.filter { it.matchesQuery(query) },
@@ -443,15 +506,23 @@ fun TabMenuScreen(activity: MainActivity, onDismiss: () -> Unit) {
                     columns,
                     forceCollapsed = dragState.draggingGroupId != null,
                     forceExpanded = query.isNotEmpty(),
-                    reversed = tabsAtBottom
+                    reversed = tabsAtBottom,
+                    groupAsCard = !listView && query.isEmpty(),
+                    onlyGroupId = if (listView) null else openedGroupId
                 )
             }
         }
-        val searching = searchQuery.isNotBlank()
+        val searching by remember { derivedStateOf { searchQuery.isNotBlank() } }
+        // Cheap derived facts so the screen scope does not subscribe to whole lists that change on every drag move.
+        val tabsEmpty by remember { derivedStateOf { tabs.isEmpty() } }
+        val renderListEmpty by remember { derivedStateOf { renderList.isEmpty() } }
+        val renderListSize by remember { derivedStateOf { renderList.size } }
         // Normal mode is read-only; selection mode enables the long-press reorder gesture.
         // Search remains isolated from both selection and reorder interactions.
         val dragAllowed = uiState.selectionMode && !searching
-        val draggingPreview = dragState.draggingId?.let { id -> tabs.find { it.id == id } }
+        val draggingPreview by remember(dragState) {
+            derivedStateOf(structuralEqualityPolicy()) { dragState.draggingId?.let { id -> tabs.find { it.id == id } } }
+        }
 
         // One screen-level loader replaces one producer/Flow collector per card. Only the visible range
         // plus one neighbouring row is decoded, and old requests/bitmaps are released as the viewport moves.
@@ -477,8 +548,12 @@ fun TabMenuScreen(activity: MainActivity, onDismiss: () -> Unit) {
                             val first = (visible.minOf { it.index } - columns).coerceAtLeast(0)
                             val last = (visible.maxOf { it.index } + columns).coerceAtMost(currentRenderList.lastIndex)
                             if (first > last) emptyList() else {
-                                (first..last).mapNotNull { index ->
-                                    (currentRenderList.getOrNull(index) as? TabMenuItem.Tab)?.preview?.id
+                                (first..last).flatMap { index ->
+                                    when (val entry = currentRenderList.getOrNull(index)) {
+                                        is TabMenuItem.Tab -> listOf(entry.preview.id)
+                                        is TabMenuItem.GroupCard -> entry.tabs.take(4).map { it.id }
+                                        else -> emptyList()
+                                    }
                                 }
                             }
                         }
@@ -527,17 +602,23 @@ fun TabMenuScreen(activity: MainActivity, onDismiss: () -> Unit) {
                 }
             }
         }
-        val collapsedGroupIds = groups.filter { it.collapsed }.map { it.id }.toSet()
+        val collapsedGroupIds by remember {
+            derivedStateOf(structuralEqualityPolicy()) { groups.filter { it.collapsed }.map { it.id }.toSet() }
+        }
         SideEffect {
             dragState.collapsedGroupIds = collapsedGroupIds
             dragState.columns = columns
             dragState.mergeEnabled = groupsEnabled
         }
-        val shownGroups = visibleGroups(tabs, groups)
-        val groupCounts = tabs.groupingBy { it.groupId ?: "" }.eachCount()
-        val activeGroupId = tabs.firstOrNull { it.id == activeTabId }?.groupId
+        val shownGroups by remember { derivedStateOf(structuralEqualityPolicy()) { visibleGroups(tabs, groups) } }
+        val groupCounts by remember { derivedStateOf(structuralEqualityPolicy()) { tabs.groupingBy { it.groupId ?: "" }.eachCount() } }
+        val activeGroupId by remember { derivedStateOf { tabs.firstOrNull { it.id == activeTabId }?.groupId } }
 
-        LaunchedEffect(scrollToGroupId, renderList.size) {
+        LaunchedEffect(openedGroupId) {
+            if (openedGroupId != null) gridState.scrollToItem(0)
+        }
+
+        LaunchedEffect(scrollToGroupId, renderListSize) {
             val target = scrollToGroupId ?: return@LaunchedEffect
             val index = renderList.indexOfFirst { it.key == groupHeaderKey(target) }
             if (index >= 0) gridState.scrollToItem(index)
@@ -702,6 +783,16 @@ fun TabMenuScreen(activity: MainActivity, onDismiss: () -> Unit) {
             dragState.drag(Offset.Zero)
         }
 
+        val draggedGroupState by remember(dragState) {
+            derivedStateOf(structuralEqualityPolicy()) { dragState.draggingGroupId?.let { id -> groups.find { it.id == id } } }
+        }
+        val draggedGroupMembers by remember(dragState) {
+            derivedStateOf(structuralEqualityPolicy()) {
+                val id = dragState.draggingGroupId
+                if (id == null) emptyList() else tabs.filter { it.groupId == id }
+            }
+        }
+
         val autoScrollEdgePx = with(density) { 72.dp.toPx() }
         val autoScrollMaxStepPx = with(density) { 20.dp.toPx() }
         LaunchedEffect(dragState.active) {
@@ -716,12 +807,14 @@ fun TabMenuScreen(activity: MainActivity, onDismiss: () -> Unit) {
             }
         }
 
-        LaunchedEffect(dragState.hoverKey) {
-            val key = dragState.hoverKey as? String ?: return@LaunchedEffect
-            val isDropZone = key.startsWith("group:") || key.startsWith("chip:") || key.startsWith("before:") ||
-                key.startsWith("after:") || key.startsWith("merge:") || key == END_DROP_KEY
-            if (dragState.active && isDropZone) {
-                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+        LaunchedEffect(dragState) {
+            snapshotFlow { dragState.hoverKey }.collect { hover ->
+                val key = hover as? String ?: return@collect
+                val isDropZone = key.startsWith("group:") || key.startsWith("chip:") || key.startsWith("before:") ||
+                    key.startsWith("after:") || key.startsWith("merge:") || key == END_DROP_KEY
+                if (dragState.active && isDropZone) {
+                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                }
             }
         }
 
@@ -757,6 +850,7 @@ fun TabMenuScreen(activity: MainActivity, onDismiss: () -> Unit) {
                 reorderMode = uiState.reorderMode,
                 onToggleReorderMode = {},
                 onToggleSelectionMode = { uiState.endReorder(); uiState.selectionMode = true },
+                onExitSelection = { uiState.exitSelectionMode() },
                 onSelectAll = { uiState.selectAll(tabs.map { it.id }) },
                 onInvertSelection = { uiState.invertSelection(tabs.map { it.id }) },
                 onDeleteSelected = { closeTabs(uiState.selectedIds.toList()); uiState.exitSelectionMode() },
@@ -830,14 +924,21 @@ fun TabMenuScreen(activity: MainActivity, onDismiss: () -> Unit) {
         }
 
         val quickActions: @Composable ColumnScope.() -> Unit = {
-            if (!uiState.selectionMode && !searchActive) {
-                Column {
-                    if (buttonsAtBottom) {
-                        if (groupsEnabled) groupChips()
-                        newTabButtons()
-                    } else {
-                        newTabButtons()
-                        if (groupsEnabled) groupChips()
+            if (!searchActive) {
+                // Stay in place while selecting so the grid below does not jump; just dim and lock.
+                val locked = uiState.selectionMode
+                Box(Modifier.alpha(if (locked) 0.35f else 1f)) {
+                    Column {
+                        if (buttonsAtBottom) {
+                            if (groupsEnabled) groupChips()
+                            newTabButtons()
+                        } else {
+                            newTabButtons()
+                            if (groupsEnabled) groupChips()
+                        }
+                    }
+                    if (locked) {
+                        Box(Modifier.matchParentSize().pointerInput(Unit) { detectTapGestures { } })
                     }
                 }
             }
@@ -864,9 +965,13 @@ fun TabMenuScreen(activity: MainActivity, onDismiss: () -> Unit) {
                     .weight(1f)
                     .onGloballyPositioned { dragState.gridOriginInRoot = it.positionInRoot() }
             ) {
-                if (tabs.isEmpty()) {
-                    Text(stringResource(R.string.no_tabs), color = colors.secondaryText, modifier = Modifier.align(Alignment.Center))
-                } else if (renderList.isEmpty()) {
+                if (tabsEmpty) {
+                    Column(Modifier.align(Alignment.Center), horizontalAlignment = Alignment.CenterHorizontally) {
+                        Icon(Icons.Filled.Tab, contentDescription = null, tint = colors.secondaryText.copy(alpha = 0.6f), modifier = Modifier.size(44.dp))
+                        Spacer(Modifier.height(10.dp))
+                        Text(stringResource(R.string.no_tabs), color = colors.secondaryText)
+                    }
+                } else if (renderListEmpty) {
                     Text(
                         stringResource(R.string.tab_menu_search_no_results),
                         color = colors.secondaryText,
@@ -942,7 +1047,8 @@ fun TabMenuScreen(activity: MainActivity, onDismiss: () -> Unit) {
                                             modifier = Modifier
                                                 .padding(top = 6.dp, bottom = if (group.collapsed) 6.dp else 0.dp)
                                                 .then(headerGhostModifier),
-                                            dragHandleModifier = if (dragAllowed) Modifier.pointerInput(group.id) {
+                                            onBack = if (openedGroupId == group.id) ({ closeGroupDetail() }) else null,
+                                            dragHandleModifier = if (dragAllowed && openedGroupId == null) Modifier.pointerInput(group.id) {
                                                     detectDragGesturesAfterLongPress(
                                                         onDragStart = { uiState.beginReorder(); dragState.startGroup(group.id) },
                                                         onDrag = { change, amount -> change.consume(); dragState.drag(amount); onGroupDragMoved() },
@@ -952,6 +1058,45 @@ fun TabMenuScreen(activity: MainActivity, onDismiss: () -> Unit) {
                                                 } else null,
                                             disableLongPressSelection = uiState.selectionMode
                                         )
+                                    }
+                                    is TabMenuItem.GroupCard -> {
+                                        val group = item.group
+                                        val groupTabIds = item.tabs.map { it.id }
+                                        val cardHighlighted by remember(group.id) {
+                                            derivedStateOf { dragState.draggingId != null && dropTargetGroupId(dragState.hoverKey) == group.id }
+                                        }
+                                        val cardContainsActive by remember(group.id, groupTabIds) {
+                                            derivedStateOf { activeTabId in groupTabIds }
+                                        }
+                                        val cardAllSelected by remember(group.id, groupTabIds) {
+                                            derivedStateOf { groupTabIds.isNotEmpty() && groupTabIds.all { it in uiState.selectedIds } }
+                                        }
+                                        Box(Modifier.fillMaxWidth().padding(CellPadding)) {
+                                            TabGroupCard(
+                                                group = group,
+                                                tabs = item.tabs,
+                                                containsActive = cardContainsActive,
+                                                highlighted = cardHighlighted,
+                                                selectionMode = uiState.selectionMode,
+                                                allSelected = cardAllSelected,
+                                                thumbnailFor = { id -> thumbnailBitmaps[id] },
+                                                onOpen = { openedGroupId = group.id },
+                                                onToggleSelection = {
+                                                    uiState.setSelected(groupTabIds, !groupTabIds.all { uiState.selectedIds.contains(it) })
+                                                },
+                                                onLongPress = { uiState.setSelected(groupTabIds, true) },
+                                                onNewTab = { activity.openNewTabInGroup(group.id); onDismiss() },
+                                                onEdit = { editorRequest = TabGroupEditorRequest.Edit(group) },
+                                                onSelectTabs = { uiState.setSelected(groupTabIds, true) },
+                                                onUngroup = { commitGroups { ungroup(group.id) } },
+                                                onCloseGroup = {
+                                                    closeTabs(
+                                                        groupTabIds,
+                                                        activity.getString(R.string.tab_group_closed_message, group.name.ifBlank { activity.getString(R.string.tab_group_untitled) })
+                                                    )
+                                                }
+                                            )
+                                        }
                                     }
                                     is TabMenuItem.GroupFiller -> Box(
                                         Modifier
@@ -992,12 +1137,17 @@ fun TabMenuScreen(activity: MainActivity, onDismiss: () -> Unit) {
                                         val isSelected by remember(preview.id) {
                                             derivedStateOf { preview.id in uiState.selectedIds }
                                         }
-                                        val mergeHighlighted by remember(preview, draggingPreview) {
+                                        val mergeHighlighted by remember(preview) {
                                             derivedStateOf {
-                                                draggingPreview != null &&
+                                                val dragged = draggingPreview
+                                                dragged != null &&
                                                     mergeTargetTabId(dragState.hoverKey) == preview.id &&
-                                                    canMergeTabs(draggingPreview, preview)
+                                                    canMergeTabs(dragged, preview)
                                             }
+                                        }
+                                        // Per-card derived read: a thumbnail finishing for one tab no longer recomposes every visible card.
+                                        val thumbnail by remember(preview.id) {
+                                            derivedStateOf(structuralEqualityPolicy()) { thumbnailBitmaps[preview.id] }
                                         }
                                         // In normal mode the card only opens. In selection mode a long-press
                                         // on the card itself starts reordering; taps still toggle selection.
@@ -1047,7 +1197,7 @@ fun TabMenuScreen(activity: MainActivity, onDismiss: () -> Unit) {
                                                     TabMenuCard(
                                                         preview = preview,
                                                         isActive = isActive,
-                                                        thumbnail = thumbnailBitmaps[preview.id],
+                                                        thumbnail = thumbnail,
                                                         selectionMode = uiState.selectionMode,
                                                         selected = isSelected,
                                                         dragHandleModifier = cardDragHandleModifier,
@@ -1110,9 +1260,9 @@ fun TabMenuScreen(activity: MainActivity, onDismiss: () -> Unit) {
                         }
                     }
 
-                    val draggedGroup = dragState.draggingGroupId?.let { id -> groups.find { it.id == id } }
+                    val draggedGroup = draggedGroupState
                     if (draggedGroup != null) {
-                        val members = tabs.filter { it.groupId == draggedGroup.id }
+                        val members = draggedGroupMembers
                         val headerWidth = with(density) { dragState.originSize.width.toDp() }
                         Box(
                             Modifier
@@ -1144,19 +1294,19 @@ fun TabMenuScreen(activity: MainActivity, onDismiss: () -> Unit) {
             }
 
             if (uiState.selectionMode) {
-                val selectedIds = uiState.selectedIds.toList()
-                TabSelectionActionBar(
-                    hasSelection = selectedIds.isNotEmpty(),
-                    canUngroup = tabs.any { it.id in selectedIds && it.groupId != null },
+                // Selection changes are read inside this host, not in the whole screen scope.
+                TabMenuSelectionBarHost(
+                    uiState = uiState,
+                    tabs = tabs,
                     groupsEnabled = groupsEnabled,
-                    onGroup = { editorRequest = TabGroupEditorRequest.CreateFromTabs(selectedIds) },
+                    onGroup = { ids -> editorRequest = TabGroupEditorRequest.CreateFromTabs(ids) },
                     onMove = { showMovePicker = true },
-                    onUngroup = {
-                        commitGroups { removeFromGroup(selectedIds) }
+                    onUngroup = { ids ->
+                        commitGroups { removeFromGroup(ids) }
                         uiState.exitSelectionMode()
                     },
-                    onClose = {
-                        closeTabs(selectedIds)
+                    onClose = { ids ->
+                        closeTabs(ids)
                         uiState.exitSelectionMode()
                     }
                 )
@@ -1175,6 +1325,28 @@ fun TabMenuScreen(activity: MainActivity, onDismiss: () -> Unit) {
             }
         }
     }
+}
+
+@Composable
+private fun TabMenuSelectionBarHost(
+    uiState: TabMenuUiState,
+    tabs: List<TabPreview>,
+    groupsEnabled: Boolean,
+    onGroup: (List<String>) -> Unit,
+    onMove: () -> Unit,
+    onUngroup: (List<String>) -> Unit,
+    onClose: (List<String>) -> Unit
+) {
+    val selectedIds = uiState.selectedIds.toList()
+    TabSelectionActionBar(
+        hasSelection = selectedIds.isNotEmpty(),
+        canUngroup = tabs.any { it.id in selectedIds && it.groupId != null },
+        groupsEnabled = groupsEnabled,
+        onGroup = { onGroup(selectedIds) },
+        onMove = onMove,
+        onUngroup = { onUngroup(selectedIds) },
+        onClose = { onClose(selectedIds) }
+    )
 }
 
 @Composable
@@ -1206,6 +1378,7 @@ private fun TabMenuTopBar(
     onToggleListView: () -> Unit,
     onCloseDuplicates: (() -> Unit)?,
     onToggleSelectionMode: () -> Unit,
+    onExitSelection: () -> Unit,
     onSelectAll: () -> Unit,
     onInvertSelection: () -> Unit,
     onDeleteSelected: () -> Unit,
@@ -1233,9 +1406,14 @@ private fun TabMenuTopBar(
             )
             .clip(RoundedCornerShape(18.dp))
             .background(colors.surfaceVariant)
-            .padding(start = 16.dp, end = 8.dp, top = 5.dp, bottom = 5.dp),
+            .padding(start = if (selectionMode) 4.dp else 16.dp, end = 8.dp, top = 5.dp, bottom = 5.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
+        if (selectionMode) {
+            IconButton(onClick = onExitSelection) {
+                Icon(Icons.Filled.Close, contentDescription = stringResource(R.string.tab_menu_exit_selection_desc), tint = colors.primary)
+            }
+        }
         if (searchActive && !selectionMode) {
             ClintSearchField(
                 query = searchQuery,
@@ -1261,6 +1439,15 @@ private fun TabMenuTopBar(
             if (!selectionMode) {
                 IconButton(onClick = onOpenSearch) {
                     Icon(Icons.Filled.Search, contentDescription = stringResource(R.string.tab_menu_search_hint), tint = colors.primary)
+                }
+            }
+            if (selectionMode) {
+                IconButton(onClick = onDeleteSelected, enabled = selectedCount > 0) {
+                    Icon(
+                        Icons.Filled.Delete,
+                        contentDescription = stringResource(R.string.tab_menu_delete_selected),
+                        tint = if (selectedCount > 0) colors.primary else colors.secondaryText.copy(alpha = 0.5f)
+                    )
                 }
             }
             Box {

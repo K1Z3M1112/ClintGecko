@@ -170,7 +170,7 @@ internal fun CreateShortcutDialog(
                     modifier = Modifier.padding(top = 2.dp)
                 )
             }
-            ClintSwitch(checked = frameless)
+            ClintSwitch(checked = frameless, onCheckedChange = { frameless = !frameless })
         }
         if (shortcutProfileFieldVisible(context, profileId)) {
             ShortcutProfileField(profileId, hideStatusBar, hideSystemNavigation) { profileId = it }

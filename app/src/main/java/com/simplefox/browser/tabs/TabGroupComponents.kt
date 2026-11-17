@@ -11,6 +11,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -25,6 +28,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.DriveFileMove
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Checklist
 import androidx.compose.material.icons.filled.Close
@@ -51,6 +55,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import android.graphics.Bitmap
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Rect
@@ -58,6 +63,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.res.pluralStringResource
@@ -230,7 +236,8 @@ internal fun TabGroupHeader(
     onCloseGroup: () -> Unit,
     modifier: Modifier = Modifier,
     dragHandleModifier: Modifier? = null,
-    disableLongPressSelection: Boolean = false
+    disableLongPressSelection: Boolean = false,
+    onBack: (() -> Unit)? = null
 ) {
     val colors = LocalClintColors.current
     val dragHandle = dragHandleModifier
@@ -245,7 +252,7 @@ internal fun TabGroupHeader(
             .then(dragHandle ?: Modifier)
             .border(if (highlighted) 2.dp else 0.dp, if (highlighted) Color(group.color) else Color.Transparent, shape)
             .combinedClickable(
-                onClick = { if (selectionMode) onToggleSelection() else onToggleCollapsed() },
+                onClick = { if (selectionMode) onToggleSelection() else if (onBack != null) onBack() else onToggleCollapsed() },
                 onLongClick = if (!disableLongPressSelection) ({ if (!selectionMode) onLongPress() }) else null
             )
             .padding(start = if (dragHandle != null) 6.dp else 14.dp, end = 4.dp, top = 8.dp, bottom = 8.dp),
@@ -261,6 +268,11 @@ internal fun TabGroupHeader(
         }
         if (selectionMode) {
             ClintCheckbox(checked = allSelected, onCheckedChange = { onToggleSelection() }, modifier = Modifier.size(20.dp))
+        } else if (onBack != null) {
+            IconButton(onClick = onBack, modifier = Modifier.size(36.dp)) {
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.tab_group_back), tint = colors.iconTint, modifier = Modifier.size(22.dp))
+            }
+            TabGroupDot(group.color, 14.dp, Modifier.padding(start = 4.dp))
         } else {
             TabGroupDot(group.color, 14.dp)
         }
@@ -300,12 +312,14 @@ internal fun TabGroupHeader(
                 Icon(Icons.Filled.Add, contentDescription = stringResource(R.string.tab_group_new_tab_in_group), tint = colors.iconTint, modifier = Modifier.size(20.dp))
             }
         }
-        Icon(
-            if (group.collapsed) Icons.Filled.ExpandMore else Icons.Filled.ExpandLess,
-            contentDescription = stringResource(if (group.collapsed) R.string.tab_group_expand else R.string.tab_group_collapse),
-            tint = colors.iconTint,
-            modifier = Modifier.size(22.dp)
-        )
+        if (onBack == null) {
+            Icon(
+                if (group.collapsed) Icons.Filled.ExpandMore else Icons.Filled.ExpandLess,
+                contentDescription = stringResource(if (group.collapsed) R.string.tab_group_expand else R.string.tab_group_collapse),
+                tint = colors.iconTint,
+                modifier = Modifier.size(22.dp)
+            )
+        }
         if (!selectionMode) {
             Box {
                 IconButton(onClick = { menuExpanded = true }, modifier = Modifier.size(36.dp)) {
@@ -314,6 +328,7 @@ internal fun TabGroupHeader(
                 TabGroupMenu(
                     expanded = menuExpanded,
                     collapsed = group.collapsed,
+                    showCollapse = onBack == null,
                     onDismiss = { menuExpanded = false },
                     onNewTab = onNewTab,
                     onEdit = onEdit,
@@ -325,6 +340,141 @@ internal fun TabGroupHeader(
             }
         } else {
             Spacer(Modifier.width(10.dp))
+        }
+    }
+}
+
+/** Chrome-style group tile for the grid view: a 2x2 preview of the group's tabs; tapping opens the whole group. */
+@Composable
+internal fun TabGroupCard(
+    group: TabGroup,
+    tabs: List<TabPreview>,
+    containsActive: Boolean,
+    highlighted: Boolean,
+    selectionMode: Boolean,
+    allSelected: Boolean,
+    thumbnailFor: (String) -> Bitmap?,
+    onOpen: () -> Unit,
+    onToggleSelection: () -> Unit,
+    onLongPress: () -> Unit,
+    onNewTab: () -> Unit,
+    onEdit: () -> Unit,
+    onSelectTabs: () -> Unit,
+    onUngroup: () -> Unit,
+    onCloseGroup: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val colors = LocalClintColors.current
+    val shape = RoundedCornerShape(18.dp)
+    val accent = Color(group.color)
+    val emphasized = highlighted || allSelected || containsActive
+    var menuExpanded by remember { mutableStateOf(false) }
+    Column(
+        modifier
+            .fillMaxWidth()
+            .aspectRatio(0.72f)
+            .clip(shape)
+            .background(tabGroupTint(group.color, colors.isLight, strong = true))
+            .border(if (emphasized) 2.dp else 0.8.dp, if (emphasized) accent else colors.divider.copy(alpha = 0.55f), shape)
+            .combinedClickable(
+                onClick = { if (selectionMode) onToggleSelection() else onOpen() },
+                onLongClick = if (!selectionMode) onLongPress else null
+            )
+            .padding(8.dp)
+    ) {
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            if (selectionMode) {
+                ClintCheckbox(checked = allSelected, onCheckedChange = { onToggleSelection() }, modifier = Modifier.size(20.dp))
+            } else {
+                TabGroupDot(group.color, 12.dp)
+            }
+            Column(Modifier.weight(1f).padding(start = 8.dp)) {
+                Text(
+                    tabGroupDisplayName(group),
+                    color = colors.onSurface,
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Text(
+                    pluralStringResource(R.plurals.tab_menu_tab_count, tabs.size, tabs.size),
+                    color = colors.secondaryText,
+                    fontSize = 11.sp,
+                    maxLines = 1
+                )
+            }
+            if (!selectionMode) {
+                Box {
+                    IconButton(onClick = { menuExpanded = true }, modifier = Modifier.size(28.dp)) {
+                        Icon(Icons.Filled.MoreVert, contentDescription = stringResource(R.string.tab_group_options_desc), tint = colors.iconTint, modifier = Modifier.size(18.dp))
+                    }
+                    TabGroupMenu(
+                        expanded = menuExpanded,
+                        collapsed = false,
+                        showCollapse = false,
+                        onDismiss = { menuExpanded = false },
+                        onNewTab = onNewTab,
+                        onEdit = onEdit,
+                        onToggleCollapsed = {},
+                        onSelectTabs = onSelectTabs,
+                        onUngroup = onUngroup,
+                        onCloseGroup = onCloseGroup
+                    )
+                }
+            }
+        }
+        Spacer(Modifier.height(8.dp))
+        Column(Modifier.weight(1f).fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            for (row in 0..1) {
+                Row(Modifier.weight(1f).fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    for (col in 0..1) {
+                        val index = row * 2 + col
+                        val tab = tabs.getOrNull(index)
+                        val overflow = if (index == 3 && tabs.size > 4) tabs.size - 3 else 0
+                        TabGroupCardTile(tab, tab?.let { thumbnailFor(it.id) }, overflow, Modifier.weight(1f).fillMaxHeight())
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun TabGroupCardTile(tab: TabPreview?, thumbnail: Bitmap?, overflow: Int, modifier: Modifier = Modifier) {
+    val colors = LocalClintColors.current
+    val tileShape = RoundedCornerShape(10.dp)
+    Box(
+        modifier.clip(tileShape).background(if (tab != null) colors.cardBackground else colors.cardBackground.copy(alpha = 0.35f)),
+        contentAlignment = Alignment.Center
+    ) {
+        if (tab != null) {
+            if (thumbnail != null && !tab.isIncognito) {
+                Image(
+                    remember(thumbnail) { thumbnail.asImageBitmap() },
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    alignment = Alignment.TopCenter,
+                    modifier = Modifier.fillMaxSize()
+                )
+            } else {
+                val favicon = rememberTabFavicon(tab)
+                if (favicon != null && !tab.isIncognito) {
+                    Image(remember(favicon) { favicon.asImageBitmap() }, contentDescription = null, modifier = Modifier.size(24.dp))
+                } else {
+                    Icon(
+                        if (tab.isIncognito) Icons.Filled.VisibilityOff else Icons.Filled.Public,
+                        contentDescription = null,
+                        tint = colors.secondaryText,
+                        modifier = Modifier.size(22.dp)
+                    )
+                }
+            }
+            if (overflow > 0) {
+                Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.55f)), contentAlignment = Alignment.Center) {
+                    Text("+$overflow", color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
+                }
+            }
         }
     }
 }
@@ -367,6 +517,7 @@ private fun TabGroupFaviconStack(tabs: List<TabPreview>, modifier: Modifier = Mo
 private fun TabGroupMenu(
     expanded: Boolean,
     collapsed: Boolean,
+    showCollapse: Boolean = true,
     onDismiss: () -> Unit,
     onNewTab: () -> Unit,
     onEdit: () -> Unit,
@@ -386,7 +537,7 @@ private fun TabGroupMenu(
     ) {
         ListMenuItem(Icons.Filled.Add, stringResource(R.string.tab_group_new_tab_in_group), checked = false) { onDismiss(); onNewTab() }
         ListMenuItem(Icons.Filled.Edit, stringResource(R.string.tab_group_edit), checked = false) { onDismiss(); onEdit() }
-        ListMenuItem(
+        if (showCollapse) ListMenuItem(
             if (collapsed) Icons.Filled.ExpandMore else Icons.Filled.ExpandLess,
             stringResource(if (collapsed) R.string.tab_group_expand else R.string.tab_group_collapse),
             checked = false

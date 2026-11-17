@@ -212,7 +212,7 @@ private fun ExtensionPromptDialog(prompt: ExtensionPrompt, hideStatusBar: Boolea
                         fontSize = 14.sp,
                         modifier = Modifier.weight(1f).padding(end = 12.dp)
                     )
-                    ClintSwitch(checked = allowPrivate)
+                    ClintSwitch(checked = allowPrivate, onCheckedChange = { allowPrivate = !allowPrivate })
                 }
             }
         }

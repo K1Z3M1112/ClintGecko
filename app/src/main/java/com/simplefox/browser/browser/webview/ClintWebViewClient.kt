@@ -202,9 +202,10 @@ class ClintWebViewClient(
 
     private fun handleIntentScheme(view: ClintWebView, uriString: String): Boolean {
         return try {
-            val intent = Intent.parseUri(uriString, Intent.URI_INTENT_SCHEME).apply {
-                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            }
+            val parsed = Intent.parseUri(uriString, Intent.URI_INTENT_SCHEME)
+            val intent = com.simplefox.browser.security.IntentSecurity.sanitizeExternalIntent(view.context, parsed)
+                ?.apply { addFlags(Intent.FLAG_ACTIVITY_NEW_TASK) }
+                ?: return true
             val pm = view.context.packageManager
             val resolveInfo = resolveActivityCompat(pm, intent)
             val activity = view.context as? android.app.Activity
@@ -215,7 +216,7 @@ class ClintWebViewClient(
                 launchOrPromptExternalApp(view, activity, intent, resolveInfo, sourceHost, pageHost)
             } else {
                 val fallbackUrl = intent.getStringExtra("browser_fallback_url")
-                if (!fallbackUrl.isNullOrEmpty()) view.loadUrlDeferred(fallbackUrl)
+                if (com.simplefox.browser.security.IntentSecurity.isWebUrl(fallbackUrl)) view.loadUrlDeferred(fallbackUrl!!)
             }
             true
         } catch (_: Exception) {
@@ -228,7 +229,9 @@ class ClintWebViewClient(
         val pm = context.packageManager
         val intent = Intent(Intent.ACTION_VIEW, uri).apply {
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            addCategory(Intent.CATEGORY_BROWSABLE)
         }
+        if (uri.scheme?.lowercase() in setOf("file", "content", "javascript", "data", "blob")) return true
         val resolveInfo = resolveActivityCompat(pm, intent)
         val activity = context as? android.app.Activity
 

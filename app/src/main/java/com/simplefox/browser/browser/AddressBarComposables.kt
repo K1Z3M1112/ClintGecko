@@ -112,12 +112,24 @@ internal fun AddressBarRow(
     val haptic = LocalHapticFeedback.current
     var showEditMenu by remember { mutableStateOf(false) }
     var canPaste by remember { mutableStateOf(false) }
-    val activeWebView = remember(activeTabId, activity.uiState.tabsRevision) {
-        activity.tabManager.tabs.firstOrNull { it.id == activeTabId }?.webView
+    // tabsRevision is bumped by every background-tab update. It is read inside derivedStateOf so the bar is
+    // only invalidated when the active tab's web view instance actually changes.
+    val activeWebViewState = remember(activeTabId) {
+        androidx.compose.runtime.derivedStateOf {
+            activity.uiState.tabsRevision
+            activity.tabManager.tabs.firstOrNull { it.id == activeTabId }?.webView
+        }
     }
-    val translationState by (activeWebView?.translator?.state ?: com.simplefox.browser.translation.EmptyPageTranslationState).collectAsState()
-    val showTranslateButton = activity.uiState.showTranslateButton && addressBarText.isNotEmpty() &&
-        (translationState.canTranslate || translationState.isRequested)
+    val activeWebView = activeWebViewState.value
+    val translationStateHolder = (activeWebView?.translator?.state ?: com.simplefox.browser.translation.EmptyPageTranslationState).collectAsState()
+    val showTranslateButton by remember(addressBarText) {
+        androidx.compose.runtime.derivedStateOf {
+            activity.uiState.showTranslateButton && addressBarText.isNotEmpty() &&
+                translationStateHolder.value.let { it.canTranslate || it.isRequested }
+        }
+    }
+    val translateIsTranslating by remember { androidx.compose.runtime.derivedStateOf { translationStateHolder.value.isTranslating } }
+    val translateIsTranslated by remember { androidx.compose.runtime.derivedStateOf { translationStateHolder.value.isTranslated } }
     var dragOffset by remember { mutableFloatStateOf(0f) }
     var swipeDirection by remember { mutableIntStateOf(0) }
     val swipeThresholdPx = with(density) { 96.dp.toPx() }
@@ -304,7 +316,7 @@ internal fun AddressBarRow(
                                 onClick = { activity.openTranslatePage() }
                             )
                     ) {
-                        if (translationState.isTranslating) {
+                        if (translateIsTranslating) {
                             CircularProgressIndicator(
                                 color = colors.primary,
                                 strokeWidth = 2.dp,
@@ -314,7 +326,7 @@ internal fun AddressBarRow(
                             Icon(
                                 imageVector = androidx.compose.material.icons.Icons.Filled.Translate,
                                 contentDescription = stringResource(R.string.translation_menu_translate),
-                                tint = if (translationState.isTranslated) colors.primary else colors.iconTint,
+                                tint = if (translateIsTranslated) colors.primary else colors.iconTint,
                                 modifier = Modifier.size(20.dp)
                             )
                         }

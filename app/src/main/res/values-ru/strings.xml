@@ -1364,6 +1364,7 @@
     <string name="tab_menu_delete_selected">Удалить выбранные вкладки</string>
     <string name="tab_menu_drag_handle_desc">Перетащите для изменения порядка</string>
     <string name="tab_group_new">Новая группа вкладок</string>
+    <string name="tab_group_back">Назад</string>
     <string name="tab_group_new_tab_in_group">Новая вкладка в группе</string>
     <string name="tab_group_edit">Изменить название и цвет</string>
     <string name="tab_group_edit_title">Изменить группу</string>
@@ -2360,4 +2361,5 @@
     <string name="address_bar_link_copied">Ссылка на страницу скопирована</string>
     <string name="address_bar_paste">Вставить</string>
     <string name="address_bar_paste_and_go">Вставить и перейти</string>
+    <string name="about_copy_info">Копировать сведения о версии</string>
 </resources>

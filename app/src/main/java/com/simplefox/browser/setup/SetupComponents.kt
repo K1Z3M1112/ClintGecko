@@ -2,6 +2,7 @@ package com.simplefox.browser.setup
 import androidx.compose.material.icons.filled.Check
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -26,7 +27,6 @@ import com.simplefox.browser.ui.foundation.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -53,11 +53,10 @@ fun SelectableCard(
         onClick = onClick,
         modifier = modifier
             .fillMaxWidth()
-            .padding(bottom = bottomSpacing)
-            .alpha(if (selected) 1.0f else 0.45f),
+            .padding(bottom = bottomSpacing),
         shape = RoundedCornerShape(14.dp),
         colors = CardDefaults.cardColors(containerColor = cardBackground),
-        border = if (selected) BorderStroke(3.dp, primary) else null
+        border = BorderStroke(if (selected) 3.dp else 1.dp, if (selected) primary else primary.copy(alpha = 0.18f))
     ) {
         Row(
             Modifier
@@ -110,12 +109,11 @@ fun SetupPrimaryButton(
         enabled = enabled,
         modifier = modifier
             .fillMaxWidth()
-            .height(52.dp)
-            .alpha(if (enabled) 1.0f else 0.5f),
+            .height(52.dp),
         shape = RoundedCornerShape(26.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = backgroundColor,
-            disabledContainerColor = backgroundColor
+            disabledContainerColor = backgroundColor.copy(alpha = 0.5f)
         )
     ) {
         if (icon != null) {
@@ -145,6 +143,7 @@ fun DefaultChip(text: String, color: Color, modifier: Modifier = Modifier) {
     }
 }
 
+/** View-based drawable preview, still used by the settings theme dialog; setup itself uses [ThemeModeSwatch]. */
 @Composable
 fun DrawableImage(drawableRes: Int, modifier: Modifier = Modifier) {
     AndroidView(
@@ -152,6 +151,28 @@ fun DrawableImage(drawableRes: Int, modifier: Modifier = Modifier) {
         update = { view -> view.background = ContextCompat.getDrawable(view.context, drawableRes) },
         modifier = modifier
     )
+}
+
+/** Cheap Compose-drawn preview of a theme mode (no View interop, no drawable inflation). */
+@Composable
+fun ThemeModeSwatch(mode: String, modifier: Modifier = Modifier) {
+    val dark = Color(0xFF1C1B1F)
+    val light = Color(0xFFF6F2F7)
+    Canvas(modifier.clip(CircleShape)) {
+        when (mode) {
+            "dark" -> drawRect(dark)
+            "light" -> drawRect(light)
+            else -> {
+                drawRect(light)
+                drawPath(
+                    androidx.compose.ui.graphics.Path().apply {
+                        moveTo(size.width, 0f); lineTo(size.width, size.height); lineTo(0f, size.height); close()
+                    },
+                    dark
+                )
+            }
+        }
+    }
 }
 
 @Composable
@@ -255,10 +276,10 @@ fun RowScope.OptionTile(
     Box(modifier.weight(1f)) {
         Card(
             onClick = onClick,
-            modifier = Modifier.fillMaxWidth().alpha(if (selected) 1f else 0.55f),
+            modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(16.dp),
             colors = CardDefaults.cardColors(containerColor = cardBackground),
-            border = if (selected) BorderStroke(2.dp, primary) else null
+            border = BorderStroke(if (selected) 2.dp else 1.dp, if (selected) primary else primary.copy(alpha = 0.18f))
         ) {
             Column(
                 Modifier.fillMaxWidth().padding(vertical = 14.dp, horizontal = 4.dp),

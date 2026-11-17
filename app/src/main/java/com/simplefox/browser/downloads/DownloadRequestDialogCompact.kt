@@ -216,7 +216,7 @@ internal fun CompactToggleRow(title: String, checked: Boolean, onToggle: () -> U
             modifier = Modifier.weight(1f).padding(end = 8.dp)
         )
         Box(Modifier.size(width = 40.dp, height = 24.dp), contentAlignment = Alignment.Center) {
-            ClintSwitch(checked = checked, modifier = Modifier.scale(0.75f))
+            ClintSwitch(checked = checked, modifier = Modifier.scale(0.75f), onCheckedChange = { onToggle() })
         }
     }
 }

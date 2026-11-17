@@ -1325,7 +1325,9 @@
     <string name="tab_menu_select_all">Select All</string>
     <string name="tab_menu_invert_selection">Invert Selection</string>
     <string name="tab_menu_delete_selected">Delete Selected Tabs</string>
+    <string name="tab_menu_exit_selection_desc">Exit selection</string>
     <string name="tab_menu_drag_handle_desc">Drag to reorder</string>
+    <string name="tab_group_back">Back</string>
     <string name="tab_group_new">New Tab Group</string>
     <string name="tab_group_new_tab_in_group">New Tab in Group</string>
     <string name="tab_group_edit">Edit Name and Color</string>
@@ -2317,4 +2319,5 @@
     <string name="address_bar_paste_and_go">Paste &amp; Go</string>
     <string name="menu_customization_rows_title">Menu rows</string>
     <string name="menu_customization_rows_desc">Choose how many rows the menu bar uses (1–3). Rows scroll left/right together.</string>
+    <string name="about_copy_info">Copy version info</string>
 </resources>

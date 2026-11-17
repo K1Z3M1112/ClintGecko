@@ -272,7 +272,7 @@ private fun MasterSwitchRow(masterEnabled: Boolean, onToggle: (Boolean) -> Unit)
         colors = colors,
         onClick = { onToggle(!masterEnabled) },
         trailing = {
-            ClintSwitch(checked = masterEnabled)
+            ClintSwitch(checked = masterEnabled, onCheckedChange = { onToggle(!masterEnabled) })
         }
     )
 }
@@ -491,7 +491,11 @@ private fun WebsiteBlockerCategoryRow(
             Text(statusText, color = colors.secondaryText, fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(top = 2.dp))
         }
         if (!isInSelectionMode) {
-            ClintSwitch(checked = category.isEnabled)
+            ClintSwitch(
+                checked = category.isEnabled,
+                enabled = masterEnabled && !interactionLocked,
+                onCheckedChange = { onClick() }
+            )
         }
         Box {
             IconButton(onClick = { optionsMenuOpen = true }, enabled = masterEnabled && !interactionLocked) {

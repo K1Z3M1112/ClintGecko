@@ -1316,6 +1316,7 @@
     <string name="tab_menu_delete_selected">Tanggalin ang mga Napiling Tab</string>
     <string name="tab_menu_drag_handle_desc">I-drag para ayusin muli</string>
     <string name="tab_group_new">Bagong Tab Group</string>
+    <string name="tab_group_back">Bumalik</string>
     <string name="tab_group_new_tab_in_group">Bagong Tab sa Grupo</string>
     <string name="tab_group_edit">Palitan ang Pangalan at Kulay</string>
     <string name="tab_group_edit_title">I-edit ang grupo</string>
@@ -2296,4 +2297,5 @@
     <string name="address_bar_link_copied">Nakopya ang link ng page</string>
     <string name="address_bar_paste">I-paste</string>
     <string name="address_bar_paste_and_go">I-paste at pumunta</string>
+    <string name="about_copy_info">Kopyahin ang impormasyon ng bersyon</string>
 </resources>

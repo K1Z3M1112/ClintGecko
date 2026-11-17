@@ -1,4 +1,5 @@
 package com.simplefox.browser.browser.delegates
+import com.simplefox.browser.tabs.restorableUrl
 import com.simplefox.browser.browser.MainActivity
 
 import android.annotation.SuppressLint
@@ -59,10 +60,7 @@ internal fun MainActivity.saveTabs() {
     val savedTabs = tabManager.tabs
         .filter { !it.isIncognito && !it.isRefreshLinkTab && !tabManager.isGhostTab(it) }
         .mapIndexedNotNull { index, tab ->
-            val url = tab.pendingUrl?.takeIf { it.isNotEmpty() && it != "about:blank" }
-                ?: tab.webView.url?.takeIf { it.isNotEmpty() && it != "about:blank" }
-                ?: tab.url.takeIf { it.isNotEmpty() && it != "about:blank" }
-                ?: return@mapIndexedNotNull null
+            val url = tab.restorableUrl() ?: return@mapIndexedNotNull null
             SavedTab(
                 position = index,
                 url = url,

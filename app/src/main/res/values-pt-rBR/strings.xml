@@ -1324,6 +1324,7 @@
     <string name="tab_menu_delete_selected">Excluir abas selecionadas</string>
     <string name="tab_menu_drag_handle_desc">Arraste para reordenar</string>
     <string name="tab_group_new">Novo grupo de abas</string>
+    <string name="tab_group_back">Voltar</string>
     <string name="tab_group_new_tab_in_group">Nova aba no grupo</string>
     <string name="tab_group_edit">Editar nome e cor</string>
     <string name="tab_group_edit_title">Editar grupo</string>
@@ -2291,4 +2292,5 @@
     <string name="address_bar_link_copied">Link da página copiado</string>
     <string name="address_bar_paste">Colar</string>
     <string name="address_bar_paste_and_go">Colar e acessar</string>
+    <string name="about_copy_info">Copiar informações da versão</string>
 </resources>

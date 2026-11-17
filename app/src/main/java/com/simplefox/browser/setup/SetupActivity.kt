@@ -10,6 +10,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsControllerCompat
+import com.simplefox.browser.app.ClintApplication
+import com.simplefox.browser.customtheme.resolveThemeChrome
 import androidx.preference.PreferenceManager
 import com.simplefox.browser.R
 import com.simplefox.browser.base.ClintActivity
@@ -29,7 +32,6 @@ class SetupActivity : ClintActivity(), OverlayHostActivity {
         const val PRIVACY_POLICY_URL = "https://github.com/jhaiian/ClintGecko/blob/main/PRIVACY_POLICY.md"
         const val TERMS_URL = "https://github.com/jhaiian/ClintGecko/blob/main/TERMS_OF_SERVICE.md"
         private const val KEY_PENDING_PAGE = "setup_pending_page"
-        private const val KEY_PENDING_SCROLL = "setup_pending_scroll"
         private const val KEY_PENDING_CONSENT = "setup_pending_consent"
         private const val KEY_PENDING_HIDE_STATUS_BAR = "setup_pending_hide_status_bar"
         private const val KEY_PENDING_HIDE_SYSTEM_NAVIGATION = "setup_pending_hide_system_navigation"
@@ -72,20 +74,15 @@ class SetupActivity : ClintActivity(), OverlayHostActivity {
 
         val pendingPage = prefs.getInt(KEY_PENDING_PAGE, -1)
         val initialPage: Int
-        val initialScroll: Int
         if (pendingPage >= 0) {
             prefs.edit().remove(KEY_PENDING_PAGE).apply()
             initialPage = pendingPage
-            initialScroll = prefs.getInt(KEY_PENDING_SCROLL, 0)
-            if (initialScroll > 0) prefs.edit().remove(KEY_PENDING_SCROLL).apply()
         } else {
             initialPage = 0
-            initialScroll = 0
         }
 
         uiState = SetupUiState(
             initialPage = initialPage,
-            initialScrollY = initialScroll,
             initialTheme = prefs.getString("app_theme", "system") ?: "system",
             initialAccent = prefs.getString("accent_color", "material_you") ?: "material_you",
             initialIntensity = prefs.getString("surface_intensity", "soft_tint") ?: "soft_tint",
@@ -100,7 +97,7 @@ class SetupActivity : ClintActivity(), OverlayHostActivity {
         uiState.consentChecked = consentChecked
 
         setContent {
-          com.simplefox.browser.ui.theme.ClintComposeTheme(theme = uiState.theme) {
+          SetupTheme(uiState) {
             SetupScreen(
                 state = uiState,
                 onPrivacyClick = {
@@ -161,43 +158,60 @@ class SetupActivity : ClintActivity(), OverlayHostActivity {
     }
 
     private fun onSetupThemeSelected(theme: String) {
-        if (theme == uiState.theme) { uiState.currentPage = 2; return }
-        savePendingNavigationState()
-        captureAndRecreate(theme)
+        if (theme == uiState.theme) return
+        uiState.theme = theme
+        applyLiveChrome()
     }
 
     private fun onSetupAccentSelected(accent: String) {
         if (accent == uiState.accent) return
-        savePendingNavigationState()
-        captureAndApplyAccentColor(accent)
+        uiState.accent = accent
+        applyLiveChrome()
     }
 
     private fun onSetupIntensitySelected(intensity: String) {
         if (intensity == uiState.intensity) return
-        savePendingNavigationState()
-        captureAndApplySurfaceIntensity(intensity)
+        uiState.intensity = intensity
+        applyLiveChrome()
+    }
+
+    /** Keeps the system bars and window background in step with the live-themed content. */
+    @Suppress("DEPRECATION")
+    private fun applyLiveChrome() {
+        val chrome = resolveThemeChrome(this, uiState.theme, uiState.accent, uiState.intensity)
+        window.setBackgroundDrawable(android.graphics.drawable.ColorDrawable(chrome.background))
+        window.statusBarColor = chrome.statusBar
+        window.navigationBarColor = chrome.navigationBar
+        val controller = WindowInsetsControllerCompat(window, window.decorView)
+        controller.isAppearanceLightStatusBars = chrome.lightStatusBar
+        controller.isAppearanceLightNavigationBars = chrome.lightNavigationBar
     }
 
     private fun onSetupLanguageSelected(language: String) {
         if (language == uiState.language) return
+        // The language change recreates the activity, which re-reads everything from preferences.
+        persistSelections()
         savePendingNavigationState(0)
         captureAndApplyLanguage(language)
     }
 
-    private fun savePendingNavigationState(page: Int = 1) {
+    private fun savePendingNavigationState(page: Int) {
         val prefs = PreferenceManager.getDefaultSharedPreferences(this)
         prefs.edit()
             .putInt(KEY_PENDING_PAGE, page)
-            .putInt(KEY_PENDING_SCROLL, if (page == 1) uiState.themePageScrollState.value else 0)
             .putBoolean(KEY_PENDING_CONSENT, uiState.consentChecked)
             .putBoolean(KEY_PENDING_HIDE_STATUS_BAR, uiState.hideStatusBar)
             .putBoolean(KEY_PENDING_HIDE_SYSTEM_NAVIGATION, uiState.hideSystemNavigation)
             .apply()
     }
 
-    private fun saveAndProceed() {
+    /** Writes every choice made so far in one batch; theme choices only reach preferences here. */
+    private fun persistSelections(complete: Boolean = false) {
         val prefs = PreferenceManager.getDefaultSharedPreferences(this)
         prefs.edit()
+            .putString("app_theme", uiState.theme)
+            .putString("accent_color", uiState.accent)
+            .putString("surface_intensity", uiState.intensity)
             .putString("search_engine", uiState.engine)
             .putString(com.simplefox.browser.browser.CustomSearchEngineNameKey, uiState.customEngineName)
             .putString(com.simplefox.browser.browser.CustomSearchEngineUrlKey, uiState.customEngineUrl)
@@ -205,8 +219,13 @@ class SetupActivity : ClintActivity(), OverlayHostActivity {
             .putString("scroll_hide_mode", uiState.scrollHideMode)
             .putBoolean("hide_status_bar", uiState.hideStatusBar)
             .putBoolean("hide_system_navigation", uiState.hideSystemNavigation)
-            .putBoolean("setup_complete", true)
-            .apply()
+            .apply { if (complete) putBoolean("setup_complete", true) }
+            .commit()
+    }
+
+    private fun saveAndProceed() {
+        persistSelections(complete = true)
+        (application as? ClintApplication)?.applyNightMode()
         startMainActivity()
     }
 

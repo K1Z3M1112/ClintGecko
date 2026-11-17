@@ -94,7 +94,7 @@ fun AdditionalWebsitesScreen(
                     Text(stringResource(R.string.additional_websites_master_switch_title), color = colors.onSurface, fontSize = 15.sp, fontWeight = FontWeight.Medium)
                     Text(stringResource(R.string.additional_websites_master_switch_summary), color = colors.secondaryText, fontSize = 13.sp, modifier = Modifier.padding(top = 2.dp))
                 }
-                ClintSwitch(checked = state.isEnabled)
+                ClintSwitch(checked = state.isEnabled, onCheckedChange = { onToggleEnabled(!state.isEnabled) })
             }
 
             Box(Modifier.weight(1f).fillMaxWidth()) {

@@ -83,27 +83,21 @@ fun DownloadChangeSettingsDialog(item: DownloadItem, hideStatusBar: Boolean, hid
 
             SettingsSection(colors.dialogSectionBackground) {
                 Column(Modifier.padding(16.dp)) {
-                    Row(
-                        Modifier.fillMaxWidth().clickable { retryEnabled = !retryEnabled }.padding(vertical = 10.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Column(Modifier.weight(1f)) {
-                            Text(stringResource(R.string.download_retry_enabled_title), color = colors.onSurface, fontSize = 14.sp, fontWeight = FontWeight.Medium)
-                            Text(stringResource(R.string.download_retry_enabled_summary), color = colors.secondaryText, fontSize = 12.sp, modifier = Modifier.padding(top = 2.dp))
-                        }
-                        ClintSwitch(checked = retryEnabled)
-                    }
+                    DownloadToggleRow(
+                        title = stringResource(R.string.download_retry_enabled_title),
+                        summary = stringResource(R.string.download_retry_enabled_summary),
+                        checked = retryEnabled,
+                        onToggle = { retryEnabled = !retryEnabled },
+                        modifier = Modifier.padding(vertical = 10.dp)
+                    )
 
-                    Row(
-                        Modifier.fillMaxWidth().clickable { unmeteredOnly = !unmeteredOnly }.padding(vertical = 10.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Column(Modifier.weight(1f)) {
-                            Text(stringResource(R.string.download_unmetered_only_title), color = colors.onSurface, fontSize = 14.sp, fontWeight = FontWeight.Medium)
-                            Text(stringResource(R.string.download_dialog_unmetered_summary), color = colors.secondaryText, fontSize = 12.sp, modifier = Modifier.padding(top = 2.dp))
-                        }
-                        ClintSwitch(checked = unmeteredOnly)
-                    }
+                    DownloadToggleRow(
+                        title = stringResource(R.string.download_unmetered_only_title),
+                        summary = stringResource(R.string.download_dialog_unmetered_summary),
+                        checked = unmeteredOnly,
+                        onToggle = { unmeteredOnly = !unmeteredOnly },
+                        modifier = Modifier.padding(vertical = 10.dp)
+                    )
 
                     Text(
                         stringResource(R.string.download_dialog_speed_limit_title), color = colors.onSurface,

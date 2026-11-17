@@ -1324,6 +1324,7 @@
     <string name="tab_menu_delete_selected">चुने गए टैब मिटाएं</string>
     <string name="tab_menu_drag_handle_desc">क्रम बदलने के लिए खींचें</string>
     <string name="tab_group_new">नया टैब ग्रुप</string>
+    <string name="tab_group_back">वापस</string>
     <string name="tab_group_new_tab_in_group">ग्रुप में नया टैब</string>
     <string name="tab_group_edit">नाम और रंग बदलें</string>
     <string name="tab_group_edit_title">ग्रुप में बदलाव करें</string>
@@ -2288,4 +2289,5 @@
     <string name="address_bar_link_copied">पेज का लिंक कॉपी हो गया</string>
     <string name="address_bar_paste">पेस्ट करें</string>
     <string name="address_bar_paste_and_go">पेस्ट करके खोलें</string>
+    <string name="about_copy_info">संस्करण जानकारी कॉपी करें</string>
 </resources>

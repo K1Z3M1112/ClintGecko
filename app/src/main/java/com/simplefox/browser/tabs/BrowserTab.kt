@@ -20,7 +20,14 @@ data class BrowserTab(
 ) {
     var lastActiveAt: Long = System.currentTimeMillis()
 
+    /** How often the user switched to this tab this session; feeds the keep-alive score. */
+    var visitCount: Int = 0
+
     init {
         WebProfiles.registerTab(id, profileId)
     }
 }
+
+/** The address worth saving/reopening for this tab, or null when it has nothing but a blank page. */
+fun BrowserTab.restorableUrl(): String? =
+    listOf(pendingUrl, webView.url, url).firstOrNull { !it.isNullOrEmpty() && it != "about:blank" }

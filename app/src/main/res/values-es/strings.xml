@@ -1332,6 +1332,7 @@
     <string name="tab_menu_delete_selected">Eliminar pestañas seleccionadas</string>
     <string name="tab_menu_drag_handle_desc">Arrastrar para reordenar</string>
     <string name="tab_group_new">Nuevo grupo de pestañas</string>
+    <string name="tab_group_back">Atrás</string>
     <string name="tab_group_new_tab_in_group">Nueva pestaña en el grupo</string>
     <string name="tab_group_edit">Cambiar nombre y color</string>
     <string name="tab_group_edit_title">Editar grupo</string>
@@ -2319,4 +2320,5 @@
     <string name="address_bar_link_copied">Enlace de la página copiado</string>
     <string name="address_bar_paste">Pegar</string>
     <string name="address_bar_paste_and_go">Pegar e ir</string>
+    <string name="about_copy_info">Copiar información de versión</string>
 </resources>

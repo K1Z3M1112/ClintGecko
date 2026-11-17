@@ -47,6 +47,8 @@ class MainActivity : ClintActivity(), OverlayHostActivity, SnackbarHostActivity,
 
     companion object {
         private const val TRIM_MEMORY_BACKGROUND_LEVEL = 40
+        private const val BACKGROUND_PRELOAD_DELAY_MS = 500L
+        private const val BACKGROUND_PRELOAD_TIMEOUT_MS = 15_000L
         private const val TRIM_MEMORY_MODERATE_LEVEL = 60
         const val EXTRA_REFRESH_LINK_MODE = "extra_refresh_link_mode"
         const val EXTRA_REFRESH_LINK_DOWNLOAD_ID = "extra_refresh_link_download_id"
@@ -689,16 +691,32 @@ class MainActivity : ClintActivity(), OverlayHostActivity, SnackbarHostActivity,
     private val backgroundTabLoadHandler = Handler(Looper.getMainLooper())
     private val backgroundTabLoadIds = LinkedHashSet<String>()
     private var backgroundTabLoadScheduled = false
+    // The one background tab currently being preloaded, and when it started (a stalled page must not block the queue).
+    private var backgroundPreloadTabId: String? = null
+    private var backgroundPreloadStartedAt = 0L
     private val backgroundTabLoadRunnable = Runnable {
         backgroundTabLoadScheduled = false
         if (!lifecycle.currentState.isAtLeast(androidx.lifecycle.Lifecycle.State.STARTED)) return@Runnable
         if (DataSaverMode.isSingleTabActive(prefs)) return@Runnable
         val budget = liveBackgroundTabBudget()
         if (budget == 0) return@Runnable
+        // Park finished background tabs beyond the live budget first: preloading may run one tab past the
+        // budget, and this is what turns that tab into a cheap saved session instead of a live page.
+        trimBackgroundTabs()
+        val now = System.currentTimeMillis()
+        val preloading = backgroundPreloadTabId?.let { id -> tabManager.tabs.firstOrNull { it.id == id } }
+        if (preloading != null && preloading.webView.progress < 100 && now - backgroundPreloadStartedAt < BACKGROUND_PRELOAD_TIMEOUT_MS) {
+            scheduleNextBackgroundTabLoad() // one preload at a time keeps CPU, network and memory flat
+            return@Runnable
+        }
+        backgroundPreloadTabId = null
         val activeId = tabManager.activeTab?.id
         val liveBackgroundCount = tabManager.tabs.count { it.id != activeId && it.webView.isSessionOpen }
-        if (liveBackgroundCount >= budget) return@Runnable
-        val tabId = backgroundTabLoadIds.firstOrNull() ?: return@Runnable
+        if (liveBackgroundCount > budget) return@Runnable
+        // Most likely to be revisited first, not just the order they were queued in.
+        val tabId = backgroundTabLoadIds.maxByOrNull { id ->
+            tabManager.tabs.firstOrNull { it.id == id }?.keepScore() ?: Long.MIN_VALUE
+        } ?: return@Runnable
         backgroundTabLoadIds.remove(tabId)
         val tab = tabManager.tabs.firstOrNull { it.id == tabId } ?: run {
             scheduleNextBackgroundTabLoad()
@@ -709,8 +727,9 @@ class MainActivity : ClintActivity(), OverlayHostActivity, SnackbarHostActivity,
             return@Runnable
         }
         tab.pendingUrl = null
+        backgroundPreloadTabId = tab.id
+        backgroundPreloadStartedAt = now
         tab.webView.loadUrl(url)
-        trimBackgroundTabs()
         scheduleNextBackgroundTabLoad()
     }
 
@@ -720,9 +739,10 @@ class MainActivity : ClintActivity(), OverlayHostActivity, SnackbarHostActivity,
     }
 
     private fun scheduleNextBackgroundTabLoad() {
-        if (backgroundTabLoadScheduled || backgroundTabLoadIds.isEmpty()) return
+        // Also wake up when only a preload is in flight, so its finished tab still gets parked.
+        if (backgroundTabLoadScheduled || (backgroundTabLoadIds.isEmpty() && backgroundPreloadTabId == null)) return
         backgroundTabLoadScheduled = true
-        backgroundTabLoadHandler.postDelayed(backgroundTabLoadRunnable, 1_000L)
+        backgroundTabLoadHandler.postDelayed(backgroundTabLoadRunnable, BACKGROUND_PRELOAD_DELAY_MS)
     }
 
     private fun cancelScheduledBackgroundTabLoad() {
@@ -1147,9 +1167,12 @@ class MainActivity : ClintActivity(), OverlayHostActivity, SnackbarHostActivity,
 
     private fun getUrlFromIntent(intent: android.content.Intent?): String? {
         if (intent == null) return null
-        return when (intent.action) {
+        val raw = when (intent.action) {
             android.content.Intent.ACTION_SEND -> intent.getStringExtra(android.content.Intent.EXTRA_TEXT)
             else -> intent.data?.toString()
         }
+        val isLocalHtml = intent.data?.scheme.equals("file", ignoreCase = true) &&
+            intent.data?.path?.let { !com.simplefox.browser.security.IntentSecurity.isInPrivateAppStorage(this, java.io.File(it)) } == true
+        return if (isLocalHtml) raw else com.simplefox.browser.security.IntentSecurity.sanitizeLaunchUrl(raw)
     }
 }

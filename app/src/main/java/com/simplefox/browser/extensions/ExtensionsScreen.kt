@@ -387,7 +387,11 @@ private fun ExtensionCard(info: ExtensionInfo, onClick: () -> Unit) {
                         if (busy) {
                             CircularProgressIndicator(Modifier.size(22.dp), strokeWidth = 2.5.dp, color = colors.primary)
                         } else {
-                            ClintSwitch(checked = info.enabled)
+                            ClintSwitch(
+                                checked = info.enabled,
+                                enabled = info.canToggle,
+                                onCheckedChange = { ClintExtensions.setEnabled(info, !info.enabled) }
+                            )
                         }
                     }
                 }

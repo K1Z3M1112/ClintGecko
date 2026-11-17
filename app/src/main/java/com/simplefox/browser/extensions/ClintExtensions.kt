@@ -318,7 +318,9 @@ object ClintExtensions {
         val parsed = Uri.parse(uri)
         val copied = runCatching {
             when (parsed.scheme?.lowercase()) {
-                "file" -> java.io.File(parsed.path ?: return null).inputStream().use { input ->
+                "file" -> java.io.File(parsed.path ?: return null).also {
+                    if (com.simplefox.browser.security.IntentSecurity.isInPrivateAppStorage(context, it)) return null
+                }.inputStream().use { input ->
                     target.outputStream().use { out -> input.copyTo(out) }
                 }
                 "content" -> context.contentResolver.openInputStream(parsed)!!.use { input ->

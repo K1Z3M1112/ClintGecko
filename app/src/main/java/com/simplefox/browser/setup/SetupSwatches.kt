@@ -232,13 +232,14 @@ fun AccentDot(
     selected: Boolean,
     ringColor: Color,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    size: androidx.compose.ui.unit.Dp = 40.dp
 ) {
     val scale by animateFloatAsState(targetValue = if (selected) 1.1f else 1f, label = "accentDotScale")
     val checkTint = if (color.luminance() > 0.5f) Color.Black else Color.White
     Box(
         modifier
-            .size(40.dp)
+            .size(size)
             .graphicsLayer { scaleX = scale; scaleY = scale }
             .clip(CircleShape)
             .background(color)

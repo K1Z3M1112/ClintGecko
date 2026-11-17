@@ -1304,6 +1304,7 @@
     <string name="tab_menu_delete_selected">Hapus Tab yang Dipilih</string>
     <string name="tab_menu_drag_handle_desc">Tarik untuk mengubah urutan</string>
     <string name="tab_group_new">Grup Tab Baru</string>
+    <string name="tab_group_back">Kembali</string>
     <string name="tab_group_new_tab_in_group">Tab Baru di Grup</string>
     <string name="tab_group_edit">Edit Nama dan Warna</string>
     <string name="tab_group_edit_title">Edit grup</string>
@@ -2261,4 +2262,5 @@
     <string name="address_bar_link_copied">Link halaman disalin</string>
     <string name="address_bar_paste">Tempel</string>
     <string name="address_bar_paste_and_go">Tempel dan buka</string>
+    <string name="about_copy_info">Salin info versi</string>
 </resources>

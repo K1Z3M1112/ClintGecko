@@ -182,6 +182,8 @@ fun SettingsRow(
                 Text(summary, color = colors.secondaryText, fontSize = 13.sp, lineHeight = 18.sp, modifier = Modifier.padding(top = 2.dp))
             }
         }
-        trailing()
+        androidx.compose.runtime.CompositionLocalProvider(
+            com.simplefox.browser.ui.LocalSwitchRowToggle provides onClick
+        ) { trailing() }
     }
 }

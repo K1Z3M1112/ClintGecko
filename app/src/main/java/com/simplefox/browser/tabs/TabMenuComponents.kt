@@ -58,6 +58,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.FilterQuality
@@ -160,6 +161,10 @@ internal fun TabMenuCard(
                     )
                 }
 
+                if (selected) {
+                    Box(Modifier.fillMaxSize().background(accentColor.copy(alpha = 0.2f)))
+                }
+
                 // Floating controls stay compact and never occupy the page-preview area.
                 if (selectionMode) {
                     Box(
@@ -199,7 +204,7 @@ internal fun TabMenuCard(
                             .clip(RoundedCornerShape(20.dp)).background(accentColor)
                             .padding(horizontal = 8.dp, vertical = 3.dp)
                     ) {
-                        Text("Active", color = Color.White, fontSize = 9.sp, fontWeight = FontWeight.SemiBold)
+                        Text(stringResource(R.string.tab_menu_active_badge), color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.SemiBold)
                     }
                 }
 
@@ -219,14 +224,15 @@ internal fun TabMenuCard(
                         if (profile != null && !preview.isIncognito) {
                             Text(profile.name, color = Color.White, fontSize = 9.sp, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(start = 5.dp).widthIn(max = 82.dp))
                         } else if (preview.isIncognito) {
-                            Text("Incognito", color = Color.White, fontSize = 9.sp, modifier = Modifier.padding(start = 4.dp))
+                            Text(stringResource(R.string.tab_menu_incognito_badge), color = Color.White, fontSize = 10.sp, modifier = Modifier.padding(start = 4.dp))
                         }
                     }
                 }
             }
 
+            Box(Modifier.fillMaxWidth().height(56.dp)) {
             Row(
-                Modifier.fillMaxWidth().height(52.dp).padding(horizontal = 9.dp, vertical = 7.dp),
+                Modifier.fillMaxSize().padding(horizontal = 10.dp, vertical = 7.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 if (favicon != null && !preview.isIncognito) {
@@ -244,7 +250,7 @@ internal fun TabMenuCard(
                     Text(
                         preview.title.ifBlank { stringResource(R.string.new_tab) },
                         color = onCard,
-                        fontSize = 11.sp,
+                        fontSize = 12.sp,
                         fontWeight = FontWeight.SemiBold,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
@@ -252,14 +258,21 @@ internal fun TabMenuCard(
                     Text(
                         preview.url.substringAfter("//", preview.url).substringBefore('/').ifBlank { preview.url },
                         color = onCardSecondary,
-                        fontSize = 9.sp,
+                        fontSize = 10.sp,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
                 }
-                if (showDragHandle && selectionMode) {
-                    Icon(Icons.Filled.DragIndicator, contentDescription = stringResource(R.string.tab_menu_drag_handle_desc), tint = onCardSecondary, modifier = Modifier.size(18.dp))
-                }
+            }
+            if (showDragHandle && selectionMode) {
+                Icon(
+                    Icons.Filled.DragIndicator,
+                    contentDescription = stringResource(R.string.tab_menu_drag_handle_desc),
+                    tint = onCardSecondary,
+                    modifier = Modifier.align(Alignment.CenterEnd).padding(end = 6.dp)
+                        .clip(CircleShape).background(cardBg.copy(alpha = 0.9f)).size(20.dp)
+                )
+            }
             }
         }
     }
@@ -305,7 +318,7 @@ internal fun TabMenuListRow(
             .height(TabListRowHeight)
             .then(dragHandleModifier)
             .clip(shape)
-            .background(rowBg)
+            .background(if (selected) accentColor.copy(alpha = 0.16f).compositeOver(rowBg) else rowBg)
             .border(borderWidth, accentColor, shape)
             .combinedClickable(
                 interactionSource = remember { MutableInteractionSource() },
@@ -316,16 +329,6 @@ internal fun TabMenuListRow(
             .padding(start = 12.dp, end = 4.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        AnimatedVisibility(
-            visible = selectionMode,
-            enter = fadeIn(tween(150)) + scaleIn(initialScale = 0.6f),
-            exit = fadeOut(tween(120)) + scaleOut(targetScale = 0.6f)
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                ClintCheckbox(checked = selected, onCheckedChange = { onToggleSelect() }, modifier = Modifier.size(20.dp))
-                Spacer(Modifier.width(10.dp))
-            }
-        }
         Box(
             Modifier
                 .size(36.dp)
@@ -333,7 +336,9 @@ internal fun TabMenuListRow(
                 .background(if (preview.isIncognito) Color(0xFF1C1C21) else colors.surfaceVariant),
             contentAlignment = Alignment.Center
         ) {
-            if (favicon != null && !preview.isIncognito) {
+            if (selectionMode) {
+                ClintCheckbox(checked = selected, onCheckedChange = { onToggleSelect() }, modifier = Modifier.size(20.dp))
+            } else if (favicon != null && !preview.isIncognito) {
                 val faviconImage = remember(favicon) { favicon.asImageBitmap() }
                 Image(faviconImage, contentDescription = null, modifier = Modifier.size(20.dp))
             } else {
@@ -369,7 +374,10 @@ internal fun TabMenuListRow(
                 }
             }
         }
-        AnimatedVisibility(visible = !selectionMode, enter = fadeIn(tween(150)), exit = fadeOut(tween(120))) {
+        val rowAudio = preview.audio
+        val trailingSlots = (if (rowAudio != null && (rowAudio.audible || rowAudio.muted)) 1 else 0) + (if (showDragHandle) 1 else 0) + 1
+        Box(Modifier.width(36.dp * trailingSlots)) {
+          if (!selectionMode) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 val audio = preview.audio
                 if (audio != null && (audio.audible || audio.muted)) {
@@ -399,6 +407,7 @@ internal fun TabMenuListRow(
                     )
                 }
             }
+          }
         }
     }
 }

@@ -1,10 +1,6 @@
 package com.simplefox.browser.setup
 
 import com.simplefox.browser.ui.AnimatedContent
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
@@ -19,17 +15,52 @@ import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.widthIn
 import com.simplefox.browser.ui.foundation.Surface
 import androidx.compose.runtime.Composable
+import com.simplefox.browser.ui.foundation.Text
+import com.simplefox.browser.R
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.draw.clip
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.clickable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
+import com.simplefox.browser.ui.foundation.LocalTextStyle
+import com.simplefox.browser.ui.theme.ClintColors
+import com.simplefox.browser.ui.theme.LocalClintColors
+import com.simplefox.browser.ui.theme.rememberIsLightTheme
+import com.simplefox.browser.ui.theme.resolveClintColors
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.dp
-import com.simplefox.browser.ui.theme.ClintComposeTheme
-import com.simplefox.browser.ui.theme.LocalClintColors
 
 private val WideScreenBreakpointDp = 600
 private val CenteredContentMaxWidth = 480.dp
 private const val SetupPageCount = 4
+
+/**
+ * Themes everything under it from the setup state itself, so picking a theme, accent or intensity
+ * recolors the screen immediately without recreating the activity or touching preferences.
+ */
+@Composable
+fun SetupTheme(state: SetupUiState, content: @Composable () -> Unit) {
+    val context = LocalContext.current
+    val isLight = rememberIsLightTheme(state.theme)
+    val colors: ClintColors = remember(isLight, state.accent, state.intensity) {
+        resolveClintColors(context, isLight, state.accent, state.intensity)
+    }
+    CompositionLocalProvider(
+        LocalClintColors provides colors,
+        LocalTextStyle provides TextStyle(color = colors.onSurface),
+        content = content
+    )
+}
 
 @Composable
 fun SetupScreen(
@@ -50,7 +81,7 @@ fun SetupScreen(
     onNextFromLayoutPage: () -> Unit,
     onNextFromEnginePage: () -> Unit,
 ) {
-    ClintComposeTheme(theme = state.theme) {
+    run {
         val colors = LocalClintColors.current
         Surface(color = colors.background, modifier = Modifier.fillMaxSize()) {
             val insets = WindowInsets.systemBars.asPaddingValues()
@@ -85,10 +116,6 @@ fun SetupScreen(
                     AnimatedContent(
                         targetState = state.currentPage,
                         modifier = Modifier.weight(1f).fillMaxWidth(),
-                        transitionSpec = {
-                            (slideInHorizontally(animationSpec = tween(300)) { width -> width })
-                                .togetherWith(slideOutHorizontally(animationSpec = tween(300)) { width -> -width })
-                        },
                         label = "setupPage"
                     ) { page ->
                         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
@@ -105,18 +132,15 @@ fun SetupScreen(
                                         consentChecked = state.consentChecked,
                                         onConsentCheckedChange = { state.consentChecked = it },
                                         onPrivacyClick = onPrivacyClick,
-                                        onTermsClick = onTermsClick,
-                                        onContinue = onContinueFromWelcome
+                                        onTermsClick = onTermsClick
                                     )
                                     1 -> SetupThemePage(
-                                        scrollState = state.themePageScrollState,
                                         theme = state.theme,
                                         accent = state.accent,
                                         intensity = state.intensity,
                                         onThemeSelected = onThemeSelected,
                                         onAccentSelected = onAccentSelected,
-                                        onIntensitySelected = onIntensitySelected,
-                                        onNext = { state.currentPage = 2 }
+                                        onIntensitySelected = onIntensitySelected
                                     )
                                     2 -> SetupLayoutPage(
                                         addressBarPosition = state.addressBarPosition,
@@ -126,8 +150,7 @@ fun SetupScreen(
                                         accent = state.accent,
                                         onAddressBarPositionSelected = onAddressBarPositionSelected,
                                         onScrollHideModeSelected = onScrollHideModeSelected,
-                                        onHideStatusBarToggled = onHideStatusBarToggled, onHideSystemNavigationToggled = onHideSystemNavigationToggled,
-                                        onNext = onNextFromLayoutPage
+                                        onHideStatusBarToggled = onHideStatusBarToggled, onHideSystemNavigationToggled = onHideSystemNavigationToggled
                                     )
                                     else -> SetupEnginePage(
                                         engine = state.engine,
@@ -135,15 +158,70 @@ fun SetupScreen(
                                         customUrl = state.customEngineUrl,
                                         hideStatusBar = state.hideStatusBar, hideSystemNavigation = state.hideSystemNavigation,
                                         onEngineSelected = onEngineSelected,
-                                        onCustomEngineSaved = onCustomEngineSaved,
-                                        onNext = onNextFromEnginePage
+                                        onCustomEngineSaved = onCustomEngineSaved
                                     )
                                 }
                             }
                         }
                     }
+
+                    SetupFooter(
+                        page = state.currentPage,
+                        canContinue = state.currentPage != 0 || state.consentChecked,
+                        isWideScreen = isWideScreen,
+                        onBack = { if (state.currentPage > 0) state.currentPage -= 1 },
+                        onContinue = {
+                            when (state.currentPage) {
+                                0 -> onContinueFromWelcome()
+                                1 -> state.currentPage = 2
+                                2 -> onNextFromLayoutPage()
+                                else -> onNextFromEnginePage()
+                            }
+                        }
+                    )
                 }
             }
+        }
+    }
+}
+
+/** Back and Next stay pinned at the bottom so they never scroll out of reach on long pages. */
+@Composable
+private fun SetupFooter(
+    page: Int,
+    canContinue: Boolean,
+    isWideScreen: Boolean,
+    onBack: () -> Unit,
+    onContinue: () -> Unit
+) {
+    val colors = LocalClintColors.current
+    Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.TopCenter) {
+        Row(
+            Modifier
+                .then(if (isWideScreen) Modifier.widthIn(max = CenteredContentMaxWidth) else Modifier.fillMaxWidth())
+                .padding(horizontal = 28.dp, vertical = 14.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            if (page > 0) {
+                Text(
+                    stringResource(R.string.back),
+                    color = colors.secondaryText,
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.Medium,
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(26.dp))
+                        .clickable(onClick = onBack)
+                        .padding(horizontal = 20.dp, vertical = 15.dp)
+                )
+            }
+            SetupPrimaryButton(
+                text = stringResource(if (page == 0) R.string.setup_terms_continue else R.string.next),
+                onClick = onContinue,
+                backgroundColor = colors.buttonBackground,
+                enabled = canContinue,
+                modifier = Modifier.weight(1f)
+            )
         }
     }
 }

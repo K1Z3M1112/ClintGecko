@@ -442,16 +442,5 @@ private fun SectionLabel(text: String) {
 }
 
 @Composable
-private fun ToggleRow(title: String, summary: String, checked: Boolean, onToggle: () -> Unit) {
-    val colors = LocalClintColors.current
-    Row(
-        Modifier.fillMaxWidth().clickable(onClick = onToggle).padding(vertical = 6.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Column(Modifier.weight(1f).padding(end = 8.dp)) {
-            Text(title, color = colors.onSurface, fontSize = 14.sp, fontWeight = FontWeight.Medium)
-            Text(summary, color = colors.secondaryText, fontSize = 12.sp, modifier = Modifier.padding(top = 2.dp))
-        }
-        ClintSwitch(checked = checked)
-    }
-}
+private fun ToggleRow(title: String, summary: String, checked: Boolean, onToggle: () -> Unit) =
+    com.simplefox.browser.downloads.DownloadToggleRow(title, summary, checked, onToggle, Modifier.padding(vertical = 6.dp))

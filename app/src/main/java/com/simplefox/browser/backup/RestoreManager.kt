@@ -232,6 +232,9 @@ object RestoreManager {
             relinkShortcutIcons(appContext)
         }
 
+        com.simplefox.browser.tabs.TabSessionManager.invalidateSnapshot()
+        com.simplefox.browser.shortcuts.ShortcutTabSessionManager.invalidateSnapshot()
+
         plainZipFile.delete()
         RestoreOutcome(restored, unavailable)
     }
