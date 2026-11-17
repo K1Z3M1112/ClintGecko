@@ -151,7 +151,12 @@ internal fun MainScreen(activity: MainActivity, state: MainUiState) {
         }
 
         val openTabSwitcher: () -> Unit = {
-            com.simplefox.browser.tabs.TabThumbnailCache.preload(activity, activity.tabManager.tabs.map { it.id })
+            val tabs = activity.tabManager.tabs
+            com.simplefox.browser.tabs.TabThumbnailCache.preload(
+                activity,
+                tabs.map { it.id },
+                tabs.getOrNull(activity.tabManager.activeIndex)?.id
+            )
             activity.captureActiveTabThen { tabSwitcherOpen = true }
         }
         val openTabGroup: (String) -> Unit = { groupId ->
