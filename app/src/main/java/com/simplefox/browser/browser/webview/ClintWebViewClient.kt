@@ -142,7 +142,7 @@ class ClintWebViewClient(
         if (tryOpenInApp(view, uri)) return true
 
         val websiteBlockerEnabled = prefs.getBoolean("website_blocker_enabled", false)
-        if (websiteBlockerEnabled && WebsiteBlockerEngine.isActive && WebsiteBlockerWebIntegration.isHostBlocked(uri.host)) {
+        if (websiteBlockerEnabled && WebsiteBlockerEngine.awaitActive() && WebsiteBlockerWebIntegration.isHostBlocked(uri.host)) {
             onWebsiteBlockedCallback(uri.toString())
             return true
         }

@@ -514,8 +514,6 @@
     <string name="download_file_missing">File no longer exists</string>
     <string name="open_folder_error_title">Can\'t open folder</string>
     <string name="open_folder_error_message">No app on this device can open a folder view. The file is saved at:\n\n%1$s</string>
-    <string name="download_menu_update_link">Update download link</string>
-    <string name="download_menu_update_link_in_browser">Update download link in browser</string>
     <string name="download_update_link_dialog_title">Update download link</string>
     <string name="download_update_link_dialog_fetch_failed">Failed to fetch link</string>
     <string name="download_update_link_dialog_size_unverifiable">File size could not be verified</string>
@@ -523,9 +521,6 @@
     <string name="download_update_link_dialog_not_a_manifest">This link doesn\'t point to a valid stream playlist</string>
     <string name="download_update_link_dialog_not_a_file">This link opens a web page, not the file</string>
     <string name="download_update_link_dialog_positive">Update</string>
-    <string name="download_menu_redownload">Redownload</string>
-    <string name="download_menu_redownload_options">Redownload with additional options</string>
-    <string name="download_menu_change_settings">Change download settings</string>
     <string name="download_change_settings_dialog_title">Change Download Settings</string>
     <string name="download_change_settings_dialog_info">Only settings that are safe to change while this download is in progress are shown here. Changes apply right away.</string>
     <string name="download_change_settings_saved">Settings updated</string>
@@ -537,8 +532,6 @@
     <string name="download_rename_positive">Rename</string>
     <string name="download_rename_exists">A file with that name already exists</string>
     <string name="download_rename_failed">Couldn\'t rename the file</string>
-    <string name="download_menu_remove">Remove</string>
-    <string name="download_menu_copy_link">Copy download link</string>
     <string name="download_menu_copy_filename">Copy file name</string>
     <string name="download_menu_copy_path">Copy file path</string>
     <string name="download_menu_properties">Properties</string>
@@ -1757,7 +1750,6 @@
     <string name="home_folder_rename">Rename folder</string>
     <string name="home_folder_name_hint">Folder name</string>
     <string name="home_folder_ungroup">Ungroup</string>
-    <string name="home_incognito_message">Pages you visit in Incognito won\'t be saved to your history</string>
     <string name="home_normal_mode">Normal</string>
     <string name="site_section_data_saver">DATA SAVER</string>
     <string name="site_settings_data_saver_summary">Saved sites</string>

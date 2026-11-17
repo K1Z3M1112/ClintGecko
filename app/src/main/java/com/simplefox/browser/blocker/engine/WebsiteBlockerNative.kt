@@ -45,8 +45,10 @@ object WebsiteBlockerNative {
         return id
     }
 
+    private const val EMPTY_STATS = "{\"added\":0,\"skipped\":0}"
+
     fun nativeAddText(builderPtr: Long, text: String): String {
-        val builder = builders[builderPtr] ?: return "{\"added\":0,\"skipped\":0}"
+        val builder = builders[builderPtr] ?: return EMPTY_STATS
         var added = 0L
         var skipped = 0L
         synchronized(builder) {
@@ -55,41 +57,63 @@ object WebsiteBlockerNative {
             while (pos < len) {
                 var lineEnd = text.indexOf('\n', pos)
                 if (lineEnd < 0) lineEnd = len
-                var start = pos
-                var end = lineEnd
+                val result = processLine(builder, text.substring(pos, lineEnd))
+                if (result > 0) added++ else if (result < 0) skipped++
                 pos = lineEnd + 1
-
-                while (start < end && (text[start] == ' ' || text[start] == '\t')) start++
-                while (end > start && isSpace(text[end - 1])) end--
-                if (end == start) continue
-
-                val first = text[start]
-                if (first == '#' || first == ';' || first == '!') continue
-
-                val line = text.substring(start, end)
-                val sep = indexOfBlank(line, 0)
-                val token: String = if (sep < 0) {
-                    line
-                } else {
-                    val firstToken = line.substring(0, sep)
-                    val rest = indexOfNonBlank(line, sep)
-                    val second = if (rest < 0) "" else {
-                        val e = indexOfBlank(line, rest)
-                        line.substring(rest, if (e < 0) line.length else e)
-                    }
-                    if (looksLikeIp(firstToken) && second.isNotEmpty()) second else firstToken
-                }
-
-                val domain = normalizeDomain(token)
-                if (domain.isEmpty() || domain.indexOf('.') < 0 || isBoilerplate(domain)) {
-                    skipped++
-                    continue
-                }
-                builder.add(fnv1a(domain, 0, domain.length))
-                added++
             }
         }
         return "{\"added\":$added,\"skipped\":$skipped}"
+    }
+
+    /**
+     * Streams a hosts file line by line. Unlike nativeAddText(file.readText()) this never holds the
+     * whole file (tens of MB for large lists) as a single String, which halves peak memory and GC churn.
+     */
+    fun nativeAddFile(builderPtr: Long, file: File): String {
+        val builder = builders[builderPtr] ?: return EMPTY_STATS
+        var added = 0L
+        var skipped = 0L
+        synchronized(builder) {
+            file.bufferedReader(Charsets.UTF_8, 1 shl 16).use { reader ->
+                while (true) {
+                    val line = reader.readLine() ?: break
+                    val result = processLine(builder, line)
+                    if (result > 0) added++ else if (result < 0) skipped++
+                }
+            }
+        }
+        return "{\"added\":$added,\"skipped\":$skipped}"
+    }
+
+    /** Returns 1 if a domain was added, -1 if the line was skipped as invalid, 0 if ignored (blank/comment). */
+    private fun processLine(builder: Builder, raw: String): Int {
+        var start = 0
+        var end = raw.length
+        while (start < end && (raw[start] == ' ' || raw[start] == '\t')) start++
+        while (end > start && isSpace(raw[end - 1])) end--
+        if (end == start) return 0
+
+        val first = raw[start]
+        if (first == '#' || first == ';' || first == '!') return 0
+
+        val line = if (start == 0 && end == raw.length) raw else raw.substring(start, end)
+        val sep = indexOfBlank(line, 0)
+        val token: String = if (sep < 0) {
+            line
+        } else {
+            val firstToken = line.substring(0, sep)
+            val rest = indexOfNonBlank(line, sep)
+            val second = if (rest < 0) "" else {
+                val e = indexOfBlank(line, rest)
+                line.substring(rest, if (e < 0) line.length else e)
+            }
+            if (looksLikeIp(firstToken) && second.isNotEmpty()) second else firstToken
+        }
+
+        val domain = normalizeDomain(token)
+        if (domain.isEmpty() || domain.indexOf('.') < 0 || isBoilerplate(domain)) return -1
+        builder.add(fnv1a(domain, 0, domain.length))
+        return 1
     }
 
     fun nativeFinalizeBuilder(builderPtr: Long, outputPath: String): String {
@@ -108,7 +132,7 @@ object WebsiteBlockerNative {
             val buf = ByteBuffer.allocate((HEADER_BYTES + dataBytes).toInt()).order(ByteOrder.LITTLE_ENDIAN)
             buf.putInt(MAGIC).putInt(VERSION).putLong(count).putLong(0L)
             val dataStart = buf.position()
-            for (h in unique) buf.putLong(h)
+            buf.asLongBuffer().put(unique)
             var checksum = FNV_OFFSET
             val arr = buf.array()
             for (i in dataStart until arr.size) {
@@ -146,8 +170,15 @@ object WebsiteBlockerNative {
                 if (magic != MAGIC || version != VERSION || HEADER_BYTES + count * 8 != size) return 0L
 
                 var h = FNV_OFFSET
-                for (i in HEADER_BYTES.toInt() until size.toInt()) {
-                    h = (h xor (map.get(i).toLong() and 0xFF)) * FNV_PRIME
+                val reader = map.duplicate()
+                reader.position(HEADER_BYTES.toInt())
+                val chunk = ByteArray(1 shl 16)
+                while (reader.hasRemaining()) {
+                    val n = minOf(chunk.size, reader.remaining())
+                    reader.get(chunk, 0, n)
+                    for (i in 0 until n) {
+                        h = (h xor (chunk[i].toLong() and 0xFF)) * FNV_PRIME
+                    }
                 }
                 if (h != checksum) return 0L
 

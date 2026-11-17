@@ -113,13 +113,13 @@ fun MenuCustomizationScreen(
                             }
                             items(entries, key = { menuItemDragKey(it.item.id) }) { entry ->
                                 val isDragging = dragState.draggingId == entry.item.id
-                                val ghostAlpha by animateFloatAsState(if (isDragging) 0.2f else 1f, label = "menuItemGhostAlpha")
+                                val ghostAlpha = animateFloatAsState(if (isDragging) 0.2f else 1f, label = "menuItemGhostAlpha")
                                 Box(
                                     Modifier
                                 ) {
                                     MenuCustomizeRow(
                                         entry = entry,
-                                        modifier = Modifier.alpha(ghostAlpha),
+                                        modifier = Modifier.graphicsLayer { alpha = ghostAlpha.value },
                                         onToggleVisible = { onToggleVisible(entry.item.id) },
                                         dragHandleModifier = Modifier.pointerInput(entry.item.id) {
                                             detectDragGestures(
@@ -141,7 +141,6 @@ fun MenuCustomizationScreen(
                         if (draggedId != null) {
                             val draggedEntry = entries.find { it.item.id == draggedId }
                             if (draggedEntry != null) {
-                                val offsetYPx = dragState.originOffsetY + dragState.dragOffsetY
                                 val density = LocalDensity.current
                                 val rowHeight = with(density) { dragState.originHeight.toDp() }
                                 val liftScale by animateFloatAsState(1.03f, animationSpec = spring(dampingRatio = 0.5f), label = "menuItemDragLiftScale")
@@ -151,7 +150,7 @@ fun MenuCustomizationScreen(
                                         .fillMaxWidth()
                                         .height(rowHeight)
                                         .graphicsLayer {
-                                            translationY = offsetYPx
+                                            translationY = dragState.originOffsetY + dragState.dragOffsetY
                                             scaleX = liftScale
                                             scaleY = liftScale
                                         }

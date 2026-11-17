@@ -510,8 +510,6 @@
     <string name="download_file_missing">File sudah tidak ada</string>
     <string name="open_folder_error_title">Tidak dapat membuka folder</string>
     <string name="open_folder_error_message">Tidak ada aplikasi di perangkat ini yang bisa membuka tampilan folder. File disimpan di:\n\n%1$s</string>
-    <string name="download_menu_update_link">Perbarui link download</string>
-    <string name="download_menu_update_link_in_browser">Perbarui link download di browser</string>
     <string name="download_update_link_dialog_title">Perbarui link download</string>
     <string name="download_update_link_dialog_fetch_failed">Gagal mengambil link</string>
     <string name="download_update_link_dialog_size_unverifiable">Ukuran file tidak dapat diverifikasi</string>
@@ -519,9 +517,6 @@
     <string name="download_update_link_dialog_not_a_manifest">Link ini tidak mengarah ke playlist streaming yang valid</string>
     <string name="download_update_link_dialog_not_a_file">Link ini membuka halaman web, bukan file-nya</string>
     <string name="download_update_link_dialog_positive">Perbarui</string>
-    <string name="download_menu_redownload">Download ulang</string>
-    <string name="download_menu_redownload_options">Download ulang dengan opsi tambahan</string>
-    <string name="download_menu_change_settings">Ubah setelan download</string>
     <string name="download_change_settings_dialog_title">Ubah Setelan Download</string>
     <string name="download_change_settings_dialog_info">Hanya setelan yang aman diubah selama download berlangsung yang ditampilkan di sini. Perubahan langsung berlaku.</string>
     <string name="download_change_settings_saved">Setelan diperbarui</string>
@@ -533,8 +528,6 @@
     <string name="download_rename_positive">Ganti nama</string>
     <string name="download_rename_exists">Sudah ada file dengan nama tersebut</string>
     <string name="download_rename_failed">Tidak dapat mengganti nama file</string>
-    <string name="download_menu_remove">Hapus</string>
-    <string name="download_menu_copy_link">Salin link download</string>
     <string name="download_menu_copy_filename">Salin nama file</string>
     <string name="download_menu_copy_path">Salin jalur file</string>
     <string name="download_menu_properties">Properti</string>
@@ -1715,7 +1708,6 @@
     <string name="home_folder_rename">Ganti nama folder</string>
     <string name="home_folder_name_hint">Nama folder</string>
     <string name="home_folder_ungroup">Pisahkan</string>
-    <string name="home_incognito_message">Halaman yang Anda kunjungi dalam mode Samaran tidak akan disimpan ke histori</string>
     <string name="home_normal_mode">Biasa</string>
     <string name="site_section_data_saver">PENGHEMAT DATA</string>
     <string name="site_settings_data_saver_summary">Situs tersimpan</string>

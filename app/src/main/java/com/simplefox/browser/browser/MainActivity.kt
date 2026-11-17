@@ -356,7 +356,16 @@ class MainActivity : ClintActivity(), OverlayHostActivity, SnackbarHostActivity,
                 MainScreen(activity = this, state = uiState)
                 overlayContent?.invoke()
                 com.simplefox.browser.extensions.ExtensionHost()
-                ClintSnackbarHost(hostState = snackbarHostState)
+                ClintSnackbarHost(
+                    hostState = snackbarHostState,
+                    bottomBarVisiblePx = {
+                        when {
+                            uiState.tabMenuOpen -> uiState.tabMenuBottomBarPx
+                            uiState.isFullscreen -> 0
+                            else -> (uiState.bottomBarFullHeightPx * (1f - uiState.bottomBarFraction)).toInt()
+                        }
+                    }
+                )
             }
         }
 
@@ -517,6 +526,11 @@ class MainActivity : ClintActivity(), OverlayHostActivity, SnackbarHostActivity,
         enterVideoPictureInPicture()
     }
 
+    override fun onPause() {
+        super.onPause()
+        captureActiveTabThumbnail()
+    }
+
     override fun onStop() {
         super.onStop()
         recordBrowsingMode()
@@ -668,7 +682,24 @@ class MainActivity : ClintActivity(), OverlayHostActivity, SnackbarHostActivity,
         )
     }
 
-    fun onTabSelected(index: Int) { captureActiveTabThumbnail(); tabManager.switchTo(index); attachActiveWebView() }
+    private var pendingTabSwitchId: String? = null
+
+    /** Snapshots the tab being left first, then switches, so its preview shows the page as it was when you left it. */
+    fun onTabSelected(index: Int) {
+        val targetId = tabManager.tabs.getOrNull(index)?.id ?: return
+        val alreadyPending = pendingTabSwitchId != null
+        pendingTabSwitchId = targetId // a newer tap just retargets the switch that is already waiting
+        if (alreadyPending) return
+        captureActiveTabThen {
+            val id = pendingTabSwitchId
+            pendingTabSwitchId = null
+            val newIndex = tabManager.tabs.indexOfFirst { it.id == id }
+            if (newIndex != -1) {
+                tabManager.switchTo(newIndex)
+                attachActiveWebView()
+            }
+        }
+    }
     fun onSwipeTabChange(direction: Int): Boolean {
         // direction: 1 = swipe right (previous tab), -1 = swipe left (next tab).
         // Only moves through tabs of the current mode (normal / incognito); no wrap-around at the ends.

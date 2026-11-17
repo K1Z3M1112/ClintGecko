@@ -36,6 +36,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import com.simplefox.browser.tabs.TabMenuScreen
 import androidx.compose.ui.Alignment
@@ -72,9 +73,28 @@ internal fun MainScreen(activity: MainActivity, state: MainUiState) {
     LaunchedEffect(rawStatusBarPx) {
         if (rawStatusBarPx > 0) state.cachedStatusBarInsetPx = rawStatusBarPx
     }
-    LaunchedEffect(imeTargetPx, state.searchOverlayOpen) {
-        state.imeInsetPx = if (state.searchOverlayOpen) 0 else imeTargetPx
-        activity.updateMainContentInsets()
+    // While the search overlay is open, and for a moment after it closes, the keyboard height must not become the
+    // web view's bottom padding: that relayouts the page twice (up, then back down) while the keyboard animates.
+    // A plain holder is used on purpose; a state flag here would recompose all of MainScreen on open and close.
+    val suppressIme = remember { booleanArrayOf(false) }
+    val latestImeTargetPx by rememberUpdatedState(imeTargetPx)
+    LaunchedEffect(imeTargetPx) {
+        if (!state.searchOverlayOpen && !suppressIme[0]) {
+            state.imeInsetPx = imeTargetPx
+            activity.updateMainContentInsets()
+        }
+    }
+    LaunchedEffect(state.searchOverlayOpen) {
+        if (state.searchOverlayOpen) {
+            suppressIme[0] = true
+            state.imeInsetPx = 0
+            activity.updateMainContentInsets()
+        } else if (suppressIme[0]) {
+            kotlinx.coroutines.delay(350)
+            suppressIme[0] = false
+            state.imeInsetPx = latestImeTargetPx
+            activity.updateMainContentInsets()
+        }
     }
     LaunchedEffect(rawNavBarPx) {
         if (rawNavBarPx > 0) state.navBarInsetPx = rawNavBarPx
@@ -119,8 +139,8 @@ internal fun MainScreen(activity: MainActivity, state: MainUiState) {
         }
 
         val openTabSwitcher: () -> Unit = {
-            activity.captureActiveTabThumbnail()
-            tabSwitcherOpen = true
+            com.simplefox.browser.tabs.TabThumbnailCache.preload(activity, activity.tabManager.tabs.map { it.id })
+            activity.captureActiveTabThen { tabSwitcherOpen = true }
         }
         val openTabGroup: (String) -> Unit = { groupId ->
             state.tabMenuFocusGroupId = groupId
@@ -205,18 +225,14 @@ internal fun MainScreen(activity: MainActivity, state: MainUiState) {
 
         AnimatedVisibility(
             visible = state.searchOverlayOpen,
-            enter = fadeIn(tween(200)) + expandVertically(
-                animationSpec = tween(300),
-                expandFrom = if (state.searchOverlayIsBottom) Alignment.Bottom else Alignment.Top
-            ),
-            exit = fadeOut(tween(150)) + shrinkVertically(
-                animationSpec = tween(250),
-                shrinkTowards = if (state.searchOverlayIsBottom) Alignment.Bottom else Alignment.Top
-            ),
+            // Fade only: expand/shrink re-measures the whole overlay every frame while the keyboard is also animating.
+            enter = fadeIn(tween(150)),
+            exit = fadeOut(tween(100)),
             modifier = Modifier.align(if (state.searchOverlayIsBottom) Alignment.BottomStart else Alignment.TopStart)
         ) {
             SearchOverlay(
-                initialText = state.searchQuery,
+                // Read once per open. Observing it would recompose this whole scope on every keystroke.
+                initialText = remember { androidx.compose.runtime.snapshots.Snapshot.withoutReadObservation { state.searchQuery } },
                 isBottom = state.searchOverlayIsBottom,
                 hint = stringResource(
                     R.string.search_bar_hint,

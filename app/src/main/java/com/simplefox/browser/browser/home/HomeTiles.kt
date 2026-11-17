@@ -281,6 +281,13 @@ internal object HomeTileIconFetcher {
 
     private class Candidate(val url: String, val size: Int, val vector: Boolean = false)
 
+    fun trimMemory(level: Int) {
+        when {
+            level >= 40 || level == 15 -> memory.evictAll()
+            level >= 10 -> memory.trimToSize(memory.maxSize() / 2)
+        }
+    }
+
     private fun originOf(pageUrl: String): String? = runCatching {
         val url = URL(pageUrl)
         if (url.protocol != "http" && url.protocol != "https") return@runCatching null

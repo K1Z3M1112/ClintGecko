@@ -513,8 +513,6 @@
     <string name="download_file_missing">Wala na ang file</string>
     <string name="open_folder_error_title">Hindi mabuksan ang folder</string>
     <string name="open_folder_error_message">Walang app sa device na ito na makakapagbukas ng folder. Naka-save ang file sa:\n\n%1$s</string>
-    <string name="download_menu_update_link">I-update ang download link</string>
-    <string name="download_menu_update_link_in_browser">I-update ang download link sa browser</string>
     <string name="download_update_link_dialog_title">I-update ang download link</string>
     <string name="download_update_link_dialog_fetch_failed">Nabigong kunin ang link</string>
     <string name="download_update_link_dialog_size_unverifiable">Hindi ma-verify ang laki ng file</string>
@@ -522,9 +520,6 @@
     <string name="download_update_link_dialog_not_a_manifest">Hindi valid na stream playlist ang link na ito</string>
     <string name="download_update_link_dialog_not_a_file">Web page ang binubuksan ng link na ito, hindi ang file</string>
     <string name="download_update_link_dialog_positive">I-update</string>
-    <string name="download_menu_redownload">I-download ulit</string>
-    <string name="download_menu_redownload_options">I-download ulit gamit ang karagdagang opsyon</string>
-    <string name="download_menu_change_settings">Baguhin ang mga setting ng download</string>
     <string name="download_change_settings_dialog_title">Baguhin ang mga Setting ng Download</string>
     <string name="download_change_settings_dialog_info">Ang mga setting lang na ligtas baguhin habang isinasagawa ang download na ito ang ipinapakita dito. Agad na ilalapat ang mga pagbabago.</string>
     <string name="download_change_settings_saved">Na-update ang mga setting</string>
@@ -536,8 +531,6 @@
     <string name="download_rename_positive">Palitan</string>
     <string name="download_rename_exists">May file nang may ganitong pangalan</string>
     <string name="download_rename_failed">Hindi mapalitan ang pangalan ng file</string>
-    <string name="download_menu_remove">Alisin</string>
-    <string name="download_menu_copy_link">Kopyahin ang download link</string>
     <string name="download_menu_copy_filename">Kopyahin ang pangalan ng file</string>
     <string name="download_menu_copy_path">Kopyahin ang path ng file</string>
     <string name="download_menu_properties">Properties</string>
@@ -1745,7 +1738,6 @@
     <string name="home_folder_rename">Palitan ang pangalan</string>
     <string name="home_folder_name_hint">Pangalan ng folder</string>
     <string name="home_folder_ungroup">Ilabas lahat sa folder</string>
-    <string name="home_incognito_message">Hindi mase-save sa history mo ang mga pahinang bibisitahin mo sa Incognito</string>
     <string name="home_normal_mode">Normal</string>
     <string name="site_section_data_saver">DATA SAVER</string>
     <string name="site_settings_data_saver_summary">Mga naka-save na site</string>

@@ -50,6 +50,7 @@ import com.simplefox.browser.ui.foundation.IconButton
 import com.simplefox.browser.ui.foundation.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
@@ -122,7 +123,7 @@ internal fun TabMenuCard(
         modifier = modifier
             .fillMaxWidth()
             .aspectRatio(0.76f)
-            .graphicsLayer { scaleX = pressScale; scaleY = pressScale }
+            .graphicsLayer { val scale = pressScale.value; scaleX = scale; scaleY = scale }
             .border(borderWidth, accentColor, RoundedCornerShape(16.dp))
             .combinedClickable(
                 interactionSource = interactionSource,
@@ -313,7 +314,7 @@ internal fun TabMenuListRow(
         modifier
             .fillMaxWidth()
             .height(TabListRowHeight)
-            .graphicsLayer { scaleX = pressScale; scaleY = pressScale }
+            .graphicsLayer { val scale = pressScale.value; scaleX = scale; scaleY = scale }
             .clip(shape)
             .background(rowBg)
             .border(borderWidth, accentColor, shape)
@@ -483,7 +484,7 @@ private fun rememberTabProfile(preview: TabPreview): com.simplefox.browser.profi
 }
 
 @Composable
-private fun rememberTabPressScale(interactionSource: MutableInteractionSource, mergeHighlighted: Boolean): Float {
+private fun rememberTabPressScale(interactionSource: MutableInteractionSource, mergeHighlighted: Boolean): State<Float> {
     var pressed by remember { mutableStateOf(false) }
     LaunchedEffect(interactionSource) {
         interactionSource.interactions.collect { interaction ->
@@ -493,7 +494,7 @@ private fun rememberTabPressScale(interactionSource: MutableInteractionSource, m
             }
         }
     }
-    val scale by animateFloatAsState(
+    val scale = animateFloatAsState(
         when {
             mergeHighlighted -> 0.9f
             pressed -> 0.95f
@@ -559,13 +560,16 @@ internal fun NewTabButton(text: String, iconRes: androidx.compose.ui.graphics.ve
 @Composable
 internal fun rememberTabFavicon(tab: TabPreview): Bitmap? {
     val context = LocalContext.current
-    var bitmap by remember(tab.url, tab.isIncognito) { mutableStateOf<Bitmap?>(null) }
+    // Seed from the in-memory cache so a cached icon shows on the first frame instead of popping in.
+    var bitmap by remember(tab.url, tab.isIncognito) {
+        mutableStateOf<Bitmap?>(FaviconCache.peek(FaviconCache.faviconUrlFor(tab.url)))
+    }
     var sharp by remember(tab.url, tab.isIncognito) {
         mutableStateOf(if (tab.isIncognito) null else com.simplefox.browser.ui.SharpFavicon.cached(tab.url))
     }
     LaunchedEffect(tab.url, tab.isIncognito) {
         val faviconUrl = FaviconCache.faviconUrlFor(tab.url)
-        if (faviconUrl.isEmpty()) return@LaunchedEffect
+        if (faviconUrl.isEmpty() || bitmap != null) return@LaunchedEffect
         if (tab.isIncognito) {
             FaviconCache.loadMemoryOnly(context, faviconUrl) { bmp -> bitmap = bmp }
         } else {

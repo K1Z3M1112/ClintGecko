@@ -522,8 +522,6 @@
     <string name="download_file_missing">Файл больше не существует</string>
     <string name="open_folder_error_title">Не удалось открыть папку</string>
     <string name="open_folder_error_message">Ни одно приложение на этом устройстве не может открыть просмотр папки. Файл сохранён по пути:\n\n%1$s</string>
-    <string name="download_menu_update_link">Обновить ссылку загрузки</string>
-    <string name="download_menu_update_link_in_browser">Обновить ссылку загрузки в браузере</string>
     <string name="download_update_link_dialog_title">Обновить ссылку загрузки</string>
     <string name="download_update_link_dialog_fetch_failed">Не удалось получить ссылку</string>
     <string name="download_update_link_dialog_size_unverifiable">Не удалось проверить размер файла</string>
@@ -531,9 +529,6 @@
     <string name="download_update_link_dialog_not_a_manifest">Эта ссылка не ведёт на корректный плейлист потока</string>
     <string name="download_update_link_dialog_not_a_file">Эта ссылка открывает веб-страницу, а не файл</string>
     <string name="download_update_link_dialog_positive">Обновить</string>
-    <string name="download_menu_redownload">Загрузить заново</string>
-    <string name="download_menu_redownload_options">Загрузить заново с дополнительными параметрами</string>
-    <string name="download_menu_change_settings">Изменить настройки загрузки</string>
     <string name="download_change_settings_dialog_title">Изменение настроек загрузки</string>
     <string name="download_change_settings_dialog_info">Здесь показаны только настройки, которые безопасно менять во время выполнения загрузки. Изменения применяются сразу.</string>
     <string name="download_change_settings_saved">Настройки обновлены</string>
@@ -545,8 +540,6 @@
     <string name="download_rename_positive">Переименовать</string>
     <string name="download_rename_exists">Файл с таким именем уже существует</string>
     <string name="download_rename_failed">Не удалось переименовать файл</string>
-    <string name="download_menu_remove">Удалить</string>
-    <string name="download_menu_copy_link">Скопировать ссылку загрузки</string>
     <string name="download_menu_copy_filename">Скопировать имя файла</string>
     <string name="download_menu_copy_path">Скопировать путь к файлу</string>
     <string name="download_menu_properties">Свойства</string>
@@ -1799,7 +1792,6 @@
     <string name="home_folder_rename">Переименовать</string>
     <string name="home_folder_name_hint">Название папки</string>
     <string name="home_folder_ungroup">Разгруппировать</string>
-    <string name="home_incognito_message">Страницы, открытые в режиме инкогнито, не сохраняются в истории</string>
     <string name="home_normal_mode">Обычный</string>
     <string name="site_section_data_saver">ЭКОНОМИЯ ТРАФИКА</string>
     <string name="site_settings_data_saver_summary">Сохранённые сайты</string>

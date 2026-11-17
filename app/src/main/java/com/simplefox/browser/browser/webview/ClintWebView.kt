@@ -506,6 +506,11 @@ class ClintWebView(
             if (enabled) GeckoSessionSettings.VIEWPORT_MODE_DESKTOP else GeckoSessionSettings.VIEWPORT_MODE_MOBILE
     }
 
+    /** True only when the page is really on screen and painted, so a capture will not return a blank/stale frame. */
+    val canCaptureThumbnail: Boolean
+        get() = !destroyed && session.isOpen && !sessionDeactivated && !paused &&
+            isAttachedToWindow && pagePainted && width > 0 && height > 0
+
     fun captureBitmap(callback: (Bitmap?) -> Unit) {
         val result = runCatching { geckoView.capturePixels() }.getOrNull()
         if (result == null) {

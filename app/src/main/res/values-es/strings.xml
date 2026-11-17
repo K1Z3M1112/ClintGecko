@@ -517,8 +517,6 @@
     <string name="download_file_missing">El archivo ya no existe</string>
     <string name="open_folder_error_title">No se puede abrir la carpeta</string>
     <string name="open_folder_error_message">Ninguna app de este dispositivo puede mostrar una carpeta. El archivo se guardó en:\n\n%1$s</string>
-    <string name="download_menu_update_link">Actualizar enlace de descarga</string>
-    <string name="download_menu_update_link_in_browser">Actualizar enlace de descarga en el navegador</string>
     <string name="download_update_link_dialog_title">Actualizar enlace de descarga</string>
     <string name="download_update_link_dialog_fetch_failed">No se pudo obtener el enlace</string>
     <string name="download_update_link_dialog_size_unverifiable">No se pudo verificar el tamaño del archivo</string>
@@ -526,9 +524,6 @@
     <string name="download_update_link_dialog_not_a_manifest">Este enlace no apunta a una lista de reproducción válida</string>
     <string name="download_update_link_dialog_not_a_file">Este enlace abre una página web, no el archivo</string>
     <string name="download_update_link_dialog_positive">Actualizar</string>
-    <string name="download_menu_redownload">Volver a descargar</string>
-    <string name="download_menu_redownload_options">Volver a descargar con opciones adicionales</string>
-    <string name="download_menu_change_settings">Cambiar ajustes de descarga</string>
     <string name="download_change_settings_dialog_title">Cambiar ajustes de descarga</string>
     <string name="download_change_settings_dialog_info">Aquí solo se muestran los ajustes que se pueden cambiar de forma segura mientras la descarga está en curso. Los cambios se aplican de inmediato.</string>
     <string name="download_change_settings_saved">Ajustes actualizados</string>
@@ -540,8 +535,6 @@
     <string name="download_rename_positive">Cambiar nombre</string>
     <string name="download_rename_exists">Ya existe un archivo con ese nombre</string>
     <string name="download_rename_failed">No se pudo cambiar el nombre del archivo</string>
-    <string name="download_menu_remove">Quitar</string>
-    <string name="download_menu_copy_link">Copiar enlace de descarga</string>
     <string name="download_menu_copy_filename">Copiar nombre del archivo</string>
     <string name="download_menu_copy_path">Copiar ruta del archivo</string>
     <string name="download_menu_properties">Propiedades</string>
@@ -1763,7 +1756,6 @@
     <string name="home_folder_rename">Cambiar nombre</string>
     <string name="home_folder_name_hint">Nombre de la carpeta</string>
     <string name="home_folder_ungroup">Desagrupar</string>
-    <string name="home_incognito_message">Las páginas que visites en incógnito no se guardarán en tu historial</string>
     <string name="home_normal_mode">Normal</string>
     <string name="site_section_data_saver">AHORRO DE DATOS</string>
     <string name="site_settings_data_saver_summary">Sitios guardados</string>

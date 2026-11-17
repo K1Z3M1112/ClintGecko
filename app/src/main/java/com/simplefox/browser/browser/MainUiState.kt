@@ -69,6 +69,9 @@ internal class MainUiState {
 
     var topBarFullHeightPx by mutableIntStateOf(0)
     var bottomBarFullHeightPx by mutableIntStateOf(0)
+    // The tab switcher covers the browser's bars; its own bottom controls are what a snackbar must clear while it is open.
+    var tabMenuOpen by mutableStateOf(false)
+    var tabMenuBottomBarPx by mutableIntStateOf(0)
     var statusBarInsetPx by mutableIntStateOf(0)
     var cachedStatusBarInsetPx by mutableIntStateOf(0)
     var navBarInsetPx by mutableIntStateOf(0)

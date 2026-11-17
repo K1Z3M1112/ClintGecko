@@ -123,7 +123,7 @@ private fun TabGroupBarItem(tab: TabPreview, active: Boolean, groupColor: Int, o
         contentAlignment = Alignment.Center
     ) {
         if (favicon != null && !tab.isIncognito) {
-            Image(favicon.asImageBitmap(), contentDescription = tab.title, modifier = Modifier.size(18.dp))
+            Image(remember(favicon) { favicon.asImageBitmap() }, contentDescription = tab.title, modifier = Modifier.size(18.dp))
         } else {
             Icon(
                 if (tab.isIncognito) Icons.Filled.VisibilityOff else Icons.Filled.Public,
@@ -349,7 +349,7 @@ private fun TabGroupFaviconStack(tabs: List<TabPreview>, modifier: Modifier = Mo
                 contentAlignment = Alignment.Center
             ) {
                 if (favicon != null && !tab.isIncognito) {
-                    Image(favicon.asImageBitmap(), contentDescription = null, modifier = Modifier.size(16.dp))
+                    Image(remember(favicon) { favicon.asImageBitmap() }, contentDescription = null, modifier = Modifier.size(16.dp))
                 } else {
                     Icon(
                         if (tab.isIncognito) Icons.Filled.VisibilityOff else Icons.Filled.Public,
