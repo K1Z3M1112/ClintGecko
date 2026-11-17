@@ -222,7 +222,7 @@ internal fun TabMenuCard(
                         contentDescription = null,
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop,
-                        filterQuality = FilterQuality.Medium
+                        filterQuality = FilterQuality.Low
                     )
                 } else {
                     Icon(
