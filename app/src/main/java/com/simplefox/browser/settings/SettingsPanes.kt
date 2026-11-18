@@ -1009,6 +1009,30 @@ fun DataSaverPane(activity: SettingsActivity) {
             initialReduceEffects = prefs.getBoolean(PREF_REDUCE_EFFECTS, DEFAULT_REDUCE_EFFECTS)
         )
     }
+    DisposableEffect(prefs, uiState) {
+        val listener = android.content.SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+            if (key == null || key.startsWith("data_saver_")) {
+                uiState.enabled = prefs.getBoolean(PREF_DATA_SAVER_ENABLED, DEFAULT_DATA_SAVER_ENABLED)
+                uiState.meteredOnly = prefs.getBoolean(PREF_METERED_ONLY, DEFAULT_METERED_ONLY)
+                uiState.disableImages = prefs.getBoolean(PREF_DISABLE_IMAGES, DEFAULT_DISABLE_IMAGES)
+                uiState.disableAutoplay = prefs.getBoolean(PREF_DISABLE_AUTOPLAY, DEFAULT_DISABLE_AUTOPLAY)
+                uiState.sendHeader = prefs.getBoolean(PREF_SEND_SAVE_DATA_HEADER, DEFAULT_SEND_SAVE_DATA_HEADER)
+                uiState.blockFonts = prefs.getBoolean(PREF_BLOCK_FONTS, DEFAULT_BLOCK_FONTS)
+                uiState.blockFrames = prefs.getBoolean(PREF_BLOCK_FRAMES, DEFAULT_BLOCK_FRAMES)
+                uiState.blockPreload = prefs.getBoolean(PREF_BLOCK_PRELOAD, DEFAULT_BLOCK_PRELOAD)
+                uiState.cacheFirst = prefs.getBoolean(PREF_CACHE_FIRST, DEFAULT_CACHE_FIRST)
+                uiState.blockVideo = prefs.getBoolean(PREF_BLOCK_VIDEO, DEFAULT_BLOCK_VIDEO)
+                uiState.disableSuggestions = prefs.getBoolean(PREF_DISABLE_SUGGESTIONS, DEFAULT_DISABLE_SUGGESTIONS)
+                uiState.disableFavicons = prefs.getBoolean(PREF_DISABLE_FAVICONS, DEFAULT_DISABLE_FAVICONS)
+                uiState.blockScripts = prefs.getBoolean(PREF_BLOCK_SCRIPTS, DEFAULT_BLOCK_SCRIPTS)
+                uiState.blockCss = prefs.getBoolean(PREF_BLOCK_CSS, DEFAULT_BLOCK_CSS)
+                uiState.singleTab = prefs.getBoolean(PREF_SINGLE_TAB, DEFAULT_SINGLE_TAB)
+                uiState.reduceEffects = prefs.getBoolean(PREF_REDUCE_EFFECTS, DEFAULT_REDUCE_EFFECTS)
+            }
+        }
+        prefs.registerOnSharedPreferenceChangeListener(listener)
+        onDispose { prefs.unregisterOnSharedPreferenceChangeListener(listener) }
+    }
     fun toggle(prefKey: String, current: Boolean, apply: (Boolean) -> Unit) {
         val newValue = !current
         prefs.edit().putBoolean(prefKey, newValue).apply()

@@ -119,6 +119,5 @@ private fun MainActivity.reopenClosedTabs(
     val targetIndex = tabManager.tabs.indexOfFirst { it.id == targetId }
     if (targetIndex >= 0) tabManager.switchTo(targetIndex)
     attachActiveWebView()
-    scheduleBackgroundTabLoads(reopenedIds.filter { it != targetId })
     onTabGroupsChanged()
 }

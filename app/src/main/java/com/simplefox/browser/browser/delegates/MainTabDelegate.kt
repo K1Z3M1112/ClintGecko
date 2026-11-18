@@ -113,7 +113,6 @@ internal fun MainActivity.restoreTabs(): Boolean {
         tabManager.tabs.firstOrNull { it.id == saved.tabId }?.lastActiveAt = saved.lastActiveAt
     }
     attachActiveWebView()
-    scheduleBackgroundTabLoads(savedTabs.filter { it.tabId != activeTabId }.map { it.tabId })
     TabThumbnailCache.pruneDisk(this, savedTabs.map { it.tabId }.toSet())
     return true
 }
@@ -300,7 +299,6 @@ internal fun MainActivity.openNewTabInBackground(url: String, openerTabId: Strin
         }
     )
     tab.pendingUrl = url
-    scheduleBackgroundTabLoads(listOf(tab.id))
     updateTabCount()
 }
 
@@ -422,17 +420,18 @@ internal fun MainActivity.attachActiveWebView() {
 
 internal fun MainActivity.syncTabPlayback() {
     val activeId = tabManager.activeTab?.id
-    val singleTab = com.simplefox.browser.settings.datasaver.DataSaverMode.isSingleTabActive(prefs)
     tabManager.tabs.forEach { tab ->
         if (tab.id == activeId) {
             tab.webView.onResume()
         } else if (tab.pendingUrl == null) {
-            if (singleTab) tab.webView.stopLoading()
-            tab.webView.onPause()
+            if (tab.webView.isMediaPlaying) {
+                tab.webView.onPause()
+            } else {
+                tab.webView.stopAndHibernateWhenInactive()
+            }
         }
     }
-    trimBackgroundTabs(if (singleTab) 0 else MAX_LIVE_BACKGROUND_TABS)
-    scheduleBackgroundTabLoads(emptyList())
+    trimBackgroundTabs()
 }
 
 internal fun MainActivity.focusTabById(tabId: String) {

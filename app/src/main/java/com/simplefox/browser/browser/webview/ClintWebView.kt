@@ -160,6 +160,8 @@ class ClintWebView(
     private var extensionAttached = false
     private var lastSessionState: GeckoSession.SessionState? = null
     private var recoveryPending = false
+    private var hibernateWhenIdle = false
+    private var suspendingInactive = false
     private var neverOpened = deferOpen
     private var paused = false
     private var sessionDeactivated = false
@@ -276,7 +278,12 @@ class ClintWebView(
     }
 
     fun onMediaIdle() {
-        if (!destroyed && session.isOpen && (paused || !isAttachedToWindow)) deactivateSession()
+        if (destroyed || suspendingInactive || !session.isOpen) return
+        if (!isAttachedToWindow && !isMediaPlaying) {
+            stopAndHibernateWhenInactive()
+        } else if (paused) {
+            deactivateSession()
+        }
     }
 
     fun evaluateJavascript(script: String, callback: ((String?) -> Unit)?) {
@@ -386,6 +393,19 @@ class ClintWebView(
         if (!destroyed && session.isOpen) session.stop()
     }
 
+    fun stopAndHibernateWhenInactive() {
+        if (destroyed || suspendingInactive || isMediaPlaying) return
+        suspendingInactive = true
+        try {
+            hibernateWhenIdle = !isPrivate
+            onPause()
+            stopLoading()
+            hibernateIfIdle()
+        } finally {
+            suspendingInactive = false
+        }
+    }
+
     fun onBlockedLoadDismissed() {
         awaitingRealLoad = false
     }
@@ -405,6 +425,7 @@ class ClintWebView(
 
     fun onResume() {
         if (destroyed) return
+        hibernateWhenIdle = false
         paused = false
         ClintGecko.setForeground(this)
         if (recoverIfNeeded()) return
@@ -478,6 +499,12 @@ class ClintWebView(
     fun canHibernate(force: Boolean = false): Boolean =
         !destroyed && !isPrivate && session.isOpen && !recoveryPending &&
             lastSessionState != null && progress >= 100 && (force || !isAttachedToWindow) && !isMediaPlaying
+
+    private fun hibernateIfIdle() {
+        if (!hibernateWhenIdle || !canHibernate()) return
+        hibernateWhenIdle = false
+        hibernate()
+    }
 
     fun hibernate(force: Boolean = false): Boolean {
         if (!canHibernate(force)) return false
@@ -746,6 +773,7 @@ class ClintWebView(
     private val progressDelegate = object : GeckoSession.ProgressDelegate {
         override fun onSessionStateChange(session: GeckoSession, sessionState: GeckoSession.SessionState) {
             lastSessionState = sessionState
+            hibernateIfIdle()
         }
 
         override fun onPageStart(session: GeckoSession, url: String) {
@@ -764,6 +792,7 @@ class ClintWebView(
             if (!isClintHomeUrl(currentUrl)) hideCover()
             webChromeClient?.onProgressChanged(this@ClintWebView, 100)
             webViewClient?.onPageFinished(this@ClintWebView, currentUrl.orEmpty())
+            hibernateIfIdle()
         }
 
         override fun onProgressChange(session: GeckoSession, progress: Int) {

@@ -112,7 +112,7 @@ internal fun MainActivity.buildRequestConfig(): org.json.JSONObject {
         .put("scripts", prefs.getBoolean("data_saver_block_scripts", false))
         .put("css", prefs.getBoolean("data_saver_block_css", false))
         .put("header", prefs.getBoolean("data_saver_send_header", true))
-        .put("cache", prefs.getBoolean("data_saver_cache_first", false))
+        .put("cache", prefs.getBoolean("data_saver_cache_first", true))
         .put("skip", skip)
     return org.json.JSONObject()
         .put("dnt", isDoNotTrackActive())

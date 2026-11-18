@@ -47,9 +47,7 @@ class MainActivity : ClintActivity(), OverlayHostActivity, SnackbarHostActivity,
 
     companion object {
         private const val TRIM_MEMORY_BACKGROUND_LEVEL = 40
-        private const val BACKGROUND_PRELOAD_DELAY_MS = 500L
         private const val BACKGROUND_RELEASE_DELAY_MS = 30_000L
-        private const val BACKGROUND_PRELOAD_TIMEOUT_MS = 15_000L
         private const val TRIM_MEMORY_MODERATE_LEVEL = 60
         const val EXTRA_REFRESH_LINK_MODE = "extra_refresh_link_mode"
         const val EXTRA_REFRESH_LINK_DOWNLOAD_ID = "extra_refresh_link_download_id"
@@ -300,7 +298,15 @@ class MainActivity : ClintActivity(), OverlayHostActivity, SnackbarHostActivity,
             com.simplefox.browser.tabs.TabGroupPrefs.PREF_SHOW_GROUP_BAR, com.simplefox.browser.tabs.TabStripPrefs.PREF_SHOW_TAB_STRIP -> updateTabCount()
             com.simplefox.browser.tabs.TabGroupPrefs.PREF_TAB_GROUPS_ENABLED -> applyTabGroupsSetting()
             com.simplefox.browser.tabs.TabBarPlacement.PREF_TAB_STRIP_POSITION, com.simplefox.browser.tabs.TabBarPlacement.PREF_TAB_GROUP_BAR_POSITION -> updateTabBarPositions()
-            "data_saver_enabled", "data_saver_metered_only", "data_saver_disable_images", "data_saver_disable_autoplay", "data_saver_send_header", "data_saver_block_fonts", "data_saver_block_frames", "data_saver_block_preload", "data_saver_block_video", "data_saver_block_scripts", "data_saver_block_css", "data_saver_cache_first", "data_saver_reduce_effects" -> applyDataSaverSettings()
+            "data_saver_enabled", "data_saver_metered_only", "data_saver_disable_images", "data_saver_disable_autoplay", "data_saver_send_header", "data_saver_block_fonts", "data_saver_block_frames", "data_saver_block_preload", "data_saver_block_video", "data_saver_block_scripts", "data_saver_block_css", "data_saver_cache_first", "data_saver_reduce_effects" -> {
+                applyDataSaverSettings()
+                if (uiState.searchOverlayOpen && (key == "data_saver_enabled" || key == "data_saver_metered_only")) {
+                    onSearchQueryChanged(uiState.searchQuery)
+                }
+            }
+            "data_saver_disable_suggestions" -> {
+                if (uiState.searchOverlayOpen) onSearchQueryChanged(uiState.searchQuery)
+            }
             "data_saver_single_tab" -> syncTabPlayback()
             "hide_bars_on_scroll" -> {
                 if (!prefs.getBoolean("hide_bars_on_scroll", true)) {
@@ -345,7 +351,10 @@ class MainActivity : ClintActivity(), OverlayHostActivity, SnackbarHostActivity,
         com.simplefox.browser.browser.webview.ClintGecko.setCookiePolicy(com.simplefox.browser.privacy.PrivacyPrefs.cookiePolicy(prefs))
         syncBaseScripts()
         syncGlobalScripts()
-        DataSaverMode.onActiveChanged = { applyDataSaverSettings() }
+        DataSaverMode.onActiveChanged = {
+            applyDataSaverSettings()
+            if (uiState.searchOverlayOpen) onSearchQueryChanged(uiState.searchQuery)
+        }
         updateHomeButtonState()
         updateTabBarPositions()
         setupTranslations()
@@ -522,7 +531,6 @@ class MainActivity : ClintActivity(), OverlayHostActivity, SnackbarHostActivity,
         super.onStart()
         backgroundReleaseHandler.removeCallbacks(backgroundReleaseRunnable)
         tabManager.activeTab?.webView?.onResume()
-        scheduleBackgroundTabLoads(emptyList())
     }
 
     override fun onUserLeaveHint() {
@@ -537,7 +545,6 @@ class MainActivity : ClintActivity(), OverlayHostActivity, SnackbarHostActivity,
 
     override fun onStop() {
         super.onStop()
-        cancelScheduledBackgroundTabLoad()
         backgroundReleaseHandler.removeCallbacks(backgroundReleaseRunnable)
         if (!isFinishing) backgroundReleaseHandler.postDelayed(backgroundReleaseRunnable, BACKGROUND_RELEASE_DELAY_MS)
         recordBrowsingMode()
@@ -557,13 +564,12 @@ class MainActivity : ClintActivity(), OverlayHostActivity, SnackbarHostActivity,
         super.onTrimMemory(level)
         when {
             level >= TRIM_MEMORY_MODERATE_LEVEL -> {
-                trimBackgroundTabs(0)
+                trimBackgroundTabs()
                 hibernateActiveTabIfHidden()
             }
-            level >= TRIM_MEMORY_BACKGROUND_LEVEL -> trimBackgroundTabs(BACKGROUND_TRIM_KEEP_LIVE)
-            level == 10 || level == 15 -> trimBackgroundTabs(0)
+            level >= TRIM_MEMORY_BACKGROUND_LEVEL -> trimBackgroundTabs()
+            level == 10 || level == 15 -> trimBackgroundTabs()
         }
-        scheduleBackgroundTabLoads(emptyList())
     }
 
     override fun onSystemThemeChanged() {
@@ -572,7 +578,6 @@ class MainActivity : ClintActivity(), OverlayHostActivity, SnackbarHostActivity,
     }
 
     override fun onDestroy() {
-        cancelScheduledBackgroundTabLoad()
         backgroundReleaseHandler.removeCallbacks(backgroundReleaseRunnable)
         teardownExtensions()
         teardownTranslations()
@@ -698,7 +703,7 @@ class MainActivity : ClintActivity(), OverlayHostActivity, SnackbarHostActivity,
     private val backgroundReleaseRunnable = Runnable {
         if (isFinishing || isDestroyed) return@Runnable
         if (lifecycle.currentState.isAtLeast(androidx.lifecycle.Lifecycle.State.STARTED)) return@Runnable
-        trimBackgroundTabs(0)
+        trimBackgroundTabs()
         hibernateActiveTabIfHidden()
         com.simplefox.browser.browser.webview.ClintGecko.releaseCachesInBackground()
         com.simplefox.browser.ui.FaviconCache.trimMemory(40)
@@ -706,68 +711,6 @@ class MainActivity : ClintActivity(), OverlayHostActivity, SnackbarHostActivity,
         com.simplefox.browser.browser.home.HomeTileIconFetcher.trimMemory(40)
         com.simplefox.browser.downloads.DownloadThumbnailLoader.trimMemory(40)
     }
-    private val backgroundTabLoadHandler = Handler(Looper.getMainLooper())
-    private val backgroundTabLoadIds = LinkedHashSet<String>()
-    private var backgroundTabLoadScheduled = false
-    // The one background tab currently being preloaded, and when it started (a stalled page must not block the queue).
-    private var backgroundPreloadTabId: String? = null
-    private var backgroundPreloadStartedAt = 0L
-    private val backgroundTabLoadRunnable = Runnable {
-        backgroundTabLoadScheduled = false
-        if (!lifecycle.currentState.isAtLeast(androidx.lifecycle.Lifecycle.State.STARTED)) return@Runnable
-        if (DataSaverMode.isSingleTabActive(prefs)) return@Runnable
-        val budget = liveBackgroundTabBudget()
-        if (budget == 0) return@Runnable
-        // Park finished background tabs beyond the live budget first: preloading may run one tab past the
-        // budget, and this is what turns that tab into a cheap saved session instead of a live page.
-        trimBackgroundTabs()
-        val now = System.currentTimeMillis()
-        val preloading = backgroundPreloadTabId?.let { id -> tabManager.tabs.firstOrNull { it.id == id } }
-        if (preloading != null && preloading.webView.progress < 100 && now - backgroundPreloadStartedAt < BACKGROUND_PRELOAD_TIMEOUT_MS) {
-            scheduleNextBackgroundTabLoad() // one preload at a time keeps CPU, network and memory flat
-            return@Runnable
-        }
-        backgroundPreloadTabId = null
-        val activeId = tabManager.activeTab?.id
-        val liveBackgroundCount = tabManager.tabs.count { it.id != activeId && it.webView.isSessionOpen }
-        if (liveBackgroundCount > budget) return@Runnable
-        // Most likely to be revisited first, not just the order they were queued in.
-        val tabId = backgroundTabLoadIds.maxByOrNull { id ->
-            tabManager.tabs.firstOrNull { it.id == id }?.keepScore() ?: Long.MIN_VALUE
-        } ?: return@Runnable
-        backgroundTabLoadIds.remove(tabId)
-        val tab = tabManager.tabs.firstOrNull { it.id == tabId } ?: run {
-            scheduleNextBackgroundTabLoad()
-            return@Runnable
-        }
-        val url = tab.pendingUrl?.takeIf { tab.id != activeId && !tab.isIncognito } ?: run {
-            scheduleNextBackgroundTabLoad()
-            return@Runnable
-        }
-        tab.pendingUrl = null
-        backgroundPreloadTabId = tab.id
-        backgroundPreloadStartedAt = now
-        tab.webView.loadUrl(url)
-        scheduleNextBackgroundTabLoad()
-    }
-
-    internal fun scheduleBackgroundTabLoads(tabIds: Iterable<String>) {
-        backgroundTabLoadIds.addAll(tabIds)
-        scheduleNextBackgroundTabLoad()
-    }
-
-    private fun scheduleNextBackgroundTabLoad() {
-        // Also wake up when only a preload is in flight, so its finished tab still gets parked.
-        if (backgroundTabLoadScheduled || (backgroundTabLoadIds.isEmpty() && backgroundPreloadTabId == null)) return
-        backgroundTabLoadScheduled = true
-        backgroundTabLoadHandler.postDelayed(backgroundTabLoadRunnable, BACKGROUND_PRELOAD_DELAY_MS)
-    }
-
-    private fun cancelScheduledBackgroundTabLoad() {
-        backgroundTabLoadHandler.removeCallbacks(backgroundTabLoadRunnable)
-        backgroundTabLoadScheduled = false
-    }
-
     /** Snapshots the tab being left first, then switches, so its preview shows the page as it was when you left it. */
     fun onTabSelected(index: Int) {
         val targetId = tabManager.tabs.getOrNull(index)?.id ?: return
