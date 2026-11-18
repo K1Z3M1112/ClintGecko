@@ -142,6 +142,9 @@ internal object HomeTileStore {
     @Volatile
     private var cache: List<HomeTile>? = null
 
+    // Last JSON written to disk; an unchanged layout is not rewritten. Guarded by the save() lock.
+    private var lastWrittenJson: String? = null
+
     private fun dataFile(context: Context): File = File(homepageImageDir(context), FILE_NAME)
 
     private fun iconFile(context: Context, id: String): File = File(homepageImageDir(context), "$ICON_PREFIX$id.png")
@@ -174,14 +177,18 @@ internal object HomeTileStore {
         runCatching {
             val dir = homepageImageDir(context)
             dir.mkdirs()
+            val json = serialize(tiles).toString()
+            if (json == lastWrittenJson && dataFile(context).exists()) return@runCatching
+            lastWrittenJson = null
             val temp = File(dir, "$FILE_NAME.tmp")
-            temp.writeText(serialize(tiles).toString())
+            temp.writeText(json)
             if (!temp.renameTo(dataFile(context))) {
                 temp.copyTo(dataFile(context), overwrite = true)
                 temp.delete()
             }
             val keep = tiles.allSites().filter { it.customIcon }.map { "$ICON_PREFIX${it.id}.png" }.toSet()
             dir.listFiles()?.forEach { if (it.name.startsWith(ICON_PREFIX) && it.name !in keep) it.delete() }
+            lastWrittenJson = json
         }
     }
 
@@ -280,6 +287,13 @@ internal object HomeTileIconFetcher {
     private val whitespace = Regex("\\s+")
 
     private class Candidate(val url: String, val size: Int, val vector: Boolean = false)
+
+    fun trimMemory(level: Int) {
+        when {
+            level >= 40 || level == 15 -> memory.evictAll()
+            level >= 10 -> memory.trimToSize(memory.maxSize() / 2)
+        }
+    }
 
     private fun originOf(pageUrl: String): String? = runCatching {
         val url = URL(pageUrl)
@@ -416,7 +430,7 @@ internal object HomeTileIconFetcher {
                         candidates.add(Candidate(url, if (vector) 512 else declared ?: 32, vector))
                 }
             }
-            Regex("<meta\\b[^>]*>", RegexOption.IGNORE_CASE).findAll(head).forEach { match ->
+            HOME_META_TAG_REGEX.findAll(head).forEach { match ->
                 val tag = match.value
                 val name = (attr(tag, "property") ?: attr(tag, "name"))?.lowercase() ?: return@forEach
                 if (name == "msapplication-tileimage") {
@@ -541,3 +555,5 @@ internal fun rememberHomeTileIcon(site: HomeSiteTile, iconVersion: Int): HomeTil
             ?: favicon?.takeIf { hd == null }?.let { HomeTileIconImage(it.asImageBitmap(), minOf(it.width, it.height) >= 96) }
     }
 }
+
+private val HOME_META_TAG_REGEX = Regex("<meta\\b[^>]*>", RegexOption.IGNORE_CASE)

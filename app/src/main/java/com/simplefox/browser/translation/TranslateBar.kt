@@ -70,6 +70,8 @@ import com.simplefox.browser.ui.listscreen.ListMenuItem
 import com.simplefox.browser.ui.listscreen.PopupShape
 import com.simplefox.browser.ui.theme.LocalClintColors
 import com.simplefox.browser.util.formatFileSize
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -149,9 +151,11 @@ private fun TranslateBarContent(
     val pageState by request.webView.translator.state.collectAsState()
     val scope = rememberCoroutineScope()
 
-    var loading by remember(request) { mutableStateOf(true) }
+    // A language list loaded earlier is shown on the first frame instead of waiting on Gecko again.
+    val cachedSupport = remember(locale) { ClintTranslations.cachedSupport(locale) }
+    var loading by remember(request) { mutableStateOf(cachedSupport == null) }
     var engineSupported by remember(request) { mutableStateOf(true) }
-    var support by remember(request) { mutableStateOf<TranslationLanguageSupport?>(null) }
+    var support by remember(request) { mutableStateOf(cachedSupport) }
     var fromCode by remember(request) { mutableStateOf<String?>(null) }
     var toCode by remember(request) { mutableStateOf<String?>(null) }
     var userPicked by remember(request) { mutableStateOf(false) }
@@ -167,10 +171,18 @@ private fun TranslateBarContent(
     val dismissThresholdPx = with(density) { 48.dp.toPx() }
 
     LaunchedEffect(request) {
-        engineSupported = ClintTranslations.isEngineSupported()
-        if (engineSupported) {
-            support = ClintTranslations.supportedLanguages(locale)
-            if (request.allowSiteSetting) neverSite = request.webView.translator.isNeverTranslateSite()
+        // The three Gecko queries are independent, so run them side by side instead of one after another.
+        coroutineScope {
+            val supportJob = async { ClintTranslations.supportedLanguages(locale) }
+            val neverSiteJob = if (request.allowSiteSetting) async { request.webView.translator.isNeverTranslateSite() } else null
+            engineSupported = ClintTranslations.isEngineSupported()
+            if (engineSupported) {
+                support = supportJob.await()
+                neverSite = neverSiteJob?.await()
+            } else {
+                supportJob.cancel()
+                neverSiteJob?.cancel()
+            }
         }
         loading = false
     }
@@ -226,9 +238,13 @@ private fun TranslateBarContent(
     val to = toCode
     val canTranslate = !loading && engineSupported && loadedSupport != null && from != null && to != null &&
         !ClintTranslations.sameLanguage(from, to) && !pageState.isTranslating
-    val fromName = from?.let { code -> loadedSupport?.fromLanguages?.firstOrNull { it.code == code }?.name ?: ClintTranslations.displayName(code, locale) }
-    val toName = to?.let { code -> loadedSupport?.toLanguages?.firstOrNull { it.code == code }?.name ?: ClintTranslations.displayName(code, locale) }
-    val sentenceName = from?.let { ClintTranslations.displayName(it, locale, capitalize = false) }.orEmpty()
+    val fromName = remember(from, loadedSupport, locale) {
+        from?.let { code -> loadedSupport?.fromLanguages?.firstOrNull { it.code == code }?.name ?: ClintTranslations.displayName(code, locale) }
+    }
+    val toName = remember(to, loadedSupport, locale) {
+        to?.let { code -> loadedSupport?.toLanguages?.firstOrNull { it.code == code }?.name ?: ClintTranslations.displayName(code, locale) }
+    }
+    val sentenceName = remember(from, locale) { from?.let { ClintTranslations.displayName(it, locale, capitalize = false) }.orEmpty() }
     val hasError = pageState.error != null
 
     val title = when {
@@ -251,7 +267,7 @@ private fun TranslateBarContent(
         shape = RoundedCornerShape(18.dp),
         color = colors.popupBackground,
         border = null,
-        shadowElevation = 8.dp,
+        shadowElevation = 0.dp,
         modifier = Modifier
             .fillMaxWidth()
             .widthIn(max = TranslateBarMaxWidth)

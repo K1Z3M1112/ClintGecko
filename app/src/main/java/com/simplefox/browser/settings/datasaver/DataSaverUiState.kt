@@ -19,7 +19,8 @@ class DataSaverUiState(
     initialDisableFavicons: Boolean,
     initialBlockScripts: Boolean,
     initialBlockCss: Boolean,
-    initialSingleTab: Boolean = false
+    initialSingleTab: Boolean = false,
+    initialReduceEffects: Boolean = true
 ) {
     var enabled by mutableStateOf(initialEnabled)
     var meteredOnly by mutableStateOf(initialMeteredOnly)
@@ -36,4 +37,5 @@ class DataSaverUiState(
     var blockScripts by mutableStateOf(initialBlockScripts)
     var blockCss by mutableStateOf(initialBlockCss)
     var singleTab by mutableStateOf(initialSingleTab)
+    var reduceEffects by mutableStateOf(initialReduceEffects)
 }

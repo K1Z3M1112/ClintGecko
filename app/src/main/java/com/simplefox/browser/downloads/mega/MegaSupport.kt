@@ -1,7 +1,7 @@
 package com.simplefox.browser.downloads.mega
 
 import android.content.Context
-import androidx.documentfile.provider.DocumentFile
+import com.simplefox.browser.util.DocumentFile
 import com.simplefox.browser.R
 import com.simplefox.browser.downloads.DownloadFileHelper
 import com.simplefox.browser.downloads.DownloadItem

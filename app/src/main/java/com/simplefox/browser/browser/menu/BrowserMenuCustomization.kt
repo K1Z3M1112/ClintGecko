@@ -17,7 +17,6 @@ import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Shield
 import androidx.compose.material.icons.filled.Translate
-import androidx.compose.material.icons.filled.VideoLibrary
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.simplefox.browser.R
@@ -30,7 +29,6 @@ enum class CustomizableMenuItem(val id: String) {
     OPEN_IN_APP("open_in_app"),
     CREATE_SHORTCUT("create_shortcut"),
     DOWNLOADS("downloads"),
-    MEDIA_CAPTURE("media_capture"),
     EXTENSIONS("extensions"),
     WEBSITE_BLOCKER("website_blocker"),
     BOOKMARKS("bookmarks"),
@@ -56,7 +54,6 @@ fun CustomizableMenuItem.icon(): ImageVector = when (this) {
     CustomizableMenuItem.OPEN_IN_APP -> Icons.AutoMirrored.Filled.OpenInNew
     CustomizableMenuItem.CREATE_SHORTCUT -> Icons.AutoMirrored.Filled.AddToHomeScreen
     CustomizableMenuItem.DOWNLOADS -> Icons.Filled.Download
-    CustomizableMenuItem.MEDIA_CAPTURE -> Icons.Filled.VideoLibrary
     CustomizableMenuItem.EXTENSIONS -> Icons.Filled.Extension
     CustomizableMenuItem.WEBSITE_BLOCKER -> Icons.Filled.Shield
     CustomizableMenuItem.BOOKMARKS -> Icons.Filled.BookmarkBorder
@@ -77,7 +74,6 @@ fun CustomizableMenuItem.titleRes(): Int = when (this) {
     CustomizableMenuItem.OPEN_IN_APP -> R.string.menu_open_in_app
     CustomizableMenuItem.CREATE_SHORTCUT -> R.string.menu_create_shortcut
     CustomizableMenuItem.DOWNLOADS -> R.string.menu_downloads
-    CustomizableMenuItem.MEDIA_CAPTURE -> R.string.menu_media_capture
     CustomizableMenuItem.EXTENSIONS -> R.string.ext_title
     CustomizableMenuItem.WEBSITE_BLOCKER -> R.string.menu_website_blocker
     CustomizableMenuItem.BOOKMARKS -> R.string.menu_bookmarks

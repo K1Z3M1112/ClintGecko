@@ -626,18 +626,13 @@ fun DownloadManualDialog(
                             )
                         }
                     }
-                    Row(
-                        Modifier.fillMaxWidth().clickable {
-                            categorizeEnabled = !categorizeEnabled
-                        }.padding(top = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Column(Modifier.weight(1f)) {
-                            Text(stringResource(R.string.download_categorize_title), color = colors.onSurface, fontSize = 14.sp, fontWeight = FontWeight.Medium)
-                            Text(stringResource(R.string.download_categorize_summary), color = colors.secondaryText, fontSize = 12.sp, modifier = Modifier.padding(top = 2.dp))
-                        }
-                        ClintSwitch(checked = categorizeEnabled)
-                    }
+                    DownloadToggleRow(
+                        title = stringResource(R.string.download_categorize_title),
+                        summary = stringResource(R.string.download_categorize_summary),
+                        checked = categorizeEnabled,
+                        onToggle = { categorizeEnabled = !categorizeEnabled },
+                        modifier = Modifier.padding(top = 8.dp)
+                    )
                     destinationPreviewText?.let {
                         Text(
                             it, color = colors.secondaryText, fontSize = 11.sp, fontFamily = FontFamily.Monospace,
@@ -650,26 +645,20 @@ fun DownloadManualDialog(
             DialogSectionLabel(stringResource(R.string.download_dialog_section_options))
             SettingsSection(colors.dialogSectionBackground, bottomSpacing = 8.dp) {
                 Column(Modifier.padding(12.dp)) {
-                    Row(
-                        Modifier.fillMaxWidth().clickable { retryEnabled = !retryEnabled }.padding(vertical = 6.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Column(Modifier.weight(1f)) {
-                            Text(stringResource(R.string.download_retry_enabled_title), color = colors.onSurface, fontSize = 14.sp, fontWeight = FontWeight.Medium)
-                            Text(stringResource(R.string.download_retry_enabled_summary), color = colors.secondaryText, fontSize = 12.sp, modifier = Modifier.padding(top = 2.dp))
-                        }
-                        ClintSwitch(checked = retryEnabled)
-                    }
-                    Row(
-                        Modifier.fillMaxWidth().clickable { unmeteredOnly = !unmeteredOnly }.padding(vertical = 6.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Column(Modifier.weight(1f)) {
-                            Text(stringResource(R.string.download_unmetered_only_title), color = colors.onSurface, fontSize = 14.sp, fontWeight = FontWeight.Medium)
-                            Text(stringResource(R.string.download_dialog_unmetered_summary), color = colors.secondaryText, fontSize = 12.sp, modifier = Modifier.padding(top = 2.dp))
-                        }
-                        ClintSwitch(checked = unmeteredOnly)
-                    }
+                    DownloadToggleRow(
+                        title = stringResource(R.string.download_retry_enabled_title),
+                        summary = stringResource(R.string.download_retry_enabled_summary),
+                        checked = retryEnabled,
+                        onToggle = { retryEnabled = !retryEnabled },
+                        modifier = Modifier.padding(vertical = 6.dp)
+                    )
+                    DownloadToggleRow(
+                        title = stringResource(R.string.download_unmetered_only_title),
+                        summary = stringResource(R.string.download_dialog_unmetered_summary),
+                        checked = unmeteredOnly,
+                        onToggle = { unmeteredOnly = !unmeteredOnly },
+                        modifier = Modifier.padding(vertical = 6.dp)
+                    )
 
                     if (streamPlan == null) {
                         Text(
@@ -750,22 +739,20 @@ fun DownloadManualDialog(
                         }
                     }
 
-                    Row(
-                        Modifier.fillMaxWidth().clickable {
+                    val toggleScheduleRow = {
                             scheduleEnabled = !scheduleEnabled
                             if (scheduleEnabled) {
                                 scheduledMillis = Calendar.getInstance().apply { add(Calendar.MINUTE, 1) }.timeInMillis
                                 if (needsExactAlarmPermissionRationale(context)) blockingError = exactAlarmPermissionDialogConfig(context)
                             }
-                        }.padding(vertical = 6.dp).padding(top = 6.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Column(Modifier.weight(1f)) {
-                            Text(stringResource(R.string.download_schedule_this_title), color = colors.onSurface, fontSize = 14.sp, fontWeight = FontWeight.Medium)
-                            Text(stringResource(R.string.download_schedule_this_summary), color = colors.secondaryText, fontSize = 12.sp, modifier = Modifier.padding(top = 2.dp))
-                        }
-                        ClintSwitch(checked = scheduleEnabled)
                     }
+                    DownloadToggleRow(
+                        title = stringResource(R.string.download_schedule_this_title),
+                        summary = stringResource(R.string.download_schedule_this_summary),
+                        checked = scheduleEnabled,
+                        onToggle = { toggleScheduleRow() },
+                        modifier = Modifier.padding(vertical = 6.dp).padding(top = 6.dp)
+                    )
                     if (scheduleEnabled) {
                         ClintScheduleDateTimeRows(
                             scheduledMillis = scheduledMillis,

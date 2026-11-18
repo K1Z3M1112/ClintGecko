@@ -1,7 +1,7 @@
 package com.simplefox.browser.downloads
 
 import android.content.Context
-import androidx.documentfile.provider.DocumentFile
+import com.simplefox.browser.util.DocumentFile
 import androidx.preference.PreferenceManager
 import com.simplefox.browser.settings.downloads.DownloadSettingsKeys
 import java.io.File

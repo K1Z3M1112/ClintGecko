@@ -1,22 +1,15 @@
-@file:androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
-
 package com.simplefox.browser.mediacapture.download
 
 import android.content.Context
 import android.media.MediaCodec
 import android.media.MediaExtractor
 import android.media.MediaFormat
-import androidx.media3.common.Format
-import androidx.media3.muxer.BufferInfo
-import androidx.media3.muxer.Mp4Muxer
-import androidx.media3.muxer.SeekableMuxerOutput
+import android.media.MediaMuxer
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.withContext
 import java.io.File
-import java.io.FileOutputStream
 import java.nio.ByteBuffer
-import java.util.Locale
 
 data class RemuxResult(val success: Boolean, val errorMessage: String?)
 
@@ -27,12 +20,6 @@ object MediaRemuxer {
     private class CancelledRemuxException : Exception("Cancelled")
 
     private const val SHARED_TIMELINE_WINDOW_US = 10_000_000L
-
-    private fun iso3Language(tag: String?): String? {
-        val clean = tag?.trim()?.takeIf { it.isNotEmpty() } ?: return null
-        return runCatching { Locale.forLanguageTag(clean.replace('_', '-')).isO3Language }
-            .getOrNull()?.takeIf { it.isNotBlank() }
-    }
 
     suspend fun verify(path: String, expectVideo: Boolean, expectAudio: Boolean): MuxVerification =
         withContext(Dispatchers.IO) {
@@ -88,7 +75,7 @@ object MediaRemuxer {
         @Suppress("UNUSED_PARAMETER") context: Context,
         inputPaths: List<String>,
         outputPath: String,
-        audioLanguage: String? = null,
+        @Suppress("UNUSED_PARAMETER") audioLanguage: String? = null,
         onProgress: ((Int) -> Unit)? = null
     ): RemuxResult {
         if (inputPaths.isEmpty()) return RemuxResult(false, null)
@@ -115,7 +102,7 @@ object MediaRemuxer {
     suspend fun remuxSegments(
         inputs: List<List<File>>,
         outputPath: String,
-        audioLanguage: String? = null,
+        @Suppress("UNUSED_PARAMETER") audioLanguage: String? = null,
         onProgress: ((Int) -> Unit)? = null
     ): RemuxResult {
         if (inputs.isEmpty()) return RemuxResult(false, null)
@@ -251,32 +238,23 @@ object MediaRemuxer {
         return listOf(NAL_START_CODE + vps, NAL_START_CODE + sps, NAL_START_CODE + pps)
     }
 
-    private fun buildFormat(mediaFormat: MediaFormat, fallbackExtractor: MediaExtractor? = null): Format {
-        val builder = Format.Builder()
-        val mime = mediaFormat.getString(MediaFormat.KEY_MIME)
-        mime?.let { builder.setSampleMimeType(it) }
-        if (mediaFormat.containsKey(MediaFormat.KEY_WIDTH)) {
-            builder.setWidth(mediaFormat.getInteger(MediaFormat.KEY_WIDTH))
+    private fun buildFormat(src: MediaFormat, fallbackExtractor: MediaExtractor? = null): MediaFormat {
+        val mime = src.getString(MediaFormat.KEY_MIME) ?: throw IllegalArgumentException("Track has no MIME type")
+        val out = if (mime.startsWith("video/")) {
+            val w = if (src.containsKey(MediaFormat.KEY_WIDTH)) src.getInteger(MediaFormat.KEY_WIDTH) else 0
+            val h = if (src.containsKey(MediaFormat.KEY_HEIGHT)) src.getInteger(MediaFormat.KEY_HEIGHT) else 0
+            MediaFormat.createVideoFormat(mime, w, h)
+        } else {
+            val rate = if (src.containsKey(MediaFormat.KEY_SAMPLE_RATE)) src.getInteger(MediaFormat.KEY_SAMPLE_RATE) else 44100
+            val ch = if (src.containsKey(MediaFormat.KEY_CHANNEL_COUNT)) src.getInteger(MediaFormat.KEY_CHANNEL_COUNT) else 2
+            MediaFormat.createAudioFormat(mime, rate, ch)
         }
-        if (mediaFormat.containsKey(MediaFormat.KEY_HEIGHT)) {
-            builder.setHeight(mediaFormat.getInteger(MediaFormat.KEY_HEIGHT))
-        }
-        if (mediaFormat.containsKey(MediaFormat.KEY_ROTATION)) {
-            builder.setRotationDegrees(mediaFormat.getInteger(MediaFormat.KEY_ROTATION))
-        }
-        if (mediaFormat.containsKey(MediaFormat.KEY_SAMPLE_RATE)) {
-            builder.setSampleRate(mediaFormat.getInteger(MediaFormat.KEY_SAMPLE_RATE))
-        }
-        if (mediaFormat.containsKey(MediaFormat.KEY_CHANNEL_COUNT)) {
-            builder.setChannelCount(mediaFormat.getInteger(MediaFormat.KEY_CHANNEL_COUNT))
-        }
-        mediaFormat.getString(MediaFormat.KEY_LANGUAGE)?.let { builder.setLanguage(it) }
         val rawCsd = mutableListOf<ByteArray>()
         var i = 0
         while (true) {
             val key = "csd-$i"
-            if (!mediaFormat.containsKey(key)) break
-            val csd = mediaFormat.getByteBuffer(key) ?: break
+            if (!src.containsKey(key)) break
+            val csd = src.getByteBuffer(key) ?: break
             val bytes = ByteArray(csd.remaining())
             csd.duplicate().get(bytes)
             rawCsd += bytes
@@ -287,15 +265,28 @@ object MediaRemuxer {
             MediaFormat.MIMETYPE_VIDEO_HEVC -> buildHevcInitializationData(rawCsd, fallbackExtractor)
             else -> rawCsd
         }
-        if (initData.isNotEmpty()) builder.setInitializationData(initData)
-        return builder.build()
+        if (mime == MediaFormat.MIMETYPE_VIDEO_HEVC && initData.isNotEmpty()) {
+            // MediaMuxer expects VPS+SPS+PPS concatenated in csd-0
+            out.setByteBuffer("csd-0", ByteBuffer.wrap(initData.fold(ByteArray(0)) { acc, b -> acc + b }))
+        } else {
+            initData.forEachIndexed { idx, bytes -> out.setByteBuffer("csd-$idx", ByteBuffer.wrap(bytes)) }
+        }
+        return out
+    }
+
+    private fun sampleInfo(ptsUs: Long, size: Int, flags: Int): MediaCodec.BufferInfo =
+        MediaCodec.BufferInfo().also { it.set(0, size, ptsUs, flags) }
+
+    private fun finishMuxer(muxer: MediaMuxer, started: Boolean) {
+        if (started) runCatching { muxer.stop() }
+        runCatching { muxer.release() }
     }
 
     private fun remuxTracks(
         extractors: List<MediaExtractor>,
         totalBytes: Long,
         outputPath: String,
-        audioLanguage: String?,
+        @Suppress("UNUSED_PARAMETER") audioLanguage: String?,
         onProgress: ((Int) -> Unit)?,
         isActive: () -> Boolean
     ): RemuxResult {
@@ -316,17 +307,12 @@ object MediaRemuxer {
             return RemuxResult(false, "No playable video or audio streams found")
         }
 
-        val outputStream = FileOutputStream(outputPath)
         val muxer = try {
-            Mp4Muxer.Builder(SeekableMuxerOutput.of(outputStream))
-                .setAttemptStreamableOutputEnabled(false)
-                .setSampleBatchingEnabled(true)
-                .setSampleCopyingEnabled(true)
-                .build()
+            MediaMuxer(outputPath, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4)
         } catch (e: Exception) {
-            runCatching { outputStream.close() }
             return RemuxResult(false, e.message)
         }
+        var started = false
 
         return try {
             val tracks = mutableListOf<Track>()
@@ -336,6 +322,12 @@ object MediaRemuxer {
                 val extractor = extractors[videoSourceIdx]
                 extractor.selectTrack(trackIndex)
                 val videoMediaFormat = extractor.getTrackFormat(trackIndex)
+                if (videoMediaFormat.containsKey(MediaFormat.KEY_ROTATION)) {
+                    val rotation = videoMediaFormat.getInteger(MediaFormat.KEY_ROTATION)
+                    if (rotation == 0 || rotation == 90 || rotation == 180 || rotation == 270) {
+                        muxer.setOrientationHint(rotation)
+                    }
+                }
                 val muxerTrackId = muxer.addTrack(buildFormat(videoMediaFormat, extractor))
                 tracks += Track(videoSourceIdx, trackIndex, muxerTrackId)
                 if (isNalVideo(videoMediaFormat.getString(MediaFormat.KEY_MIME))) nalTrackIds += muxerTrackId
@@ -344,11 +336,12 @@ object MediaRemuxer {
                 val trackIndex = audioTrackIndices[audioSourceIdx]
                 val extractor = extractors[audioSourceIdx]
                 extractor.selectTrack(trackIndex)
-                var audioFormat = buildFormat(extractor.getTrackFormat(trackIndex))
-                iso3Language(audioLanguage)?.let { audioFormat = audioFormat.buildUpon().setLanguage(it).build() }
-                val muxerTrackId = muxer.addTrack(audioFormat)
+                val muxerTrackId = muxer.addTrack(buildFormat(extractor.getTrackFormat(trackIndex)))
                 tracks += Track(audioSourceIdx, trackIndex, muxerTrackId)
             }
+
+            muxer.start()
+            started = true
 
             val startByExtractor = mutableMapOf<Int, Long>()
             for (extractorIndex in tracks.map { it.extractorIndex }.distinct()) {
@@ -416,7 +409,7 @@ object MediaRemuxer {
                     } else 0
                     buffer.position(0)
                     buffer.limit(size)
-                    muxer.writeSampleData(muxerTrackId, buffer, BufferInfo(ptsUs, size, flags))
+                    muxer.writeSampleData(muxerTrackId, buffer, sampleInfo(ptsUs, size, flags))
                     maxPtsUs = maxOf(maxPtsUs, ptsUs)
                     bytesProcessed += size
                     sampleCount++
@@ -442,7 +435,7 @@ object MediaRemuxer {
                     val next = candidate ?: break
                     next.buffer.position(0)
                     next.buffer.limit(next.size)
-                    muxer.writeSampleData(next.muxerTrackId, next.buffer, BufferInfo(next.ptsUs, next.size, next.flags))
+                    muxer.writeSampleData(next.muxerTrackId, next.buffer, sampleInfo(next.ptsUs, next.size, next.flags))
                     maxPtsUs = maxOf(maxPtsUs, next.ptsUs)
                     bytesProcessed += next.size
                     sampleCount++
@@ -451,14 +444,14 @@ object MediaRemuxer {
                 }
             }
 
-            muxer.close()
+            finishMuxer(muxer, started)
             onProgress?.invoke(100)
             RemuxResult(true, null)
         } catch (e: CancelledRemuxException) {
-            runCatching { muxer.close() }
+            finishMuxer(muxer, started)
             RemuxResult(false, "Cancelled")
         } catch (e: Exception) {
-            runCatching { muxer.close() }
+            finishMuxer(muxer, started)
             RemuxResult(false, e.message)
         }
     }

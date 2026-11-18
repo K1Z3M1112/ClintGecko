@@ -1,5 +1,6 @@
 package com.simplefox.browser.browser.delegates
 
+import com.simplefox.browser.tabs.restorableUrl
 import com.simplefox.browser.R
 import com.simplefox.browser.browser.MainActivity
 import com.simplefox.browser.browser.home.isClintHomeUrl
@@ -60,16 +61,15 @@ internal fun MainActivity.closeTabsWithUndo(ids: List<String>, message: String) 
     val snapshots = targets
         .filter { !it.isIncognito && !it.isRefreshLinkTab && !tabManager.isGhostTab(it) }
         .mapNotNull { tab ->
-            val url = tab.pendingUrl?.takeIf { it.isNotEmpty() && it != "about:blank" }
-                ?: tab.webView.url?.takeIf { it.isNotEmpty() && it != "about:blank" }
-                ?: tab.url.takeIf { it.isNotEmpty() && it != "about:blank" }
-                ?: return@mapNotNull null
+            val url = tab.restorableUrl() ?: return@mapNotNull null
             ClosedTabSnapshot(url, tab.title, tab.profileId, tab.groupId, tabManager.tabs.indexOf(tab))
         }
         .sortedBy { it.index }
     val closedGroups = snapshots.mapNotNull { it.groupId }.distinct().mapNotNull { tabManager.group(it) }
     val activeWasClosed = targets.any { it.id == previousActiveId }
-    targets.forEach { tab ->
+    // Close the active tab last. Closing it first would wake the neighbouring tab (a hibernated one reloads from the
+    // network, which is the expensive case in Single Tab Mode) only for that tab to be closed right after.
+    targets.sortedBy { if (it.id == previousActiveId) 1 else 0 }.forEach { tab ->
         val index = tabManager.tabs.indexOfFirst { it.id == tab.id }
         if (index >= 0) onTabClosed(index)
     }
@@ -119,5 +119,6 @@ private fun MainActivity.reopenClosedTabs(
     val targetIndex = tabManager.tabs.indexOfFirst { it.id == targetId }
     if (targetIndex >= 0) tabManager.switchTo(targetIndex)
     attachActiveWebView()
+    scheduleBackgroundTabLoads(reopenedIds.filter { it != targetId })
     onTabGroupsChanged()
 }

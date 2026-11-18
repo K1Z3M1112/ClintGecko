@@ -1,7 +1,6 @@
 package com.simplefox.browser.settings.menucustomization
 
 import com.simplefox.browser.ui.animateFloatAsState
-import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
@@ -38,7 +37,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
@@ -113,13 +111,13 @@ fun MenuCustomizationScreen(
                             }
                             items(entries, key = { menuItemDragKey(it.item.id) }) { entry ->
                                 val isDragging = dragState.draggingId == entry.item.id
-                                val ghostAlpha by animateFloatAsState(if (isDragging) 0.2f else 1f, label = "menuItemGhostAlpha")
+                                val ghostAlpha = animateFloatAsState(if (isDragging) 0.2f else 1f, label = "menuItemGhostAlpha")
                                 Box(
                                     Modifier
                                 ) {
                                     MenuCustomizeRow(
                                         entry = entry,
-                                        modifier = Modifier.alpha(ghostAlpha),
+                                        modifier = Modifier.graphicsLayer { alpha = ghostAlpha.value },
                                         onToggleVisible = { onToggleVisible(entry.item.id) },
                                         dragHandleModifier = Modifier.pointerInput(entry.item.id) {
                                             detectDragGestures(
@@ -141,22 +139,17 @@ fun MenuCustomizationScreen(
                         if (draggedId != null) {
                             val draggedEntry = entries.find { it.item.id == draggedId }
                             if (draggedEntry != null) {
-                                val offsetYPx = dragState.originOffsetY + dragState.dragOffsetY
                                 val density = LocalDensity.current
                                 val rowHeight = with(density) { dragState.originHeight.toDp() }
-                                val liftScale by animateFloatAsState(1.03f, animationSpec = spring(dampingRatio = 0.5f), label = "menuItemDragLiftScale")
                                 Box(
                                     Modifier
                                         .padding(horizontal = 12.dp)
                                         .fillMaxWidth()
                                         .height(rowHeight)
                                         .graphicsLayer {
-                                            translationY = offsetYPx
-                                            scaleX = liftScale
-                                            scaleY = liftScale
+                                            translationY = dragState.originOffsetY + dragState.dragOffsetY
                                         }
                                         .zIndex(10f)
-                                        .shadow(10.dp, RoundedCornerShape(16.dp))
                                 ) {
                                     MenuCustomizeRow(
                                         entry = draggedEntry,
@@ -244,7 +237,7 @@ private fun MenuCustomizeRow(
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.weight(1f).padding(start = 14.dp)
             )
-            ClintSwitch(checked = entry.visible)
+            ClintSwitch(checked = entry.visible, onCheckedChange = { onToggleVisible() })
         }
         Icon(
             imageVector = Icons.Filled.DragHandle,

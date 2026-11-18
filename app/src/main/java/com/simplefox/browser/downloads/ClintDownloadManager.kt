@@ -3,7 +3,7 @@ package com.simplefox.browser.downloads
 import android.app.NotificationManager
 import android.content.Context
 import android.net.Uri
-import androidx.documentfile.provider.DocumentFile
+import com.simplefox.browser.util.DocumentFile
 import androidx.preference.PreferenceManager
 import com.simplefox.browser.R
 import com.simplefox.browser.downloads.mega.MegaPaths
@@ -35,7 +35,8 @@ object ClintDownloadManager {
     internal val httpClient: OkHttpClient = OkHttpClient.Builder()
         .connectTimeout(30, TimeUnit.SECONDS)
         .readTimeout(60, TimeUnit.SECONDS)
-        .connectionPool(ConnectionPool(32, 5, TimeUnit.MINUTES))
+        // Pool must cover several parallel downloads (up to 16 connections each) or TLS handshakes get repeated.
+        .connectionPool(ConnectionPool(64, 5, TimeUnit.MINUTES))
         .build()
 
     internal val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)

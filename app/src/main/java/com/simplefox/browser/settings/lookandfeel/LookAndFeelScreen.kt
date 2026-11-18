@@ -1,6 +1,7 @@
 package com.simplefox.browser.settings.lookandfeel
 import androidx.compose.material.icons.filled.ColorLens
 import androidx.compose.material.icons.filled.Tab
+import androidx.compose.material.icons.filled.PhotoSizeSelectLarge
 import androidx.compose.material.icons.filled.VerticalAlignTop
 import androidx.compose.material.icons.filled.Brush
 import androidx.compose.material.icons.filled.Close
@@ -72,6 +73,7 @@ fun LookAndFeelScreen(
     onTabStripPositionSelected: (String) -> Unit,
     onTabGroupsRowClicked: () -> Unit,
     onTabGroupBarPositionSelected: (String) -> Unit,
+    onTabPreviewResolutionSelected: (String) -> Unit,
     onCustomizeMenuRowClicked: () -> Unit,
     onExitConfirmationConfirmed: (String) -> Unit,
     onPopupAlertStyleSelected: (String) -> Unit
@@ -115,6 +117,10 @@ fun LookAndFeelScreen(
                     title = stringResource(R.string.pref_tab_group_bar_position_title),
                     current = state.tabGroupBarPosition, hideStatusBar = state.hideStatusBar, hideSystemNavigation = state.hideSystemNavigation,
                     onSelect = onTabGroupBarPositionSelected, onDismiss = { state.openDialog = null }
+                )
+                LookAndFeelDialog.TAB_PREVIEW_RESOLUTION -> TabPreviewResolutionDialog(
+                    current = state.tabPreviewResolution, hideStatusBar = state.hideStatusBar, hideSystemNavigation = state.hideSystemNavigation,
+                    onSelect = onTabPreviewResolutionSelected, onDismiss = { state.openDialog = null }
                 )
                 LookAndFeelDialog.POPUP_ALERT_STYLE -> PopupAlertStyleDialog(
                     current = state.popupAlertStyle, hideStatusBar = state.hideStatusBar, hideSystemNavigation = state.hideSystemNavigation,
@@ -229,6 +235,14 @@ fun LookAndFeelScreen(
                 summary = stringResource(tabBarPositionSummaryRes(state.tabStripPosition)),
                 colors = colors,
                 onClick = { state.openDialog = LookAndFeelDialog.TAB_STRIP_POSITION }
+            )
+            RowDivider(colors.divider)
+            SettingsRow(
+                icon = androidx.compose.material.icons.Icons.Filled.PhotoSizeSelectLarge,
+                title = stringResource(R.string.pref_tab_preview_resolution_title),
+                summary = stringResource(tabPreviewResolutionSummaryRes(state.tabPreviewResolution)),
+                colors = colors,
+                onClick = { state.openDialog = LookAndFeelDialog.TAB_PREVIEW_RESOLUTION }
             )
             RowDivider(colors.divider)
             SettingsRow(

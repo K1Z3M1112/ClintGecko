@@ -28,6 +28,7 @@ import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Headphones
 import androidx.compose.material.icons.filled.Apps
 import androidx.compose.material.icons.filled.Backup
+import androidx.compose.material.icons.filled.BlurOff
 import androidx.compose.material.icons.filled.CloudDownload
 import androidx.compose.material.icons.filled.Tab
 import androidx.compose.material.icons.filled.Workspaces
@@ -418,6 +419,7 @@ internal fun buildSettingsSearchEntries(context: Context): List<SettingsSearchEn
         item(R.string.data_saver_block_frames_title, R.string.data_saver_block_frames_summary, R.string.data_saver_loading_section, icon = Icons.Filled.Web)
         item(R.string.data_saver_block_scripts_title, R.string.data_saver_block_scripts_summary, R.string.data_saver_loading_section, icon = Icons.Filled.Code)
         item(R.string.data_saver_block_css_title, R.string.data_saver_block_css_summary, R.string.data_saver_loading_section, icon = Icons.Filled.Style)
+        item(R.string.data_saver_reduce_effects_title, R.string.data_saver_reduce_effects_summary, R.string.data_saver_loading_section, icon = Icons.Filled.BlurOff)
         item(R.string.data_saver_cache_first_title, R.string.data_saver_cache_first_summary, R.string.data_saver_loading_section, icon = Icons.Filled.History)
         item(R.string.data_saver_send_header_title, R.string.data_saver_send_header_summary, R.string.data_saver_loading_section, icon = Icons.Filled.Speed)
         item(R.string.data_saver_single_tab_title, R.string.data_saver_single_tab_summary, R.string.data_saver_browser_section, icon = Icons.Filled.Tab)

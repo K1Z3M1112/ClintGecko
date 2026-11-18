@@ -3,6 +3,7 @@ package com.simplefox.browser.browser.webview
 import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
+import android.os.Looper
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
@@ -47,7 +48,9 @@ class ClintWebView(
     deferOpen: Boolean = false
 ) : FrameLayout(context) {
 
-    val geckoView = object : GeckoView(context) {
+    private var geckoView: GeckoView? = null
+
+    private fun ensureGeckoView(): GeckoView = geckoView ?: object : GeckoView(context) {
         override fun onCreateInputConnection(outAttrs: android.view.inputmethod.EditorInfo): android.view.inputmethod.InputConnection? {
             val connection = super.onCreateInputConnection(outAttrs)
             if (isPrivate && com.simplefox.browser.privacy.IncognitoKeyboard.isEnabled(context)) {
@@ -84,6 +87,9 @@ class ClintWebView(
             )
             return true
         }
+    }.also {
+        geckoView = it
+        addView(it, 0, LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
     }
     private var touchDownTime = -1L
     private var touchPullAllowed: Boolean? = null
@@ -122,11 +128,13 @@ class ClintWebView(
     var autofillAllowed: Boolean = true
         set(value) {
             field = value
-            geckoView.setAutofillEnabled(value)
-            geckoView.importantForAutofill = if (value) {
-                android.view.View.IMPORTANT_FOR_AUTOFILL_YES
-            } else {
-                android.view.View.IMPORTANT_FOR_AUTOFILL_NO_EXCLUDE_DESCENDANTS
+            geckoView?.let { view ->
+                view.setAutofillEnabled(value)
+                view.importantForAutofill = if (value) {
+                    android.view.View.IMPORTANT_FOR_AUTOFILL_YES
+                } else {
+                    android.view.View.IMPORTANT_FOR_AUTOFILL_NO_EXCLUDE_DESCENDANTS
+                }
             }
         }
     var clipboardPermissionHandler: ((String, (Boolean) -> Unit) -> Unit)? = null
@@ -159,6 +167,7 @@ class ClintWebView(
     val url: String? get() = currentUrl
     val originalUrl: String? get() = currentUrl
     val title: String? get() = currentTitle
+    val isSessionOpen: Boolean get() = session.isOpen
     val bridges = ConcurrentHashMap<String, Any>()
     val audioState = TabAudioState()
     val isMediaPlaying: Boolean get() = MediaPlaybackController.isPlaying(this)
@@ -180,7 +189,6 @@ class ClintWebView(
             val top = runCatching { port.sender.isTopLevel }.getOrDefault(false)
             ports.add(port)
             if (audioState.muted) port.postMessage(muteMessage(true))
-            if (webViewClient?.isMediaCaptureEnabled() == true) port.postMessage(mediaScanMessage(false))
             port.setDelegate(object : WebExtension.PortDelegate {
                 override fun onPortMessage(message: Any, port: WebExtension.Port) {}
                 override fun onDisconnect(port: WebExtension.Port) {
@@ -202,10 +210,6 @@ class ClintWebView(
                 "call" -> handleCall(msg)
                 "evalRes" -> {
                     pendingEval.remove(msg.optString("id"))?.invoke(msg.optString("v"))
-                    null
-                }
-                "media" -> {
-                    webViewClient?.onPageMediaFound(msg)
                     null
                 }
                 "nonce" -> {
@@ -260,14 +264,6 @@ class ClintWebView(
     private fun muteMessage(muted: Boolean): JSONObject =
         JSONObject().put("k", "eval").put("code", TabMediaControl.muteScript(muted)).put("id", "")
 
-    private fun mediaScanMessage(full: Boolean): JSONObject =
-        JSONObject().put("k", "mediaScan").put("full", full)
-
-    fun rescanMedia() {
-        val message = mediaScanMessage(true)
-        ArrayList(ports).forEach { runCatching { it.postMessage(message) } }
-    }
-
     fun setAudioMuted(muted: Boolean) {
         audioState.muted = muted
         MediaPlaybackController.applyNativeMute(this, muted)
@@ -309,8 +305,20 @@ class ClintWebView(
         }
     }
 
+    /**
+     * Start navigation as soon as the Gecko runtime/session is available.
+     * Extension bundle registration is optional page instrumentation and must not
+     * hold the document request behind its asynchronous startup handshake.
+     */
     fun loadUrl(url: String) {
-        ClintGecko.whenReady { if (!destroyed) doLoad(url) }
+        if (destroyed) return
+        if (Looper.myLooper() == Looper.getMainLooper()) {
+            doLoad(url)
+        } else {
+            ClintGecko.main.post {
+                if (!destroyed) doLoad(url)
+            }
+        }
     }
 
     fun loadUrl(url: String, headers: Map<String, String>) = loadUrl(url)
@@ -432,8 +440,8 @@ class ClintWebView(
         if (!enabled) hideCover()
         cover.setBackgroundColor(color)
         setBackgroundColor(color)
-        geckoView.setBackgroundColor(color)
-        if (!surfaceComposited) coverSurface()
+        geckoView?.setBackgroundColor(color)
+        if (!surfaceComposited && geckoView != null) coverSurface()
         if (enabled && color != 0 && initialCoverPending) {
             initialCoverPending = false
             showCover()
@@ -445,7 +453,7 @@ class ClintWebView(
     private fun coverSurface() {
         if (destroyed || loadingBackground == 0) return
         surfaceComposited = false
-        runCatching { geckoView.coverUntilFirstPaint(loadingBackground) }
+        runCatching { geckoView?.coverUntilFirstPaint(loadingBackground) }
     }
 
     private fun showCover() {
@@ -480,7 +488,7 @@ class ClintWebView(
         queuedEvals.clear()
         ClintGecko.clearForeground(this)
         MediaPlaybackController.onViewReleased(this)
-        runCatching { geckoView.releaseSession() }
+        runCatching { geckoView?.releaseSession() }
         runCatching { session.close() }
         return true
     }
@@ -506,8 +514,13 @@ class ClintWebView(
             if (enabled) GeckoSessionSettings.VIEWPORT_MODE_DESKTOP else GeckoSessionSettings.VIEWPORT_MODE_MOBILE
     }
 
+    /** True only when the page is really on screen and painted, so a capture will not return a blank/stale frame. */
+    val canCaptureThumbnail: Boolean
+        get() = !destroyed && session.isOpen && !sessionDeactivated && !paused &&
+            isAttachedToWindow && pagePainted && width > 0 && height > 0
+
     fun captureBitmap(callback: (Bitmap?) -> Unit) {
-        val result = runCatching { geckoView.capturePixels() }.getOrNull()
+        val result = runCatching { geckoView?.capturePixels() }.getOrNull()
         if (result == null) {
             callback(null)
             return
@@ -529,7 +542,7 @@ class ClintWebView(
         MediaPlaybackController.onViewReleased(this)
         ClintGecko.clearForeground(this)
         ClintGecko.unregisterView(this)
-        runCatching { geckoView.releaseSession() }
+        runCatching { geckoView?.releaseSession() }
         runCatching { session.close() }
         runCatching {
             session.contentDelegate = null
@@ -902,9 +915,9 @@ class ClintWebView(
         neverOpened = false
         pagePainted = false
         sessionDeactivated = false
-        runCatching { geckoView.releaseSession() }
+        runCatching { geckoView?.releaseSession() }
         if (!session.isOpen) session.open(ClintGecko.runtime)
-        geckoView.setSession(session)
+        ensureGeckoView().setSession(session)
         coverSurface()
         extensionAttached = false
         ClintGecko.registerView(this)
@@ -1221,9 +1234,8 @@ class ClintWebView(
         autofillAllowed = !isPrivate
         if (!deferOpen) {
             session.open(ClintGecko.runtime)
-            geckoView.setSession(session)
+            ensureGeckoView().setSession(session)
         }
-        addView(geckoView, LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
         addView(cover, LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
         if (!deferOpen) ClintGecko.registerView(this)
     }

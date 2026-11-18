@@ -3,6 +3,7 @@ package com.simplefox.browser.blocker.engine
 import android.content.Context
 import com.simplefox.browser.blocker.WebsiteBlockerCategory
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
 
@@ -25,10 +26,11 @@ object WebsiteBlockerCompiler {
 
         try {
             for (category in activeCategories) {
+                ensureActive()
                 onProgress(WebsiteBlockerCompileProgress(category.id, processed, totalItems))
                 val file = WebsiteBlockerPaths.categoryFile(context, category.id)
                 if (file.exists()) {
-                    WebsiteBlockerNative.nativeAddText(builderPtr, file.readText())
+                    WebsiteBlockerNative.nativeAddFile(builderPtr, file)
                 }
                 processed++
             }
@@ -57,10 +59,22 @@ object WebsiteBlockerCompiler {
             }
 
             val engineFile = WebsiteBlockerPaths.engineFile(context)
-            if (engineFile.exists()) engineFile.delete()
-            if (!tempFile.renameTo(engineFile)) {
+            // Atomic replace: a crash mid-swap must never leave the device without a database.
+            val replaced = runCatching {
+                java.nio.file.Files.move(
+                    tempFile.toPath(), engineFile.toPath(),
+                    java.nio.file.StandardCopyOption.REPLACE_EXISTING,
+                    java.nio.file.StandardCopyOption.ATOMIC_MOVE
+                )
+            }.isSuccess || run {
+                if (engineFile.exists()) engineFile.delete()
+                tempFile.renameTo(engineFile)
+            }
+            if (!replaced) {
                 return@withContext WebsiteBlockerCompileResult(false, 0, 0, "Failed to activate compiled database")
             }
+
+            WebsiteBlockerEngine.markVerified(context)
 
             CompiledWebsiteBlockerManifest(
                 compiledAt = System.currentTimeMillis(),

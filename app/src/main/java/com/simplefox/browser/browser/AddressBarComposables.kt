@@ -4,7 +4,6 @@ import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.LockOpen
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Translate
-import androidx.compose.material.icons.filled.VideoLibrary
 import androidx.compose.material.icons.filled.VisibilityOff
 
 import com.simplefox.browser.ui.AnimatedContent
@@ -61,6 +60,11 @@ import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntRect
 import androidx.compose.ui.unit.IntSize
@@ -85,11 +89,9 @@ internal fun AddressBarRow(
     addressBarText: String,
     isSecure: Boolean,
     tabCountText: String,
-    isMediaCaptureEnabled: Boolean,
     activeTabId: String?,
     onAddressBarClick: () -> Unit,
     onTabCountClick: () -> Unit,
-    onMediaCaptureClick: () -> Unit,
     onSwipeTabChange: (Int) -> Boolean,
     onSiteInfoClick: () -> Unit = {},
     showHomeButton: Boolean = false,
@@ -100,10 +102,6 @@ internal fun AddressBarRow(
 ) {
     val colors = LocalClintColors.current
     val density = LocalDensity.current
-    val mediaCaptureCount = if (isMediaCaptureEnabled && activeTabId != null) {
-        val items by com.simplefox.browser.mediacapture.MediaCaptureStore.observe(activeTabId).collectAsState()
-        items.size
-    } else 0
     val addressBarHint = stringResource(
         R.string.search_bar_hint,
         engineDisplayName(
@@ -114,12 +112,24 @@ internal fun AddressBarRow(
     val haptic = LocalHapticFeedback.current
     var showEditMenu by remember { mutableStateOf(false) }
     var canPaste by remember { mutableStateOf(false) }
-    val activeWebView = remember(activeTabId, activity.uiState.tabsRevision) {
-        activity.tabManager.tabs.firstOrNull { it.id == activeTabId }?.webView
+    // tabsRevision is bumped by every background-tab update. It is read inside derivedStateOf so the bar is
+    // only invalidated when the active tab's web view instance actually changes.
+    val activeWebViewState = remember(activeTabId) {
+        androidx.compose.runtime.derivedStateOf {
+            activity.uiState.tabsRevision
+            activity.tabManager.tabs.firstOrNull { it.id == activeTabId }?.webView
+        }
     }
-    val translationState by (activeWebView?.translator?.state ?: com.simplefox.browser.translation.EmptyPageTranslationState).collectAsState()
-    val showTranslateButton = activity.uiState.showTranslateButton && addressBarText.isNotEmpty() &&
-        (translationState.canTranslate || translationState.isRequested)
+    val activeWebView = activeWebViewState.value
+    val translationStateHolder = (activeWebView?.translator?.state ?: com.simplefox.browser.translation.EmptyPageTranslationState).collectAsState()
+    val showTranslateButton by remember(addressBarText) {
+        androidx.compose.runtime.derivedStateOf {
+            activity.uiState.showTranslateButton && addressBarText.isNotEmpty() &&
+                translationStateHolder.value.let { it.canTranslate || it.isRequested }
+        }
+    }
+    val translateIsTranslating by remember { androidx.compose.runtime.derivedStateOf { translationStateHolder.value.isTranslating } }
+    val translateIsTranslated by remember { androidx.compose.runtime.derivedStateOf { translationStateHolder.value.isTranslated } }
     var dragOffset by remember { mutableFloatStateOf(0f) }
     var swipeDirection by remember { mutableIntStateOf(0) }
     val swipeThresholdPx = with(density) { 96.dp.toPx() }
@@ -175,10 +185,14 @@ internal fun AddressBarRow(
             Box(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
-                    .padding(end = 6.dp)
-                    .size(36.dp)
+                    .padding(end = 4.dp)
+                    .size(40.dp)
                     .clip(CircleShape)
-                    .clickable(onClick = onHomeClick)
+                    .clickable(
+                        onClickLabel = stringResource(R.string.home),
+                        role = Role.Button,
+                        onClick = onHomeClick
+                    )
             ) {
                 Icon(
                     imageVector = androidx.compose.material.icons.Icons.Filled.Home,
@@ -302,7 +316,7 @@ internal fun AddressBarRow(
                                 onClick = { activity.openTranslatePage() }
                             )
                     ) {
-                        if (translationState.isTranslating) {
+                        if (translateIsTranslating) {
                             CircularProgressIndicator(
                                 color = colors.primary,
                                 strokeWidth = 2.dp,
@@ -312,7 +326,7 @@ internal fun AddressBarRow(
                             Icon(
                                 imageVector = androidx.compose.material.icons.Icons.Filled.Translate,
                                 contentDescription = stringResource(R.string.translation_menu_translate),
-                                tint = if (translationState.isTranslated) colors.primary else colors.iconTint,
+                                tint = if (translateIsTranslated) colors.primary else colors.iconTint,
                                 modifier = Modifier.size(20.dp)
                             )
                         }
@@ -320,58 +334,18 @@ internal fun AddressBarRow(
                 }
             }
         }
-        if (isMediaCaptureEnabled) {
-            Box(
-                modifier = Modifier
-                    .padding(start = 8.dp)
-                    .size(30.dp)
-            ) {
-                Box(
-                    contentAlignment = Alignment.Center,
-                    modifier = Modifier
-                        .matchParentSize()
-                        .clip(RoundedCornerShape(8.dp))
-                        .clickable(onClick = onMediaCaptureClick)
-                ) {
-                    Icon(
-                        imageVector = androidx.compose.material.icons.Icons.Filled.VideoLibrary,
-                        contentDescription = stringResource(R.string.menu_media_capture),
-                        tint = colors.iconTint,
-                        modifier = Modifier.size(20.dp)
-                    )
-                }
-                if (mediaCaptureCount > 0) {
-                    Box(
-                        contentAlignment = Alignment.Center,
-                        modifier = Modifier
-                            .align(Alignment.TopEnd)
-                            .offset(x = 2.dp, y = (-2).dp)
-                            .defaultMinSize(minWidth = 13.dp)
-                            .height(13.dp)
-                            .clip(RoundedCornerShape(6.5.dp))
-                            .background(colors.primary)
-                            .padding(horizontal = 3.dp)
-                    ) {
-                        Text(
-                            text = com.simplefox.browser.ui.status.formatCompactCount(mediaCaptureCount.toLong()),
-                            color = colors.onPrimary,
-                            fontSize = 9.sp,
-                            lineHeight = 9.sp,
-                            fontWeight = FontWeight.Medium,
-                            textAlign = TextAlign.Center
-                        )
-                    }
-                }
-            }
-        }
+        val tabCountDescription = tabCountText.toIntOrNull()
+            ?.let { pluralStringResource(R.plurals.tab_menu_tab_count, it, it) }
+            ?: tabCountText
+        // Outer box is the 48dp touch target; the inner box keeps the original compact visual.
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
-                .padding(start = 10.dp)
-                .defaultMinSize(minWidth = 34.dp, minHeight = 26.dp)
-                .clip(RoundedCornerShape(5.dp))
-                .border(2.dp, colors.primary, RoundedCornerShape(5.dp))
+                .padding(start = 2.dp)
+                .defaultMinSize(minWidth = 48.dp, minHeight = 48.dp)
+                .clip(RoundedCornerShape(12.dp))
                 .combinedClickable(
+                    onClickLabel = tabCountDescription,
                     onClick = onTabCountClick,
                     onLongClickLabel = stringResource(if (isIncognito) R.string.new_incognito_tab else R.string.new_tab),
                     onLongClick = {
@@ -379,6 +353,17 @@ internal fun AddressBarRow(
                         if (isIncognito) activity.onNewIncognitoTab() else activity.onNewTab()
                     }
                 )
+                .semantics(mergeDescendants = true) {
+                    contentDescription = tabCountDescription
+                    role = Role.Button
+                }
+        ) {
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .defaultMinSize(minWidth = 30.dp, minHeight = 26.dp)
+                .clip(RoundedCornerShape(7.dp))
+                .border(2.dp, colors.primary, RoundedCornerShape(7.dp))
                 .padding(horizontal = 5.dp, vertical = 4.dp)
         ) {
             Text(
@@ -400,7 +385,8 @@ internal fun AddressBarRow(
                 )
             )
         }
-        Box(modifier = Modifier.padding(start = 4.dp).size(36.dp), contentAlignment = Alignment.Center) {
+        }
+        Box(modifier = Modifier.size(40.dp), contentAlignment = Alignment.Center) {
             com.simplefox.browser.browser.menu.MenuTriggerButton(activity)
         }
     }
@@ -457,7 +443,7 @@ private fun AddressBarEditMenu(
             contentColor = colors.popupText,
             shape = RoundedCornerShape(12.dp),
             border = null,
-            shadowElevation = 6.dp
+            shadowElevation = 0.dp
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,

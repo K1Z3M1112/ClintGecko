@@ -22,6 +22,10 @@ object WebsiteBlockerPaths {
     fun engineTempFile(context: Context): File =
         File(rootDir(context), "engine.tmp")
 
+    /** Records "size:lastModified" of an engine.dat that has passed full checksum verification. */
+    fun engineStampFile(context: Context): File =
+        File(rootDir(context), "engine.verified")
+
     fun manifestFile(context: Context): File =
         File(rootDir(context), "manifest.json")
 }

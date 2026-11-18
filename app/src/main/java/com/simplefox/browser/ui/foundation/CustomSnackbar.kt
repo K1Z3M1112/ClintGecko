@@ -89,7 +89,7 @@ fun Snackbar(
     actionColor: Color = Color(0xFFB0C8FF),
     content: (@Composable () -> Unit)? = null
 ) {
-    Surface(shape = shape, color = containerColor, contentColor = contentColor, shadowElevation = 8.dp) {
+    Surface(shape = shape, color = containerColor, contentColor = contentColor) {
         Row(
             Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 10.dp),
             verticalAlignment = Alignment.CenterVertically,

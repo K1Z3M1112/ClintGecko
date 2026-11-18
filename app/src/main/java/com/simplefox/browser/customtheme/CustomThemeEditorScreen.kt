@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
+import com.simplefox.browser.ui.imeTargetPadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -202,7 +203,7 @@ fun CustomThemeEditorScreen(
                     .weight(1f)
                     .fillMaxWidth()
                     .navigationBarsPadding()
-                    .imePadding()
+                    .imeTargetPadding()
             ) {
                 if (maxWidth >= 840.dp) {
                     Row(Modifier.fillMaxSize()) {

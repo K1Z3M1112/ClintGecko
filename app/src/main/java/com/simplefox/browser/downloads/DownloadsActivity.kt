@@ -21,7 +21,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.core.content.FileProvider
-import androidx.documentfile.provider.DocumentFile
+import com.simplefox.browser.util.DocumentFile
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
@@ -154,7 +154,16 @@ class DownloadsActivity : ClintActivity(), OverlayHostActivity, SnackbarHostActi
                 }
 
                 var tick by remember { mutableStateOf(0L) }
-                LaunchedEffect(Unit) {
+                // The once-a-second tick recomposed the whole screen forever, even with nothing downloading.
+                // Only run it while something is running/queued and a view that shows live values is visible.
+                val needsTick by remember {
+                    androidx.compose.runtime.derivedStateOf {
+                        allItems.any { it.status in DownloadStatus.RUNNING_OR_QUEUED } &&
+                            (uiState.section == DownloadsSection.QUEUE || uiState.propertiesItem != null)
+                    }
+                }
+                LaunchedEffect(needsTick) {
+                    if (!needsTick) return@LaunchedEffect
                     while (true) {
                         delay(1000)
                         tick++

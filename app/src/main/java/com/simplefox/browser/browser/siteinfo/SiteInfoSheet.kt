@@ -350,7 +350,7 @@ private fun TrackingProtectionCard(enabled: Boolean, trackers: SiteInfoTrackers?
                     modifier = Modifier.padding(top = 2.dp)
                 )
             }
-            ClintSwitch(checked = enabled)
+            ClintSwitch(checked = enabled, onCheckedChange = { onChange(!enabled) })
         }
         if (enabled && trackers != null) {
             SiteInfoDivider()

@@ -272,7 +272,7 @@ private fun MasterSwitchRow(masterEnabled: Boolean, onToggle: (Boolean) -> Unit)
         colors = colors,
         onClick = { onToggle(!masterEnabled) },
         trailing = {
-            ClintSwitch(checked = masterEnabled)
+            ClintSwitch(checked = masterEnabled, onCheckedChange = { onToggle(!masterEnabled) })
         }
     )
 }
@@ -333,7 +333,7 @@ private fun WebsiteBlockerToolbar(
     val showToolbarIcons = !state.isInSelectionMode && !state.isSearchMode
     var selectionItemOptionsMenuOpen by remember { mutableStateOf(false) }
 
-    Surface(color = colors.surface, shadowElevation = 4.dp, modifier = Modifier.statusBarsPadding()) {
+    Surface(color = colors.surface, modifier = Modifier.statusBarsPadding()) {
         Row(Modifier.fillMaxWidth().height(56.dp).padding(horizontal = 4.dp), verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = onBack) {
                 Icon(
@@ -491,7 +491,11 @@ private fun WebsiteBlockerCategoryRow(
             Text(statusText, color = colors.secondaryText, fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(top = 2.dp))
         }
         if (!isInSelectionMode) {
-            ClintSwitch(checked = category.isEnabled)
+            ClintSwitch(
+                checked = category.isEnabled,
+                enabled = masterEnabled && !interactionLocked,
+                onCheckedChange = { onClick() }
+            )
         }
         Box {
             IconButton(onClick = { optionsMenuOpen = true }, enabled = masterEnabled && !interactionLocked) {

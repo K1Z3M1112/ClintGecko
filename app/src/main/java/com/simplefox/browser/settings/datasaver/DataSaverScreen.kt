@@ -43,7 +43,8 @@ fun DataSaverScreen(
     onDisableFaviconsClick: () -> Unit,
     onBlockScriptsClick: () -> Unit,
     onBlockCssClick: () -> Unit,
-    onSingleTabClick: () -> Unit = {}
+    onSingleTabClick: () -> Unit = {},
+    onReduceEffectsClick: () -> Unit = {}
 ) {
     val colors = LocalClintColors.current
 
@@ -170,6 +171,18 @@ fun DataSaverScreen(
                 enabled = state.enabled,
                 trailing = {
                     ClintSwitch(checked = state.blockCss)
+                }
+            )
+            RowDivider(colors.divider)
+            SettingsRow(
+                icon = androidx.compose.material.icons.Icons.Filled.BlurOff,
+                title = stringResource(R.string.data_saver_reduce_effects_title),
+                summary = stringResource(R.string.data_saver_reduce_effects_summary),
+                colors = colors,
+                onClick = onReduceEffectsClick,
+                enabled = state.enabled,
+                trailing = {
+                    ClintSwitch(checked = state.reduceEffects)
                 }
             )
             RowDivider(colors.divider)

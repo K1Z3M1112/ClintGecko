@@ -149,7 +149,7 @@ fun ExtensionsScreen(
                 }
             }
             HorizontalDivider(color = colors.divider, thickness = 1.dp)
-            Surface(color = colors.surface, shadowElevation = 4.dp, modifier = Modifier.navigationBarsPadding()) {
+            Surface(color = colors.surface, modifier = Modifier.navigationBarsPadding()) {
                 Row(
                     Modifier.fillMaxWidth().height(56.dp).padding(start = 4.dp, end = 8.dp),
                     verticalAlignment = Alignment.CenterVertically
@@ -387,7 +387,11 @@ private fun ExtensionCard(info: ExtensionInfo, onClick: () -> Unit) {
                         if (busy) {
                             CircularProgressIndicator(Modifier.size(22.dp), strokeWidth = 2.5.dp, color = colors.primary)
                         } else {
-                            ClintSwitch(checked = info.enabled)
+                            ClintSwitch(
+                                checked = info.enabled,
+                                enabled = info.canToggle,
+                                onCheckedChange = { ClintExtensions.setEnabled(info, !info.enabled) }
+                            )
                         }
                     }
                 }

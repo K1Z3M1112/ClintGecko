@@ -12,11 +12,13 @@ import androidx.compose.ui.platform.LocalContext
 @Composable
 fun rememberClintFavicon(pageUrl: String, storedFaviconUrl: String = ""): Bitmap? {
     val context = LocalContext.current
-    var bitmap by remember(pageUrl, storedFaviconUrl) { mutableStateOf<Bitmap?>(null) }
+    var bitmap by remember(pageUrl, storedFaviconUrl) {
+        mutableStateOf(FaviconCache.peek(storedFaviconUrl.ifBlank { FaviconCache.faviconUrlFor(pageUrl) }))
+    }
     var sharp by remember(pageUrl) { mutableStateOf(SharpFavicon.cached(pageUrl)) }
     LaunchedEffect(pageUrl, storedFaviconUrl) {
         val faviconUrl = storedFaviconUrl.ifBlank { FaviconCache.faviconUrlFor(pageUrl) }
-        if (faviconUrl.isNotEmpty()) {
+        if (bitmap == null && faviconUrl.isNotEmpty()) {
             FaviconCache.load(context, faviconUrl) { bmp -> bitmap = bmp }
         }
     }

@@ -44,8 +44,7 @@ fun SetupLayoutPage(
     onAddressBarPositionSelected: (String) -> Unit,
     onScrollHideModeSelected: (String) -> Unit,
     onHideStatusBarToggled: (Boolean) -> Unit,
-    onHideSystemNavigationToggled: (Boolean) -> Unit,
-    onNext: () -> Unit
+    onHideSystemNavigationToggled: (Boolean) -> Unit
 ) {
     val colors = LocalClintColors.current
     val context = LocalContext.current
@@ -141,7 +140,7 @@ fun SetupLayoutPage(
                         Text(stringResource(R.string.hide_status_bar), color = colors.onSurface, fontSize = 15.sp, fontWeight = FontWeight.Medium)
                         Text(stringResource(R.string.hide_status_bar_summary), color = colors.secondaryText, fontSize = 12.sp, lineHeight = 15.6.sp, modifier = Modifier.padding(top = 2.dp))
                     }
-                    ClintSwitch(checked = hideStatusBar)
+                    ClintSwitch(checked = hideStatusBar, onCheckedChange = { onHideStatusBarToggled(!hideStatusBar) })
                 }
                 Box(Modifier.fillMaxWidth().height(1.dp).background(colors.surfaceVariant))
                 Row(
@@ -152,11 +151,10 @@ fun SetupLayoutPage(
                         Text(stringResource(R.string.hide_system_navigation), color = colors.onSurface, fontSize = 15.sp, fontWeight = FontWeight.Medium)
                         Text(stringResource(R.string.hide_system_navigation_summary), color = colors.secondaryText, fontSize = 12.sp, lineHeight = 15.6.sp, modifier = Modifier.padding(top = 2.dp))
                     }
-                    ClintSwitch(checked = hideSystemNavigation)
+                    ClintSwitch(checked = hideSystemNavigation, onCheckedChange = { onHideSystemNavigationToggled(!hideSystemNavigation) })
                 }
             }
         }
 
-        SetupPrimaryButton(stringResource(R.string.next), onNext, colors.buttonBackground, Modifier.padding(bottom = 24.dp))
     }
 }

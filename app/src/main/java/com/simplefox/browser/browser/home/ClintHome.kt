@@ -79,6 +79,10 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -415,6 +419,10 @@ internal fun ClintHomeScreen(activity: MainActivity, state: MainUiState, modifie
                     if (centered) Spacer(Modifier.height(16.dp))
                     if (isDesktop) {
                         if (!centered) Spacer(Modifier.height(if (compact) 16.dp else 56.dp))
+                        if (!compact) {
+                            HomeGreeting(stringResource(greetingRes), dateText, isIncognito)
+                            Spacer(Modifier.height(20.dp))
+                        }
                         HomeSearchPill(
                             hint = hint,
                             onClick = openSearch,
@@ -427,7 +435,11 @@ internal fun ClintHomeScreen(activity: MainActivity, state: MainUiState, modifie
                             HomeDesktopActions(actions, actionsPerRow)
                         }
                     } else {
-                        if (!centered) Spacer(Modifier.height(if (compact) 12.dp else 40.dp))
+                        if (!centered) Spacer(Modifier.height(if (compact) 12.dp else 32.dp))
+                        if (!compact) {
+                            HomeGreeting(stringResource(greetingRes), dateText, isIncognito)
+                            Spacer(Modifier.height(20.dp))
+                        }
                         HomeSearchPill(hint = hint, onClick = openSearch, onVoice = openVoice)
                         if (showQuickActions) {
                             Spacer(Modifier.height(if (compact) 16.dp else 28.dp))
@@ -553,6 +565,36 @@ internal fun ClintHomeScreen(activity: MainActivity, state: MainUiState, modifie
 }
 
 @Composable
+private fun HomeGreeting(greeting: String, date: String, incognito: Boolean) {
+    val colors = LocalClintColors.current
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Text(
+            text = greeting,
+            color = colors.onSurface,
+            fontSize = 26.sp,
+            fontWeight = FontWeight.SemiBold,
+            textAlign = TextAlign.Center,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
+        if (!incognito) {
+            Text(
+                text = date,
+                color = colors.secondaryText,
+                fontSize = 14.sp,
+                textAlign = TextAlign.Center,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.padding(top = 4.dp)
+            )
+        }
+    }
+}
+
+@Composable
 private fun HomeSearchPill(
     hint: String,
     onClick: () -> Unit,
@@ -566,8 +608,11 @@ private fun HomeSearchPill(
         color = colors.addressBarColor,
         shape = RoundedCornerShape(28.dp),
         border = BorderStroke(1.dp, colors.divider),
-        shadowElevation = if (colors.isLight) 2.dp else 0.dp,
-        modifier = modifier.fillMaxWidth().height(height)
+        shadowElevation = 0.dp,
+        modifier = modifier
+            .fillMaxWidth()
+            .height(height)
+            .semantics { role = Role.Button; contentDescription = hint }
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -608,7 +653,7 @@ private fun HomeQuickActions(actions: List<HomeAction>) {
                 modifier = Modifier
                     .weight(1f)
                     .clip(RoundedCornerShape(16.dp))
-                    .clickable(onClick = action.onClick)
+                    .clickable(role = Role.Button, onClick = action.onClick)
                     .padding(vertical = 8.dp)
             ) {
                 Box(
@@ -628,7 +673,7 @@ private fun HomeQuickActions(actions: List<HomeAction>) {
                 Text(
                     text = stringResource(action.labelRes),
                     color = colors.secondaryText,
-                    fontSize = 12.sp,
+                    fontSize = 13.sp,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     textAlign = TextAlign.Center,
@@ -647,7 +692,8 @@ private fun HomeSectionTitle(text: String) {
         color = colors.primary,
         fontSize = 12.sp,
         fontWeight = FontWeight.SemiBold,
-        letterSpacing = 1.sp,
+        // Letter-spacing breaks joined scripts (e.g. Devanagari), so only track Latin/Cyrillic titles.
+        letterSpacing = if (java.util.Locale.getDefault().language == "hi") 0.sp else 1.sp,
         modifier = Modifier.fillMaxWidth().padding(start = 4.dp, bottom = 10.dp)
     )
 }

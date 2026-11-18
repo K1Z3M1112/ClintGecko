@@ -100,6 +100,8 @@ private const val PREF_BLOCK_SCRIPTS = "data_saver_block_scripts"
 private const val PREF_BLOCK_CSS = "data_saver_block_css"
 private const val PREF_SINGLE_TAB = "data_saver_single_tab"
 private const val DEFAULT_SINGLE_TAB = false
+private const val PREF_REDUCE_EFFECTS = "data_saver_reduce_effects"
+private const val DEFAULT_REDUCE_EFFECTS = true
 private const val DEFAULT_BLOCK_SCRIPTS = false
 private const val DEFAULT_BLOCK_CSS = false
 private const val PREF_CACHE_FIRST = "data_saver_cache_first"
@@ -152,6 +154,7 @@ fun LookAndFeelPane(activity: SettingsActivity) {
             initialTabStripPosition = com.simplefox.browser.tabs.TabBarPlacement.normalize(prefs.getString(com.simplefox.browser.tabs.TabBarPlacement.PREF_TAB_STRIP_POSITION, null)),
             initialTabGroupsEnabled = com.simplefox.browser.tabs.TabGroupPrefs.isEnabled(prefs),
             initialTabGroupBarPosition = com.simplefox.browser.tabs.TabBarPlacement.normalize(prefs.getString(com.simplefox.browser.tabs.TabBarPlacement.PREF_TAB_GROUP_BAR_POSITION, null)),
+            initialTabPreviewResolution = com.simplefox.browser.tabs.TabThumbnailCache.normalizeResolution(prefs.getString(com.simplefox.browser.tabs.TabThumbnailCache.PREF_RESOLUTION, null)),
             initialExitConfirmation = prefs.getString("exit_confirmation", "toast") ?: "toast",
             initialPopupAlertStyle = prefs.getString("popup_alert_style", "dialog") ?: "dialog"
         )
@@ -159,6 +162,7 @@ fun LookAndFeelPane(activity: SettingsActivity) {
     var confirmDialog by remember { mutableStateOf<ConfirmDialogConfig?>(null) }
 
     OnResume {
+        uiState.tabPreviewResolution = com.simplefox.browser.tabs.TabThumbnailCache.normalizeResolution(prefs.getString(com.simplefox.browser.tabs.TabThumbnailCache.PREF_RESOLUTION, null))
         uiState.scrollHideMode = prefs.getString("scroll_hide_mode", "off") ?: "off"
         uiState.addressBarPosition = prefs.getString("address_bar_position", "bottom") ?: "bottom"
         uiState.hideStatusBar = prefs.getBoolean("hide_status_bar", false)
@@ -330,6 +334,12 @@ fun LookAndFeelPane(activity: SettingsActivity) {
         onTabGroupBarPositionSelected = { value ->
             prefs.edit().putString(com.simplefox.browser.tabs.TabBarPlacement.PREF_TAB_GROUP_BAR_POSITION, value).apply()
             uiState.tabGroupBarPosition = value
+            uiState.openDialog = null
+        },
+        onTabPreviewResolutionSelected = { value ->
+            prefs.edit().putString(com.simplefox.browser.tabs.TabThumbnailCache.PREF_RESOLUTION, value).apply()
+            uiState.tabPreviewResolution = value
+            com.simplefox.browser.tabs.TabThumbnailCache.refreshResolution(activity)
             uiState.openDialog = null
         },
         onCustomizeMenuRowClicked = {
@@ -995,7 +1005,8 @@ fun DataSaverPane(activity: SettingsActivity) {
             initialDisableFavicons = prefs.getBoolean(PREF_DISABLE_FAVICONS, DEFAULT_DISABLE_FAVICONS),
             initialBlockScripts = prefs.getBoolean(PREF_BLOCK_SCRIPTS, DEFAULT_BLOCK_SCRIPTS),
             initialBlockCss = prefs.getBoolean(PREF_BLOCK_CSS, DEFAULT_BLOCK_CSS),
-            initialSingleTab = prefs.getBoolean(PREF_SINGLE_TAB, DEFAULT_SINGLE_TAB)
+            initialSingleTab = prefs.getBoolean(PREF_SINGLE_TAB, DEFAULT_SINGLE_TAB),
+            initialReduceEffects = prefs.getBoolean(PREF_REDUCE_EFFECTS, DEFAULT_REDUCE_EFFECTS)
         )
     }
     fun toggle(prefKey: String, current: Boolean, apply: (Boolean) -> Unit) {
@@ -1048,6 +1059,9 @@ fun DataSaverPane(activity: SettingsActivity) {
         },
         onSingleTabClick = {
             if (uiState.enabled) toggle(PREF_SINGLE_TAB, uiState.singleTab) { uiState.singleTab = it }
+        },
+        onReduceEffectsClick = {
+            if (uiState.enabled) toggle(PREF_REDUCE_EFFECTS, uiState.reduceEffects) { uiState.reduceEffects = it }
         }
     )
 }

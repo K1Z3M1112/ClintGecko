@@ -89,8 +89,6 @@ internal data class BrowserMenuSnapshot(
     val isDesktopMode: Boolean,
     val isDataSaverEnabled: Boolean,
     val pendingDownloadCount: Long,
-    val mediaCaptureCount: Long,
-    val isMediaCaptureEnabled: Boolean,
     val isWebsiteBlockerEnabled: Boolean,
     val canCreateShortcut: Boolean,
     val canToggleTabMute: Boolean,
@@ -118,7 +116,6 @@ internal class BrowserMenuActions(
     val onOpenShortcutManager: () -> Unit,
     val onDownloads: () -> Unit,
     val onOpenDownloadSettings: () -> Unit,
-    val onMediaCapture: () -> Unit,
     val onExtensionClick: (String, Boolean) -> Unit,
     val onOpenExtensionSettings: (String) -> Unit,
     val onOpenExtensionsSettings: () -> Unit,
@@ -162,8 +159,6 @@ internal fun MainActivity.buildMenuSnapshot(previous: BrowserMenuSnapshot?): Bro
         isDataSaverEnabled = prefs.getBoolean("data_saver_enabled", false),
         pendingDownloadCount = ClintDownloadManager.downloadsFlow.value
             .count { it.status in DownloadStatus.RUNNING_OR_QUEUED }.toLong(),
-        mediaCaptureCount = com.simplefox.browser.mediacapture.MediaCaptureStore.countForTab(tabManager.activeTab?.id).toLong(),
-        isMediaCaptureEnabled = prefs.getBoolean(com.simplefox.browser.mediacapture.MEDIA_CAPTURE_ENABLED_PREF, true),
         isWebsiteBlockerEnabled = prefs.getBoolean("website_blocker_enabled", false),
         canCreateShortcut = currentUrl.isNotEmpty(),
         canToggleTabMute = wv != null && (wv.audioState.audible || wv.audioState.muted),
@@ -214,7 +209,6 @@ internal fun MainActivity.buildMenuActions(dismiss: () -> Unit): BrowserMenuActi
     onOpenShortcutManager = { dismiss(); onMenuOpenShortcutManager() },
     onDownloads = { dismiss(); onMenuDownloads() },
     onOpenDownloadSettings = { dismiss(); onMenuOpenDownloadSettings() },
-    onMediaCapture = { dismiss(); onMenuMediaCapture() },
     onExtensionClick = { id, actionable -> dismiss(); onMenuExtensionClick(id, actionable) },
     onOpenExtensionSettings = { id -> dismiss(); onMenuOpenExtensionSettings(id) },
     onOpenExtensionsSettings = { dismiss(); onMenuOpenExtensionsSettings() },
@@ -299,7 +293,7 @@ internal fun MenuTriggerButton(activity: MainActivity, modifier: Modifier = Modi
                 com.simplefox.browser.ui.foundation.Surface(
                     color = colors.popupBackground,
                     shape = PopupShape,
-                    shadowElevation = 8.dp,
+                    shadowElevation = 0.dp,
                     modifier = Modifier.width(menuWidth).heightIn(max = maxMenuHeight)
                 ) {
                     Column(Modifier.verticalScroll(androidx.compose.foundation.rememberScrollState())) {
@@ -467,12 +461,6 @@ private fun MenuGridCellFor(
             badge = if (snapshot.pendingDownloadCount > 0L) com.simplefox.browser.ui.status.formatCompactCount(snapshot.pendingDownloadCount) else null,
             onClick = actions.onDownloads,
             onLongClick = actions.onOpenDownloadSettings
-        )
-        CustomizableMenuItem.MEDIA_CAPTURE -> MenuGridCell(
-            item.icon(),
-            stringResource(item.titleRes()),
-            checked = snapshot.isMediaCaptureEnabled,
-            onClick = actions.onMediaCapture
         )
         CustomizableMenuItem.EXTENSIONS -> MenuGridCell(
             item.icon(),

@@ -1,4 +1,5 @@
 package com.simplefox.browser.browser.delegates
+import com.simplefox.browser.tabs.restorableUrl
 import com.simplefox.browser.browser.MainActivity
 
 import android.annotation.SuppressLint
@@ -59,10 +60,7 @@ internal fun MainActivity.saveTabs() {
     val savedTabs = tabManager.tabs
         .filter { !it.isIncognito && !it.isRefreshLinkTab && !tabManager.isGhostTab(it) }
         .mapIndexedNotNull { index, tab ->
-            val url = tab.pendingUrl?.takeIf { it.isNotEmpty() && it != "about:blank" }
-                ?: tab.webView.url?.takeIf { it.isNotEmpty() && it != "about:blank" }
-                ?: tab.url.takeIf { it.isNotEmpty() && it != "about:blank" }
-                ?: return@mapIndexedNotNull null
+            val url = tab.restorableUrl() ?: return@mapIndexedNotNull null
             SavedTab(
                 position = index,
                 url = url,
@@ -115,6 +113,7 @@ internal fun MainActivity.restoreTabs(): Boolean {
         tabManager.tabs.firstOrNull { it.id == saved.tabId }?.lastActiveAt = saved.lastActiveAt
     }
     attachActiveWebView()
+    scheduleBackgroundTabLoads(savedTabs.filter { it.tabId != activeTabId }.map { it.tabId })
     TabThumbnailCache.pruneDisk(this, savedTabs.map { it.tabId }.toSet())
     return true
 }
@@ -136,7 +135,6 @@ internal fun MainActivity.closeInactiveTabs() {
     if (expired.isEmpty()) return
     expired.forEach { tab ->
         removeDesktopScript(tab)
-        com.simplefox.browser.mediacapture.MediaCaptureStore.removeTab(tab.id)
         if (!tab.isIncognito) com.simplefox.browser.ui.FaviconCache.evict(this, tab.url)
         TabThumbnailCache.evict(this, tab.id)
         val index = tabManager.tabs.indexOfFirst { it.id == tab.id }
@@ -152,6 +150,16 @@ internal fun MainActivity.captureActiveTabThumbnail() {
     if (uiState.isHomePage) return
     val tab = tabManager.activeTab ?: return
     TabThumbnailCache.capture(tab.id, tab.webView, tab.isIncognito)
+}
+
+/** Captures the active tab's thumbnail and runs [then] as soon as the frame is grabbed (immediately if it can't be). */
+internal fun MainActivity.captureActiveTabThen(then: () -> Unit) {
+    val tab = tabManager.activeTab
+    if (tab == null || uiState.isHomePage) {
+        then()
+        return
+    }
+    TabThumbnailCache.captureThen(tab.id, tab.webView, tab.isIncognito, then = then)
 }
 
 private fun MainActivity.migrateTabsFromPrefsIfNeeded() {
@@ -250,7 +258,7 @@ internal fun MainActivity.openNewTabInBackground(url: String, openerTabId: Strin
     }
     val sourceTab = openerTabId?.let { id -> tabManager.tabs.firstOrNull { it.id == id } } ?: tabManager.activeTab
     val sourceProfile = sourceTab?.takeIf { !it.isIncognito }?.profileId ?: WebProfiles.DEFAULT_ID
-    val webView = createClintWebView(false, WebProfiles.resolve(this, sourceProfile))
+    val webView = createClintWebView(false, WebProfiles.resolve(this, sourceProfile), deferOpen = true)
     val inheritedGroupId = sourceTab?.takeIf { !it.isIncognito }?.groupId
     val tab = BrowserTab(url = url, openerTabId = openerTabId, profileId = WebProfiles.profileOf(webView), groupId = inheritedGroupId, webView = webView)
     tabManager.addInBackground(tab)
@@ -291,7 +299,8 @@ internal fun MainActivity.openNewTabInBackground(url: String, openerTabId: Strin
             showPopupAlertDialog(newUrl, false, tab.id)
         }
     )
-    webView.loadUrl(url)
+    tab.pendingUrl = url
+    scheduleBackgroundTabLoads(listOf(tab.id))
     updateTabCount()
 }
 
@@ -366,9 +375,14 @@ internal fun MainActivity.switchToTabMode(incognito: Boolean) {
         openNewTab(isIncognito = incognito)
         return
     }
-    captureActiveTabThumbnail()
-    tabManager.switchTo(index)
-    attachActiveWebView()
+    val targetId = tabManager.tabs[index].id
+    captureActiveTabThen {
+        val newIndex = tabManager.tabs.indexOfFirst { it.id == targetId }
+        if (newIndex != -1) {
+            tabManager.switchTo(newIndex)
+            attachActiveWebView()
+        }
+    }
 }
 
 internal fun MainActivity.attachActiveWebView() {
@@ -418,6 +432,7 @@ internal fun MainActivity.syncTabPlayback() {
         }
     }
     trimBackgroundTabs(if (singleTab) 0 else MAX_LIVE_BACKGROUND_TABS)
+    scheduleBackgroundTabLoads(emptyList())
 }
 
 internal fun MainActivity.focusTabById(tabId: String) {
@@ -506,7 +521,6 @@ internal fun MainActivity.closePopupTabToOpener(tab: BrowserTab): Boolean {
     if (closingIndex !in tabManager.tabs.indices) return false
 
     removeDesktopScript(tab)
-    com.simplefox.browser.mediacapture.MediaCaptureStore.removeTab(tab.id)
     if (!tab.isIncognito) com.simplefox.browser.ui.FaviconCache.evict(this, tab.url)
     TabThumbnailCache.evict(this, tab.id)
     tabManager.closeTab(closingIndex)

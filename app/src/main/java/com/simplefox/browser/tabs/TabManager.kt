@@ -65,9 +65,14 @@ class TabManager {
         com.simplefox.browser.profiles.WebProfiles.unregisterTab(tab.id)
     }
 
+    private companion object {
+        const val MAX_VISIT_COUNT = 20
+    }
+
     fun switchTo(index: Int) {
         if (index !in tabs.indices) return
         touchActive()
+        if (index != activeIndex) tabs[index].let { it.visitCount = (it.visitCount + 1).coerceAtMost(MAX_VISIT_COUNT) }
         activeIndex = index
         touchActive()
     }

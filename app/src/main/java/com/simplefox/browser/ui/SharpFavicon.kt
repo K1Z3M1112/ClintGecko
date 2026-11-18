@@ -19,7 +19,7 @@ object SharpFavicon {
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private val gate = Semaphore(MAX_PARALLEL)
-    private val memory = LruCache<String, Bitmap>(160)
+    private val memory = LruCache<String, Bitmap>(96)
     private val inFlight = HashMap<String, Deferred<Bitmap?>>()
 
     private fun originOf(pageUrl: String): String? = runCatching {
@@ -29,6 +29,13 @@ object SharpFavicon {
     }.getOrNull()
 
     fun cached(pageUrl: String): Bitmap? = originOf(pageUrl)?.let { memory.get(it) }
+
+    fun trimMemory(level: Int) {
+        when {
+            level >= 40 || level == 15 -> memory.evictAll()
+            level >= 10 -> memory.trimToSize(memory.maxSize() / 2)
+        }
+    }
 
     suspend fun load(context: Context, pageUrl: String): Bitmap? {
         val origin = originOf(pageUrl) ?: return null

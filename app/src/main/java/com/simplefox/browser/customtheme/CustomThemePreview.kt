@@ -69,7 +69,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
@@ -594,7 +593,7 @@ private fun MockSearchPill() {
         color = colors.addressBarColor,
         shape = RoundedCornerShape(28.dp),
         border = BorderStroke(1.dp, colors.divider),
-        shadowElevation = if (colors.isLight) 2.dp else 0.dp,
+        shadowElevation = 0.dp,
         modifier = Modifier.fillMaxWidth().height(56.dp)
     ) {
         Row(
@@ -760,7 +759,6 @@ private fun MockMenu() {
     Column(
         Modifier
             .width(240.dp)
-            .shadow(3.dp, shape)
             .clip(shape)
             .background(colors.popupBackground)
             .border(1.dp, colors.popupStroke, shape)

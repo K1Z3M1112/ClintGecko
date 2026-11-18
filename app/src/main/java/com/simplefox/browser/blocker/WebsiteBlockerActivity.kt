@@ -21,7 +21,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.json.JSONObject
 import java.io.File
 
 class WebsiteBlockerActivity : ClintActivity() {
@@ -51,11 +50,7 @@ class WebsiteBlockerActivity : ClintActivity() {
 
     internal suspend fun countDomains(file: File): Long = withContext(Dispatchers.IO) {
         if (!file.exists()) return@withContext 0L
-        val builderPtr = WebsiteBlockerNative.nativeCreateBuilder()
-        if (builderPtr == 0L) return@withContext 0L
-        val stats = JSONObject(WebsiteBlockerNative.nativeAddText(builderPtr, file.readText()))
-        WebsiteBlockerNative.nativeDestroyBuilder(builderPtr)
-        stats.optLong("added", 0L)
+        WebsiteBlockerNative.nativeCountFile(file)
     }
 
     internal fun downloadCategories(categories: List<WebsiteBlockerCategory>, force: Boolean, onComplete: () -> Unit = {}) {

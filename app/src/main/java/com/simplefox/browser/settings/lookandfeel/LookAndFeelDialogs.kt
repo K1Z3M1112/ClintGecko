@@ -365,6 +365,50 @@ fun TabBarPositionDialog(
     }
 }
 
+fun tabPreviewResolutionSummaryRes(key: String): Int = when (com.simplefox.browser.tabs.TabThumbnailCache.normalizeResolution(key)) {
+    com.simplefox.browser.tabs.TabThumbnailCache.RES_LOW -> R.string.tab_preview_resolution_low
+    com.simplefox.browser.tabs.TabThumbnailCache.RES_HIGH -> R.string.tab_preview_resolution_high
+    com.simplefox.browser.tabs.TabThumbnailCache.RES_VERY_HIGH -> R.string.tab_preview_resolution_very_high
+    else -> R.string.tab_preview_resolution_standard
+}
+
+@Composable
+fun TabPreviewResolutionDialog(
+    current: String,
+    hideStatusBar: Boolean, hideSystemNavigation: Boolean,
+    onSelect: (String) -> Unit,
+    onDismiss: () -> Unit
+) {
+    val colors = LocalClintColors.current
+    val scrollState = rememberScrollState()
+    val selectedKey = com.simplefox.browser.tabs.TabThumbnailCache.normalizeResolution(current)
+    ClintDialog(
+        title = stringResource(R.string.pref_tab_preview_resolution_title),
+        hideStatusBar = hideStatusBar, hideSystemNavigation = hideSystemNavigation,
+        onDismiss = onDismiss, scrollState = scrollState
+    ) {
+        listOf(
+            Triple(com.simplefox.browser.tabs.TabThumbnailCache.RES_LOW, R.string.tab_preview_resolution_low, R.string.tab_preview_resolution_low_desc),
+            Triple(com.simplefox.browser.tabs.TabThumbnailCache.RES_STANDARD, R.string.tab_preview_resolution_standard, R.string.tab_preview_resolution_standard_desc),
+            Triple(com.simplefox.browser.tabs.TabThumbnailCache.RES_HIGH, R.string.tab_preview_resolution_high, R.string.tab_preview_resolution_high_desc),
+            Triple(com.simplefox.browser.tabs.TabThumbnailCache.RES_VERY_HIGH, R.string.tab_preview_resolution_very_high, R.string.tab_preview_resolution_very_high_desc)
+        ).forEach { (key, titleRes, descRes) ->
+            SelectableCard(
+                selected = selectedKey == key, onClick = { onSelect(key) },
+                cardBackground = colors.surfaceVariant, primary = colors.primary,
+                contentPadding = OptionContentPadding, bottomSpacing = OptionBottomSpacing,
+                modifier = Modifier.scrollToSelection(scrollState, selectedKey == key)
+            ) {
+                Column(Modifier.weight(1f).padding(start = 4.dp, end = 8.dp)) {
+                    Text(stringResource(titleRes), color = colors.onSurface, fontSize = 15.sp, fontWeight = FontWeight.Medium)
+                    Text(stringResource(descRes), color = colors.secondaryText, fontSize = 12.sp, modifier = Modifier.padding(top = 2.dp))
+                }
+                CheckSlot(selectedKey == key, colors.primary)
+            }
+        }
+    }
+}
+
 @Composable
 fun ScrollHideModeDialog(
     current: String,

@@ -87,7 +87,7 @@ internal object DownloadThumbnailLoader {
     private const val BUNDLE_ICON_PX = 256
 
     private val cache = object : LruCache<String, DownloadThumbnail>(
-        (Runtime.getRuntime().maxMemory() / 1024L / 24L).toInt().coerceIn(4 * 1024, 48 * 1024)
+        (Runtime.getRuntime().maxMemory() / 1024L / 64L).toInt().coerceIn(2 * 1024, 12 * 1024)
     ) {
         override fun sizeOf(key: String, value: DownloadThumbnail): Int =
             ((value.bitmap?.let { it.width * it.height * 4 } ?: 0) / 1024).coerceAtLeast(1)
@@ -95,6 +95,19 @@ internal object DownloadThumbnailLoader {
     private val bundleCache = LruCache<String, DownloadThumbnail>(12)
     private val misses: MutableSet<String> = Collections.newSetFromMap(ConcurrentHashMap())
     private val gate = Semaphore(3)
+
+    fun trimMemory(level: Int) {
+        when {
+            level >= 40 || level == 15 -> {
+                cache.evictAll()
+                bundleCache.evictAll()
+            }
+            level >= 10 -> {
+                cache.trimToSize(cache.maxSize() / 2)
+                bundleCache.trimToSize(bundleCache.maxSize() / 2)
+            }
+        }
+    }
 
     fun keyFor(item: DownloadItem): String? {
         if (item.status != DownloadStatus.COMPLETE) return null

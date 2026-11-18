@@ -7,7 +7,6 @@ import com.simplefox.browser.browser.MainActivity
 
 import android.annotation.SuppressLint
 import com.simplefox.browser.downloads.DownloadFilenameResolver
-import com.simplefox.browser.mediacapture.MEDIA_CAPTURE_ENABLED_PREF
 import com.simplefox.browser.tabs.BrowserTab
 import com.simplefox.browser.profiles.WebProfiles
 import com.simplefox.browser.util.registeredDomain
@@ -116,12 +115,9 @@ internal fun MainActivity.buildRequestConfig(): org.json.JSONObject {
         .put("cache", prefs.getBoolean("data_saver_cache_first", false))
         .put("skip", skip)
     return org.json.JSONObject()
-        .put("media", prefs.getBoolean(MEDIA_CAPTURE_ENABLED_PREF, true))
         .put("dnt", isDoNotTrackActive())
         .put("ds", dataSaver)
 }
-
-internal fun MainActivity.installServiceWorkerMediaCapture() {}
 
 internal fun MainActivity.buildDesktopHeaders(): Map<String, String>? = null
 
@@ -134,6 +130,13 @@ internal fun MainActivity.isDataSaverBlockActive(): Boolean =
 
 internal fun MainActivity.addDataSaverMediaScript(tab: BrowserTab? = null) {
     ClintGecko.setScript("ds_media", if (isDataSaverBlockActive()) loadDataSaverJs("data_saver_media.js") else null)
+}
+
+internal fun MainActivity.isDataSaverEffectsActive(): Boolean =
+    DataSaverMode.isActive(prefs) && prefs.getBoolean("data_saver_reduce_effects", true)
+
+internal fun MainActivity.addDataSaverEffectsScript(tab: BrowserTab? = null) {
+    ClintGecko.setScript("ds_effects", if (isDataSaverEffectsActive()) loadDataSaverJs("data_saver_effects.js") else null)
 }
 
 internal fun MainActivity.isDoNotTrackActive(): Boolean =
@@ -339,4 +342,5 @@ internal fun MainActivity.syncGlobalScripts() {
     addAutoplayScript()
     addDoNotTrackScript()
     addDataSaverMediaScript()
+    addDataSaverEffectsScript()
 }

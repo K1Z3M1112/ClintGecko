@@ -174,7 +174,7 @@ fun ExtensionDetailScreen(
                                         modifier = Modifier.clickable(enabled = !busy) {
                                             ClintExtensions.setOptionalAccess(info, permission, null, !granted)
                                         },
-                                        trailing = { ClintSwitch(checked = granted) }
+                                        trailing = { ClintSwitch(checked = granted, enabled = !busy, onCheckedChange = { ClintExtensions.setOptionalAccess(info, permission, null, !granted) }) }
                                     )
                                 }
                                 optionalHosts.forEach { origin ->
@@ -188,7 +188,7 @@ fun ExtensionDetailScreen(
                                         modifier = Modifier.clickable(enabled = !busy) {
                                             ClintExtensions.setOptionalAccess(info, null, origin, !granted)
                                         },
-                                        trailing = { ClintSwitch(checked = granted) }
+                                        trailing = { ClintSwitch(checked = granted, enabled = !busy, onCheckedChange = { ClintExtensions.setOptionalAccess(info, null, origin, !granted) }) }
                                     )
                                 }
                             }
@@ -202,7 +202,7 @@ fun ExtensionDetailScreen(
                                 summary = stringResource(R.string.ext_detail_private_summary),
                                 onClick = { ClintExtensions.setAllowedInPrivate(info, !info.allowedInPrivate) },
                                 enabled = !busy,
-                                trailing = { ClintSwitch(checked = info.allowedInPrivate) }
+                                trailing = { ClintSwitch(checked = info.allowedInPrivate, enabled = !busy, onCheckedChange = { ClintExtensions.setAllowedInPrivate(info, !info.allowedInPrivate) }) }
                             )
                             if (info.optionsUrl != null) {
                                 RowDivider(colors.divider)
@@ -287,7 +287,7 @@ fun ExtensionDetailScreen(
                 }
             }
             HorizontalDivider(color = colors.divider, thickness = 1.dp)
-            Surface(color = colors.surface, shadowElevation = 4.dp, modifier = Modifier.navigationBarsPadding()) {
+            Surface(color = colors.surface, modifier = Modifier.navigationBarsPadding()) {
                 Row(
                     Modifier.fillMaxWidth().height(56.dp).padding(start = 4.dp, end = 8.dp),
                     verticalAlignment = Alignment.CenterVertically
@@ -414,7 +414,11 @@ private fun DetailHeader(info: ExtensionInfo, busy: Boolean) {
             if (busy) {
                 CircularProgressIndicator(Modifier.size(22.dp), strokeWidth = 2.5.dp, color = colors.primary)
             } else {
-                ClintSwitch(checked = info.enabled)
+                ClintSwitch(
+                    checked = info.enabled,
+                    enabled = info.canToggle,
+                    onCheckedChange = { ClintExtensions.setEnabled(info, !info.enabled) }
+                )
             }
         }
     }

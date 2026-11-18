@@ -120,7 +120,7 @@ internal object ParallelDownloader {
     private const val MIN_SPLIT_BYTES = 512L * 1024L
     private const val BUFFER_BYTES = 256 * 1024
     private const val MONITOR_TICK_MS = 200L
-    private const val CHECKPOINT_INTERVAL_MS = 2000L
+    private const val CHECKPOINT_INTERVAL_MS = 4000L
     private const val RAMP_UP_INTERVAL_MS = 3000L
     private const val NO_PROGRESS_LIMIT_MS = 90_000L
     private const val MAX_BACKOFF_MS = 30_000L

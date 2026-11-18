@@ -94,7 +94,7 @@ fun AdditionalWebsitesScreen(
                     Text(stringResource(R.string.additional_websites_master_switch_title), color = colors.onSurface, fontSize = 15.sp, fontWeight = FontWeight.Medium)
                     Text(stringResource(R.string.additional_websites_master_switch_summary), color = colors.secondaryText, fontSize = 13.sp, modifier = Modifier.padding(top = 2.dp))
                 }
-                ClintSwitch(checked = state.isEnabled)
+                ClintSwitch(checked = state.isEnabled, onCheckedChange = { onToggleEnabled(!state.isEnabled) })
             }
 
             Box(Modifier.weight(1f).fillMaxWidth()) {
@@ -179,7 +179,7 @@ private fun AdditionalWebsitesToolbar(
     val colors = LocalClintColors.current
     val showToolbarIcons = !state.isInSelectionMode && !state.isSearchMode
 
-    Surface(color = colors.surface, shadowElevation = 4.dp, modifier = Modifier.statusBarsPadding()) {
+    Surface(color = colors.surface, modifier = Modifier.statusBarsPadding()) {
         Row(Modifier.fillMaxWidth().height(56.dp).padding(horizontal = 4.dp), verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = onBack) {
                 Icon(
