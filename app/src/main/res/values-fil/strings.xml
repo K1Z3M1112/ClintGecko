@@ -1123,9 +1123,9 @@
     <string name="data_saver_block_frames_title">I-block ang Third-Party Frame</string>
     <string name="data_saver_block_frames_summary">Hindi isasama ang naka-embed na content mula sa ibang website, tulad ng mga ad at widget. Maglo-load pa rin ang mga frame ng captcha, sign-in, at video player</string>
     <string name="data_saver_block_scripts_title">I-block ang Script</string>
-    <string name="data_saver_block_scripts_summary">Hindi magda-download ang mga JavaScript file ng mga pahina. Malaki ang matitipid na data, pero maraming website ang hindi gagana nang maayos</string>
+    <string name="data_saver_block_scripts_summary">Bina-block ang JavaScript ng third party pero pinapayagan ang sariling script ng site para patuloy na gumana ang mga page</string>
     <string name="data_saver_block_css_title">I-block ang CSS</string>
-    <string name="data_saver_block_css_summary">Hindi magda-download ang mga stylesheet ng mga pahina. Magmumukhang simple at walang disenyo ang mga pahina</string>
+    <string name="data_saver_block_css_summary">Bina-block ang stylesheet ng third party pero pinapayagan ang sariling stylesheet ng site</string>
     <string name="data_saver_block_preload_title">I-block ang Pre-load ng Media</string>
     <string name="data_saver_block_preload_summary">Dina-download lang ang video at audio kapag pinindot mo ang play</string>
     <string name="data_saver_cache_first_title">Gamitin Muli ang Na-save na Nilalaman</string>

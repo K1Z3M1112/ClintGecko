@@ -23,7 +23,9 @@ import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.lifecycle.lifecycleScope
 import kotlin.math.abs
+import kotlinx.coroutines.launch
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import com.simplefox.browser.ui.foundation.SnackbarHostState
@@ -84,6 +86,9 @@ class MainActivity : ClintActivity(), OverlayHostActivity, SnackbarHostActivity,
 
     internal lateinit var prefs: SharedPreferences
     internal val tabManager = TabManager()
+    internal var isRestoringTabs = false
+    private var startupIntentSuperseded = false
+    private var pendingStartupMediaTabId: String? = null
     internal var isDesktopMode: Boolean
         get() = uiState.isDesktopMode
         set(value) { uiState.isDesktopMode = value }
@@ -396,43 +401,61 @@ class MainActivity : ClintActivity(), OverlayHostActivity, SnackbarHostActivity,
         setupSwipeRefresh()
         setupAddressBar()
         applyAddressBarPosition()
-        if (savedInstanceState == null && com.simplefox.browser.privacy.PrivacyPrefs.closesTabsOnExit(prefs)) discardSavedTabs()
+        if (savedInstanceState == null && com.simplefox.browser.privacy.PrivacyPrefs.closesTabsOnExit(prefs)) discardSavedTabsAsync()
         com.simplefox.browser.privacy.IncognitoNotification.closeTabsHandler = closeIncognitoTabsHandler
-        val isRefreshLinkMode = intent.getBooleanExtra(EXTRA_REFRESH_LINK_MODE, false)
-        val shortcutId = intent.getStringExtra(EXTRA_SHORTCUT_ID)
+        val startupIntent = android.content.Intent(intent)
+        val isRefreshLinkMode = startupIntent.getBooleanExtra(EXTRA_REFRESH_LINK_MODE, false)
+        val shortcutId = startupIntent.getStringExtra(EXTRA_SHORTCUT_ID)
         applyShortcutFrameless(shortcutId)
-        if (isRefreshLinkMode) {
-            val downloadId = intent.getIntExtra(EXTRA_REFRESH_LINK_DOWNLOAD_ID, -1)
-            val filename = intent.getStringExtra(EXTRA_REFRESH_LINK_FILENAME) ?: ""
-            val originalUrl = intent.getStringExtra(EXTRA_REFRESH_LINK_ORIGINAL_URL) ?: ""
-            val originalReferer = intent.getStringExtra(EXTRA_REFRESH_LINK_ORIGINAL_REFERER) ?: ""
-            val pageUrl = intent.getStringExtra(EXTRA_REFRESH_LINK_PAGE_URL) ?: ""
-            setIntent(android.content.Intent())
-            if (downloadId != -1) {
+        setIntent(android.content.Intent())
+        val refreshLinkDownloadId = startupIntent.getIntExtra(EXTRA_REFRESH_LINK_DOWNLOAD_ID, -1)
+        val refreshLinkFilename = startupIntent.getStringExtra(EXTRA_REFRESH_LINK_FILENAME) ?: ""
+        val refreshLinkOriginalUrl = startupIntent.getStringExtra(EXTRA_REFRESH_LINK_ORIGINAL_URL) ?: ""
+        val refreshLinkOriginalReferer = startupIntent.getStringExtra(EXTRA_REFRESH_LINK_ORIGINAL_REFERER) ?: ""
+        val refreshLinkPageUrl = startupIntent.getStringExtra(EXTRA_REFRESH_LINK_PAGE_URL) ?: ""
+        val startupUrl = getUrlFromIntent(startupIntent)
+        val shortcutFallbackUrl = startupUrl
+        isRestoringTabs = true
+        lifecycleScope.launch {
+            val restored = try {
                 restoreTabs()
-                refreshLinkSession = RefreshLinkSession(downloadId, filename, originalUrl, originalReferer, tabManager.activeIndex, pageUrl)
-                openRefreshLinkTab(refreshLinkStartUrl(pageUrl, originalReferer, originalUrl))
-            } else if (!restoreTabs()) {
-                openNewTab(isIncognito = false, url = getHomepageUrl(false))
+            } finally {
+                isRestoringTabs = false
             }
-        } else if (shortcutId != null) {
-            val fallbackUrl = getUrlFromIntent(intent)
-            setIntent(android.content.Intent())
-            restoreTabs()
-            openOrResumeShortcutTab(shortcutId, fallbackUrl)
-        } else {
-            val intentUrl = getUrlFromIntent(intent)
-            setIntent(android.content.Intent())
-            if (!intentUrl.isNullOrEmpty()) {
-                restoreTabs()
-                openNewTab(isIncognito = false, url = intentUrl)
-            } else {
-                val restored = restoreTabs()
-                if (shouldReopenInIncognito()) {
+            if (isFinishing || isDestroyed) return@launch
+            if (!startupIntentSuperseded) {
+                if (isRefreshLinkMode) {
+                    if (refreshLinkDownloadId != -1) {
+                        refreshLinkSession = RefreshLinkSession(
+                            refreshLinkDownloadId,
+                            refreshLinkFilename,
+                            refreshLinkOriginalUrl,
+                            refreshLinkOriginalReferer,
+                            tabManager.activeIndex,
+                            refreshLinkPageUrl
+                        )
+                        openRefreshLinkTab(refreshLinkStartUrl(refreshLinkPageUrl, refreshLinkOriginalReferer, refreshLinkOriginalUrl))
+                    } else if (!restored && tabManager.tabs.isEmpty()) {
+                        openNewTab(isIncognito = false, url = getHomepageUrl(false))
+                    }
+                } else if (shortcutId != null) {
+                    openOrResumeShortcutTab(shortcutId, shortcutFallbackUrl)
+                } else if (!startupUrl.isNullOrEmpty()) {
+                    openNewTab(isIncognito = false, url = startupUrl)
+                } else if (shouldReopenInIncognito()) {
                     openNewTab(isIncognito = true, url = getHomepageUrl(true))
-                } else if (!restored) {
+                } else if (!restored && tabManager.tabs.isEmpty()) {
                     openNewTab(isIncognito = false, url = getHomepageUrl(false))
                 }
+            }
+            val mediaTabIdToFocus = pendingStartupMediaTabId
+            pendingStartupMediaTabId = null
+            if (lifecycle.currentState.isAtLeast(androidx.lifecycle.Lifecycle.State.RESUMED)) {
+                closeInactiveTabs(preserveTabId = mediaTabIdToFocus)
+            }
+            mediaTabIdToFocus?.let { focusTabById(it) }
+            if (!lifecycle.currentState.isAtLeast(androidx.lifecycle.Lifecycle.State.STARTED)) {
+                tabManager.activeTab?.webView?.onPause()
             }
         }
         setupBackPressedDispatcher()
@@ -445,12 +468,18 @@ class MainActivity : ClintActivity(), OverlayHostActivity, SnackbarHostActivity,
 
     override fun onNewIntent(intent: android.content.Intent) {
         super.onNewIntent(intent)
+        if (isRestoringTabs) startupIntentSuperseded = true
         val mediaTabId = intent.getStringExtra(com.simplefox.browser.media.MediaPlaybackService.EXTRA_TAB_ID)
         if (mediaTabId != null) {
             setIntent(android.content.Intent())
-            focusTabById(mediaTabId)
+            if (isRestoringTabs) {
+                pendingStartupMediaTabId = mediaTabId
+            } else {
+                focusTabById(mediaTabId)
+            }
             return
         }
+        pendingStartupMediaTabId = null
         syncFramelessShortcuts()
         val isRefreshLinkMode = intent.getBooleanExtra(EXTRA_REFRESH_LINK_MODE, false)
         val shortcutId = intent.getStringExtra(EXTRA_SHORTCUT_ID)

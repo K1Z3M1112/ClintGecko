@@ -206,10 +206,10 @@ object ClintGecko {
         "network.http.http2.enabled" to true,
         "network.ssl_tokens_cache_enabled" to true,
         "network.early-hints.enabled" to true,
-        "network.early-hints.preconnect.enabled" to false,
+        "network.early-hints.preconnect.enabled" to true,
         "network.preload" to true,
-        "network.prefetch-next" to false,
-        "network.dns.disablePrefetch" to true,
+        "network.prefetch-next" to true,
+        "network.dns.disablePrefetch" to false,
         "network.http.rcwn.enabled" to true,
         "network.http.pacing.requests.enabled" to false,
         "network.dns.disableIPv6" to false,
@@ -248,9 +248,9 @@ object ClintGecko {
         val mediumMemory = !lowMemory && totalRamMb < 6144L
 
         // More cache reuse helps repeat visits and image-heavy pages. Keep connection fan-out
-        // moderate on phones so dozens of parallel requests do not compete for CPU/network radio.
+        // adaptive so stronger devices can establish speculative connections sooner.
         val values = mapOf(
-            "network.http.speculative-parallel-limit" to when { lowMemory -> 6; mediumMemory -> 8; else -> 10 },
+            "network.http.speculative-parallel-limit" to when { lowMemory -> 6; mediumMemory -> 10; else -> 14 },
             "network.http.max-persistent-connections-per-server" to 8,
             "network.http.max-connections" to when { lowMemory -> 256; mediumMemory -> 384; else -> 512 },
             "network.dnsCacheEntries" to when { lowMemory -> 500; mediumMemory -> 800; else -> 1200 },

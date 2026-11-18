@@ -1124,9 +1124,9 @@
     <string name="data_saver_block_frames_title">Bloquear frames de terceiros</string>
     <string name="data_saver_block_frames_summary">Pula o conteúdo incorporado de outros sites, como anúncios e widgets. Frames de captcha, login e players de vídeo continuam carregando</string>
     <string name="data_saver_block_scripts_title">Bloquear scripts</string>
-    <string name="data_saver_block_scripts_summary">Impede que as páginas baixem arquivos JavaScript. Economiza muitos dados, mas vários sites não vão funcionar direito</string>
+    <string name="data_saver_block_scripts_summary">Bloqueia JavaScript de terceiros e permite os scripts do próprio site para manter as páginas funcionando</string>
     <string name="data_saver_block_css_title">Bloquear CSS</string>
-    <string name="data_saver_block_css_summary">Impede que as páginas baixem folhas de estilo. As páginas vão ficar simples e sem formatação</string>
+    <string name="data_saver_block_css_summary">Bloqueia folhas de estilo de terceiros e permite as do próprio site</string>
     <string name="data_saver_block_preload_title">Bloquear pré-carregamento de mídia</string>
     <string name="data_saver_block_preload_summary">Vídeos e áudios só são baixados quando você aperta o play</string>
     <string name="data_saver_cache_first_title">Reaproveitar conteúdo salvo</string>

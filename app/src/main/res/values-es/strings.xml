@@ -1132,9 +1132,9 @@
     <string name="data_saver_block_frames_title">Bloquear marcos de terceros</string>
     <string name="data_saver_block_frames_summary">Omite el contenido incrustado de otros sitios, como anuncios y widgets. Los marcos de captcha, inicio de sesión y reproductores de vídeo se siguen cargando</string>
     <string name="data_saver_block_scripts_title">Bloquear scripts</string>
-    <string name="data_saver_block_scripts_summary">Evita que las páginas descarguen archivos de JavaScript. Ahorra muchos datos, pero muchos sitios no funcionarán bien</string>
+    <string name="data_saver_block_scripts_summary">Bloquea JavaScript de terceros y permite el del propio sitio para que las páginas sigan funcionando</string>
     <string name="data_saver_block_css_title">Bloquear CSS</string>
-    <string name="data_saver_block_css_summary">Evita que las páginas descarguen hojas de estilo. Las páginas se verán sencillas y sin formato</string>
+    <string name="data_saver_block_css_summary">Bloquea las hojas de estilo de terceros y permite las del propio sitio</string>
     <string name="data_saver_block_preload_title">Bloquear precarga de multimedia</string>
     <string name="data_saver_block_preload_summary">El vídeo y el audio solo se descargan cuando pulsas reproducir</string>
     <string name="data_saver_cache_first_title">Reutilizar contenido guardado</string>

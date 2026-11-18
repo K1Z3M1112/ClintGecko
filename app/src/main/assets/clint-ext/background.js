@@ -16,6 +16,13 @@
   var lightTypes = { main_frame: 1, sub_frame: 1, image: 1, imageset: 1, media: 1 };
   var staticTypes = { image: 1, imageset: 1, font: 1 };
   var secondLevel = { co: 1, com: 1, org: 1, net: 1, gov: 1, edu: 1, ac: 1, or: 1, ne: 1, go: 1, gob: 1, mil: 1 };
+  var privateSuffixes = [
+    "s3.amazonaws.com", "azurewebsites.net", "cloudfront.net", "firebaseapp.com", "github.io",
+    "herokuapp.com", "netlify.app", "onrender.com", "pages.dev", "readthedocs.io",
+    "vercel.app", "web.app", "workers.dev", "appspot.com", "blogspot.com", "fly.dev",
+    "gitlab.io", "glitch.me", "notion.site", "repl.co", "surge.sh", "tumblr.com",
+    "wordpress.com"
+  ];
   var iconFontHints = ["icon", "awesome", "glyph", "symbol", "material", "fa-", "fa5", "fa6", "dashicons", "bootstrap", "ionicons", "feather", "codicon"];
   var audioPath = /\.(mp3|aac|m4a|oga|ogg|opus|wav|flac|weba)$/;
   var videoPath = /\.(mp4|m4v|webm|mkv|mov|ogv|3gp|f4v|m3u8|mpd|m4s|ts)$/;
@@ -69,6 +76,17 @@
 
   function siteOf(h) {
     var p = h.split(".");
+    var matchedSuffix = "";
+    for (var i = 0; i < privateSuffixes.length; i++) {
+      var suffix = privateSuffixes[i];
+      if ((h === suffix || h.endsWith("." + suffix)) && suffix.length > matchedSuffix.length) {
+        matchedSuffix = suffix;
+      }
+    }
+    if (matchedSuffix) {
+      var suffixLabels = matchedSuffix.split(".").length;
+      return p.length > suffixLabels ? p.slice(-(suffixLabels + 1)).join(".") : h;
+    }
     if (p.length <= 2) return h;
     var tld = p[p.length - 1];
     var sld = p[p.length - 2];
@@ -159,10 +177,14 @@
         if (ds.video && videoPath.test(path)) return { cancel: true };
         break;
       case "script":
-        if (ds.scripts) return { redirectUrl: EMPTY_JS };
+        if (ds.scripts && (!pageHost || siteOf(url.hostname) !== siteOf(pageHost))) {
+          return { redirectUrl: EMPTY_JS };
+        }
         break;
       case "stylesheet":
-        if (ds.css) return { redirectUrl: EMPTY_CSS };
+        if (ds.css && (!pageHost || siteOf(url.hostname) !== siteOf(pageHost))) {
+          return { redirectUrl: EMPTY_CSS };
+        }
         break;
       case "sub_frame":
         if (ds.frames && frameBlocked(d, url, pageHost)) return { redirectUrl: EMPTY_HTML };

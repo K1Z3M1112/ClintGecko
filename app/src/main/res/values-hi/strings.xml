@@ -1124,9 +1124,9 @@
     <string name="data_saver_block_frames_title">तीसरे पक्ष के फ़्रेम ब्लॉक करें</string>
     <string name="data_saver_block_frames_summary">दूसरी वेबसाइटों से एम्बेड किया गया कॉन्टेंट, जैसे विज्ञापन और विजेट, लोड नहीं करता. कैप्चा, साइन-इन और वीडियो प्लेयर के फ़्रेम फिर भी लोड होते हैं</string>
     <string name="data_saver_block_scripts_title">स्क्रिप्ट ब्लॉक करें</string>
-    <string name="data_saver_block_scripts_summary">पेजों को JavaScript फ़ाइलें डाउनलोड करने से रोकता है. इससे काफ़ी डेटा बचता है, लेकिन कई साइटें ठीक से काम नहीं करेंगी</string>
+    <string name="data_saver_block_scripts_summary">पेजों को काम करते रहने देने के लिए साइट की अपनी JavaScript चालू रखता है और तीसरे पक्ष की JavaScript रोकता है</string>
     <string name="data_saver_block_css_title">CSS ब्लॉक करें</string>
-    <string name="data_saver_block_css_summary">पेजों को स्टाइलशीट डाउनलोड करने से रोकता है. पेज सादे और बिना स्टाइल के दिखेंगे</string>
+    <string name="data_saver_block_css_summary">तीसरे पक्ष की स्टाइलशीट रोकता है और साइट की अपनी स्टाइलशीट चालू रखता है</string>
     <string name="data_saver_block_preload_title">मीडिया की प्रीलोडिंग ब्लॉक करें</string>
     <string name="data_saver_block_preload_summary">वीडियो और ऑडियो तभी डाउनलोड होते हैं, जब आप चलाएं बटन दबाते हैं</string>
     <string name="data_saver_cache_first_title">सेव किया गया कॉन्टेंट दोबारा इस्तेमाल करें</string>

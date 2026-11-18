@@ -1115,9 +1115,9 @@
     <string name="data_saver_block_frames_title">Blokir Frame Pihak Ketiga</string>
     <string name="data_saver_block_frames_summary">Melewati konten sematan dari situs lain, seperti iklan dan widget. Frame captcha, login, dan pemutar video tetap dimuat</string>
     <string name="data_saver_block_scripts_title">Blokir Skrip</string>
-    <string name="data_saver_block_scripts_summary">Mencegah halaman mendownload file JavaScript. Sangat menghemat kuota, tetapi banyak situs tidak akan berfungsi dengan benar</string>
+    <string name="data_saver_block_scripts_summary">Memblokir JavaScript pihak ketiga dan mengizinkan skrip dari situs itu sendiri agar halaman tetap berfungsi</string>
     <string name="data_saver_block_css_title">Blokir CSS</string>
-    <string name="data_saver_block_css_summary">Mencegah halaman mendownload stylesheet. Halaman akan tampil polos tanpa gaya</string>
+    <string name="data_saver_block_css_summary">Memblokir stylesheet pihak ketiga dan mengizinkan stylesheet dari situs itu sendiri</string>
     <string name="data_saver_block_preload_title">Blokir Pramuat Media</string>
     <string name="data_saver_block_preload_summary">Video dan audio baru didownload setelah Anda menekan putar</string>
     <string name="data_saver_cache_first_title">Gunakan Ulang Konten Tersimpan</string>

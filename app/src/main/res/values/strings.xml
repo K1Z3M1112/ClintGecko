@@ -1124,13 +1124,13 @@
     <string name="data_saver_block_frames_title">Block Third-Party Frames</string>
     <string name="data_saver_block_frames_summary">Skips embedded content from other websites, like ads and widgets. Captcha, sign-in and video player frames still load</string>
     <string name="data_saver_block_scripts_title">Block Scripts</string>
-    <string name="data_saver_block_scripts_summary">Stops pages from downloading JavaScript files. Saves a lot of data, but many sites will not work properly</string>
+    <string name="data_saver_block_scripts_summary">Blocks third-party JavaScript while allowing scripts from the site itself, helping pages keep working</string>
     <string name="data_saver_single_tab_title">Single Tab Mode</string>
     <string name="data_saver_single_tab_summary">Never opens tabs in the background. Links and pop-ups load in the current tab, and other tabs stay paused so only the page you are viewing uses data</string>
     <string name="data_saver_reduce_effects_title">Reduce Page Effects</string>
     <string name="data_saver_reduce_effects_summary">Removes blur, shadows, blend effects, animations and parallax backgrounds, and lazy-loads images and frames, so pages scroll smoother and use less data</string>
     <string name="data_saver_block_css_title">Block CSS</string>
-    <string name="data_saver_block_css_summary">Stops pages from downloading stylesheets. Pages will look plain and unstyled</string>
+    <string name="data_saver_block_css_summary">Blocks third-party stylesheets while allowing styles from the site itself</string>
     <string name="data_saver_block_preload_title">Block Media Preloading</string>
     <string name="data_saver_block_preload_summary">Videos and audio only download once you press play</string>
     <string name="data_saver_cache_first_title">Reuse Saved Content</string>

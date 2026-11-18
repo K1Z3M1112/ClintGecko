@@ -1142,9 +1142,9 @@
     <string name="data_saver_block_frames_title">Блокировать сторонние фреймы</string>
     <string name="data_saver_block_frames_summary">Пропускает встроенное содержимое с других сайтов, например рекламу и виджеты. Фреймы капчи, входа и видеоплееров по-прежнему загружаются</string>
     <string name="data_saver_block_scripts_title">Блокировать скрипты</string>
-    <string name="data_saver_block_scripts_summary">Страницы не будут загружать файлы JavaScript. Это сильно экономит трафик, но многие сайты могут работать некорректно</string>
+    <string name="data_saver_block_scripts_summary">Блокирует сторонний JavaScript, но разрешает скрипты самого сайта, чтобы страницы продолжали работать</string>
     <string name="data_saver_block_css_title">Блокировать CSS</string>
-    <string name="data_saver_block_css_summary">Страницы не будут загружать таблицы стилей. Они будут выглядеть просто и без оформления</string>
+    <string name="data_saver_block_css_summary">Блокирует сторонние таблицы стилей, но разрешает таблицы самого сайта</string>
     <string name="data_saver_block_preload_title">Блокировать предзагрузку медиа</string>
     <string name="data_saver_block_preload_summary">Видео и аудио загружаются только после нажатия кнопки воспроизведения</string>
     <string name="data_saver_cache_first_title">Использовать сохранённое содержимое</string>
