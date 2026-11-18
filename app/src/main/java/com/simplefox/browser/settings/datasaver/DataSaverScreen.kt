@@ -175,7 +175,7 @@ fun DataSaverScreen(
             )
             RowDivider(colors.divider)
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.BlurOff,
+                icon = androidx.compose.material.icons.Icons.Filled.Speed,
                 title = stringResource(R.string.data_saver_reduce_effects_title),
                 summary = stringResource(R.string.data_saver_reduce_effects_summary),
                 colors = colors,
