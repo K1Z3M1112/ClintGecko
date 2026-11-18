@@ -13,17 +13,16 @@
     xmlhttprequest: "xhr", xhr: "xhr", fetch: "xhr", ping: "xhr", beacon: "xhr", csp_report: "other",
     media: "media", websocket: "websocket", speculative: "other", web_manifest: "other", other: "other"
   };
-  var observed = { media: 1, xmlhttprequest: 1, xhr: 1, fetch: 1, other: 1, object: 1, object_subrequest: 1, sub_frame: 1 };
-  var directMediaPath = /\.(mp4|m4v|webm|mkv|mov|ogv|3gp|3g2|avi|flv|f4v|wmv|mp3|m4a|aac|wav|flac|ogg|oga|opus|wma|weba|vtt|srt|m3u8|mpd)$/i;
-  var segmentPath = /\.(ts|m4s|cmfv|cmfa)$/i;
-  var segmentTypes = { "video/mp2t": 1, "video/vnd.dlna.mpeg-tts": 1, "video/iso.segment": 1, "audio/iso.segment": 1 };
-  var nonMediaTypes = /^(text\/(html|css|javascript|ecmascript)|application\/(json|[\w.+-]+\+json|javascript|x-javascript|ecmascript|wasm|x-protobuf|grpc|xhtml\+xml)|image\/|font\/|application\/(font|x-font))/;
-  var MIN_CAPTURE_BYTES = 24;
-  var MAX_PENDING_CAPTURES = 512;
-  var pendingCaptures = new Map();
   var lightTypes = { main_frame: 1, sub_frame: 1, image: 1, imageset: 1, media: 1 };
   var staticTypes = { image: 1, imageset: 1, font: 1 };
   var secondLevel = { co: 1, com: 1, org: 1, net: 1, gov: 1, edu: 1, ac: 1, or: 1, ne: 1, go: 1, gob: 1, mil: 1 };
+  var privateSuffixes = [
+    "s3.amazonaws.com", "azurewebsites.net", "cloudfront.net", "firebaseapp.com", "github.io",
+    "herokuapp.com", "netlify.app", "onrender.com", "pages.dev", "readthedocs.io",
+    "vercel.app", "web.app", "workers.dev", "appspot.com", "blogspot.com", "fly.dev",
+    "gitlab.io", "glitch.me", "notion.site", "repl.co", "surge.sh", "tumblr.com",
+    "wordpress.com"
+  ];
   var iconFontHints = ["icon", "awesome", "glyph", "symbol", "material", "fa-", "fa5", "fa6", "dashicons", "bootstrap", "ionicons", "feather", "codicon"];
   var audioPath = /\.(mp3|aac|m4a|oga|ogg|opus|wav|flac|weba)$/;
   var videoPath = /\.(mp4|m4v|webm|mkv|mov|ogv|3gp|f4v|m3u8|mpd|m4s|ts)$/;
@@ -77,6 +76,17 @@
 
   function siteOf(h) {
     var p = h.split(".");
+    var matchedSuffix = "";
+    for (var i = 0; i < privateSuffixes.length; i++) {
+      var suffix = privateSuffixes[i];
+      if ((h === suffix || h.endsWith("." + suffix)) && suffix.length > matchedSuffix.length) {
+        matchedSuffix = suffix;
+      }
+    }
+    if (matchedSuffix) {
+      var suffixLabels = matchedSuffix.split(".").length;
+      return p.length > suffixLabels ? p.slice(-(suffixLabels + 1)).join(".") : h;
+    }
     if (p.length <= 2) return h;
     var tld = p[p.length - 1];
     var sld = p[p.length - 2];
@@ -167,10 +177,14 @@
         if (ds.video && videoPath.test(path)) return { cancel: true };
         break;
       case "script":
-        if (ds.scripts) return { redirectUrl: EMPTY_JS };
+        if (ds.scripts && (!pageHost || siteOf(url.hostname) !== siteOf(pageHost))) {
+          return { redirectUrl: EMPTY_JS };
+        }
         break;
       case "stylesheet":
-        if (ds.css) return { redirectUrl: EMPTY_CSS };
+        if (ds.css && (!pageHost || siteOf(url.hostname) !== siteOf(pageHost))) {
+          return { redirectUrl: EMPTY_CSS };
+        }
         break;
       case "sub_frame":
         if (ds.frames && frameBlocked(d, url, pageHost)) return { redirectUrl: EMPTY_HTML };
@@ -354,7 +368,7 @@
     if (m.k === "bundle") {
       registerBundle(m.code).then(function () { port.postMessage({ k: "bundleOk", seq: m.seq }); });
     } else if (m.k === "cfg") {
-      if (m.cfg) cfg = m.cfg;
+      if (m.cfg) { cfg = m.cfg; syncListeners(); }
     } else if (m.k === "cookies") {
       cookiesFor(m);
     } else if (m.k === "ck") {
@@ -387,71 +401,33 @@
     }
   });
 
-  browser.webRequest.onBeforeRequest.addListener(decide, { urls: ["<all_urls>"] }, ["blocking"]);
-
-  browser.webRequest.onBeforeSendHeaders.addListener(function (d) {
-    var dnt = cfg.dnt && isWeb(d.url);
-    var save = wantsSaveData(d);
-    if (!dnt && !save) return {};
+  // Blocking webRequest listeners force every network request through this background
+  // page (an extra process hop). Only keep them registered while a feature needs them.
+  function onSendHeaders(d) {
+    if (!wantsSaveData(d)) return {};
     var headers = d.requestHeaders || [];
-    var changed = false;
-    if (dnt && !hasHeader(headers, "DNT")) { headers.push({ name: "DNT", value: "1" }); changed = true; }
-    if (save && !hasHeader(headers, "Save-Data")) { headers.push({ name: "Save-Data", value: "on" }); changed = true; }
-    return changed ? { requestHeaders: headers } : {};
-  }, { urls: ["<all_urls>"] }, ["blocking", "requestHeaders"]);
-
-  browser.webRequest.onHeadersReceived.addListener(extendFreshness, { urls: ["<all_urls>"] }, ["blocking", "responseHeaders"]);
-
-  function observe(d, headers, contentType) {
-    send({
-      k: "obs", u: d.url, mt: d.method, t: typeMap[d.type] || "other", tab: d.tabId,
-      h: headers, page: pageUrlOf(d), ct: contentType
-    }).catch(function () {});
+    if (hasHeader(headers, "Save-Data")) return {};
+    headers.push({ name: "Save-Data", value: "on" });
+    return { requestHeaders: headers };
   }
 
-  function responseInfo(headers) {
-    var info = { type: "", length: -1 };
-    (headers || []).forEach(function (h) {
-      var n = h.name.toLowerCase();
-      if (n === "content-type") info.type = (h.value || "").split(";")[0].trim().toLowerCase();
-      else if (n === "content-length") info.length = parseInt(h.value, 10);
-    });
-    return info;
+  function toggle(event, fn, filter, extra, wanted) {
+    var has = event.hasListener(fn);
+    if (wanted && !has) event.addListener(fn, filter, extra);
+    else if (!wanted && has) event.removeListener(fn);
   }
 
-  function settleCapture(d) {
-    var headers = pendingCaptures.get(d.requestId);
-    if (!headers) return;
-    pendingCaptures.delete(d.requestId);
-    if (!cfg.media || d.statusCode < 200 || d.statusCode >= 300) return;
-    var info = responseInfo(d.responseHeaders);
-    if (segmentTypes[info.type] || nonMediaTypes.test(info.type)) return;
-    if (info.length >= 0 && info.length < MIN_CAPTURE_BYTES) return;
-    observe(d, headers, info.type);
+  function syncListeners() {
+    var ds = cfg.ds;
+    var saverOn = !!(ds && ds.on);
+    var anyBlock = saverOn && !!(ds.images || ds.fonts || ds.video || ds.scripts || ds.css || ds.frames);
+    var needHeaders = saverOn && !!ds.header;
+    var needCache = saverOn && !!ds.cache;
+    toggle(browser.webRequest.onBeforeRequest, decide, { urls: ["http://*/*", "https://*/*"] }, ["blocking"], anyBlock);
+    toggle(browser.webRequest.onBeforeSendHeaders, onSendHeaders, { urls: ["<all_urls>"] }, ["blocking", "requestHeaders"], needHeaders);
+    toggle(browser.webRequest.onHeadersReceived, extendFreshness,
+      { urls: ["http://*/*", "https://*/*"], types: ["image", "imageset", "font"] }, ["blocking", "responseHeaders"], needCache);
   }
 
-  browser.webRequest.onSendHeaders.addListener(function (d) {
-    if (!cfg.media || d.method !== "GET" || !observed[d.type] || !isHttp(d.url)) return;
-    var url = parse(d.url);
-    if (!url || segmentPath.test(url.pathname) || adHost(url.hostname.toLowerCase())) return;
-    var headers = {};
-    (d.requestHeaders || []).forEach(function (h) {
-      var n = h.name.toLowerCase();
-      if (n !== "cookie") headers[h.name] = h.value;
-    });
-    if (d.type === "media" || directMediaPath.test(url.pathname)) {
-      pendingCaptures.delete(d.requestId);
-      observe(d, headers, "");
-      return;
-    }
-    pendingCaptures.delete(d.requestId);
-    if (pendingCaptures.size >= MAX_PENDING_CAPTURES) pendingCaptures.delete(pendingCaptures.keys().next().value);
-    pendingCaptures.set(d.requestId, headers);
-  }, { urls: ["<all_urls>"] }, ["requestHeaders"]);
-
-  browser.webRequest.onHeadersReceived.addListener(settleCapture, { urls: ["<all_urls>"] }, ["responseHeaders"]);
-  browser.webRequest.onCompleted.addListener(settleCapture, { urls: ["<all_urls>"] }, ["responseHeaders"]);
-  browser.webRequest.onErrorOccurred.addListener(function (d) {
-    pendingCaptures.delete(d.requestId);
-  }, { urls: ["<all_urls>"] });
+  syncListeners();
 })();

@@ -23,14 +23,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.CreateNewFolder
-import androidx.compose.material.icons.filled.DeleteSweep
-import androidx.compose.material.icons.filled.LinkOff
-import androidx.compose.material.icons.filled.Public
-import androidx.compose.material.icons.filled.VisibilityOff
+import com.simplefox.browser.ui.icons.Icons
 import com.simplefox.browser.ui.foundation.DropdownMenu
 import com.simplefox.browser.ui.foundation.Icon
 import com.simplefox.browser.ui.foundation.IconButton
@@ -120,7 +113,7 @@ internal fun TabStrip(
     modifier: Modifier = Modifier
 ) {
     val colors = LocalClintColors.current
-    val items = buildTabStripItems(state)
+    val items = remember(state) { buildTabStripItems(state) }
     val listState = rememberLazyListState()
     val activeIndex = items.indexOfFirst { it is TabStripItem.Tab && it.preview.id == state.activeTabId }
     LaunchedEffect(state.activeTabId, items.size) {
@@ -132,7 +125,7 @@ internal fun TabStrip(
             visible.offset + visible.size <= info.viewportEndOffset
         if (!fullyVisible) listState.scrollToItem((activeIndex - 1).coerceAtLeast(0))
     }
-    BoxWithConstraints(modifier.fillMaxWidth().height(34.dp)) {
+    BoxWithConstraints(modifier.fillMaxWidth().height(40.dp)) {
         val tabCount = items.count { it is TabStripItem.Tab }.coerceAtLeast(1)
         val tabWidth = ((maxWidth - 40.dp) / tabCount).coerceIn(104.dp, 196.dp)
         Row(Modifier.fillMaxSize(), verticalAlignment = Alignment.CenterVertically) {
@@ -174,7 +167,7 @@ internal fun TabStrip(
                     }
                 }
             }
-            IconButton(onClick = onNewTab, modifier = Modifier.size(34.dp)) {
+            IconButton(onClick = onNewTab, modifier = Modifier.size(40.dp)) {
                 Icon(
                     Icons.Filled.Add,
                     contentDescription = stringResource(if (state.isIncognito) R.string.new_incognito_tab else R.string.new_tab),
@@ -299,7 +292,7 @@ private fun TabStripTab(
                 modifier = Modifier.weight(1f).padding(start = 8.dp)
             )
             if (active || width >= 128.dp) {
-                IconButton(onClick = onClose, modifier = Modifier.size(28.dp)) {
+                IconButton(onClick = onClose, modifier = Modifier.size(32.dp)) {
                     Icon(
                         Icons.Filled.Close,
                         contentDescription = stringResource(R.string.close_tab),

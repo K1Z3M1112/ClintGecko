@@ -1,19 +1,4 @@
 package com.simplefox.browser.settings.lookandfeel
-import androidx.compose.material.icons.filled.ColorLens
-import androidx.compose.material.icons.filled.Tab
-import androidx.compose.material.icons.filled.VerticalAlignTop
-import androidx.compose.material.icons.filled.Brush
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Contrast
-import androidx.compose.material.icons.filled.Workspaces
-import androidx.compose.material.icons.filled.Fullscreen
-import androidx.compose.material.icons.filled.Layers
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Palette
-import androidx.compose.material.icons.filled.Reorder
-import androidx.compose.material.icons.filled.SwapVert
-import androidx.compose.material.icons.filled.Translate
-import androidx.compose.material.icons.filled.WebAsset
 
 import androidx.compose.foundation.layout.padding
 import android.content.ClipData
@@ -29,8 +14,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ContentCopy
+import com.simplefox.browser.ui.icons.Icons
 import com.simplefox.browser.ui.foundation.Icon
 import com.simplefox.browser.ui.foundation.Text
 import androidx.compose.ui.Alignment
@@ -52,16 +36,12 @@ import com.simplefox.browser.settings.common.SettingsRow
 import com.simplefox.browser.settings.common.SettingsScreenScaffold
 import com.simplefox.browser.settings.common.SettingsSection
 import com.simplefox.browser.settings.common.SettingsSectionLabel
-import com.simplefox.browser.ui.ThemeSwatchUtils
 import com.simplefox.browser.ui.theme.LocalClintColors
 
 @Composable
 fun LookAndFeelScreen(
     state: LookAndFeelUiState,
     onThemeSelected: (String) -> Unit,
-    onCustomThemesClicked: () -> Unit,
-    onAccentSelected: (String) -> Unit,
-    onIntensitySelected: (String) -> Unit,
     onLanguageSelected: (String) -> Unit,
     onAddressBarPositionSelected: (String) -> Unit,
     onScrollHideModeSelected: (String) -> Unit,
@@ -72,12 +52,12 @@ fun LookAndFeelScreen(
     onTabStripPositionSelected: (String) -> Unit,
     onTabGroupsRowClicked: () -> Unit,
     onTabGroupBarPositionSelected: (String) -> Unit,
+    onTabPreviewResolutionSelected: (String) -> Unit,
     onCustomizeMenuRowClicked: () -> Unit,
     onExitConfirmationConfirmed: (String) -> Unit,
     onPopupAlertStyleSelected: (String) -> Unit
 ) {
     val colors = LocalClintColors.current
-    val intensityEnabled = ThemeSwatchUtils.isSurfaceIntensityEnabled(state.theme, state.accent)
 
     SettingsScreenScaffold(
         overlay = {
@@ -86,20 +66,12 @@ fun LookAndFeelScreen(
                     current = state.theme, hideStatusBar = state.hideStatusBar, hideSystemNavigation = state.hideSystemNavigation,
                     onSelect = onThemeSelected, onDismiss = { state.openDialog = null }
                 )
-                LookAndFeelDialog.ACCENT -> AccentColorDialog(
-                    current = state.accent, theme = state.theme, hideStatusBar = state.hideStatusBar, hideSystemNavigation = state.hideSystemNavigation,
-                    onSelect = onAccentSelected, onDismiss = { state.openDialog = null }
-                )
-                LookAndFeelDialog.SURFACE_INTENSITY -> SurfaceIntensityDialog(
-                    current = state.intensity, theme = state.theme, accent = state.accent, hideStatusBar = state.hideStatusBar, hideSystemNavigation = state.hideSystemNavigation,
-                    onSelect = onIntensitySelected, onDismiss = { state.openDialog = null }
-                )
                 LookAndFeelDialog.ADDRESS_BAR_POSITION -> AddressBarPositionDialog(
-                    current = state.addressBarPosition, theme = state.theme, accent = state.accent, hideStatusBar = state.hideStatusBar, hideSystemNavigation = state.hideSystemNavigation,
+                    current = state.addressBarPosition, theme = state.theme, hideStatusBar = state.hideStatusBar, hideSystemNavigation = state.hideSystemNavigation,
                     onSelect = onAddressBarPositionSelected, onDismiss = { state.openDialog = null }
                 )
                 LookAndFeelDialog.SCROLL_HIDE_MODE -> ScrollHideModeDialog(
-                    current = state.scrollHideMode, addressBarPosition = state.addressBarPosition, theme = state.theme, accent = state.accent,
+                    current = state.scrollHideMode, addressBarPosition = state.addressBarPosition, theme = state.theme,
                     hideStatusBar = state.hideStatusBar, hideSystemNavigation = state.hideSystemNavigation, onSelect = onScrollHideModeSelected, onDismiss = { state.openDialog = null }
                 )
                 LookAndFeelDialog.EXIT_CONFIRMATION -> ExitConfirmationDialog(
@@ -116,6 +88,10 @@ fun LookAndFeelScreen(
                     current = state.tabGroupBarPosition, hideStatusBar = state.hideStatusBar, hideSystemNavigation = state.hideSystemNavigation,
                     onSelect = onTabGroupBarPositionSelected, onDismiss = { state.openDialog = null }
                 )
+                LookAndFeelDialog.TAB_PREVIEW_RESOLUTION -> TabPreviewResolutionDialog(
+                    current = state.tabPreviewResolution, hideStatusBar = state.hideStatusBar, hideSystemNavigation = state.hideSystemNavigation,
+                    onSelect = onTabPreviewResolutionSelected, onDismiss = { state.openDialog = null }
+                )
                 LookAndFeelDialog.POPUP_ALERT_STYLE -> PopupAlertStyleDialog(
                     current = state.popupAlertStyle, hideStatusBar = state.hideStatusBar, hideSystemNavigation = state.hideSystemNavigation,
                     onSelect = onPopupAlertStyleSelected, onDismiss = { state.openDialog = null }
@@ -131,7 +107,7 @@ fun LookAndFeelScreen(
         SettingsSectionLabel(stringResource(R.string.pref_category_language))
         SettingsSection(colors.cardBackground) {
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.Translate,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.Translate,
                 title = stringResource(R.string.pref_language_title),
                 summary = languageSummaryText(state.language),
                 colors = colors,
@@ -142,40 +118,11 @@ fun LookAndFeelScreen(
         SettingsSectionLabel(stringResource(R.string.pref_category_appearance))
         SettingsSection(colors.cardBackground) {
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.Palette,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.Palette,
                 title = stringResource(R.string.pref_app_theme_title),
                 summary = stringResource(R.string.pref_app_theme_summary),
                 colors = colors,
                 onClick = { state.openDialog = LookAndFeelDialog.THEME }
-            )
-            RowDivider(colors.divider)
-            SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.Brush,
-                title = stringResource(R.string.pref_accent_color_title),
-                summary = if (com.simplefox.browser.customtheme.isCustomAccent(state.accent)) {
-                    com.simplefox.browser.customtheme.customAccentLabel(androidx.compose.ui.platform.LocalContext.current, state.accent)
-                } else {
-                    stringResource(accentSummaryRes(state.accent))
-                },
-                colors = colors,
-                onClick = { state.openDialog = LookAndFeelDialog.ACCENT }
-            )
-            RowDivider(colors.divider)
-            SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.ColorLens,
-                title = stringResource(R.string.custom_themes_title),
-                summary = stringResource(R.string.custom_themes_row_summary),
-                colors = colors,
-                onClick = onCustomThemesClicked
-            )
-            RowDivider(colors.divider)
-            SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.Contrast,
-                title = stringResource(R.string.pref_surface_intensity_title),
-                summary = if (intensityEnabled) stringResource(intensitySummaryRes(state.intensity)) else stringResource(R.string.pref_surface_intensity_disabled_summary),
-                colors = colors,
-                enabled = intensityEnabled,
-                onClick = { if (intensityEnabled) state.openDialog = LookAndFeelDialog.SURFACE_INTENSITY }
             )
         }
         DarkReaderColorHint(colors)
@@ -183,7 +130,7 @@ fun LookAndFeelScreen(
         SettingsSectionLabel(stringResource(R.string.pref_category_address_bar))
         SettingsSection(colors.cardBackground) {
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.WebAsset,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.WebAsset,
                 title = stringResource(R.string.pref_address_bar_position_title),
                 summary = stringResource(addressBarPositionSummaryRes(state.addressBarPosition)),
                 colors = colors,
@@ -191,7 +138,7 @@ fun LookAndFeelScreen(
             )
             RowDivider(colors.divider)
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.SwapVert,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.SwapVert,
                 title = stringResource(R.string.pref_nested_scroll_title),
                 summary = stringResource(nestedScrollSummaryRes(state.scrollHideMode)),
                 colors = colors,
@@ -199,7 +146,7 @@ fun LookAndFeelScreen(
             )
             RowDivider(colors.divider)
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.Home,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.Home,
                 title = stringResource(R.string.pref_show_home_button_title),
                 summary = stringResource(R.string.pref_show_home_button_summary),
                 colors = colors,
@@ -213,7 +160,7 @@ fun LookAndFeelScreen(
         SettingsSectionLabel(stringResource(R.string.pref_category_tabs))
         SettingsSection(colors.cardBackground) {
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.Tab,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.Tab,
                 title = stringResource(R.string.pref_tab_strip_title),
                 summary = stringResource(R.string.pref_tab_strip_summary),
                 colors = colors,
@@ -224,7 +171,7 @@ fun LookAndFeelScreen(
             )
             RowDivider(colors.divider)
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.VerticalAlignTop,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.VerticalAlignTop,
                 title = stringResource(R.string.pref_tab_strip_position_title),
                 summary = stringResource(tabBarPositionSummaryRes(state.tabStripPosition)),
                 colors = colors,
@@ -232,7 +179,15 @@ fun LookAndFeelScreen(
             )
             RowDivider(colors.divider)
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.Workspaces,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.PhotoSizeSelectLarge,
+                title = stringResource(R.string.pref_tab_preview_resolution_title),
+                summary = stringResource(tabPreviewResolutionSummaryRes(state.tabPreviewResolution)),
+                colors = colors,
+                onClick = { state.openDialog = LookAndFeelDialog.TAB_PREVIEW_RESOLUTION }
+            )
+            RowDivider(colors.divider)
+            SettingsRow(
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.Workspaces,
                 title = stringResource(R.string.pref_tab_groups_title),
                 summary = stringResource(R.string.pref_tab_groups_summary),
                 colors = colors,
@@ -246,7 +201,7 @@ fun LookAndFeelScreen(
         SettingsSectionLabel(stringResource(R.string.menu))
         SettingsSection(colors.cardBackground) {
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.Reorder,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.Reorder,
                 title = stringResource(R.string.menu_customization_title),
                 summary = stringResource(R.string.menu_customization_settings_summary),
                 colors = colors,
@@ -257,7 +212,7 @@ fun LookAndFeelScreen(
         SettingsSectionLabel(stringResource(R.string.pref_category_fullscreen))
         SettingsSection(colors.cardBackground) {
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.Fullscreen,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.Fullscreen,
                 title = stringResource(R.string.hide_status_bar),
                 summary = stringResource(R.string.hide_status_bar_summary),
                 colors = colors,
@@ -268,7 +223,7 @@ fun LookAndFeelScreen(
             )
             RowDivider(colors.divider)
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.Fullscreen,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.Fullscreen,
                 title = stringResource(R.string.hide_system_navigation),
                 summary = stringResource(R.string.hide_system_navigation_summary),
                 colors = colors,
@@ -282,7 +237,7 @@ fun LookAndFeelScreen(
         SettingsSectionLabel(stringResource(R.string.pref_category_navigation))
         SettingsSection(colors.cardBackground) {
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.Close,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.Close,
                 title = stringResource(R.string.exit_confirmation_title),
                 summary = stringResource(exitConfirmationSummaryRes(state.exitConfirmation)),
                 colors = colors,
@@ -290,7 +245,7 @@ fun LookAndFeelScreen(
             )
             RowDivider(colors.divider)
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.Layers,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.Layers,
                 title = stringResource(R.string.pref_popup_alert_style_title),
                 summary = stringResource(popupAlertStyleSummaryRes(state.popupAlertStyle)),
                 colors = colors,
@@ -298,67 +253,6 @@ fun LookAndFeelScreen(
             )
         }
     }
-}
-
-private fun accentSummaryRes(accent: String): Int = when (accent) {
-    "material_you" -> R.string.accent_material_you
-    "purple" -> R.string.accent_purple
-    "deep_purple" -> R.string.accent_deep_purple
-    "royal_purple" -> R.string.accent_royal_purple
-    "amethyst" -> R.string.accent_amethyst
-    "lavender" -> R.string.accent_lavender
-    "teal" -> R.string.accent_teal
-    "azure" -> R.string.accent_azure
-    "pink" -> R.string.accent_pink
-    "indigo" -> R.string.accent_indigo
-    "cyan" -> R.string.accent_cyan
-    "amber" -> R.string.accent_amber
-    "mint" -> R.string.accent_mint
-    "crimson" -> R.string.accent_crimson
-    "slate" -> R.string.accent_slate
-    "graphite" -> R.string.accent_graphite
-    "obsidian" -> R.string.accent_obsidian
-    "onyx" -> R.string.accent_onyx
-    "titanium" -> R.string.accent_titanium
-    "coral" -> R.string.accent_coral
-    "burgundy" -> R.string.accent_burgundy
-    "scarlet" -> R.string.accent_scarlet
-    "midnight" -> R.string.accent_midnight
-    "sepia" -> R.string.accent_sepia
-    "mustard" -> R.string.accent_mustard
-    "forest" -> R.string.accent_forest
-    "sage" -> R.string.accent_sage
-    "lime" -> R.string.accent_lime
-    "olive" -> R.string.accent_olive
-    "plum" -> R.string.accent_plum
-    "violet" -> R.string.accent_violet
-    "sand" -> R.string.accent_sand
-    "ruby" -> R.string.accent_ruby
-    "sky" -> R.string.accent_sky
-    "charcoal" -> R.string.accent_charcoal
-    "peach" -> R.string.accent_peach
-    "terracotta" -> R.string.accent_terracotta
-    "emerald" -> R.string.accent_emerald
-    "blue" -> R.string.accent_blue
-    "yellow" -> R.string.accent_yellow
-    "lemon" -> R.string.accent_lemon
-    "gold" -> R.string.accent_gold
-    "red" -> R.string.accent_red
-    "green" -> R.string.accent_green
-    "orange" -> R.string.accent_orange
-    "deep_orange" -> R.string.accent_deep_orange
-    "tangerine" -> R.string.accent_tangerine
-    "apricot" -> R.string.accent_apricot
-    "copper" -> R.string.accent_copper
-    else -> R.string.accent_default
-}
-
-private fun intensitySummaryRes(intensity: String): Int = when (intensity) {
-    "amoled_no_tint" -> R.string.surface_intensity_amoled_no_tint
-    "no_tint" -> R.string.surface_intensity_no_tint
-    "strong_tint" -> R.string.surface_intensity_strong
-    "pure_mode" -> R.string.surface_intensity_pure
-    else -> R.string.surface_intensity_soft
 }
 
 private fun nestedScrollSummaryRes(mode: String): Int = when (mode) {

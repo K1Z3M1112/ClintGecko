@@ -6,8 +6,8 @@ import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Environment
 import android.provider.DocumentsContract
-import androidx.documentfile.provider.DocumentFile
-import androidx.preference.PreferenceManager
+import com.simplefox.browser.util.DocumentFile
+import com.simplefox.browser.util.PreferenceManager
 import com.simplefox.browser.R
 import com.simplefox.browser.downloads.mega.MegaApi
 import com.simplefox.browser.downloads.mega.MegaCtrDecryptor

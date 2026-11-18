@@ -19,14 +19,7 @@ import androidx.compose.foundation.layout.windowInsetsBottomHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.CleaningServices
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.Warning
+import com.simplefox.browser.ui.icons.Icons
 import com.simplefox.browser.ui.foundation.DropdownMenu
 import com.simplefox.browser.ui.foundation.HorizontalDivider
 import com.simplefox.browser.ui.foundation.Icon
@@ -99,7 +92,7 @@ fun ProfilesScreen(
 
     Surface(color = colors.background, modifier = Modifier.fillMaxSize()) {
         Column(Modifier.fillMaxSize()) {
-            Surface(color = colors.surface, shadowElevation = 4.dp, modifier = Modifier.statusBarsPadding()) {
+            Surface(color = colors.surface, modifier = Modifier.statusBarsPadding()) {
                 Row(
                     Modifier.fillMaxWidth().height(56.dp).padding(start = 4.dp, end = 8.dp),
                     verticalAlignment = Alignment.CenterVertically

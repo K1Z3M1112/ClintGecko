@@ -17,8 +17,8 @@ class CrashHandler(private val context: Context) : Thread.UncaughtExceptionHandl
     companion object {
         const val CRASH_DIR = "crash_reports"
         const val MAX_REPORTS = 20
-        val DATE_FORMAT = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US)
-        val FILE_DATE_FORMAT = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US)
+        private const val DATE_PATTERN = "yyyy-MM-dd HH:mm:ss"
+        private const val FILE_DATE_PATTERN = "yyyyMMdd_HHmmss"
 
         fun install(context: Context) {
             Thread.setDefaultUncaughtExceptionHandler(CrashHandler(context.applicationContext))
@@ -117,8 +117,8 @@ class CrashHandler(private val context: Context) : Thread.UncaughtExceptionHandl
             throwable.printStackTrace(PrintWriter(sw))
             val stackTrace = sw.toString()
 
-            val timestamp = DATE_FORMAT.format(Date())
-            val fileTimestamp = FILE_DATE_FORMAT.format(Date())
+            val timestamp = SimpleDateFormat(DATE_PATTERN, Locale.US).format(Date())
+            val fileTimestamp = SimpleDateFormat(FILE_DATE_PATTERN, Locale.US).format(Date())
 
             val report = buildString {
                 appendLine("============================")

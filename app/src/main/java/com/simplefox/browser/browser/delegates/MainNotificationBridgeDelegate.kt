@@ -6,7 +6,7 @@ import android.app.NotificationManager
 import android.os.Build
 import com.simplefox.browser.browser.webview.ClintWebView
 import androidx.core.app.NotificationCompat
-import androidx.preference.PreferenceManager
+import com.simplefox.browser.util.PreferenceManager
 import com.simplefox.browser.R
 import com.simplefox.browser.settings.sitepermissions.SitePermissionDatabase
 import com.simplefox.browser.settings.sitepermissions.SitePermissionManager
@@ -33,7 +33,13 @@ internal fun MainActivity.showWebNotificationPermissionFromBridge(
     rawOrigin: String,
     isIncognito: Boolean = false
 ) {
-    val safeId = callbackId.replace("'", "")
+    val safeId = callbackId
+        .replace("\\", "\\\\")
+        .replace("'", "\\'")
+        .replace("\n", "\\n")
+        .replace("\r", "\\r")
+        .replace("\u2028", "\\u2028")
+        .replace("\u2029", "\\u2029")
 
     if (!isIncognito) {
         val stored = SitePermissionManager.getState(this, rawOrigin, SitePermissionDatabase.TYPE_NOTIFICATION)

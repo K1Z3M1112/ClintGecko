@@ -1,11 +1,4 @@
 package com.simplefox.browser.browser.sheets
-import androidx.compose.material.icons.filled.ContentCopy
-import androidx.compose.material.icons.filled.Link
-import androidx.compose.material.icons.automirrored.filled.OpenInNew
-import androidx.compose.material.icons.filled.Share
-import androidx.compose.material.icons.filled.Tab
-import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.material.icons.filled.ZoomIn
 
 import android.graphics.Bitmap
 import androidx.compose.foundation.Image
@@ -46,7 +39,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.preference.PreferenceManager
+import com.simplefox.browser.util.PreferenceManager
 import com.simplefox.browser.R
 import com.simplefox.browser.browser.MainActivity
 import com.simplefox.browser.ui.FaviconCache
@@ -115,27 +108,27 @@ internal fun LinkLongPressSheet(request: LinkLongPressRequest, activity: MainAct
 
             LongPressSheetDivider()
 
-            LongPressActionRow(androidx.compose.material.icons.Icons.AutoMirrored.Filled.OpenInNew, stringResource(R.string.link_open_in_new_tab)) {
+            LongPressActionRow(com.simplefox.browser.ui.icons.Icons.AutoMirrored.Filled.OpenInNew, stringResource(R.string.link_open_in_new_tab)) {
                 dismissAnd { activity.onLinkOpenInNewTab(request.url) }
             }
-            LongPressActionRow(androidx.compose.material.icons.Icons.Filled.Tab, stringResource(R.string.link_open_new_tab_background)) {
+            LongPressActionRow(com.simplefox.browser.ui.icons.Icons.Filled.Tab, stringResource(R.string.link_open_new_tab_background)) {
                 dismissAnd { activity.onLinkOpenNewTabBackground(request.url) }
             }
-            LongPressActionRow(androidx.compose.material.icons.Icons.Filled.VisibilityOff, stringResource(R.string.link_open_incognito)) {
+            LongPressActionRow(com.simplefox.browser.ui.icons.Icons.Filled.VisibilityOff, stringResource(R.string.link_open_incognito)) {
                 dismissAnd { activity.onLinkOpenIncognito(request.url) }
             }
-            LongPressActionRow(androidx.compose.material.icons.Icons.Filled.ZoomIn, stringResource(R.string.link_preview_page)) {
+            LongPressActionRow(com.simplefox.browser.ui.icons.Icons.Filled.ZoomIn, stringResource(R.string.link_preview_page)) {
                 dismissAnd { activity.onLinkPreviewPage(request.url) }
             }
-            LongPressActionRow(androidx.compose.material.icons.Icons.Filled.ContentCopy, stringResource(R.string.link_copy_address)) {
+            LongPressActionRow(com.simplefox.browser.ui.icons.Icons.Filled.ContentCopy, stringResource(R.string.link_copy_address)) {
                 dismissAnd { activity.onLinkCopyAddress(request.url) }
             }
             if (hasLinkText) {
-                LongPressActionRow(androidx.compose.material.icons.Icons.Filled.ContentCopy, stringResource(R.string.link_copy_text)) {
+                LongPressActionRow(com.simplefox.browser.ui.icons.Icons.Filled.ContentCopy, stringResource(R.string.link_copy_text)) {
                     dismissAnd { activity.onLinkCopyText(request.url, request.linkText) }
                 }
             }
-            LongPressActionRow(androidx.compose.material.icons.Icons.Filled.Share, stringResource(R.string.link_share)) {
+            LongPressActionRow(com.simplefox.browser.ui.icons.Icons.Filled.Share, stringResource(R.string.link_share)) {
                 dismissAnd { activity.onLinkShare(request.url) }
             }
         }
@@ -155,7 +148,7 @@ private fun LinkFaviconChip(favicon: Bitmap?, colors: com.simplefox.browser.ui.t
         if (favicon != null) {
             Image(favicon.asImageBitmap(), contentDescription = null, modifier = Modifier.size(22.dp))
         } else {
-            Icon(androidx.compose.material.icons.Icons.Filled.Link, contentDescription = null, tint = colors.iconTint, modifier = Modifier.size(20.dp))
+            Icon(com.simplefox.browser.ui.icons.Icons.Filled.Link, contentDescription = null, tint = colors.iconTint, modifier = Modifier.size(20.dp))
         }
     }
 }

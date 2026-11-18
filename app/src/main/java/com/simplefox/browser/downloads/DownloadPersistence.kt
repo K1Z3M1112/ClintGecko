@@ -23,6 +23,13 @@ internal object DownloadPersistence {
 
     fun nextSequence(): Long = writeSequence.incrementAndGet()
 
+    // Last full row / last checkpoint written per download, so identical writes can be skipped.
+    // A full-row write overwrites the checkpoint columns and a checkpoint changes the row, so each
+    // write invalidates the other cache.
+    private val lastWrittenRow = ConcurrentHashMap<Int, ContentValues>()
+    private val lastCheckpoint = ConcurrentHashMap<Int, ContentValues>()
+    private val writeLock = Any()
+
     private val RECOVERABLE_STATUSES = setOf(
         DownloadStatus.CONNECTING, DownloadStatus.RETRYING, DownloadStatus.ALLOCATING, DownloadStatus.DOWNLOADING,
         DownloadStatus.DECRYPTING, DownloadStatus.MUXING, DownloadStatus.CONVERTING
@@ -256,9 +263,15 @@ internal object DownloadPersistence {
                 if (mega != null) put(DownloadDatabase.COL_MEGA_JSON, mega.toJson())
                 else putNull(DownloadDatabase.COL_MEGA_JSON)
             }
-            db(context).writableDatabase.insertWithOnConflict(
-                DownloadDatabase.TABLE, null, values, SQLiteDatabase.CONFLICT_REPLACE
-            )
+            synchronized(writeLock) {
+                if (lastWrittenRow[item.id] == values) return@synchronized
+                lastWrittenRow.remove(item.id)
+                lastCheckpoint.remove(item.id)
+                db(context).writableDatabase.insertWithOnConflict(
+                    DownloadDatabase.TABLE, null, values, SQLiteDatabase.CONFLICT_REPLACE
+                )
+                lastWrittenRow[item.id] = values
+            }
             Unit
         }
     }
@@ -350,14 +363,25 @@ internal object DownloadPersistence {
                 put(DownloadDatabase.COL_PART_OFFSETS, partOffsets)
                 put(DownloadDatabase.COL_PART_MAP, partMap)
             }
-            db(context).writableDatabase.update(
-                DownloadDatabase.TABLE, values, "${DownloadDatabase.COL_ID} = ?", arrayOf(id.toString())
-            )
+            // Paused/stalled downloads re-checkpoint the same numbers; nothing new to store.
+            synchronized(writeLock) {
+                if (lastCheckpoint[id] == values) return@synchronized
+                lastWrittenRow.remove(id)
+                lastCheckpoint.remove(id)
+                db(context).writableDatabase.update(
+                    DownloadDatabase.TABLE, values, "${DownloadDatabase.COL_ID} = ?", arrayOf(id.toString())
+                )
+                lastCheckpoint[id] = values
+            }
         }
     }
 
     suspend fun deletePersistedDownload(context: Context, id: Int) = withContext(DownloadDispatchers.database) {
         lastWrittenSequence[id] = Long.MAX_VALUE
+        synchronized(writeLock) {
+            lastWrittenRow.remove(id)
+            lastCheckpoint.remove(id)
+        }
         db(context).writableDatabase.delete(
             DownloadDatabase.TABLE,
             "${DownloadDatabase.COL_ID} = ?",

@@ -1,6 +1,4 @@
 package com.simplefox.browser.settings.misc
-import androidx.compose.material.icons.filled.Language
-import androidx.compose.material.icons.filled.Refresh
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -78,7 +76,7 @@ fun MiscScreen(
         SettingsSectionLabel(stringResource(R.string.misc_section_app))
         SettingsSection(colors.cardBackground) {
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.Language,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.Language,
                 title = stringResource(R.string.default_browser_title),
                 summary = state.defaultBrowserSummary,
                 colors = colors,
@@ -89,7 +87,7 @@ fun MiscScreen(
         SettingsSectionLabel(stringResource(R.string.misc_section_setup))
         SettingsSection(colors.cardBackground) {
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.Refresh,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.Refresh,
                 title = stringResource(R.string.pref_rerun_setup_title),
                 summary = stringResource(R.string.pref_rerun_setup_summary),
                 colors = colors,

@@ -1,26 +1,40 @@
 package com.simplefox.browser.ui
-import androidx.compose.material.icons.filled.Check
 
 import androidx.compose.foundation.layout.size
 import com.simplefox.browser.ui.foundation.Icon
 import com.simplefox.browser.ui.foundation.Switch
 import com.simplefox.browser.ui.foundation.SwitchDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.simplefox.browser.ui.theme.LocalClintColors
 
+/**
+ * Click handler of the row that hosts a switch. Rows (e.g. SettingsRow) provide it so that a
+ * ClintSwitch placed inside them is itself tappable and triggers the same action as the row.
+ */
+val LocalSwitchRowToggle = compositionLocalOf<(() -> Unit)?> { null }
+
 @Composable
-fun ClintSwitch(checked: Boolean, modifier: Modifier = Modifier) {
+fun ClintSwitch(
+    checked: Boolean,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    onCheckedChange: ((Boolean) -> Unit)? = null
+) {
     val colors = LocalClintColors.current
+    val rowToggle = LocalSwitchRowToggle.current
+    val handler: ((Boolean) -> Unit)? = onCheckedChange ?: rowToggle?.let { toggle -> { _: Boolean -> toggle() } }
     Switch(
         checked = checked,
-        onCheckedChange = null,
+        onCheckedChange = handler,
         modifier = modifier,
+        enabled = enabled,
         thumbContent = if (checked) {
             {
                 Icon(
-                    imageVector = androidx.compose.material.icons.Icons.Filled.Check,
+                    imageVector = com.simplefox.browser.ui.icons.Icons.Filled.Check,
                     contentDescription = null,
                     modifier = Modifier.size(SwitchDefaults.IconSize)
                 )

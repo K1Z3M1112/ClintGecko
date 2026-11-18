@@ -34,7 +34,7 @@ import androidx.core.content.pm.PackageInfoCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import androidx.preference.PreferenceManager
+import com.simplefox.browser.util.PreferenceManager
 import com.simplefox.browser.BuildConfig
 import com.simplefox.browser.R
 import com.simplefox.browser.crash.CrashHandler
@@ -100,6 +100,8 @@ private const val PREF_BLOCK_SCRIPTS = "data_saver_block_scripts"
 private const val PREF_BLOCK_CSS = "data_saver_block_css"
 private const val PREF_SINGLE_TAB = "data_saver_single_tab"
 private const val DEFAULT_SINGLE_TAB = false
+private const val PREF_REDUCE_EFFECTS = "data_saver_reduce_effects"
+private const val DEFAULT_REDUCE_EFFECTS = true
 private const val DEFAULT_BLOCK_SCRIPTS = false
 private const val DEFAULT_BLOCK_CSS = false
 private const val PREF_CACHE_FIRST = "data_saver_cache_first"
@@ -140,8 +142,6 @@ fun LookAndFeelPane(activity: SettingsActivity) {
     val uiState = remember {
         LookAndFeelUiState(
             initialTheme = prefs.getString("app_theme", "system") ?: "system",
-            initialAccent = prefs.getString("accent_color", "material_you") ?: "material_you",
-            initialIntensity = prefs.getString("surface_intensity", "soft_tint") ?: "soft_tint",
             initialLanguage = prefs.getString(LocaleHelper.PREF_APP_LANGUAGE, LocaleHelper.LANGUAGE_SYSTEM) ?: LocaleHelper.LANGUAGE_SYSTEM,
             initialScrollHideMode = prefs.getString("scroll_hide_mode", "off") ?: "off",
             initialAddressBarPosition = prefs.getString("address_bar_position", "bottom") ?: "bottom",
@@ -152,6 +152,7 @@ fun LookAndFeelPane(activity: SettingsActivity) {
             initialTabStripPosition = com.simplefox.browser.tabs.TabBarPlacement.normalize(prefs.getString(com.simplefox.browser.tabs.TabBarPlacement.PREF_TAB_STRIP_POSITION, null)),
             initialTabGroupsEnabled = com.simplefox.browser.tabs.TabGroupPrefs.isEnabled(prefs),
             initialTabGroupBarPosition = com.simplefox.browser.tabs.TabBarPlacement.normalize(prefs.getString(com.simplefox.browser.tabs.TabBarPlacement.PREF_TAB_GROUP_BAR_POSITION, null)),
+            initialTabPreviewResolution = com.simplefox.browser.tabs.TabThumbnailCache.normalizeResolution(prefs.getString(com.simplefox.browser.tabs.TabThumbnailCache.PREF_RESOLUTION, null)),
             initialExitConfirmation = prefs.getString("exit_confirmation", "toast") ?: "toast",
             initialPopupAlertStyle = prefs.getString("popup_alert_style", "dialog") ?: "dialog"
         )
@@ -159,6 +160,7 @@ fun LookAndFeelPane(activity: SettingsActivity) {
     var confirmDialog by remember { mutableStateOf<ConfirmDialogConfig?>(null) }
 
     OnResume {
+        uiState.tabPreviewResolution = com.simplefox.browser.tabs.TabThumbnailCache.normalizeResolution(prefs.getString(com.simplefox.browser.tabs.TabThumbnailCache.PREF_RESOLUTION, null))
         uiState.scrollHideMode = prefs.getString("scroll_hide_mode", "off") ?: "off"
         uiState.addressBarPosition = prefs.getString("address_bar_position", "bottom") ?: "bottom"
         uiState.hideStatusBar = prefs.getBoolean("hide_status_bar", false)
@@ -309,11 +311,6 @@ fun LookAndFeelPane(activity: SettingsActivity) {
     LookAndFeelScreen(
         state = uiState,
         onThemeSelected = { newTheme -> uiState.openDialog = null; activity.captureAndRecreate(newTheme) },
-        onCustomThemesClicked = {
-            activity.startActivity(android.content.Intent(activity, com.simplefox.browser.customtheme.CustomThemesActivity::class.java))
-        },
-        onAccentSelected = { newAccent -> uiState.openDialog = null; activity.captureAndApplyAccentColor(newAccent) },
-        onIntensitySelected = { newIntensity -> uiState.openDialog = null; activity.captureAndApplySurfaceIntensity(newIntensity) },
         onLanguageSelected = { newLanguage -> uiState.openDialog = null; activity.captureAndApplyLanguage(newLanguage) },
         onAddressBarPositionSelected = ::selectAddressBarPosition,
         onScrollHideModeSelected = ::selectScrollHideMode,
@@ -330,6 +327,12 @@ fun LookAndFeelPane(activity: SettingsActivity) {
         onTabGroupBarPositionSelected = { value ->
             prefs.edit().putString(com.simplefox.browser.tabs.TabBarPlacement.PREF_TAB_GROUP_BAR_POSITION, value).apply()
             uiState.tabGroupBarPosition = value
+            uiState.openDialog = null
+        },
+        onTabPreviewResolutionSelected = { value ->
+            prefs.edit().putString(com.simplefox.browser.tabs.TabThumbnailCache.PREF_RESOLUTION, value).apply()
+            uiState.tabPreviewResolution = value
+            com.simplefox.browser.tabs.TabThumbnailCache.refreshResolution(activity)
             uiState.openDialog = null
         },
         onCustomizeMenuRowClicked = {
@@ -995,8 +998,33 @@ fun DataSaverPane(activity: SettingsActivity) {
             initialDisableFavicons = prefs.getBoolean(PREF_DISABLE_FAVICONS, DEFAULT_DISABLE_FAVICONS),
             initialBlockScripts = prefs.getBoolean(PREF_BLOCK_SCRIPTS, DEFAULT_BLOCK_SCRIPTS),
             initialBlockCss = prefs.getBoolean(PREF_BLOCK_CSS, DEFAULT_BLOCK_CSS),
-            initialSingleTab = prefs.getBoolean(PREF_SINGLE_TAB, DEFAULT_SINGLE_TAB)
+            initialSingleTab = prefs.getBoolean(PREF_SINGLE_TAB, DEFAULT_SINGLE_TAB),
+            initialReduceEffects = prefs.getBoolean(PREF_REDUCE_EFFECTS, DEFAULT_REDUCE_EFFECTS)
         )
+    }
+    DisposableEffect(prefs, uiState) {
+        val listener = android.content.SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+            if (key == null || key.startsWith("data_saver_")) {
+                uiState.enabled = prefs.getBoolean(PREF_DATA_SAVER_ENABLED, DEFAULT_DATA_SAVER_ENABLED)
+                uiState.meteredOnly = prefs.getBoolean(PREF_METERED_ONLY, DEFAULT_METERED_ONLY)
+                uiState.disableImages = prefs.getBoolean(PREF_DISABLE_IMAGES, DEFAULT_DISABLE_IMAGES)
+                uiState.disableAutoplay = prefs.getBoolean(PREF_DISABLE_AUTOPLAY, DEFAULT_DISABLE_AUTOPLAY)
+                uiState.sendHeader = prefs.getBoolean(PREF_SEND_SAVE_DATA_HEADER, DEFAULT_SEND_SAVE_DATA_HEADER)
+                uiState.blockFonts = prefs.getBoolean(PREF_BLOCK_FONTS, DEFAULT_BLOCK_FONTS)
+                uiState.blockFrames = prefs.getBoolean(PREF_BLOCK_FRAMES, DEFAULT_BLOCK_FRAMES)
+                uiState.blockPreload = prefs.getBoolean(PREF_BLOCK_PRELOAD, DEFAULT_BLOCK_PRELOAD)
+                uiState.cacheFirst = prefs.getBoolean(PREF_CACHE_FIRST, DEFAULT_CACHE_FIRST)
+                uiState.blockVideo = prefs.getBoolean(PREF_BLOCK_VIDEO, DEFAULT_BLOCK_VIDEO)
+                uiState.disableSuggestions = prefs.getBoolean(PREF_DISABLE_SUGGESTIONS, DEFAULT_DISABLE_SUGGESTIONS)
+                uiState.disableFavicons = prefs.getBoolean(PREF_DISABLE_FAVICONS, DEFAULT_DISABLE_FAVICONS)
+                uiState.blockScripts = prefs.getBoolean(PREF_BLOCK_SCRIPTS, DEFAULT_BLOCK_SCRIPTS)
+                uiState.blockCss = prefs.getBoolean(PREF_BLOCK_CSS, DEFAULT_BLOCK_CSS)
+                uiState.singleTab = prefs.getBoolean(PREF_SINGLE_TAB, DEFAULT_SINGLE_TAB)
+                uiState.reduceEffects = prefs.getBoolean(PREF_REDUCE_EFFECTS, DEFAULT_REDUCE_EFFECTS)
+            }
+        }
+        prefs.registerOnSharedPreferenceChangeListener(listener)
+        onDispose { prefs.unregisterOnSharedPreferenceChangeListener(listener) }
     }
     fun toggle(prefKey: String, current: Boolean, apply: (Boolean) -> Unit) {
         val newValue = !current
@@ -1048,6 +1076,9 @@ fun DataSaverPane(activity: SettingsActivity) {
         },
         onSingleTabClick = {
             if (uiState.enabled) toggle(PREF_SINGLE_TAB, uiState.singleTab) { uiState.singleTab = it }
+        },
+        onReduceEffectsClick = {
+            if (uiState.enabled) toggle(PREF_REDUCE_EFFECTS, uiState.reduceEffects) { uiState.reduceEffects = it }
         }
     )
 }
@@ -1311,7 +1342,6 @@ fun DownloadSettingsPane(activity: SettingsActivity) {
             initialConcurrentDownloads = prefs.getInt(DownloadSettingsKeys.PREF_CONCURRENT_DOWNLOADS, DownloadSettingsKeys.DEFAULT_CONCURRENT_DOWNLOADS),
             initialSplitParts = prefs.getInt(DownloadSettingsKeys.PREF_SPLIT_PARTS, DownloadSettingsKeys.DEFAULT_SPLIT_PARTS),
             initialMultithreadingParts = prefs.getInt(DownloadSettingsKeys.PREF_MULTITHREADING_PARTS, DownloadSettingsKeys.DEFAULT_MULTITHREADING_PARTS),
-            initialConcurrentSegments = prefs.getInt(DownloadSettingsKeys.PREF_STREAM_CONCURRENT_SEGMENTS, DownloadSettingsKeys.DEFAULT_STREAM_CONCURRENT_SEGMENTS),
             initialSpeedLimitAmount = prefs.getInt(DownloadSettingsKeys.PREF_SPEED_LIMIT_AMOUNT, DownloadSettingsKeys.DEFAULT_SPEED_LIMIT_AMOUNT),
             initialSpeedLimitUnit = prefs.getString(DownloadSettingsKeys.PREF_SPEED_LIMIT_UNIT, DEFAULT_SPEED_LIMIT_UNIT) ?: DEFAULT_SPEED_LIMIT_UNIT,
             initialTotalSpeedLimitAmount = prefs.getInt(DownloadSettingsKeys.PREF_TOTAL_SPEED_LIMIT_AMOUNT, DownloadSettingsKeys.DEFAULT_TOTAL_SPEED_LIMIT_AMOUNT),
@@ -1455,10 +1485,6 @@ fun DownloadSettingsPane(activity: SettingsActivity) {
         onMultithreadingPartsChange = { value ->
             prefs.edit().putInt(DownloadSettingsKeys.PREF_MULTITHREADING_PARTS, value).apply()
             uiState.multithreadingParts = value
-        },
-        onConcurrentSegmentsChange = { value ->
-            prefs.edit().putInt(DownloadSettingsKeys.PREF_STREAM_CONCURRENT_SEGMENTS, value).apply()
-            uiState.concurrentSegments = value
         },
         onTotalSpeedLimitConfirm = { amount, unit ->
             prefs.edit().putInt(DownloadSettingsKeys.PREF_TOTAL_SPEED_LIMIT_AMOUNT, amount).putString(DownloadSettingsKeys.PREF_TOTAL_SPEED_LIMIT_UNIT, unit).apply()

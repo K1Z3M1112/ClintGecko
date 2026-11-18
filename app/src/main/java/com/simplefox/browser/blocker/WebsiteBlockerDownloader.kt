@@ -1,5 +1,6 @@
 package com.simplefox.browser.blocker
 
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
@@ -7,6 +8,7 @@ import okhttp3.Request
 import java.io.File
 
 object WebsiteBlockerDownloader {
+    private const val PROGRESS_INTERVAL_NS = 100_000_000L
     private val client = OkHttpClient()
 
     sealed class Result {
@@ -22,6 +24,7 @@ object WebsiteBlockerDownloader {
         lastModified: String?,
         onProgress: (bytesRead: Long, contentLength: Long) -> Unit
     ): Result = withContext(Dispatchers.IO) {
+        val tempFile = File(destination.parentFile, "${destination.name}.tmp")
         try {
             val requestBuilder = Request.Builder().url(url)
             if (!etag.isNullOrBlank()) requestBuilder.header("If-None-Match", etag)
@@ -33,24 +36,40 @@ object WebsiteBlockerDownloader {
 
                 val body = response.body
                 val contentLength = body.contentLength()
-                val tempFile = File(destination.parentFile, "${destination.name}.tmp")
-
                 var bytesRead = 0L
+                var lastReportNs = 0L
                 body.byteStream().use { input ->
                     tempFile.outputStream().use { output ->
-                        val buffer = ByteArray(8192)
+                        val buffer = ByteArray(64 * 1024)
                         while (true) {
                             val read = input.read(buffer)
                             if (read == -1) break
                             output.write(buffer, 0, read)
                             bytesRead += read
-                            onProgress(bytesRead, contentLength)
+                            // Progress writes Compose state; throttle so large lists don't trigger thousands of recompositions.
+                            val now = System.nanoTime()
+                            if (now - lastReportNs >= PROGRESS_INTERVAL_NS) {
+                                lastReportNs = now
+                                onProgress(bytesRead, contentLength)
+                            }
                         }
                     }
                 }
 
-                if (destination.exists()) destination.delete()
-                if (!tempFile.renameTo(destination)) {
+                onProgress(bytesRead, contentLength)
+
+                val saved = runCatching {
+                    java.nio.file.Files.move(
+                        tempFile.toPath(), destination.toPath(),
+                        java.nio.file.StandardCopyOption.REPLACE_EXISTING,
+                        java.nio.file.StandardCopyOption.ATOMIC_MOVE
+                    )
+                }.isSuccess || run {
+                    if (destination.exists()) destination.delete()
+                    tempFile.renameTo(destination)
+                }
+                if (!saved) {
+                    tempFile.delete()
                     return@withContext Result.Failure("Failed to save file")
                 }
 
@@ -60,7 +79,11 @@ object WebsiteBlockerDownloader {
                     bytesWritten = bytesRead
                 )
             }
+        } catch (e: CancellationException) {
+            tempFile.delete()
+            throw e
         } catch (e: Exception) {
+            tempFile.delete()
             Result.Failure(e.message ?: "Download failed")
         }
     }

@@ -5,7 +5,7 @@ import android.Manifest
 import com.simplefox.browser.browser.webview.GeolocationCallback
 import com.simplefox.browser.browser.webview.ClintPermissionRequest as PermissionRequest
 import androidx.core.content.ContextCompat
-import androidx.preference.PreferenceManager
+import com.simplefox.browser.util.PreferenceManager
 import com.simplefox.browser.R
 import com.simplefox.browser.settings.sitepermissions.SitePermissionDatabase
 import com.simplefox.browser.settings.sitepermissions.SitePermissionManager

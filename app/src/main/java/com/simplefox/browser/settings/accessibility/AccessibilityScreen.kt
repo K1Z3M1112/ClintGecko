@@ -1,7 +1,4 @@
 package com.simplefox.browser.settings.accessibility
-import androidx.compose.material.icons.filled.FormatSize
-import androidx.compose.material.icons.filled.TextFields
-import androidx.compose.material.icons.filled.ZoomIn
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -60,7 +57,7 @@ fun AccessibilityScreen(
         SettingsSectionLabel(stringResource(R.string.accessibility_section_text))
         SettingsSection(colors.cardBackground) {
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.TextFields,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.TextFields,
                 title = stringResource(R.string.accessibility_auto_font_size_title),
                 summary = stringResource(R.string.accessibility_auto_font_size_summary),
                 colors = colors,
@@ -80,7 +77,7 @@ fun AccessibilityScreen(
         SettingsSectionLabel(stringResource(R.string.accessibility_section_zoom))
         SettingsSection(colors.cardBackground) {
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.ZoomIn,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.ZoomIn,
                 title = stringResource(R.string.accessibility_force_zoom_title),
                 summary = stringResource(R.string.accessibility_force_zoom_summary),
                 colors = colors,
@@ -120,7 +117,7 @@ private fun FontSizeBlock(
             Modifier.fillMaxWidth().heightIn(min = 44.dp).alpha(if (enabled) 1f else 0.45f),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            SettingsIconTile(androidx.compose.material.icons.Icons.Filled.FormatSize, colors)
+            SettingsIconTile(com.simplefox.browser.ui.icons.Icons.Filled.FormatSize, colors)
             Column(Modifier.weight(1f).padding(start = 16.dp, end = 12.dp)) {
                 Text(title, color = colors.onSurface, fontSize = 16.sp, fontWeight = FontWeight.Medium, lineHeight = 21.sp)
                 Text(

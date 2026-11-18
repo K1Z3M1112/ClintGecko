@@ -1,9 +1,7 @@
 package com.simplefox.browser.blocker
 
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import com.simplefox.browser.ui.listscreen.ConfirmDialogConfig
 import com.simplefox.browser.ui.listscreen.ListSortKey
@@ -96,6 +94,3 @@ class WebsiteBlockerUiState {
         selectedIds = emptySet()
     }
 }
-
-@Composable
-fun rememberWebsiteBlockerUiState(): WebsiteBlockerUiState = remember { WebsiteBlockerUiState() }

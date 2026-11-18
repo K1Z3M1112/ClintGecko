@@ -13,28 +13,23 @@ import android.os.Bundle
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.FrameLayout
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
+import androidx.activity.ComponentActivity
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import androidx.preference.PreferenceManager
-import com.simplefox.browser.app.ClintApplication
+import com.simplefox.browser.util.PreferenceManager
 import com.simplefox.browser.ui.ThemeRevealHolder
 import com.simplefox.browser.ui.ThemeRevealOverlay
 import com.simplefox.browser.ui.theme.ThemeMode
-import com.simplefox.browser.customtheme.CUSTOM_THEME_REVISION_PREF
-import com.simplefox.browser.customtheme.resolveThemeChrome
+import com.simplefox.browser.ui.theme.resolveThemeChrome
 import com.simplefox.browser.util.LocaleHelper
 import kotlin.math.hypot
 import kotlin.math.max
 
-abstract class ClintActivity : AppCompatActivity() {
+abstract class ClintActivity : ComponentActivity() {
 
     private var appliedTheme: String? = null
-    private var appliedAccent: String? = null
-    private var appliedIntensity: String? = null
     private var appliedLanguage: String? = null
-    private var appliedCustomRevision = 0L
     private var appliedSystemDark = false
 
     private var storagePermissionCallback: ((Boolean) -> Unit)? = null
@@ -53,16 +48,13 @@ abstract class ClintActivity : AppCompatActivity() {
     }
 
     override fun attachBaseContext(newBase: Context) {
-        super.attachBaseContext(LocaleHelper.wrapContext(newBase))
+        super.attachBaseContext(LocaleHelper.wrapContext(newBase, com.simplefox.browser.util.NightMode.override(newBase)))
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         val prefs = PreferenceManager.getDefaultSharedPreferences(this)
         appliedTheme = prefs.getString("app_theme", "system") ?: "system"
-        appliedAccent = prefs.getString("accent_color", "material_you") ?: "material_you"
-        appliedIntensity = prefs.getString("surface_intensity", "soft_tint") ?: "soft_tint"
         appliedLanguage = prefs.getString(LocaleHelper.PREF_APP_LANGUAGE, LocaleHelper.LANGUAGE_SYSTEM) ?: LocaleHelper.LANGUAGE_SYSTEM
-        appliedCustomRevision = prefs.getLong(CUSTOM_THEME_REVISION_PREF, 0L)
         appliedSystemDark = ThemeMode.isSystemDark()
         applyWindowChrome()
         super.onCreate(savedInstanceState)
@@ -90,11 +82,8 @@ abstract class ClintActivity : AppCompatActivity() {
         openDialogCount = 0
         val prefs = PreferenceManager.getDefaultSharedPreferences(this)
         val currentTheme = prefs.getString("app_theme", "system") ?: "system"
-        val currentAccent = prefs.getString("accent_color", "material_you") ?: "material_you"
-        val currentIntensity = prefs.getString("surface_intensity", "soft_tint") ?: "soft_tint"
         val currentLanguage = prefs.getString(LocaleHelper.PREF_APP_LANGUAGE, LocaleHelper.LANGUAGE_SYSTEM) ?: LocaleHelper.LANGUAGE_SYSTEM
-        val currentRevision = prefs.getLong(CUSTOM_THEME_REVISION_PREF, 0L)
-        if (currentTheme != appliedTheme || currentAccent != appliedAccent || currentIntensity != appliedIntensity || currentRevision != appliedCustomRevision || currentLanguage != appliedLanguage) {
+        if (currentTheme != appliedTheme || currentLanguage != appliedLanguage) {
             window.setWindowAnimations(0)
             recreate()
             return
@@ -111,9 +100,7 @@ abstract class ClintActivity : AppCompatActivity() {
     @Suppress("DEPRECATION")
     private fun applyWindowChrome() {
         val theme = appliedTheme ?: "system"
-        val accent = appliedAccent ?: "material_you"
-        val intensity = appliedIntensity ?: "soft_tint"
-        val chrome = resolveThemeChrome(this, theme, accent, intensity)
+        val chrome = resolveThemeChrome(theme)
         window.setBackgroundDrawable(ColorDrawable(chrome.background))
         window.statusBarColor = chrome.statusBar
         window.navigationBarColor = chrome.navigationBar
@@ -128,37 +115,6 @@ abstract class ClintActivity : AppCompatActivity() {
         if (current == newTheme) return
         captureScreenBitmap()
         prefs.edit().putString("app_theme", newTheme).commit()
-        (application as? ClintApplication)?.applyNightMode()
-        window.setWindowAnimations(0)
-        recreate()
-    }
-
-    fun captureAndApplyAccentColor(newAccent: String) {
-        val prefs = PreferenceManager.getDefaultSharedPreferences(this)
-        val current = prefs.getString("accent_color", "material_you") ?: "material_you"
-        if (current == newAccent) return
-        val currentIntensity = prefs.getString("surface_intensity", "soft_tint") ?: "soft_tint"
-        if (currentIntensity == "strong_tint" && newAccent != "purple" && newAccent != "deep_purple" && newAccent != "royal_purple" && newAccent != "amethyst" && newAccent != "lavender" && newAccent != "teal" && newAccent != "pink" && newAccent != "indigo" && newAccent != "cyan" && newAccent != "amber" && newAccent != "mint" && newAccent != "crimson" && newAccent != "slate" && newAccent != "graphite" && newAccent != "obsidian" && newAccent != "onyx" && newAccent != "coral" && newAccent != "midnight" && newAccent != "sepia" && newAccent != "forest" && newAccent != "plum" && newAccent != "sand" && newAccent != "ruby" && newAccent != "sky" && newAccent != "charcoal" && newAccent != "peach" && newAccent != "emerald" && newAccent != "blue" && newAccent != "yellow" && newAccent != "lemon" && newAccent != "gold" && newAccent != "red" && newAccent != "green" && newAccent != "orange" && newAccent != "deep_orange" && newAccent != "tangerine" && newAccent != "apricot" && newAccent != "copper" && newAccent != "scarlet" && newAccent != "lime" && newAccent != "olive" && newAccent != "default" && newAccent != "material_you" && newAccent != "violet" && newAccent != "titanium" && newAccent != "azure" && newAccent != "mustard" && newAccent != "burgundy" && newAccent != "terracotta" && newAccent != "sage") {
-            prefs.edit().putString("surface_intensity", "soft_tint").apply()
-        }
-        captureScreenBitmap()
-        prefs.edit().putString("accent_color", newAccent).commit()
-        window.setWindowAnimations(0)
-        recreate()
-    }
-
-    fun captureAndApplySurfaceIntensity(newIntensity: String) {
-        val prefs = PreferenceManager.getDefaultSharedPreferences(this)
-        val current = prefs.getString("surface_intensity", "soft_tint") ?: "soft_tint"
-        if (current == newIntensity) return
-        captureScreenBitmap()
-        prefs.edit().putString("surface_intensity", newIntensity).commit()
-        window.setWindowAnimations(0)
-        recreate()
-    }
-
-    fun captureAndRecreateForCustomTheme() {
-        captureScreenBitmap()
         window.setWindowAnimations(0)
         recreate()
     }

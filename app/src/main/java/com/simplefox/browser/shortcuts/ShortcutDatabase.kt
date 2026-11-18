@@ -3,7 +3,7 @@ package com.simplefox.browser.shortcuts
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
-import androidx.preference.PreferenceManager
+import com.simplefox.browser.util.PreferenceManager
 import com.simplefox.browser.profiles.WebProfiles
 
 internal class ShortcutDatabase(context: Context) :

@@ -17,7 +17,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.ime
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.imeAnimationTarget
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
@@ -32,16 +33,7 @@ import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.delete
 import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Bookmark
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.DeleteOutline
-import androidx.compose.material.icons.filled.History
-import androidx.compose.material.icons.filled.Mic
-import androidx.compose.material.icons.filled.Public
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.SportsEsports
+import com.simplefox.browser.ui.icons.Icons
 import com.simplefox.browser.ui.foundation.DropdownMenu
 import com.simplefox.browser.ui.foundation.HorizontalDivider
 import com.simplefox.browser.ui.foundation.Icon
@@ -52,7 +44,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.withFrameNanos
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.setValue
@@ -69,6 +63,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.layout.layout
+import androidx.compose.ui.unit.offset
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
@@ -91,13 +87,15 @@ import com.simplefox.browser.ui.listscreen.ListMenuItem
 import com.simplefox.browser.ui.listscreen.PopupShape
 import com.simplefox.browser.ui.rememberClintFavicon
 import com.simplefox.browser.ui.theme.LocalClintColors
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.drop
 
 private val SuggestionContentMaxWidth = 720.dp
-private val SuggestionCardShape = RoundedCornerShape(18.dp)
 
 private data class SuggestionSection(val type: SuggestionType, val items: List<SuggestionItem>)
 
+@OptIn(FlowPreview::class)
 @Composable
 internal fun SearchOverlay(
     initialText: String,
@@ -127,6 +125,8 @@ internal fun SearchOverlay(
     }
 
     LaunchedEffect(Unit) {
+        // The overlay's first composition and the keyboard animation used to start in the same frame.
+        repeat(2) { withFrameNanos { } }
         focusRequester.requestFocus()
         keyboardController?.show()
     }
@@ -134,6 +134,20 @@ internal fun SearchOverlay(
     fun fill(text: String) {
         fieldState.setTextAndPlaceCursorAtEnd(text)
     }
+
+    // The highlight only needs to follow the text once typing pauses; reading the field text in the list
+    // recomposed every suggestion row on each keystroke, on top of the recomposition when results arrive.
+    var highlightQuery by remember { mutableStateOf(initialText.trim()) }
+    LaunchedEffect(fieldState) {
+        snapshotFlow { fieldState.text.toString().trim() }.debounce(90).collect { highlightQuery = it }
+    }
+
+    // Remembered, stable callbacks let unchanged rows skip recomposition.
+    val currentOnSuggestionClick by rememberUpdatedState(onSuggestionClick)
+    val currentOnSuggestionDelete by rememberUpdatedState(onSuggestionDelete)
+    val onRowClick = remember { { item: SuggestionItem -> currentOnSuggestionClick(item.query) } }
+    val onRowFill = remember { { item: SuggestionItem -> fieldState.setTextAndPlaceCursorAtEnd(item.query) } }
+    val onRowDelete = remember { { item: SuggestionItem -> currentOnSuggestionDelete(item.query) } }
 
     val withoutAutoSpaceAfterPeriod = remember {
         InputTransformation {
@@ -156,6 +170,8 @@ internal fun SearchOverlay(
             suggestions.filter { it.type == type }.takeIf { it.isNotEmpty() }?.let { SuggestionSection(type, it) }
         }
     }
+
+    val entries = remember(sections, isBottom) { buildEntries(sections, isBottom) }
 
     val hideKeyboardOnDrag = remember(keyboardController) {
         object : NestedScrollConnection {
@@ -231,28 +247,41 @@ internal fun SearchOverlay(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.fillMaxSize().nestedScroll(hideKeyboardOnDrag)
         ) {
-            items(sections, key = { it.type.name }) { section ->
-                SuggestionSectionCard(
-                    section = section,
-                    query = fieldState.text.toString().trim(),
-                    isBottom = isBottom,
-                    onClick = { onSuggestionClick(it.query) },
-                    onFill = { fill(it.query) },
-                    onDelete = { onSuggestionDelete(it.query) },
-                    modifier = Modifier
-                )
+            items(entries, key = { it.key }, contentType = { it::class }) { entry ->
+                when (entry) {
+                    is SuggestionEntry.Header -> SuggestionSectionTitle(entry.type)
+                    is SuggestionEntry.Row -> SuggestionRowCard(
+                        entry = entry,
+                        query = highlightQuery,
+                        isBottom = isBottom,
+                        onClick = onRowClick,
+                        onFill = onRowFill,
+                        onDelete = onRowDelete
+                    )
+                }
             }
         }
     }
 
-    val bottomInsetPx = maxOf(WindowInsets.ime.getBottom(density), navBarPaddingPx)
+    // Track the keyboard's final height, not its per-frame height. The target changes only when the keyboard starts
+    // to open or close, so the list is re-measured twice instead of on every animation frame.
+    @OptIn(ExperimentalLayoutApi::class)
+    val imeInsets = WindowInsets.imeAnimationTarget
     Surface(color = colors.background, modifier = modifier.fillMaxSize()) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.fillMaxSize().padding(
-                top = with(density) { statusBarPaddingPx.toDp() },
-                bottom = with(density) { bottomInsetPx.toDp() }
-            )
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(top = with(density) { statusBarPaddingPx.toDp() })
+                // Read in the layout phase: only this node is re-measured, never the whole overlay recomposed.
+                .layout { measurable, constraints ->
+                    val bottom = maxOf(imeInsets.getBottom(this), navBarPaddingPx)
+                    val placeable = measurable.measure(constraints.offset(vertical = -bottom))
+                    layout(
+                        placeable.width,
+                        (placeable.height + bottom).coerceIn(constraints.minHeight, constraints.maxHeight)
+                    ) { placeable.place(0, 0) }
+                }
         ) {
             if (isBottom) {
                 Box(modifier = Modifier.weight(1f, fill = true), contentAlignment = Alignment.BottomCenter) { suggestionsList() }
@@ -281,64 +310,107 @@ private fun FieldIconButton(icon: ImageVector, description: String, onClick: () 
     }
 }
 
+private sealed interface SuggestionEntry {
+    val key: String
+
+    data class Header(val type: SuggestionType) : SuggestionEntry {
+        override val key: String get() = "hdr:${type.name}"
+    }
+
+    /** [displayIndex] is the row's position from the top of its card, [count] the rows in that card. */
+    data class Row(val item: SuggestionItem, val displayIndex: Int, val count: Int, override val key: String) : SuggestionEntry
+}
+
+private fun buildEntries(sections: List<SuggestionSection>, isBottom: Boolean): List<SuggestionEntry> {
+    val out = ArrayList<SuggestionEntry>()
+    val seen = HashMap<String, Int>()
+    sections.forEach { section ->
+        val n = section.items.size
+        val rows = section.items.mapIndexed { index, item ->
+            val base = "row:${item.type.name}:${item.query}"
+            val occurrence = (seen[base] ?: 0) + 1
+            seen[base] = occurrence
+            SuggestionEntry.Row(item, if (isBottom) n - 1 - index else index, n, if (occurrence == 1) base else "$base#$occurrence")
+        }
+        // A reversed list is laid out bottom-up, so the title has to come after its rows there.
+        if (isBottom) {
+            out.addAll(rows)
+            out.add(SuggestionEntry.Header(section.type))
+        } else {
+            out.add(SuggestionEntry.Header(section.type))
+            out.addAll(rows)
+        }
+    }
+    return out
+}
+
 @Composable
-private fun SuggestionSectionCard(
-    section: SuggestionSection,
-    query: String,
-    isBottom: Boolean,
-    onClick: (SuggestionItem) -> Unit,
-    onFill: (SuggestionItem) -> Unit,
-    onDelete: (SuggestionItem) -> Unit,
-    modifier: Modifier = Modifier
-) {
+private fun SuggestionSectionTitle(type: SuggestionType) {
     val colors = LocalClintColors.current
     val title = stringResource(
-        when (section.type) {
+        when (type) {
             SuggestionType.CLINT_PAGE -> R.string.suggestion_section_clint
             SuggestionType.BOOKMARK -> R.string.bookmarks_title
             SuggestionType.HISTORY -> R.string.history_title
             SuggestionType.SUGGESTION -> R.string.suggestion_section_search
         }
     )
-    val rows = if (isBottom) section.items.asReversed() else section.items
-
-    Column(
-        modifier = modifier
+    Text(
+        text = title,
+        color = colors.primary,
+        fontSize = 12.sp,
+        fontWeight = FontWeight.SemiBold,
+        letterSpacing = 0.4.sp,
+        modifier = Modifier
             .fillMaxWidth()
             .widthIn(max = SuggestionContentMaxWidth)
-            .padding(vertical = 6.dp)
-    ) {
-        Text(
-            text = title,
-            color = colors.primary,
-            fontSize = 12.sp,
-            fontWeight = FontWeight.SemiBold,
-            letterSpacing = 0.4.sp,
-            modifier = Modifier.padding(start = 14.dp, bottom = 6.dp)
+            .padding(start = 14.dp, top = 6.dp, bottom = 6.dp)
+    )
+}
+
+@Composable
+private fun SuggestionRowCard(
+    entry: SuggestionEntry.Row,
+    query: String,
+    isBottom: Boolean,
+    onClick: (SuggestionItem) -> Unit,
+    onFill: (SuggestionItem) -> Unit,
+    onDelete: (SuggestionItem) -> Unit
+) {
+    val colors = LocalClintColors.current
+    val first = entry.displayIndex == 0
+    val last = entry.displayIndex == entry.count - 1
+    val shape = remember(first, last) {
+        RoundedCornerShape(
+            topStart = if (first) 18.dp else 0.dp,
+            topEnd = if (first) 18.dp else 0.dp,
+            bottomStart = if (last) 18.dp else 0.dp,
+            bottomEnd = if (last) 18.dp else 0.dp
         )
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(SuggestionCardShape)
-                .background(colors.cardBackground)
-        ) {
-            rows.forEachIndexed { index, item ->
-                if (index > 0) {
-                    HorizontalDivider(
-                        color = colors.divider.copy(alpha = 0.5f),
-                        modifier = Modifier.padding(start = 64.dp, end = 16.dp)
-                    )
-                }
-                SuggestionRow(
-                    item = item,
-                    query = query,
-                    isBottom = isBottom,
-                    onClick = { onClick(item) },
-                    onFill = { onFill(item) },
-                    onDelete = { onDelete(item) }
-                )
-            }
+    }
+    val dividerColor = remember(colors.divider) { colors.divider.copy(alpha = 0.5f) }
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .widthIn(max = SuggestionContentMaxWidth)
+            .padding(bottom = if (last) 6.dp else 0.dp)
+            .clip(shape)
+            .background(colors.cardBackground)
+    ) {
+        if (!first) {
+            HorizontalDivider(
+                color = dividerColor,
+                modifier = Modifier.padding(start = 64.dp, end = 16.dp)
+            )
         }
+        SuggestionRow(
+            item = entry.item,
+            query = query,
+            isBottom = isBottom,
+            onClick = onClick,
+            onFill = onFill,
+            onDelete = onDelete
+        )
     }
 }
 
@@ -348,9 +420,9 @@ private fun SuggestionRow(
     item: SuggestionItem,
     query: String,
     isBottom: Boolean,
-    onClick: () -> Unit,
-    onFill: () -> Unit,
-    onDelete: () -> Unit
+    onClick: (SuggestionItem) -> Unit,
+    onFill: (SuggestionItem) -> Unit,
+    onDelete: (SuggestionItem) -> Unit
 ) {
     val colors = LocalClintColors.current
     val isUrl = item.query.startsWith("http://") || item.query.startsWith("https://")
@@ -371,7 +443,7 @@ private fun SuggestionRow(
                 .fillMaxWidth()
                 .heightIn(min = 56.dp)
                 .combinedClickable(
-                    onClick = onClick,
+                    onClick = { onClick(item) },
                     onLongClick = if (canRemove) ({ menuOpen = true }) else null,
                     onLongClickLabel = if (canRemove) removeLabel else null
                 )
@@ -385,8 +457,9 @@ private fun SuggestionRow(
                 contentAlignment = Alignment.Center
             ) {
                 if (favicon != null) {
+                    val faviconImage = remember(favicon) { favicon.asImageBitmap() }
                     Image(
-                        bitmap = favicon.asImageBitmap(),
+                        bitmap = faviconImage,
                         contentDescription = null,
                         modifier = Modifier.size(20.dp).clip(RoundedCornerShape(4.dp))
                     )
@@ -428,7 +501,7 @@ private fun SuggestionRow(
                 }
             }
 
-            IconButton(onClick = onFill) {
+            IconButton(onClick = { onFill(item) }) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = stringResource(R.string.suggestion_fill_desc),
@@ -448,7 +521,7 @@ private fun SuggestionRow(
             ) {
                 ListMenuItem(Icons.Filled.DeleteOutline, removeLabel, checked = false) {
                     menuOpen = false
-                    onDelete()
+                    onDelete(item)
                 }
             }
         }

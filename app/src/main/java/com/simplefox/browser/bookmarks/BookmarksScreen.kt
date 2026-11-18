@@ -1,17 +1,4 @@
 package com.simplefox.browser.bookmarks
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.BookmarkAdd
-import androidx.compose.material.icons.filled.Checklist
-import androidx.compose.material.icons.filled.ChevronRight
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.CreateNewFolder
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Folder
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.Public
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.automirrored.filled.Sort
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 
 import com.simplefox.browser.R
 
@@ -332,7 +319,7 @@ private fun BookmarksBreadcrumb(
         )
         path.forEachIndexed { index, folder ->
             Icon(
-                androidx.compose.material.icons.Icons.Filled.ChevronRight, contentDescription = null,
+                com.simplefox.browser.ui.icons.Icons.Filled.ChevronRight, contentDescription = null,
                 tint = colors.secondaryText, modifier = Modifier.size(16.dp).padding(horizontal = 2.dp)
             )
             val isLast = index == path.lastIndex
@@ -362,11 +349,11 @@ private fun BookmarksToolbar(
     val colors = LocalClintColors.current
     val showToolbarIcons = !state.isInSelectionMode && !state.isSearchMode
 
-    Surface(color = colors.surface, shadowElevation = 4.dp, modifier = Modifier.statusBarsPadding()) {
+    Surface(color = colors.surface, modifier = Modifier.statusBarsPadding()) {
         Row(Modifier.fillMaxWidth().height(56.dp).padding(horizontal = 4.dp), verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = onBack) {
                 Icon(
-                    if (state.isInSelectionMode) androidx.compose.material.icons.Icons.Filled.Close else androidx.compose.material.icons.Icons.AutoMirrored.Filled.ArrowBack,
+                    if (state.isInSelectionMode) com.simplefox.browser.ui.icons.Icons.Filled.Close else com.simplefox.browser.ui.icons.Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = stringResource(if (state.isInSelectionMode) R.string.history_cancel_selection_desc else R.string.back),
                     tint = colors.onSurface
                 )
@@ -390,11 +377,11 @@ private fun BookmarksToolbar(
 
             if (showToolbarIcons) {
                 IconButton(onClick = { state.isSearchMode = true }) {
-                    Icon(androidx.compose.material.icons.Icons.Filled.Search, contentDescription = stringResource(R.string.bookmarks_search), tint = colors.iconTint)
+                    Icon(com.simplefox.browser.ui.icons.Icons.Filled.Search, contentDescription = stringResource(R.string.bookmarks_search), tint = colors.iconTint)
                 }
                 Box {
                     IconButton(onClick = { state.sortMenuOpen = true }) {
-                        Icon(androidx.compose.material.icons.Icons.AutoMirrored.Filled.Sort, contentDescription = stringResource(R.string.history_sort), tint = colors.primary)
+                        Icon(com.simplefox.browser.ui.icons.Icons.AutoMirrored.Filled.Sort, contentDescription = stringResource(R.string.history_sort), tint = colors.primary)
                     }
                     BookmarksSortMenu(
                         expanded = state.sortMenuOpen,
@@ -409,7 +396,7 @@ private fun BookmarksToolbar(
                 }
                 Box {
                     IconButton(onClick = { state.moreMenuOpen = true }) {
-                        Icon(androidx.compose.material.icons.Icons.Filled.MoreVert, contentDescription = stringResource(R.string.history_more_options), tint = colors.iconTint)
+                        Icon(com.simplefox.browser.ui.icons.Icons.Filled.MoreVert, contentDescription = stringResource(R.string.history_more_options), tint = colors.iconTint)
                     }
                     BookmarksMoreMenu(
                         expanded = state.moreMenuOpen,
@@ -422,7 +409,7 @@ private fun BookmarksToolbar(
             if (state.isInSelectionMode) {
                 Box {
                     IconButton(onClick = { state.selectionOptionsMenuOpen = true }) {
-                        Icon(androidx.compose.material.icons.Icons.Filled.Checklist, contentDescription = stringResource(R.string.history_more_options), tint = colors.primary)
+                        Icon(com.simplefox.browser.ui.icons.Icons.Filled.Checklist, contentDescription = stringResource(R.string.history_more_options), tint = colors.primary)
                     }
                     BookmarksSelectionOptionsMenu(
                         expanded = state.selectionOptionsMenuOpen,
@@ -433,7 +420,7 @@ private fun BookmarksToolbar(
                 }
                 Box {
                     IconButton(onClick = { state.selectionItemOptionsMenuOpen = true }) {
-                        Icon(androidx.compose.material.icons.Icons.Filled.MoreVert, contentDescription = stringResource(R.string.history_more_options), tint = colors.primary)
+                        Icon(com.simplefox.browser.ui.icons.Icons.Filled.MoreVert, contentDescription = stringResource(R.string.history_more_options), tint = colors.primary)
                     }
                     BookmarksSelectionItemOptionsMenu(
                         expanded = state.selectionItemOptionsMenuOpen,
@@ -471,7 +458,7 @@ private fun FolderRow(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Box(Modifier.size(40.dp).clip(CircleShape).background(colors.surfaceVariant), contentAlignment = Alignment.Center) {
-            Icon(androidx.compose.material.icons.Icons.Filled.Folder, contentDescription = null, tint = colors.iconTint, modifier = Modifier.size(20.dp))
+            Icon(com.simplefox.browser.ui.icons.Icons.Filled.Folder, contentDescription = null, tint = colors.iconTint, modifier = Modifier.size(20.dp))
         }
         Column(Modifier.weight(1f).padding(start = 12.dp)) {
             Text(
@@ -514,7 +501,7 @@ private fun BookmarkRow(
             if (favicon != null) {
                 Image(bitmap = favicon.asImageBitmap(), contentDescription = null, modifier = Modifier.size(22.dp))
             } else {
-                Icon(androidx.compose.material.icons.Icons.Filled.Public, contentDescription = null, tint = colors.iconTint, modifier = Modifier.size(20.dp))
+                Icon(com.simplefox.browser.ui.icons.Icons.Filled.Public, contentDescription = null, tint = colors.iconTint, modifier = Modifier.size(20.dp))
             }
         }
         Column(Modifier.weight(1f).padding(start = 12.dp)) {
@@ -564,7 +551,7 @@ private fun BoxScope.BookmarksFabMenu(
             containerColor = colors.buttonBackground, contentColor = colors.buttonIconTint,
             modifier = Modifier.align(Alignment.BottomEnd).navigationBarsPadding().padding(bottom = 24.dp, end = 20.dp)
         ) {
-            Icon(androidx.compose.material.icons.Icons.Filled.Delete, contentDescription = stringResource(R.string.bookmarks_delete_selected_desc))
+            Icon(com.simplefox.browser.ui.icons.Icons.Filled.Delete, contentDescription = stringResource(R.string.bookmarks_delete_selected_desc))
         }
     }
 
@@ -575,9 +562,9 @@ private fun BoxScope.BookmarksFabMenu(
             enter = fadeIn(), exit = fadeOut()
         ) {
             Column(horizontalAlignment = Alignment.End) {
-                FabMenuPill(text = stringResource(R.string.bookmarks_fab_add_folder), icon = androidx.compose.material.icons.Icons.Filled.CreateNewFolder, onClick = onAddFolderClick)
+                FabMenuPill(text = stringResource(R.string.bookmarks_fab_add_folder), icon = com.simplefox.browser.ui.icons.Icons.Filled.CreateNewFolder, onClick = onAddFolderClick)
                 Spacer(Modifier.height(10.dp))
-                FabMenuPill(text = stringResource(R.string.bookmarks_fab_add_bookmark), icon = androidx.compose.material.icons.Icons.Filled.BookmarkAdd, onClick = onAddBookmarkClick)
+                FabMenuPill(text = stringResource(R.string.bookmarks_fab_add_bookmark), icon = com.simplefox.browser.ui.icons.Icons.Filled.BookmarkAdd, onClick = onAddBookmarkClick)
             }
         }
 
@@ -587,7 +574,7 @@ private fun BoxScope.BookmarksFabMenu(
             modifier = Modifier.align(Alignment.BottomEnd).navigationBarsPadding().padding(bottom = 24.dp, end = 20.dp)
         ) {
             Icon(
-                androidx.compose.material.icons.Icons.Filled.Add,
+                com.simplefox.browser.ui.icons.Icons.Filled.Add,
                 contentDescription = stringResource(R.string.bookmarks_add_fab_desc),
                 modifier = Modifier.rotate(rotation)
             )

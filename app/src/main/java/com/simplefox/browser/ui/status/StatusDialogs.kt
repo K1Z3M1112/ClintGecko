@@ -1,11 +1,6 @@
 package com.simplefox.browser.ui.status
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ContentCopy
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.RestartAlt
-import androidx.compose.material.icons.filled.Share
-import androidx.compose.material.icons.filled.Update
+import com.simplefox.browser.ui.icons.Icons
 import com.simplefox.browser.ui.foundation.DropdownMenu
 import com.simplefox.browser.ui.foundation.HorizontalDivider
 import androidx.compose.runtime.Composable
@@ -14,20 +9,6 @@ import com.simplefox.browser.R
 import com.simplefox.browser.ui.listscreen.ListMenuItem
 import com.simplefox.browser.ui.listscreen.PopupShape
 import com.simplefox.browser.ui.theme.LocalClintColors
-
-data class UpdateProgressUi(
-    val title: String,
-    val totalCount: Int,
-    val processedCount: Int = 0,
-    val statusText: String = "",
-    val currentListName: String = ""
-)
-
-data class UpdateResultUi(
-    val title: String,
-    val message: String,
-    val onCompile: (() -> Unit)? = null
-)
 
 fun formatElapsedSeconds(totalSeconds: Long): String {
     val m = totalSeconds / 60L

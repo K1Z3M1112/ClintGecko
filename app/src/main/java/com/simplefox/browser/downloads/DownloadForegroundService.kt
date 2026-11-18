@@ -7,8 +7,12 @@ import android.content.Intent
 import android.content.pm.ServiceInfo
 import android.os.Build
 import android.os.PowerManager
-import androidx.lifecycle.LifecycleService
-import androidx.lifecycle.lifecycleScope
+import android.app.Service
+import android.os.IBinder
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import com.simplefox.browser.util.LocaleHelper
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -17,7 +21,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
-class DownloadForegroundService : LifecycleService() {
+class DownloadForegroundService : Service() {
 
     companion object {
         internal const val FOREGROUND_ID = 9001
@@ -67,6 +71,9 @@ class DownloadForegroundService : LifecycleService() {
     private var wakeLock: PowerManager.WakeLock? = null
     private var currentType = -1
     private var stateJob: Job? = null
+    private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
+
+    override fun onBind(intent: Intent?): IBinder? = null
 
     private fun promote(notification: Notification, type: Int): Boolean = runCatching {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -102,11 +109,11 @@ class DownloadForegroundService : LifecycleService() {
     override fun onDestroy() {
         wakeLock?.let { if (it.isHeld) it.release() }
         wakeLock = null
+        serviceScope.cancel()
         super.onDestroy()
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        super.onStartCommand(intent, flags, startId)
         val notification = DownloadNotificationHelper.buildSummaryNotification(this, ClintDownloadManager.activeCount())
         val initialType = typeFor(ClintDownloadManager.downloadsFlow.value)
         if (!promote(notification, initialType) && !promote(notification, typeFor(emptyList()))) {
@@ -119,7 +126,7 @@ class DownloadForegroundService : LifecycleService() {
         wakeLock?.let { if (!it.isHeld) it.acquire(WAKE_LOCK_TIMEOUT_MS) }
 
         if (stateJob?.isActive == true) return START_STICKY
-        stateJob = lifecycleScope.launch {
+        stateJob = serviceScope.launch {
             ClintDownloadManager.init(applicationContext).join()
             ClintDownloadManager.downloadsFlow
                 .map { list ->

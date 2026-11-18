@@ -1,7 +1,7 @@
 package com.simplefox.browser.media
 
 import android.content.Context
-import androidx.preference.PreferenceManager
+import com.simplefox.browser.util.PreferenceManager
 
 object MediaPlaybackSettings {
     const val PREF_BACKGROUND_PLAYBACK = "background_playback_enabled"

@@ -1,30 +1,9 @@
 package com.simplefox.browser.settings.browser
 import com.simplefox.browser.browser.home.HOMEPAGE_SEARCH_ENGINE
 import com.simplefox.browser.browser.home.HOMEPAGE_CUSTOM
-import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Headphones
-import androidx.compose.material.icons.filled.Tune
-import androidx.compose.material.icons.filled.AutoDelete
 import com.simplefox.browser.tabs.InactiveTabsPolicy
-import androidx.compose.material.icons.filled.BrightnessHigh
-import androidx.compose.material.icons.filled.Gradient
-import androidx.compose.material.icons.filled.Apps
-import androidx.compose.material.icons.filled.Bookmark
-import androidx.compose.material.icons.filled.History
-import androidx.compose.material.icons.filled.Image
 import com.simplefox.browser.browser.home.HOMEPAGE_DESIGN_GRADIENT
 import com.simplefox.browser.browser.home.HOMEPAGE_DESIGN_IMAGE
-import androidx.compose.material.icons.automirrored.filled.ManageSearch
-import androidx.compose.material.icons.filled.Extension
-import androidx.compose.material.icons.filled.DesktopWindows
-import androidx.compose.material.icons.automirrored.filled.AddToHomeScreen
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Shield
-import androidx.compose.material.icons.filled.Translate
-import androidx.compose.material.icons.filled.Restore
-import androidx.compose.material.icons.filled.VerticalAlignCenter
-import androidx.compose.material.icons.filled.VisibilityOff
 
 import com.simplefox.browser.ui.ClintSwitch
 import androidx.compose.runtime.Composable
@@ -152,21 +131,21 @@ fun BrowserSettingsScreen(
         SettingsSectionLabel(stringResource(R.string.pref_category_search))
         SettingsSection(colors.cardBackground) {
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.Search,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.Search,
                 title = stringResource(R.string.search_engine),
                 summary = engineSummaryText(state.searchEngine, state.customSearchEngineName),
                 colors = colors,
                 onClick = { state.searchEngineDialogOpen = true }
             )
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.AutoMirrored.Filled.ManageSearch,
+                icon = com.simplefox.browser.ui.icons.Icons.AutoMirrored.Filled.ManageSearch,
                 title = stringResource(R.string.search_suggestions_api),
                 summary = if (state.searchSuggestionsApi == "off") stringResource(R.string.suggestions_api_off) else engineSummaryText(state.searchSuggestionsApi, state.customSearchSuggestionsApiName),
                 colors = colors,
                 onClick = { state.searchSuggestionsApiDialogOpen = true }
             )
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.History,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.History,
                 title = stringResource(R.string.suggestions_show_history_title),
                 summary = stringResource(R.string.suggestions_show_history_summary),
                 colors = colors,
@@ -176,7 +155,7 @@ fun BrowserSettingsScreen(
                 }
             )
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.Bookmark,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.Bookmark,
                 title = stringResource(R.string.suggestions_show_bookmarks_title),
                 summary = stringResource(R.string.suggestions_show_bookmarks_summary),
                 colors = colors,
@@ -190,14 +169,14 @@ fun BrowserSettingsScreen(
         SettingsSectionLabel(stringResource(R.string.pref_category_homepage))
         SettingsSection(colors.cardBackground) {
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.Home,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.Home,
                 title = stringResource(R.string.homepage_title),
                 summary = homepageSummaryText(state.homepage, state.homepageCustomUrl),
                 colors = colors,
                 onClick = { state.homepageDialogOpen = true }
             )
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.Gradient,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.Gradient,
                 title = stringResource(R.string.homepage_design_title),
                 summary = homepageDesignSummaryText(state.homepageDesign),
                 colors = colors,
@@ -206,7 +185,7 @@ fun BrowserSettingsScreen(
             )
             if (state.homepageDesign == HOMEPAGE_DESIGN_IMAGE) {
                 SettingsRow(
-                    icon = androidx.compose.material.icons.Icons.Filled.Image,
+                    icon = com.simplefox.browser.ui.icons.Icons.Filled.Image,
                     title = stringResource(R.string.homepage_image_title),
                     summary = stringResource(R.string.homepage_image_summary),
                     colors = colors,
@@ -214,7 +193,7 @@ fun BrowserSettingsScreen(
                     onClick = { if (homepageOptionsEnabled) onHomepageImageRowClicked() }
                 )
                 SettingsRow(
-                    icon = androidx.compose.material.icons.Icons.Filled.BrightnessHigh,
+                    icon = com.simplefox.browser.ui.icons.Icons.Filled.BrightnessHigh,
                     title = stringResource(R.string.homepage_image_full_brightness_title),
                     summary = stringResource(R.string.homepage_image_full_brightness_summary),
                     colors = colors,
@@ -226,7 +205,7 @@ fun BrowserSettingsScreen(
                 )
             }
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.Apps,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.Apps,
                 title = stringResource(R.string.homepage_show_quick_actions_title),
                 summary = stringResource(R.string.homepage_show_quick_actions_summary),
                 colors = colors,
@@ -237,7 +216,7 @@ fun BrowserSettingsScreen(
                 }
             )
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.Bookmark,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.Bookmark,
                 title = stringResource(R.string.homepage_show_favorites_title),
                 summary = stringResource(R.string.homepage_show_favorites_summary),
                 colors = colors,
@@ -248,7 +227,7 @@ fun BrowserSettingsScreen(
                 }
             )
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.History,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.History,
                 title = stringResource(R.string.homepage_show_recent_title),
                 summary = stringResource(R.string.homepage_show_recent_summary),
                 colors = colors,
@@ -259,7 +238,7 @@ fun BrowserSettingsScreen(
                 }
             )
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.VerticalAlignCenter,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.VerticalAlignCenter,
                 title = stringResource(R.string.homepage_center_content_title),
                 summary = stringResource(R.string.homepage_center_content_summary),
                 colors = colors,
@@ -274,7 +253,7 @@ fun BrowserSettingsScreen(
         SettingsSectionLabel(stringResource(R.string.pref_category_tabs))
         SettingsSection(colors.cardBackground) {
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.AutoDelete,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.AutoDelete,
                 title = stringResource(R.string.delete_inactive_tabs_title),
                 summary = deleteInactiveTabsSummaryText(state.deleteInactiveTabs),
                 colors = colors,
@@ -285,7 +264,7 @@ fun BrowserSettingsScreen(
         SettingsSectionLabel(stringResource(R.string.pref_category_web_content))
         SettingsSection(colors.cardBackground) {
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.DesktopWindows,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.DesktopWindows,
                 title = stringResource(R.string.javascript_enabled),
                 summary = stringResource(R.string.javascript_enabled_summary),
                 colors = colors,
@@ -295,7 +274,7 @@ fun BrowserSettingsScreen(
                 }
             )
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.Headphones,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.Headphones,
                 title = stringResource(R.string.background_playback_title),
                 summary = stringResource(R.string.background_playback_summary),
                 colors = colors,
@@ -309,28 +288,28 @@ fun BrowserSettingsScreen(
         SettingsSectionLabel(stringResource(R.string.pref_category_tools))
         SettingsSection(colors.cardBackground) {
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.Translate,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.Translate,
                 title = stringResource(R.string.translation_settings_title),
                 summary = stringResource(R.string.translation_settings_summary),
                 colors = colors,
                 onClick = onTranslationsRowClicked
             )
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.Extension,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.Extension,
                 title = stringResource(R.string.ext_title),
                 summary = stringResource(R.string.ext_settings_summary),
                 colors = colors,
                 onClick = onExtensionsRowClicked
             )
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.AccountCircle,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.AccountCircle,
                 title = stringResource(R.string.profiles_title),
                 summary = stringResource(R.string.profiles_settings_summary),
                 colors = colors,
                 onClick = onProfilesRowClicked
             )
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.AutoMirrored.Filled.AddToHomeScreen,
+                icon = com.simplefox.browser.ui.icons.Icons.AutoMirrored.Filled.AddToHomeScreen,
                 title = stringResource(R.string.shortcut_manager_title),
                 summary = stringResource(R.string.shortcut_manager_summary),
                 colors = colors,
@@ -341,7 +320,7 @@ fun BrowserSettingsScreen(
         SettingsSectionLabel(stringResource(R.string.pref_category_protection))
         SettingsSection(colors.cardBackground) {
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.Shield,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.Shield,
                 title = stringResource(R.string.website_blocker_title),
                 summary = stringResource(R.string.website_blocker_settings_summary),
                 colors = colors,
@@ -352,7 +331,7 @@ fun BrowserSettingsScreen(
         SettingsSectionLabel(stringResource(R.string.pref_category_incognito))
         SettingsSection(colors.cardBackground) {
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.Search,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.Search,
                 title = stringResource(R.string.incognito_search_engine_title),
                 summary = if (state.incognitoSearchEngine == com.simplefox.browser.browser.SameAsNormalMode) {
                     stringResource(R.string.search_same_as_normal_summary, engineSummaryText(state.searchEngine, state.customSearchEngineName))
@@ -363,7 +342,7 @@ fun BrowserSettingsScreen(
                 onClick = { state.incognitoSearchEngineDialogOpen = true }
             )
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.AutoMirrored.Filled.ManageSearch,
+                icon = com.simplefox.browser.ui.icons.Icons.AutoMirrored.Filled.ManageSearch,
                 title = stringResource(R.string.incognito_search_suggestions_api_title),
                 summary = when (state.incognitoSearchSuggestionsApi) {
                     com.simplefox.browser.browser.SameAsNormalMode -> stringResource(
@@ -377,7 +356,7 @@ fun BrowserSettingsScreen(
                 onClick = { state.incognitoSearchSuggestionsApiDialogOpen = true }
             )
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.VisibilityOff,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.VisibilityOff,
                 title = stringResource(R.string.incognito_search_history_title),
                 summary = stringResource(R.string.incognito_search_history_summary),
                 colors = colors,
@@ -387,7 +366,7 @@ fun BrowserSettingsScreen(
                 }
             )
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.Restore,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.Restore,
                 title = stringResource(R.string.remember_browsing_mode_title),
                 summary = stringResource(R.string.remember_browsing_mode_summary),
                 colors = colors,
@@ -401,7 +380,7 @@ fun BrowserSettingsScreen(
         SettingsSectionLabel(stringResource(R.string.settings_group_advanced))
         SettingsSection(colors.cardBackground) {
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.Tune,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.Tune,
                 title = stringResource(R.string.about_config_title),
                 summary = stringResource(R.string.about_config_summary),
                 colors = colors,

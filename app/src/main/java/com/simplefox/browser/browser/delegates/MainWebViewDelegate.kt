@@ -7,7 +7,6 @@ import com.simplefox.browser.browser.MainActivity
 
 import android.annotation.SuppressLint
 import com.simplefox.browser.downloads.DownloadFilenameResolver
-import com.simplefox.browser.mediacapture.MEDIA_CAPTURE_ENABLED_PREF
 import com.simplefox.browser.tabs.BrowserTab
 import com.simplefox.browser.profiles.WebProfiles
 import com.simplefox.browser.util.registeredDomain
@@ -113,17 +112,12 @@ internal fun MainActivity.buildRequestConfig(): org.json.JSONObject {
         .put("scripts", prefs.getBoolean("data_saver_block_scripts", false))
         .put("css", prefs.getBoolean("data_saver_block_css", false))
         .put("header", prefs.getBoolean("data_saver_send_header", true))
-        .put("cache", prefs.getBoolean("data_saver_cache_first", false))
+        .put("cache", prefs.getBoolean("data_saver_cache_first", true))
         .put("skip", skip)
     return org.json.JSONObject()
-        .put("media", prefs.getBoolean(MEDIA_CAPTURE_ENABLED_PREF, true))
         .put("dnt", isDoNotTrackActive())
         .put("ds", dataSaver)
 }
-
-internal fun MainActivity.installServiceWorkerMediaCapture() {}
-
-internal fun MainActivity.buildDesktopHeaders(): Map<String, String>? = null
 
 internal fun MainActivity.loadDataSaverJs(filename: String): String =
     "(function(){try{var hs=[location.hostname];if(window!==window.top&&document.referrer){hs.push(new URL(document.referrer).hostname);}var b=window.ClintDataSaverBridge;if(b){for(var i=0;i<hs.length;i++){if(b.isExcepted(hs[i])){return;}}}}catch(e){}\n" +
@@ -134,6 +128,13 @@ internal fun MainActivity.isDataSaverBlockActive(): Boolean =
 
 internal fun MainActivity.addDataSaverMediaScript(tab: BrowserTab? = null) {
     ClintGecko.setScript("ds_media", if (isDataSaverBlockActive()) loadDataSaverJs("data_saver_media.js") else null)
+}
+
+internal fun MainActivity.isDataSaverEffectsActive(): Boolean =
+    DataSaverMode.isActive(prefs) && prefs.getBoolean("data_saver_reduce_effects", true)
+
+internal fun MainActivity.addDataSaverEffectsScript(tab: BrowserTab? = null) {
+    ClintGecko.setScript("ds_effects", if (isDataSaverEffectsActive()) loadDataSaverJs("data_saver_effects.js") else null)
 }
 
 internal fun MainActivity.isDoNotTrackActive(): Boolean =
@@ -164,12 +165,7 @@ internal fun MainActivity.buildUserAgent(): String {
 
 internal fun MainActivity.applyWebDarkMode(webView: ClintWebView) {
     val theme = prefs.getString("app_theme", "system") ?: "system"
-    val chrome = com.simplefox.browser.customtheme.resolveThemeChrome(
-        this,
-        if (ThemeMode.isLight(theme)) "light" else "dark",
-        prefs.getString("accent_color", "material_you") ?: "material_you",
-        prefs.getString("surface_intensity", "soft_tint") ?: "soft_tint"
-    )
+    val chrome = com.simplefox.browser.ui.theme.resolveThemeChrome(theme)
     webView.setLoadingBackground(chrome.background, true)
     ClintGecko.setDarkMode(
         when {
@@ -339,4 +335,5 @@ internal fun MainActivity.syncGlobalScripts() {
     addAutoplayScript()
     addDoNotTrackScript()
     addDataSaverMediaScript()
+    addDataSaverEffectsScript()
 }

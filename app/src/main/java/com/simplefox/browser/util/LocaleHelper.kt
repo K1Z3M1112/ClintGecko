@@ -3,7 +3,6 @@ package com.simplefox.browser.util
 import android.content.Context
 import android.content.res.Configuration
 import android.content.res.Resources
-import androidx.preference.PreferenceManager
 import java.util.Locale
 
 object LocaleHelper {
@@ -20,11 +19,14 @@ object LocaleHelper {
 
     private val SUPPORTED_LANGUAGE_TAGS = listOf(LANGUAGE_ENGLISH, LANGUAGE_FILIPINO, LANGUAGE_HINDI, LANGUAGE_INDONESIAN, LANGUAGE_PORTUGUESE_BRAZIL, LANGUAGE_RUSSIAN, LANGUAGE_SPANISH)
 
-    fun wrapContext(context: Context): Context {
+    fun wrapContext(context: Context, nightModeOverride: Int = 0): Context {
         val locale = resolveEffectiveLocale(context)
         Locale.setDefault(locale)
         val config = Configuration()
+        // Configuration() defaults fontScale to 1f, which would override the user's system font size.
+        config.fontScale = 0f
         config.setLocale(locale)
+        if (nightModeOverride != 0) config.uiMode = nightModeOverride
         return context.createConfigurationContext(config)
     }
 

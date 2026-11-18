@@ -28,13 +28,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Extension
-import androidx.compose.material.icons.filled.Folder
-import androidx.compose.material.icons.filled.Link
-import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material.icons.filled.Storefront
+import com.simplefox.browser.ui.icons.Icons
 import com.simplefox.browser.ui.foundation.CircularProgressIndicator
 import com.simplefox.browser.ui.foundation.HorizontalDivider
 import com.simplefox.browser.ui.foundation.Icon
@@ -149,7 +143,7 @@ fun ExtensionsScreen(
                 }
             }
             HorizontalDivider(color = colors.divider, thickness = 1.dp)
-            Surface(color = colors.surface, shadowElevation = 4.dp, modifier = Modifier.navigationBarsPadding()) {
+            Surface(color = colors.surface, modifier = Modifier.navigationBarsPadding()) {
                 Row(
                     Modifier.fillMaxWidth().height(56.dp).padding(start = 4.dp, end = 8.dp),
                     verticalAlignment = Alignment.CenterVertically
@@ -387,7 +381,11 @@ private fun ExtensionCard(info: ExtensionInfo, onClick: () -> Unit) {
                         if (busy) {
                             CircularProgressIndicator(Modifier.size(22.dp), strokeWidth = 2.5.dp, color = colors.primary)
                         } else {
-                            ClintSwitch(checked = info.enabled)
+                            ClintSwitch(
+                                checked = info.enabled,
+                                enabled = info.canToggle,
+                                onCheckedChange = { ClintExtensions.setEnabled(info, !info.enabled) }
+                            )
                         }
                     }
                 }

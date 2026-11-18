@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.USE_BIOMETRIC" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="29" />
@@ -61,7 +62,7 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.AppCompat.DayNight.NoActionBar"
+        android:theme="@style/Theme.Clint"
         android:hardwareAccelerated="true"
         android:largeHeap="true"
         android:usesCleartextTraffic="true">
@@ -90,7 +91,6 @@
                 <data android:scheme="http" />
                 <data android:scheme="https" />
                 <data android:scheme="about" />
-                <data android:scheme="javascript" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -116,12 +116,6 @@
             android:excludeFromRecents="true"
             android:noHistory="true"
             android:theme="@android:style/Theme.Translucent.NoTitleBar" />
-
-        <activity
-            android:name=".mediacapture.VideoPreviewActivity"
-            android:exported="false"
-            android:configChanges="uiMode|screenSize|smallestScreenSize|screenLayout|orientation"
-            android:parentActivityName=".browser.MainActivity" />
 
         <activity
             android:name=".settings.SettingsActivity"
@@ -175,12 +169,6 @@
 
         <activity
             android:name=".extensions.ExtensionsActivity"
-            android:exported="false"
-            android:configChanges="uiMode|screenSize|smallestScreenSize|screenLayout|orientation"
-            android:parentActivityName=".settings.SettingsActivity" />
-
-        <activity
-            android:name=".customtheme.CustomThemesActivity"
             android:exported="false"
             android:configChanges="uiMode|screenSize|smallestScreenSize|screenLayout|orientation"
             android:parentActivityName=".settings.SettingsActivity" />
@@ -265,6 +253,10 @@
             android:exported="false" />
 
         <receiver
+            android:name=".downloads.DownloadScheduleReceiver"
+            android:exported="false" />
+
+        <receiver
             android:name=".privacy.IncognitoCloseReceiver"
             android:exported="false" />
 
@@ -300,12 +292,6 @@
             android:name=".media.MediaPlaybackService"
             android:exported="false"
             android:foregroundServiceType="mediaPlayback" />
-
-        <!-- WorkManager runs DownloadScheduleWorker's setForeground() promotion through its own
-             internal service, so that service needs the same type declared here too. -->
-        <service
-            android:name="androidx.work.impl.foreground.SystemForegroundService"
-            android:foregroundServiceType="dataSync|mediaProcessing" />
 
     </application>
 

@@ -19,7 +19,7 @@ internal class SuggestionFetcher {
         .build()
 
     private val handler = Handler(Looper.getMainLooper())
-    private var pendingCall: Call? = null
+    @Volatile private var pendingCall: Call? = null
 
     fun fetch(query: String, provider: String = "duckduckgo", customUrl: String? = null, onResult: (List<String>) -> Unit) {
         pendingCall?.cancel()

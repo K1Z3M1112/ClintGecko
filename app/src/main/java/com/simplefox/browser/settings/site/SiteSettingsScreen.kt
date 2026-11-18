@@ -1,12 +1,4 @@
 package com.simplefox.browser.settings.site
-import androidx.compose.material.icons.automirrored.filled.OpenInNew
-import androidx.compose.material.icons.filled.ContentPaste
-import androidx.compose.material.icons.filled.DataSaverOff
-import androidx.compose.material.icons.filled.DesktopWindows
-import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.Mic
-import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.filled.Videocam
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
@@ -38,7 +30,7 @@ fun SiteSettingsScreen(
         SettingsSectionLabel(stringResource(R.string.site_section_permissions))
         SettingsSection(colors.cardBackground) {
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.Videocam,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.Videocam,
                 title = stringResource(R.string.site_settings_camera),
                 summary = stringResource(permissionSummaryRes(state.cameraBehavior)),
                 colors = colors,
@@ -46,7 +38,7 @@ fun SiteSettingsScreen(
             )
             RowDivider(colors.divider)
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.Mic,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.Mic,
                 title = stringResource(R.string.site_settings_mic),
                 summary = stringResource(permissionSummaryRes(state.micBehavior)),
                 colors = colors,
@@ -54,7 +46,7 @@ fun SiteSettingsScreen(
             )
             RowDivider(colors.divider)
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.LocationOn,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.LocationOn,
                 title = stringResource(R.string.site_settings_location),
                 summary = stringResource(permissionSummaryRes(state.locationBehavior)),
                 colors = colors,
@@ -62,7 +54,7 @@ fun SiteSettingsScreen(
             )
             RowDivider(colors.divider)
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.Notifications,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.Notifications,
                 title = stringResource(R.string.site_settings_notifications),
                 summary = stringResource(permissionSummaryRes(state.notificationsBehavior)),
                 colors = colors,
@@ -70,7 +62,7 @@ fun SiteSettingsScreen(
             )
             RowDivider(colors.divider)
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.ContentPaste,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.ContentPaste,
                 title = stringResource(R.string.site_settings_clipboard),
                 summary = stringResource(permissionSummaryRes(state.clipboardBehavior)),
                 colors = colors,
@@ -81,7 +73,7 @@ fun SiteSettingsScreen(
         SettingsSectionLabel(stringResource(R.string.site_section_open_in_app))
         SettingsSection(colors.cardBackground) {
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.AutoMirrored.Filled.OpenInNew,
+                icon = com.simplefox.browser.ui.icons.Icons.AutoMirrored.Filled.OpenInNew,
                 title = stringResource(R.string.site_settings_open_in_app),
                 summary = stringResource(openInAppSummaryRes(state.openInAppBehavior)),
                 colors = colors,
@@ -92,7 +84,7 @@ fun SiteSettingsScreen(
         SettingsSectionLabel(stringResource(R.string.site_section_desktop_mode))
         SettingsSection(colors.cardBackground) {
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.DesktopWindows,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.DesktopWindows,
                 title = stringResource(R.string.site_settings_desktop_mode),
                 summary = stringResource(
                     if (state.desktopModeSaveState == DesktopModeActivity.VALUE_DO_NOT_SAVE)
@@ -108,7 +100,7 @@ fun SiteSettingsScreen(
         SettingsSectionLabel(stringResource(R.string.site_section_data_saver))
         SettingsSection(colors.cardBackground) {
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.DataSaverOff,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.DataSaverOff,
                 title = stringResource(R.string.data_saver_title),
                 summary = stringResource(R.string.site_settings_data_saver_summary),
                 colors = colors,

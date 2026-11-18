@@ -3,8 +3,8 @@ package com.simplefox.browser.downloads
 import android.app.NotificationManager
 import android.content.Context
 import android.net.Uri
-import androidx.documentfile.provider.DocumentFile
-import androidx.preference.PreferenceManager
+import com.simplefox.browser.util.DocumentFile
+import com.simplefox.browser.util.PreferenceManager
 import com.simplefox.browser.R
 import com.simplefox.browser.downloads.mega.MegaPaths
 import com.simplefox.browser.downloads.mega.MegaSource
@@ -35,7 +35,8 @@ object ClintDownloadManager {
     internal val httpClient: OkHttpClient = OkHttpClient.Builder()
         .connectTimeout(30, TimeUnit.SECONDS)
         .readTimeout(60, TimeUnit.SECONDS)
-        .connectionPool(ConnectionPool(32, 5, TimeUnit.MINUTES))
+        // Pool must cover several parallel downloads (up to 16 connections each) or TLS handshakes get repeated.
+        .connectionPool(ConnectionPool(64, 5, TimeUnit.MINUTES))
         .build()
 
     internal val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
@@ -442,18 +443,12 @@ object ClintDownloadManager {
             DownloadLog.i(updated.id, "QUEUE") { "Starting from queue \u00B7 limit $limit concurrent download(s)" }
             DownloadNotificationHelper.showProgressNotification(context, updated)
             DownloadForegroundService.start(context)
-            if (updated.isStream) launchStreamDownload(context, updated) else launchDownload(context, updated)
+            launchDownload(context, updated)
         }
     }
 
     private fun launchDownload(context: Context, item: DownloadItem) {
         launchWorker(context, item) { ctx, owned -> DownloadWorker.run(ctx, owned) }
-    }
-
-    private fun launchStreamDownload(context: Context, item: DownloadItem) {
-        launchWorker(context, item) { ctx, owned ->
-            com.simplefox.browser.mediacapture.download.StreamDownloadJob.run(ctx, owned)
-        }
     }
 
     private fun launchWorker(context: Context, item: DownloadItem, body: suspend (Context, DownloadItem) -> Unit) {
@@ -510,64 +505,8 @@ object ClintDownloadManager {
             )
         } else item
 
-    fun enqueueStreamFromItem(
-        context: Context,
-        item: DownloadItem,
-        filename: String = item.filename,
-        speedLimitBytesPerSec: Long = item.speedLimitBytesPerSec,
-        locationMode: String = item.locationMode,
-        customLocationUri: String? = item.customLocationUri,
-        categorizeEnabled: Boolean = item.categorizeEnabled,
-        startPaused: Boolean = false
-    ) {
-        val primaryUrl = item.streamVideoUrl.ifBlank { item.url }
-        val request = com.simplefox.browser.mediacapture.download.StreamDownloadRequest(
-            format = if (item.streamFormat == "DASH") com.simplefox.browser.mediacapture.download.StreamContainerFormat.DASH
-            else com.simplefox.browser.mediacapture.download.StreamContainerFormat.HLS,
-            videoUrl = if (item.streamPrimaryIsAudio) null else primaryUrl,
-            audioUrl = if (item.streamPrimaryIsAudio) primaryUrl else item.streamAudioUrl,
-            subtitleUrl = item.streamSubtitleUrl,
-            pageUrl = item.streamPageUrl,
-            referer = item.referer,
-            cookies = item.cookies,
-            userAgent = item.userAgent,
-            filename = filename,
-            headers = item.streamHeaders,
-            estimatedTotalBytes = item.totalBytes.coerceAtLeast(0L),
-            speedLimitBytesPerSec = speedLimitBytesPerSec,
-            concurrentSegments = item.streamConcurrentSegments,
-            noAudio = item.streamNoAudio,
-            isLive = item.streamIsLive,
-            convertTsToMp4 = item.streamConvertTsToMp4,
-            subtitleOnly = item.streamFormat == com.simplefox.browser.mediacapture.download.STREAM_FORMAT_HLS_SUBTITLE,
-            audioLanguage = item.streamAudioLanguage,
-            audioLabel = item.streamAudioLabel
-        )
-        enqueueStream(
-            context = context,
-            request = request,
-            videoWidth = item.streamVideoWidth,
-            videoHeight = item.streamVideoHeight,
-            videoBandwidth = item.streamVideoBandwidth,
-            audioBandwidth = item.streamAudioBandwidth,
-            primaryIsAudio = item.streamPrimaryIsAudio,
-            locationMode = locationMode.ifBlank { null },
-            customLocationUri = customLocationUri,
-            categorizeEnabled = categorizeEnabled,
-            videoRepresentationId = item.streamVideoRepresentationId,
-            audioRepresentationId = item.streamAudioRepresentationId,
-            audioLanguage = item.streamAudioLanguage,
-            audioLabel = item.streamAudioLabel,
-            startPaused = startPaused
-        )
-    }
-
     fun redownloadItem(context: Context, item: DownloadItem) {
         DownloadLog.i(item.id, "USER") { "Redownload requested for ${item.filename}" }
-        if (item.isStream) {
-            enqueueStreamFromItem(context, item)
-            return
-        }
         val mega = item.mega
         if (mega != null) {
             enqueueMega(
@@ -595,124 +534,6 @@ object ClintDownloadManager {
             customLocationUri = item.customLocationUri,
             pageUrl = item.pageUrl
         )
-    }
-
-    fun enqueueStream(
-        context: Context,
-        request: com.simplefox.browser.mediacapture.download.StreamDownloadRequest,
-        videoWidth: Int?,
-        videoHeight: Int?,
-        videoBandwidth: Long?,
-        audioBandwidth: Long?,
-        primaryIsAudio: Boolean = false,
-        locationMode: String? = null,
-        customLocationUri: String? = null,
-        categorizeEnabled: Boolean? = null,
-        videoRepresentationId: String? = null,
-        audioRepresentationId: String? = null,
-        audioLanguage: String? = null,
-        audioLabel: String? = null,
-        startPaused: Boolean = false
-    ) {
-        val prefs = PreferenceManager.getDefaultSharedPreferences(context)
-        val effectiveLocationMode = locationMode
-            ?: prefs.getString(DownloadSettingsKeys.PREF_DOWNLOAD_LOCATION_MODE, DownloadSettingsKeys.MODE_DEFAULT)
-            ?: DownloadSettingsKeys.MODE_DEFAULT
-        val effectiveCustomLocationUri = if (locationMode != null) customLocationUri
-            else prefs.getString(DownloadSettingsKeys.PREF_DOWNLOAD_CUSTOM_URI, null)
-        val effectiveCategorizeEnabled = categorizeEnabled ?: DownloadCategories.isEnabled(context)
-        if (!DownloadFileHelper.isCustomLocationAccessible(context, effectiveLocationMode, effectiveCustomLocationUri)) {
-            promptInvalidLocation(context) {
-                enqueueStream(context, request, videoWidth, videoHeight, videoBandwidth, audioBandwidth, primaryIsAudio, locationMode, customLocationUri, categorizeEnabled, videoRepresentationId, audioRepresentationId, audioLanguage, audioLabel, startPaused)
-            }
-            return
-        }
-        if (requestStoragePermissionIfNeeded(context, effectiveLocationMode) {
-                enqueueStream(context, request, videoWidth, videoHeight, videoBandwidth, audioBandwidth, primaryIsAudio, locationMode, customLocationUri, categorizeEnabled, videoRepresentationId, audioRepresentationId, audioLanguage, audioLabel, startPaused)
-            }
-        ) return
-
-        val id = nextId(context)
-        File(context.filesDir, "stream_downloads/$id").deleteRecursively()
-        val queued = activeCount() >= concurrentLimit(context)
-        val baseItem = DownloadItem(
-            id = id,
-            isIncognito = startedInIncognito(),
-            url = request.videoUrl ?: request.audioUrl ?: "",
-            filename = request.filename,
-            userAgent = request.userAgent,
-            startedAt = System.currentTimeMillis(),
-            status = if (queued) DownloadStatus.QUEUED else DownloadStatus.CONNECTING,
-            locationMode = effectiveLocationMode,
-            customLocationUri = effectiveCustomLocationUri,
-            categorizeEnabled = effectiveCategorizeEnabled,
-            resumable = true,
-            isStream = true,
-            totalBytes = request.estimatedTotalBytes.takeIf { it > 0L } ?: -1L,
-            streamVideoUrl = request.videoUrl ?: request.audioUrl ?: "",
-            streamAudioUrl = if (request.videoUrl != null) request.audioUrl else null,
-            streamSubtitleUrl = request.subtitleUrl,
-            streamFormat = when {
-                request.subtitleOnly -> com.simplefox.browser.mediacapture.download.STREAM_FORMAT_HLS_SUBTITLE
-                request.format == com.simplefox.browser.mediacapture.download.StreamContainerFormat.DASH -> "DASH"
-                else -> "HLS"
-            },
-            streamPageUrl = request.pageUrl,
-            pageUrl = request.pageUrl,
-            referer = request.referer,
-            streamVideoWidth = videoWidth,
-            streamVideoHeight = videoHeight,
-            streamVideoBandwidth = videoBandwidth,
-            streamAudioBandwidth = audioBandwidth,
-            streamPrimaryIsAudio = primaryIsAudio,
-            streamNoAudio = request.noAudio,
-            streamHeaders = request.headers,
-            streamConcurrentSegments = request.concurrentSegments,
-            streamIsLive = request.isLive,
-            streamConvertTsToMp4 = request.convertTsToMp4,
-            streamVideoRepresentationId = videoRepresentationId,
-            streamAudioRepresentationId = audioRepresentationId,
-            streamAudioLanguage = audioLanguage,
-            streamAudioLabel = audioLabel,
-            speedLimitBytesPerSec = request.speedLimitBytesPerSec
-        )
-        val directCustomDir = DownloadFileHelper.resolveDirectCustomDir(context, baseItem)
-        val safMode = directCustomDir == null && DownloadFileHelper.isSafCustomMode(context, baseItem)
-        val rawDestDir = directCustomDir ?: if (safMode) DownloadFileHelper.tempDownloadDir(context) else DownloadFileHelper.resolveDownloadDir()
-        val needsMuxGuess = request.videoUrl != null && request.audioUrl != null
-        val convertsTsGuess = request.convertTsToMp4 && !primaryIsAudio
-        val userExt = request.filename.substringAfterLast('.', "").trim().takeIf { it.isNotBlank() }
-        val guessedExt = userExt ?: when {
-            request.subtitleOnly -> "vtt"
-            needsMuxGuess || convertsTsGuess -> "mp4"
-            primaryIsAudio && request.convertTsToMp4 -> "aac"
-            else -> "ts"
-        }
-        val dot = request.filename.lastIndexOf('.')
-        val guessedBase = if (dot > 0) request.filename.substring(0, dot) else request.filename
-        val guessedFilename = "$guessedBase.$guessedExt"
-        val destDir = if (safMode) rawDestDir else DownloadCategories.resolveDir(effectiveCategorizeEnabled, rawDestDir, guessedFilename)
-        destDir.mkdirs()
-        val previewName = DownloadFileHelper.previewUniqueName(destDir, guessedFilename)
-        val item = baseItem.copy(filename = previewName)
-        if (startPaused) {
-            val paused = item.copy(status = DownloadStatus.PAUSED)
-            DownloadLog.i(id, "USER") { "Added to the list paused" }
-            addNew(paused)
-            persistLater(paused)
-            return
-        }
-        addNew(item)
-
-        if (queued) {
-            DownloadNotificationHelper.showQueuedNotification(context, item)
-            DownloadForegroundService.start(context)
-            return
-        }
-
-        DownloadNotificationHelper.showProgressNotification(context, item)
-        DownloadForegroundService.start(context)
-        launchStreamDownload(context, item)
     }
 
     internal fun withLiveSettings(item: DownloadItem): DownloadItem {
@@ -973,11 +794,11 @@ object ClintDownloadManager {
             waitingForUnmetered = false, waitingForNetwork = false, waitingForCustomSchedule = false,
             status = DownloadStatus.CONNECTING, speedBytesPerSec = 0L
         )
-        DownloadLog.i(updated.id, "START") { "Starting immediately (${if (updated.isStream) "stream" else "direct"} download)" }
+        DownloadLog.i(updated.id, "START") { "Starting immediately (direct download)" }
         record(updated)
         DownloadNotificationHelper.showProgressNotification(context, updated)
         DownloadForegroundService.start(context)
-        if (updated.isStream) launchStreamDownload(context, updated) else launchDownload(context, updated)
+        launchDownload(context, updated)
     }
 
     fun enqueue(
@@ -1325,7 +1146,7 @@ object ClintDownloadManager {
 
     fun updateDownloadUrl(id: Int, newUrl: String, referer: String? = null, cookies: String? = null, pageUrl: String? = null) {
         updateItem(id) { current ->
-            val withUrl = if (current.isStream) current.copy(url = newUrl, streamVideoUrl = newUrl) else current.copy(url = newUrl)
+            val withUrl = current.copy(url = newUrl)
             withUrl.copy(
                 referer = referer?.takeIf { it.isNotBlank() } ?: withUrl.referer,
                 cookies = cookies?.takeIf { it.isNotBlank() } ?: withUrl.cookies,
@@ -1333,18 +1154,6 @@ object ClintDownloadManager {
             )
         }
         DownloadLog.i(id, "USER") { "Download link updated" }
-        persistCurrent(id)
-    }
-
-    fun updateStreamUrls(id: Int, primaryUrl: String?, audioUrl: String?) {
-        updateItem(id) { current ->
-            if (!current.isStream) return@updateItem current
-            var next = current
-            if (primaryUrl != null) next = next.copy(url = primaryUrl, streamVideoUrl = primaryUrl)
-            if (audioUrl != null && next.streamAudioUrl != null && !next.streamPrimaryIsAudio) next = next.copy(streamAudioUrl = audioUrl)
-            next
-        }
-        DownloadLog.i(id, "USER") { "Stream links updated" }
         persistCurrent(id)
     }
 

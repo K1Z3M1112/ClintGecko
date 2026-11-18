@@ -1,15 +1,6 @@
 package com.simplefox.browser.browser.sheets
-import androidx.compose.material.icons.filled.ContentCopy
-import androidx.compose.material.icons.filled.Download
-import androidx.compose.material.icons.automirrored.filled.OpenInNew
-import androidx.compose.material.icons.filled.Public
-import androidx.compose.material.icons.filled.Share
-import androidx.compose.material.icons.filled.Tab
-import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.material.icons.filled.ZoomIn
 import androidx.compose.ui.graphics.asAndroidBitmap
 
-import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.ImageDecoder
@@ -52,8 +43,8 @@ import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.preference.PreferenceManager
-import com.caverock.androidsvg.SVG
+import com.simplefox.browser.util.PreferenceManager
+import com.simplefox.browser.util.SimpleSvg
 import com.simplefox.browser.R
 import com.simplefox.browser.browser.MainActivity
 import com.simplefox.browser.ui.theme.LocalClintColors
@@ -145,30 +136,30 @@ internal fun ImageLongPressSheet(request: ImageLongPressRequest, activity: MainA
             LongPressSheetDivider()
 
             if (showTabActions) {
-                LongPressActionRow(androidx.compose.material.icons.Icons.AutoMirrored.Filled.OpenInNew, stringResource(R.string.image_open_in_new_tab)) {
+                LongPressActionRow(com.simplefox.browser.ui.icons.Icons.AutoMirrored.Filled.OpenInNew, stringResource(R.string.image_open_in_new_tab)) {
                     dismissAnd { activity.onImageOpenInNewTab(request.imageUrl) }
                 }
-                LongPressActionRow(androidx.compose.material.icons.Icons.Filled.VisibilityOff, stringResource(R.string.image_open_incognito)) {
+                LongPressActionRow(com.simplefox.browser.ui.icons.Icons.Filled.VisibilityOff, stringResource(R.string.image_open_incognito)) {
                     dismissAnd { activity.onImageOpenIncognito(request.imageUrl) }
                 }
             }
-            LongPressActionRow(androidx.compose.material.icons.Icons.Filled.Download, stringResource(R.string.image_download)) {
+            LongPressActionRow(com.simplefox.browser.ui.icons.Icons.Filled.Download, stringResource(R.string.image_download)) {
                 dismissAnd { activity.onImageDownload(request.imageUrl, request.pageTitle) }
             }
             if (request.isPreviewContext) {
-                LongPressActionRow(androidx.compose.material.icons.Icons.Filled.Tab, stringResource(R.string.image_open_in_current_tab)) {
+                LongPressActionRow(com.simplefox.browser.ui.icons.Icons.Filled.Tab, stringResource(R.string.image_open_in_current_tab)) {
                     dismissAnd { activity.onImageOpenInCurrentTab(request.imageUrl) }
                 }
             }
             if (showTabActions && !request.isPreviewContext) {
-                LongPressActionRow(androidx.compose.material.icons.Icons.Filled.ZoomIn, stringResource(R.string.image_preview)) {
+                LongPressActionRow(com.simplefox.browser.ui.icons.Icons.Filled.ZoomIn, stringResource(R.string.image_preview)) {
                     dismissAnd { activity.onImagePreview(request.imageUrl) }
                 }
             }
-            LongPressActionRow(androidx.compose.material.icons.Icons.Filled.ContentCopy, stringResource(R.string.image_copy)) {
+            LongPressActionRow(com.simplefox.browser.ui.icons.Icons.Filled.ContentCopy, stringResource(R.string.image_copy)) {
                 dismissAnd { activity.onImageCopy(request.imageUrl) }
             }
-            LongPressActionRow(androidx.compose.material.icons.Icons.Filled.Share, stringResource(R.string.image_share)) {
+            LongPressActionRow(com.simplefox.browser.ui.icons.Icons.Filled.Share, stringResource(R.string.image_share)) {
                 dismissAnd { activity.onImageShare(request.imageUrl) }
             }
         }
@@ -191,7 +182,7 @@ private fun ImageThumbnail(imageUrl: String, referer: String) {
         drawable = withContext(Dispatchers.IO) { decodeThumbnailDrawable(bytes) }
     }
 
-    val placeholderDrawable = rememberVectorDrawable(androidx.compose.material.icons.Icons.Filled.Public, 48)
+    val placeholderDrawable = rememberVectorDrawable(com.simplefox.browser.ui.icons.Icons.Filled.Public, 48)
     val cardShape = RoundedCornerShape(LongPressCardCorner)
 
     AndroidView(
@@ -300,15 +291,5 @@ private fun decodeThumbnailDrawable(bytes: ByteArray): Drawable? {
     return decodeSvgDrawable(bytes)
 }
 
-private fun decodeSvgDrawable(bytes: ByteArray): Drawable? = runCatching {
-    val svg = SVG.getFromString(bytes.toString(Charsets.UTF_8))
-    val vb = svg.documentViewBox
-    val rawW = vb?.width()?.toInt()?.takeIf { it > 0 } ?: svg.documentWidth.toInt().takeIf { it > 0 } ?: 512
-    val rawH = vb?.height()?.toInt()?.takeIf { it > 0 } ?: svg.documentHeight.toInt().takeIf { it > 0 } ?: 512
-    val scale = 512f / maxOf(rawW, rawH).toFloat()
-    val bw = (rawW * scale).toInt().coerceAtLeast(1)
-    val bh = (rawH * scale).toInt().coerceAtLeast(1)
-    val bitmap = Bitmap.createBitmap(bw, bh, Bitmap.Config.ARGB_8888)
-    svg.renderToCanvas(Canvas(bitmap))
-    android.graphics.drawable.BitmapDrawable(null, bitmap)
-}.getOrNull()
+private fun decodeSvgDrawable(bytes: ByteArray): Drawable? =
+    SimpleSvg.toBitmap(bytes.toString(Charsets.UTF_8), 512)?.let { android.graphics.drawable.BitmapDrawable(null, it) }

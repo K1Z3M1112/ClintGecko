@@ -1,7 +1,4 @@
 package com.simplefox.browser.setup
-import androidx.compose.material.icons.filled.ViewAgenda
-import androidx.compose.material.icons.filled.SwapVert
-import androidx.compose.material.icons.filled.VisibilityOff
 
 import com.simplefox.browser.ui.Crossfade
 import androidx.compose.foundation.background
@@ -22,16 +19,13 @@ import com.simplefox.browser.ui.foundation.CardDefaults
 import com.simplefox.browser.ui.ClintSwitch
 import com.simplefox.browser.ui.foundation.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.simplefox.browser.R
-import com.simplefox.browser.ui.ThemeSwatchUtils
 import com.simplefox.browser.ui.theme.LocalClintColors
 
 @Composable
@@ -39,22 +33,14 @@ fun SetupLayoutPage(
     addressBarPosition: String,
     scrollHideMode: String,
     hideStatusBar: Boolean, hideSystemNavigation: Boolean,
-    theme: String,
-    accent: String,
     onAddressBarPositionSelected: (String) -> Unit,
     onScrollHideModeSelected: (String) -> Unit,
     onHideStatusBarToggled: (Boolean) -> Unit,
-    onHideSystemNavigationToggled: (Boolean) -> Unit,
-    onNext: () -> Unit
+    onHideSystemNavigationToggled: (Boolean) -> Unit
 ) {
     val colors = LocalClintColors.current
-    val context = LocalContext.current
-
-    val swatch = remember(theme, accent, colors.isLight) {
-        ThemeSwatchUtils.resolveSwatchColors(context, theme, accent)
-    }
-    val bg = androidx.compose.ui.graphics.Color(swatch.bg)
-    val surface = androidx.compose.ui.graphics.Color(swatch.surface)
+    val bg = colors.background
+    val surface = colors.surface
     val onSurface = colors.onSurface
 
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 28.dp)) {
@@ -70,7 +56,7 @@ fun SetupLayoutPage(
             AddrOption("split", R.string.address_bar_position_split, R.string.address_bar_position_split_desc)
         )
         SetupSectionHeading(
-            androidx.compose.material.icons.Icons.Filled.ViewAgenda,
+            com.simplefox.browser.ui.icons.Icons.Filled.ViewAgenda,
             stringResource(R.string.setup_section_address_bar), colors.primary,
             Modifier.fillMaxWidth().padding(bottom = 12.dp)
         )
@@ -98,7 +84,7 @@ fun SetupLayoutPage(
             ScrollOption("both", R.string.nested_scroll_both, R.string.nested_scroll_both_desc)
         ).filter { scrollCardVisible(it.key, addressBarPosition) }
         SetupSectionHeading(
-            androidx.compose.material.icons.Icons.Filled.SwapVert,
+            com.simplefox.browser.ui.icons.Icons.Filled.SwapVert,
             stringResource(R.string.setup_section_nested_scroll), colors.primary,
             Modifier.fillMaxWidth().padding(top = 24.dp, bottom = 12.dp)
         )
@@ -123,7 +109,7 @@ fun SetupLayoutPage(
         }
 
         SetupSectionHeading(
-            androidx.compose.material.icons.Icons.Filled.VisibilityOff,
+            com.simplefox.browser.ui.icons.Icons.Filled.VisibilityOff,
             stringResource(R.string.setup_section_status_bar), colors.primary,
             Modifier.fillMaxWidth().padding(top = 24.dp, bottom = 12.dp)
         )
@@ -141,7 +127,7 @@ fun SetupLayoutPage(
                         Text(stringResource(R.string.hide_status_bar), color = colors.onSurface, fontSize = 15.sp, fontWeight = FontWeight.Medium)
                         Text(stringResource(R.string.hide_status_bar_summary), color = colors.secondaryText, fontSize = 12.sp, lineHeight = 15.6.sp, modifier = Modifier.padding(top = 2.dp))
                     }
-                    ClintSwitch(checked = hideStatusBar)
+                    ClintSwitch(checked = hideStatusBar, onCheckedChange = { onHideStatusBarToggled(!hideStatusBar) })
                 }
                 Box(Modifier.fillMaxWidth().height(1.dp).background(colors.surfaceVariant))
                 Row(
@@ -152,11 +138,10 @@ fun SetupLayoutPage(
                         Text(stringResource(R.string.hide_system_navigation), color = colors.onSurface, fontSize = 15.sp, fontWeight = FontWeight.Medium)
                         Text(stringResource(R.string.hide_system_navigation_summary), color = colors.secondaryText, fontSize = 12.sp, lineHeight = 15.6.sp, modifier = Modifier.padding(top = 2.dp))
                     }
-                    ClintSwitch(checked = hideSystemNavigation)
+                    ClintSwitch(checked = hideSystemNavigation, onCheckedChange = { onHideSystemNavigationToggled(!hideSystemNavigation) })
                 }
             }
         }
 
-        SetupPrimaryButton(stringResource(R.string.next), onNext, colors.buttonBackground, Modifier.padding(bottom = 24.dp))
     }
 }

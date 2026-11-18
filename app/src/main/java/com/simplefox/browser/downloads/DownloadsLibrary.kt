@@ -23,12 +23,7 @@ import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ViewList
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.GridView
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.Share
+import com.simplefox.browser.ui.icons.Icons
 import com.simplefox.browser.ui.foundation.Icon
 import com.simplefox.browser.ui.foundation.IconButton
 import com.simplefox.browser.ui.foundation.Text
@@ -112,7 +107,7 @@ internal fun DownloadsLibraryContent(
                 onToggleGrid = {
                     val grid = !state.libraryGrid
                     state.libraryGrid = grid
-                    androidx.preference.PreferenceManager.getDefaultSharedPreferences(context).edit()
+                    com.simplefox.browser.util.PreferenceManager.getDefaultSharedPreferences(context).edit()
                         .putBoolean(com.simplefox.browser.settings.downloads.DownloadSettingsKeys.PREF_LIBRARY_GRID, grid).apply()
                 }
             )

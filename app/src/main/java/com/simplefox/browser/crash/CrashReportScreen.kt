@@ -1,8 +1,4 @@
 package com.simplefox.browser.crash
-import androidx.compose.material.icons.filled.BugReport
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Code
-import androidx.compose.material.icons.filled.ContentCopy
 
 import android.util.TypedValue
 import android.widget.TextView
@@ -59,14 +55,14 @@ private fun CrashReportCard(
                 .padding(start = 16.dp, end = 8.dp, top = 10.dp, bottom = 10.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(androidx.compose.material.icons.Icons.Filled.BugReport, contentDescription = null, tint = colors.primary, modifier = Modifier.size(18.dp))
+            Icon(com.simplefox.browser.ui.icons.Icons.Filled.BugReport, contentDescription = null, tint = colors.primary, modifier = Modifier.size(18.dp))
             Spacer(Modifier.width(12.dp))
             Text(item.title, color = colors.onSurface, fontSize = 13.sp, fontWeight = FontWeight.Medium, modifier = Modifier.weight(1f))
             IconButton(onClick = onCopy) {
-                Icon(androidx.compose.material.icons.Icons.Filled.ContentCopy, contentDescription = stringResource(R.string.crash_copy), tint = colors.primary)
+                Icon(com.simplefox.browser.ui.icons.Icons.Filled.ContentCopy, contentDescription = stringResource(R.string.crash_copy), tint = colors.primary)
             }
             IconButton(onClick = onDelete) {
-                Icon(androidx.compose.material.icons.Icons.Filled.Close, contentDescription = stringResource(R.string.crash_delete), tint = colors.secondaryText)
+                Icon(com.simplefox.browser.ui.icons.Icons.Filled.Close, contentDescription = stringResource(R.string.crash_delete), tint = colors.secondaryText)
             }
         }
     }
@@ -275,7 +271,7 @@ fun CrashReportScreen(
                         modifier = Modifier.weight(1f)
                     )
                     IconButton(onClick = onCopyTemplate) {
-                        Icon(androidx.compose.material.icons.Icons.Filled.ContentCopy, contentDescription = stringResource(R.string.crash_copy_template), tint = colors.primary)
+                        Icon(com.simplefox.browser.ui.icons.Icons.Filled.ContentCopy, contentDescription = stringResource(R.string.crash_copy_template), tint = colors.primary)
                     }
                 }
                 Text(
@@ -293,7 +289,7 @@ fun CrashReportScreen(
             onClick = onOpenGithub,
             backgroundColor = colors.buttonBackground,
             textColor = colors.buttonTextColor,
-            icon = androidx.compose.material.icons.Icons.Filled.Code,
+            icon = com.simplefox.browser.ui.icons.Icons.Filled.Code,
             iconTint = colors.buttonIconTint,
             modifier = Modifier.padding(bottom = 24.dp)
         )

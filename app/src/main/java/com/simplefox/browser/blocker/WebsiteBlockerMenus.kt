@@ -1,7 +1,4 @@
 package com.simplefox.browser.blocker
-import androidx.compose.material.icons.filled.Cached
-import androidx.compose.material.icons.filled.RestartAlt
-import androidx.compose.material.icons.filled.Update
 
 import com.simplefox.browser.R
 
@@ -30,12 +27,12 @@ fun WebsiteBlockerActionsMenu(
         containerColor = colors.popupBackground,
         border = null
     ) {
-        ListMenuItem(androidx.compose.material.icons.Icons.Filled.Update, stringResource(R.string.filter_list_check_update_active), false) { onDismiss(); onCheckUpdateActive() }
-        ListMenuItem(androidx.compose.material.icons.Icons.Filled.Update, stringResource(R.string.filter_list_check_update_all), false) { onDismiss(); onCheckUpdateAll() }
+        ListMenuItem(com.simplefox.browser.ui.icons.Icons.Filled.Update, stringResource(R.string.filter_list_check_update_active), false) { onDismiss(); onCheckUpdateActive() }
+        ListMenuItem(com.simplefox.browser.ui.icons.Icons.Filled.Update, stringResource(R.string.filter_list_check_update_all), false) { onDismiss(); onCheckUpdateAll() }
         HorizontalDivider(color = colors.divider)
-        ListMenuItem(androidx.compose.material.icons.Icons.Filled.RestartAlt, stringResource(R.string.filter_list_force_update_active), false) { onDismiss(); onForceUpdateActive() }
-        ListMenuItem(androidx.compose.material.icons.Icons.Filled.RestartAlt, stringResource(R.string.filter_list_force_update_all), false) { onDismiss(); onForceUpdateAll() }
+        ListMenuItem(com.simplefox.browser.ui.icons.Icons.Filled.RestartAlt, stringResource(R.string.filter_list_force_update_active), false) { onDismiss(); onForceUpdateActive() }
+        ListMenuItem(com.simplefox.browser.ui.icons.Icons.Filled.RestartAlt, stringResource(R.string.filter_list_force_update_all), false) { onDismiss(); onForceUpdateAll() }
         HorizontalDivider(color = colors.divider)
-        ListMenuItem(androidx.compose.material.icons.Icons.Filled.Cached, stringResource(R.string.website_blocker_menu_recompile), false) { onDismiss(); onRecompile() }
+        ListMenuItem(com.simplefox.browser.ui.icons.Icons.Filled.Cached, stringResource(R.string.website_blocker_menu_recompile), false) { onDismiss(); onRecompile() }
     }
 }

@@ -1,18 +1,7 @@
 package com.simplefox.browser.setup
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.runtime.getValue
 
-import androidx.compose.animation.core.Easing
-import androidx.compose.animation.core.InfiniteRepeatableSpec
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateFloat
-import com.simplefox.browser.ui.animateFloatAsState
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
@@ -24,9 +13,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import com.simplefox.browser.ui.foundation.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -35,46 +22,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import kotlin.math.PI
-import kotlin.math.cos
-
-val AccelerateDecelerateEasing = Easing { fraction ->
-    (cos((fraction + 1) * PI) / 2.0 + 0.5).toFloat()
-}
-
-private fun loopSpec(): InfiniteRepeatableSpec<Float> = infiniteRepeatable(
-    animation = tween(durationMillis = 1100, easing = AccelerateDecelerateEasing),
-    repeatMode = RepeatMode.Reverse
-)
-
-@Composable
-fun AccentSwatch(bg: Color, surface: Color, accent: Color, modifier: Modifier = Modifier) {
-    Box(
-        modifier
-            .size(44.dp)
-            .clip(RoundedCornerShape(10.dp))
-            .background(bg)
-    ) {
-        Box(
-            Modifier
-                .fillMaxSize()
-                .padding(top = 22.dp)
-                .clip(RoundedCornerShape(bottomStart = 10.dp, bottomEnd = 10.dp))
-                .background(surface)
-        )
-        Box(
-            Modifier
-                .fillMaxSize()
-                .padding(start = 6.dp, top = 6.dp, end = 14.dp, bottom = 24.dp)
-                .clip(RoundedCornerShape(3.dp))
-                .background(accent)
-        )
-    }
-}
-
 private val PreviewWidth = 52.dp
 private val PreviewHeight = 64.dp
 private val BarHeight = 14.dp
@@ -207,13 +156,8 @@ fun ScrollHidePreview(
     val pillAtTop = addressBarPosition != "bottom"
     val navDotsVisible = addressBarPosition == "split"
 
-    // The animated value is only read inside graphicsLayer lambdas (draw phase), so the
-    // preview is never recomposed per frame.
-    val fState: androidx.compose.runtime.State<Float>? = if (animate) {
-        rememberInfiniteTransition(label = "scrollHide")
-            .animateFloat(initialValue = 0f, targetValue = 1f, animationSpec = loopSpec(), label = "f")
-    } else null
-    val f: () -> Float = { fState?.value ?: 0f }
+    val fraction = if (animate) 1f else 0f
+    val f: () -> Float = { fraction }
 
     val moveTop = kind == "search_bar" || kind == "both"
     val moveBottom = kind == "navigation_bar" || kind == "both"
@@ -247,36 +191,5 @@ fun ScrollHidePreview(
                 .background(bottomColor)
         )
         if (navDotsVisible) NavDotsRow(onSurface, translationFraction = dotsFraction)
-    }
-}
-
-@Composable
-fun AccentDot(
-    color: Color,
-    selected: Boolean,
-    ringColor: Color,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    val scale by animateFloatAsState(targetValue = if (selected) 1.1f else 1f, label = "accentDotScale")
-    val checkTint = if (color.luminance() > 0.5f) Color.Black else Color.White
-    Box(
-        modifier
-            .size(40.dp)
-            .graphicsLayer { scaleX = scale; scaleY = scale }
-            .clip(CircleShape)
-            .background(color)
-            .then(if (selected) Modifier.border(2.5.dp, ringColor, CircleShape) else Modifier)
-            .clickable(onClick = onClick),
-        contentAlignment = Alignment.Center
-    ) {
-        if (selected) {
-            Icon(
-                imageVector = androidx.compose.material.icons.Icons.Filled.Check,
-                contentDescription = null,
-                tint = checkTint,
-                modifier = Modifier.size(18.dp)
-            )
-        }
     }
 }

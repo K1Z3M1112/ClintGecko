@@ -12,10 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDownward
-import androidx.compose.material.icons.filled.Folder
-import androidx.compose.material.icons.filled.Link
+import com.simplefox.browser.ui.icons.Icons
 import com.simplefox.browser.ui.foundation.DropdownMenu
 import com.simplefox.browser.ui.foundation.DropdownMenuItem
 import com.simplefox.browser.ui.foundation.Icon
@@ -216,7 +213,7 @@ internal fun CompactToggleRow(title: String, checked: Boolean, onToggle: () -> U
             modifier = Modifier.weight(1f).padding(end = 8.dp)
         )
         Box(Modifier.size(width = 40.dp, height = 24.dp), contentAlignment = Alignment.Center) {
-            ClintSwitch(checked = checked, modifier = Modifier.scale(0.75f))
+            ClintSwitch(checked = checked, modifier = Modifier.scale(0.75f), onCheckedChange = { onToggle() })
         }
     }
 }

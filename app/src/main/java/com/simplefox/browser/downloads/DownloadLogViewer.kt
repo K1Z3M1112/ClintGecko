@@ -17,10 +17,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.DeleteSweep
-import androidx.compose.material.icons.filled.Share
+import com.simplefox.browser.ui.icons.Icons
 import com.simplefox.browser.ui.foundation.Icon
 import com.simplefox.browser.ui.foundation.IconButton
 import com.simplefox.browser.ui.foundation.Surface

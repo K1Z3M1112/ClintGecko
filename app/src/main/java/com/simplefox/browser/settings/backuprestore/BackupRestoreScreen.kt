@@ -10,29 +10,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AppShortcut
-import androidx.compose.material.icons.filled.Backup
-import androidx.compose.material.icons.filled.Bookmark
-import androidx.compose.material.icons.filled.Cookie
-import androidx.compose.material.icons.filled.Download
-import androidx.compose.material.icons.filled.Extension
-import androidx.compose.material.icons.filled.Restore
-import androidx.compose.material.icons.filled.History
-import androidx.compose.material.icons.filled.PrivacyTip
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.Shield
-import androidx.compose.material.icons.filled.SwitchAccount
-import androidx.compose.material.icons.filled.SystemUpdate
-import androidx.compose.material.icons.filled.Tab
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
+import com.simplefox.browser.ui.icons.Icons
 import com.simplefox.browser.ui.foundation.Icon
 import com.simplefox.browser.ui.foundation.IconButton
 import com.simplefox.browser.ui.foundation.LinearProgressIndicator
 import com.simplefox.browser.ui.foundation.Text
 import com.simplefox.browser.ui.foundation.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -46,10 +31,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.preference.PreferenceManager
+import com.simplefox.browser.util.PreferenceManager
 import com.simplefox.browser.R
-import com.simplefox.browser.backup.AuthGateResult
-import com.simplefox.browser.backup.BackupAuthGate
 import com.simplefox.browser.backup.BackupCategory
 import com.simplefox.browser.backup.BackupManager
 import com.simplefox.browser.backup.RestoreManager
@@ -63,7 +46,6 @@ import com.simplefox.browser.settings.common.SettingsSection
 import com.simplefox.browser.ui.ClintCheckbox
 import com.simplefox.browser.ui.ClintDialog
 import com.simplefox.browser.ui.ClintOutlinedPasswordField
-import com.simplefox.browser.ui.ClintRadioButton
 import com.simplefox.browser.ui.listscreen.ConfirmDialogConfig
 import com.simplefox.browser.ui.listscreen.ConfirmDialogHost
 import com.simplefox.browser.ui.theme.LocalClintColors
@@ -140,15 +122,18 @@ fun BackupRestorePane(activity: SettingsActivity) {
     val hideSystemNavigation = remember { PreferenceManager.getDefaultSharedPreferences(activity).getBoolean("hide_system_navigation", false) }
     val uiState = remember { BackupRestoreUiState(hideStatusBar, hideSystemNavigation) }
 
+    // Leaving this page mid-restore must not leave the picked file or its decrypted copy in the cache.
+    DisposableEffect(Unit) {
+        onDispose {
+            uiState.stagedFile.value?.let { RestoreManager.discard(it) }
+            uiState.plainZipFile.value?.let { RestoreManager.discardPlain(it) }
+        }
+    }
+
     var simpleDialog by remember { mutableStateOf<ConfirmDialogConfig?>(null) }
 
     val okLabel = stringResource(R.string.backup_generic_ok)
     val cancelLabel = stringResource(R.string.action_cancel)
-    val authTitle = stringResource(R.string.backup_auth_title)
-    val authSubtitleBackup = stringResource(R.string.backup_auth_subtitle_backup)
-    val authSubtitleRestore = stringResource(R.string.backup_auth_subtitle_restore)
-    val authUnavailableTitle = stringResource(R.string.backup_auth_unavailable_title)
-    val authUnavailableMessage = stringResource(R.string.backup_auth_unavailable_message)
     val backupResultSuccessTitle = stringResource(R.string.backup_result_success_title)
     val backupResultSuccessMessage = stringResource(R.string.backup_result_success_message)
     val backupResultSkippedNote = stringResource(R.string.backup_result_skipped_note)
@@ -169,33 +154,7 @@ fun BackupRestorePane(activity: SettingsActivity) {
     val restoreResultErrorTitle = stringResource(R.string.restore_result_error_title)
     val restoreResultErrorMessage = stringResource(R.string.restore_result_error_message)
     val restoreActionRestartNow = stringResource(R.string.restore_action_restart_now)
-    val backupPasswordTooShort = stringResource(R.string.backup_password_too_short)
-    val backupPasswordMismatch = stringResource(R.string.backup_password_mismatch)
     val restorePasswordWrong = stringResource(R.string.restore_password_wrong)
-
-    fun requireAuthThen(subtitle: String, onSuccess: () -> Unit) {
-        if (!BackupAuthGate.isAuthenticationAvailable(activity)) {
-            simpleDialog = ConfirmDialogConfig(
-                title = authUnavailableTitle,
-                message = authUnavailableMessage,
-                positiveLabel = okLabel
-            )
-            return
-        }
-        scope.launch {
-            when (BackupAuthGate.authenticate(activity, authTitle, subtitle)) {
-                is AuthGateResult.Success -> onSuccess()
-                is AuthGateResult.NotAvailable -> {
-                    simpleDialog = ConfirmDialogConfig(
-                        title = authUnavailableTitle,
-                        message = authUnavailableMessage,
-                        positiveLabel = okLabel
-                    )
-                }
-                else -> Unit
-            }
-        }
-    }
 
     fun performRestoreNow() {
         val zipFile = uiState.plainZipFile.value ?: return
@@ -226,6 +185,7 @@ fun BackupRestorePane(activity: SettingsActivity) {
                     cancelable = false
                 )
             }.onFailure {
+                uiState.plainZipFile.value?.let { RestoreManager.discardPlain(it) }
                 uiState.stage.value = BackupRestoreStage.IDLE
                 simpleDialog = ConfirmDialogConfig(
                     title = restoreResultErrorTitle,
@@ -326,50 +286,37 @@ fun BackupRestorePane(activity: SettingsActivity) {
                     onPositive = { uiState.resetBackupFlow() }
                 )
             }.onFailure {
-                uiState.stage.value = BackupRestoreStage.SELECT_BACKUP_CATEGORIES
+                uiState.stage.value = BackupRestoreStage.IDLE
                 simpleDialog = ConfirmDialogConfig(
                     title = backupResultErrorTitle,
                     message = backupResultErrorMessage,
-                    positiveLabel = okLabel
+                    positiveLabel = okLabel,
+                    onPositive = { uiState.resetBackupFlow() }
                 )
             }
         }
     }
 
+    // Backup opens Android's system file picker immediately so the user can
+    // choose the destination (device storage, SD card, or a document provider).
+    // By default, include every supported category and create an unencrypted file.
     fun startBackupFlow() {
-        requireAuthThen(authSubtitleBackup) {
-            uiState.resetBackupFlow()
-            uiState.stage.value = BackupRestoreStage.SELECT_BACKUP_CATEGORIES
-        }
+        uiState.resetBackupFlow()
+        createDocumentLauncher.launch("clint_backup_${SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())}.clintbackup")
     }
 
+    // Restore opens the system document picker; the selected backup is staged,
+    // validated, and then offered for category selection before any data is changed.
     fun startRestoreFlow() {
-        requireAuthThen(authSubtitleRestore) {
-            openDocumentLauncher.launch(arrayOf("*/*"))
-        }
-    }
-
-    fun launchBackupCreation() {
-        if (uiState.encryptBackup.value) {
-            val error = when {
-                uiState.backupPassword.value.length < 6 -> backupPasswordTooShort
-                uiState.backupPassword.value != uiState.backupPasswordConfirm.value -> backupPasswordMismatch
-                else -> null
-            }
-            uiState.passwordError.value = error
-            if (error != null) return
-        }
-        val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
-        createDocumentLauncher.launch("clint_backup_$timestamp.clintbackup")
+        uiState.stagedFile.value?.let { RestoreManager.discard(it) }
+        uiState.plainZipFile.value?.let { RestoreManager.discardPlain(it) }
+        uiState.resetRestoreFlow()
+        openDocumentLauncher.launch(arrayOf("*/*"))
     }
 
     SettingsScreenScaffold(
         overlay = {
             ConfirmDialogHost(config = simpleDialog, hideStatusBar = hideStatusBar, hideSystemNavigation = hideSystemNavigation, onDismiss = { simpleDialog = null })
-
-            if (uiState.stage.value == BackupRestoreStage.SELECT_BACKUP_CATEGORIES) {
-                BackupCategoryDialog(uiState, hideStatusBar, hideSystemNavigation, onDismiss = { uiState.resetBackupFlow() }, onCreate = { launchBackupCreation() })
-            }
 
             if (uiState.stage.value == BackupRestoreStage.RESTORE_PASSWORD) {
                 RestorePasswordDialog(
@@ -515,117 +462,6 @@ fun CategoryCheckboxRow(category: BackupCategory, checked: Boolean, onToggle: ()
             Text(stringResource(categoryDescRes(category)), color = colors.secondaryText, fontSize = 12.sp)
         }
         ClintCheckbox(checked = checked, onCheckedChange = { onToggle() })
-    }
-}
-
-@Composable
-private fun BackupCategoryDialog(uiState: BackupRestoreUiState, hideStatusBar: Boolean, hideSystemNavigation: Boolean, onDismiss: () -> Unit, onCreate: () -> Unit) {
-    val colors = LocalClintColors.current
-    val categories = remember { BackupCategory.available() }
-    val allSelected = uiState.selectedBackupCategories.size == categories.size
-
-    ClintDialog(
-        title = stringResource(R.string.backup_select_categories_title),
-        hideStatusBar = hideStatusBar, hideSystemNavigation = hideSystemNavigation,
-        onDismiss = onDismiss,
-        footer = {
-            Row(Modifier.fillMaxWidth().padding(end = 12.dp, bottom = 8.dp), horizontalArrangement = androidx.compose.foundation.layout.Arrangement.End) {
-                TextButton(onClick = onDismiss) {
-                    Text(stringResource(R.string.action_cancel), color = colors.primary, fontWeight = FontWeight.Medium)
-                }
-                TextButton(
-                    onClick = onCreate,
-                    enabled = uiState.selectedBackupCategories.isNotEmpty() && (!uiState.encryptBackup.value || (uiState.backupPassword.value.isNotEmpty() && uiState.backupPasswordConfirm.value.isNotEmpty()))
-                ) {
-                    Text(stringResource(R.string.backup_action_create), color = colors.primary, fontWeight = FontWeight.Medium)
-                }
-            }
-        }
-    ) {
-        Column(Modifier.fillMaxWidth().padding(horizontal = 8.dp)) {
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = androidx.compose.foundation.layout.Arrangement.End) {
-                TextButton(onClick = {
-                    if (allSelected) uiState.selectedBackupCategories.clear() else {
-                        uiState.selectedBackupCategories.clear()
-                        uiState.selectedBackupCategories.addAll(categories)
-                    }
-                }) {
-                    Text(
-                        stringResource(if (allSelected) R.string.backup_deselect_all else R.string.backup_select_all),
-                        color = colors.primary,
-                        fontSize = 13.sp
-                    )
-                }
-            }
-            categories.forEach { category ->
-                CategoryCheckboxRow(
-                    category = category,
-                    checked = category in uiState.selectedBackupCategories,
-                    onToggle = {
-                        if (category in uiState.selectedBackupCategories) {
-                            uiState.selectedBackupCategories.remove(category)
-                        } else {
-                            uiState.selectedBackupCategories.add(category)
-                        }
-                    }
-                )
-            }
-            RowDivider(colors.divider)
-            Text(
-                stringResource(R.string.backup_protect_title),
-                color = colors.onSurface,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Medium,
-                modifier = Modifier.padding(top = 12.dp, bottom = 4.dp)
-            )
-            Row(Modifier.fillMaxWidth().clickable { uiState.encryptBackup.value = false }.padding(vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-                ClintRadioButton(selected = !uiState.encryptBackup.value)
-                Text(stringResource(R.string.backup_protect_no_password), color = colors.onSurface, fontSize = 14.sp, modifier = Modifier.padding(start = 12.dp))
-            }
-            Row(Modifier.fillMaxWidth().clickable { uiState.encryptBackup.value = true }.padding(vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-                ClintRadioButton(selected = uiState.encryptBackup.value)
-                Text(stringResource(R.string.backup_protect_with_password), color = colors.onSurface, fontSize = 14.sp, modifier = Modifier.padding(start = 12.dp))
-            }
-            if (uiState.encryptBackup.value) {
-                ClintOutlinedPasswordField(
-                    value = uiState.backupPassword.value,
-                    onValueChange = { uiState.backupPassword.value = it; uiState.passwordError.value = null },
-                    passwordVisible = uiState.backupPasswordVisible.value,
-                    modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
-                    label = { Text(stringResource(R.string.backup_password_label)) },
-                    isError = uiState.passwordError.value != null,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                    trailingIcon = {
-                        PasswordVisibilityToggle(uiState.backupPasswordVisible.value) {
-                            uiState.backupPasswordVisible.value = !uiState.backupPasswordVisible.value
-                        }
-                    }
-                )
-                ClintOutlinedPasswordField(
-                    value = uiState.backupPasswordConfirm.value,
-                    onValueChange = { uiState.backupPasswordConfirm.value = it; uiState.passwordError.value = null },
-                    passwordVisible = uiState.backupPasswordConfirmVisible.value,
-                    modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
-                    label = { Text(stringResource(R.string.backup_password_confirm_label)) },
-                    isError = uiState.passwordError.value != null,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                    trailingIcon = {
-                        PasswordVisibilityToggle(uiState.backupPasswordConfirmVisible.value) {
-                            uiState.backupPasswordConfirmVisible.value = !uiState.backupPasswordConfirmVisible.value
-                        }
-                    }
-                )
-                uiState.passwordError.value?.let { error ->
-                    Text(error, color = colors.primary, fontSize = 12.sp, modifier = Modifier.padding(top = 4.dp))
-                }
-                Text(
-                    stringResource(R.string.backup_password_hint),
-                    color = colors.secondaryText,
-                    fontSize = 12.sp,
-                    modifier = Modifier.padding(top = 8.dp)
-                )
-            }
-        }
     }
 }
 

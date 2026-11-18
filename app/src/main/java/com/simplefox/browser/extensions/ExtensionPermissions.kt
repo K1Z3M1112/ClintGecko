@@ -1,29 +1,6 @@
 package com.simplefox.browser.extensions
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Bookmark
-import androidx.compose.material.icons.filled.Code
-import androidx.compose.material.icons.filled.ContentPaste
-import androidx.compose.material.icons.filled.Cookie
-import androidx.compose.material.icons.filled.Dns
-import androidx.compose.material.icons.filled.Download
-import androidx.compose.material.icons.filled.Extension
-import androidx.compose.material.icons.filled.History
-import androidx.compose.material.icons.filled.Key
-import androidx.compose.material.icons.filled.Language
-import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.filled.Palette
-import androidx.compose.material.icons.filled.Schedule
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Security
-import androidx.compose.material.icons.filled.Storage
-import androidx.compose.material.icons.filled.Sync
-import androidx.compose.material.icons.filled.Tab
-import androidx.compose.material.icons.filled.Tune
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.Block
+import com.simplefox.browser.ui.icons.Icons
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.simplefox.browser.R
 

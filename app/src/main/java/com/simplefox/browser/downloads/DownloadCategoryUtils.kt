@@ -1,8 +1,8 @@
 package com.simplefox.browser.downloads
 
 import android.content.Context
-import androidx.documentfile.provider.DocumentFile
-import androidx.preference.PreferenceManager
+import com.simplefox.browser.util.DocumentFile
+import com.simplefox.browser.util.PreferenceManager
 import com.simplefox.browser.settings.downloads.DownloadSettingsKeys
 import java.io.File
 import java.util.Locale

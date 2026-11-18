@@ -72,6 +72,8 @@ import androidx.compose.animation.core.tween
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.semantics.ProgressBarRangeInfo
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.semantics.toggleableState
@@ -257,14 +259,14 @@ fun Button(
     val bg = colors.containerColor(enabled)
     val fg = colors.contentColor(enabled)
     Surface(
-        modifier = modifier.clickable(enabled = enabled, onClick = onClick),
+        modifier = modifier.clickable(enabled = enabled, role = Role.Button, onClick = onClick),
         shape = shape,
         color = bg,
         contentColor = fg,
         border = border
     ) {
         Row(
-            Modifier.defaultMinSize(minHeight = 40.dp).padding(contentPadding),
+            Modifier.defaultMinSize(minHeight = 48.dp).padding(contentPadding),
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically,
             content = content
@@ -283,7 +285,7 @@ fun TextButton(
     Row(
         modifier = modifier
             .clip(RoundedCornerShape(18.dp))
-            .clickable(enabled = enabled, onClick = onClick)
+            .clickable(enabled = enabled, role = Role.Button, onClick = onClick)
             .padding(contentPadding),
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
@@ -296,9 +298,9 @@ fun TextButton(
 fun IconButton(onClick: () -> Unit, modifier: Modifier = Modifier, enabled: Boolean = true, content: @Composable () -> Unit) {
     Box(
         modifier = modifier
-            .defaultMinSize(minWidth = 40.dp, minHeight = 40.dp)
+            .defaultMinSize(minWidth = 48.dp, minHeight = 48.dp)
             .clip(CircleShape)
-            .clickable(enabled = enabled, onClick = onClick),
+            .clickable(enabled = enabled, role = Role.Button, onClick = onClick),
         contentAlignment = Alignment.Center
     ) {
         CompositionLocalProvider(LocalCustomContentColor provides LocalClintColors.current.iconTint) { content() }
@@ -314,7 +316,7 @@ object CardDefaults {
         disabledContainerColor: Color = containerColor,
         disabledContentColor: Color = contentColor
     ) = CardColors(containerColor, contentColor, disabledContainerColor, disabledContentColor)
-    fun cardElevation(defaultElevation: Dp = 1.dp) = CardElevation(defaultElevation)
+    fun cardElevation(defaultElevation: Dp = 0.dp) = CardElevation(defaultElevation)
 }
 
 @Composable
@@ -445,6 +447,7 @@ fun DropdownMenu(
     shape: Shape = RoundedCornerShape(16.dp),
     containerColor: Color = LocalClintColors.current.popupBackground,
     border: BorderStroke? = null,
+    shadowElevation: Dp = 0.dp,
     content: @Composable ColumnScope.() -> Unit
 ) {
     if (expanded) {
@@ -483,7 +486,7 @@ fun DropdownMenu(
                 modifier = modifier,
                 shape = shape,
                 color = containerColor,
-                shadowElevation = 8.dp,
+                shadowElevation = shadowElevation,
                 border = border
             ) {
                 CompositionLocalProvider(LocalCustomContentColor provides LocalClintColors.current.popupText) {
@@ -505,7 +508,7 @@ fun DropdownMenuItem(
     contentPadding: PaddingValues = PaddingValues(horizontal = 14.dp, vertical = 10.dp)
 ) {
     Row(
-        modifier = modifier.fillMaxWidth().clickable(enabled = enabled, onClick = onClick).padding(contentPadding),
+        modifier = modifier.fillMaxWidth().defaultMinSize(minHeight = 48.dp).clickable(enabled = enabled, role = Role.Button, onClick = onClick).padding(contentPadding),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
@@ -525,11 +528,11 @@ fun FloatingActionButton(
     content: @Composable () -> Unit
 ) {
     Surface(
-        modifier = modifier.clickable(onClick = onClick).defaultMinSize(minWidth = 56.dp, minHeight = 56.dp),
+        modifier = modifier.clickable(role = Role.Button, onClick = onClick).defaultMinSize(minWidth = 56.dp, minHeight = 56.dp),
         shape = shape,
         color = containerColor,
         contentColor = contentColor,
-        shadowElevation = 6.dp
+        shadowElevation = 0.dp
     ) { Box(Modifier.padding(16.dp), contentAlignment = Alignment.Center) { content() } }
 }
 
@@ -544,7 +547,7 @@ fun ExtendedFloatingActionButton(
     contentColor: Color = LocalClintColors.current.onPrimary,
     shape: Shape = RoundedCornerShape(18.dp)
 ) {
-    Surface(modifier = modifier.clickable(onClick = onClick), shape = shape, color = containerColor, contentColor = contentColor, shadowElevation = 6.dp) {
+    Surface(modifier = modifier.clickable(role = Role.Button, onClick = onClick), shape = shape, color = containerColor, contentColor = contentColor) {
         Row(Modifier.padding(horizontal = 18.dp, vertical = 14.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             icon()
             if (expanded) text()
@@ -566,12 +569,16 @@ object CheckboxDefaults {
 
 @Composable
 fun Checkbox(checked: Boolean, onCheckedChange: ((Boolean) -> Unit)?, modifier: Modifier = Modifier, enabled: Boolean = true, colors: CheckboxColors = CheckboxDefaults.colors()) {
+    val haptic = LocalHapticFeedback.current
     val activeColor = if (enabled) colors.checkedColor else colors.disabledCheckedColor
     val inactiveColor = if (enabled) colors.uncheckedColor else colors.disabledUncheckedColor
     Canvas(
         modifier.size(24.dp)
             .semantics { role = Role.Checkbox; toggleableState = if (checked) ToggleableState.On else ToggleableState.Off }
-            .clickable(enabled = enabled && onCheckedChange != null) { onCheckedChange?.invoke(!checked) }
+            .clickable(enabled = enabled && onCheckedChange != null) {
+                haptic.performHapticFeedback(if (checked) HapticFeedbackType.ToggleOff else HapticFeedbackType.ToggleOn)
+                onCheckedChange?.invoke(!checked)
+            }
     ) {
         val s = size.minDimension
         val side = s * .72f
@@ -605,12 +612,16 @@ object RadioButtonDefaults {
 
 @Composable
 fun RadioButton(selected: Boolean, onClick: (() -> Unit)?, modifier: Modifier = Modifier, enabled: Boolean = true, colors: RadioButtonColors = RadioButtonDefaults.colors()) {
+    val haptic = LocalHapticFeedback.current
     val activeColor = if (enabled) colors.selectedColor else colors.disabledSelectedColor
     val inactiveColor = if (enabled) colors.unselectedColor else colors.disabledUnselectedColor
     Canvas(
         modifier.size(24.dp)
             .semantics { role = Role.RadioButton; this.selected = selected }
-            .clickable(enabled = enabled && onClick != null) { onClick?.invoke() }
+            .clickable(enabled = enabled && onClick != null) {
+                if (!selected) haptic.performHapticFeedback(HapticFeedbackType.ToggleOn)
+                onClick?.invoke()
+            }
     ) {
         val radius = size.minDimension * .36f
         val center = Offset(size.width / 2f, size.height / 2f)
@@ -675,11 +686,15 @@ fun Switch(
     thumbContent: (@Composable () -> Unit)? = null,
     colors: SwitchColors = SwitchDefaults.colors()
 ) {
+    val haptic = LocalHapticFeedback.current
     Box(
         modifier = modifier
             .size(width = 52.dp, height = 32.dp)
             .semantics { role = Role.Switch; toggleableState = if (checked) ToggleableState.On else ToggleableState.Off }
-            .clickable(enabled = enabled && onCheckedChange != null) { onCheckedChange?.invoke(!checked) },
+            .clickable(enabled = enabled && onCheckedChange != null) {
+                haptic.performHapticFeedback(if (checked) HapticFeedbackType.ToggleOff else HapticFeedbackType.ToggleOn)
+                onCheckedChange?.invoke(!checked)
+            },
         contentAlignment = if (checked) Alignment.CenterEnd else Alignment.CenterStart
     ) {
         Canvas(Modifier.fillMaxSize()) {
@@ -966,7 +981,7 @@ fun ModalBottomSheet(
                 shape = shape,
                 color = containerColor,
                 contentColor = contentColor,
-                shadowElevation = 12.dp
+                shadowElevation = 0.dp
             ) {
                 Column {
                     if (dragHandle != null) {

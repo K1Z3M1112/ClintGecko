@@ -1,9 +1,7 @@
 package com.simplefox.browser.blocker.additional
 
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 
 class AdditionalWebsitesUiState {
@@ -26,9 +24,6 @@ class AdditionalWebsitesUiState {
         selectedIds = emptySet()
     }
 }
-
-@Composable
-fun rememberAdditionalWebsitesUiState(): AdditionalWebsitesUiState = remember { AdditionalWebsitesUiState() }
 
 fun filterRules(rules: List<AdditionalWebsiteRule>, query: String): List<AdditionalWebsiteRule> {
     if (query.isBlank()) return rules

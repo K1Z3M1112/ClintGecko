@@ -16,10 +16,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDownward
-import androidx.compose.material.icons.filled.Description
-import androidx.compose.material.icons.filled.Folder
+import com.simplefox.browser.ui.icons.Icons
 import com.simplefox.browser.ui.foundation.CircularProgressIndicator
 import com.simplefox.browser.ui.foundation.DropdownMenu
 import com.simplefox.browser.ui.foundation.DropdownMenuItem
@@ -59,7 +56,6 @@ import com.simplefox.browser.settings.common.dialogSectionBackground
 import com.simplefox.browser.settings.downloads.DownloadSettingsKeys
 import com.simplefox.browser.ui.ClintCheckbox
 import com.simplefox.browser.ui.ClintDialogStatusBarEffect
-import com.simplefox.browser.ui.ClintSwitch
 import com.simplefox.browser.ui.listscreen.PopupShape
 import com.simplefox.browser.ui.theme.LocalClintColors
 import com.simplefox.browser.util.formatFileSize
@@ -129,7 +125,7 @@ internal fun MegaDownloadDialog(
 ) {
     val context = LocalContext.current
     val colors = LocalClintColors.current
-    val prefs = remember { androidx.preference.PreferenceManager.getDefaultSharedPreferences(context) }
+    val prefs = remember { com.simplefox.browser.util.PreferenceManager.getDefaultSharedPreferences(context) }
     var state by remember { mutableStateOf<MegaDialogState>(MegaDialogState.Loading) }
     var attempt by remember { mutableIntStateOf(0) }
 
@@ -442,16 +438,5 @@ private fun SectionLabel(text: String) {
 }
 
 @Composable
-private fun ToggleRow(title: String, summary: String, checked: Boolean, onToggle: () -> Unit) {
-    val colors = LocalClintColors.current
-    Row(
-        Modifier.fillMaxWidth().clickable(onClick = onToggle).padding(vertical = 6.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Column(Modifier.weight(1f).padding(end = 8.dp)) {
-            Text(title, color = colors.onSurface, fontSize = 14.sp, fontWeight = FontWeight.Medium)
-            Text(summary, color = colors.secondaryText, fontSize = 12.sp, modifier = Modifier.padding(top = 2.dp))
-        }
-        ClintSwitch(checked = checked)
-    }
-}
+private fun ToggleRow(title: String, summary: String, checked: Boolean, onToggle: () -> Unit) =
+    com.simplefox.browser.downloads.DownloadToggleRow(title, summary, checked, onToggle, Modifier.padding(vertical = 6.dp))

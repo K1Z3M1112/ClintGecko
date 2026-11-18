@@ -6,8 +6,6 @@ import android.app.Application
 import android.content.Context
 import android.os.Build
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatDelegate
-import androidx.preference.PreferenceManager
 import com.simplefox.browser.browser.webview.ClintGecko
 import com.simplefox.browser.media.MediaPlaybackController
 import com.simplefox.browser.settings.datasaver.DataSaverMode
@@ -30,7 +28,6 @@ class ClintApplication : Application() {
         super.onCreate()
         mainProcess = isMainProcess()
         if (!mainProcess) return
-        applyNightMode()
         SystemDarkState.install(this)
         loadMeasurementSystemPreference(this)
         DataSaverMode.register(this)
@@ -60,7 +57,13 @@ class ClintApplication : Application() {
 
     override fun onTrimMemory(level: Int) {
         super.onTrimMemory(level)
-        if (mainProcess) ClintGecko.trimMemory(level)
+        if (!mainProcess) return
+        ClintGecko.trimMemory(level)
+        com.simplefox.browser.ui.FaviconCache.trimMemory(level)
+        com.simplefox.browser.ui.SharpFavicon.trimMemory(level)
+        com.simplefox.browser.browser.home.HomeTileIconFetcher.trimMemory(level)
+        com.simplefox.browser.tabs.TabThumbnailCache.trimMemory(level)
+        com.simplefox.browser.downloads.DownloadThumbnailLoader.trimMemory(level)
     }
 
     private fun isMainProcess(): Boolean {
@@ -74,17 +77,5 @@ class ClintApplication : Application() {
                 ?.processName
         }
         return name == null || name == packageName
-    }
-
-    fun applyNightMode() {
-        val prefs = PreferenceManager.getDefaultSharedPreferences(this)
-        val theme = prefs.getString("app_theme", "system") ?: "system"
-        AppCompatDelegate.setDefaultNightMode(
-            when (theme) {
-                "dark" -> AppCompatDelegate.MODE_NIGHT_YES
-                "light" -> AppCompatDelegate.MODE_NIGHT_NO
-                else -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
-            }
-        )
     }
 }

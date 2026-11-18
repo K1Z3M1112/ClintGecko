@@ -27,8 +27,6 @@ object DownloadSettingsKeys {
     const val DEFAULT_SPLIT_PARTS          = 0
     const val PREF_MULTITHREADING_PARTS    = "download_multithreading_parts"
     const val DEFAULT_MULTITHREADING_PARTS = 0
-    const val PREF_STREAM_CONCURRENT_SEGMENTS    = "stream_concurrent_segments"
-    const val DEFAULT_STREAM_CONCURRENT_SEGMENTS = 0
     const val PREF_SPEED_LIMIT_AMOUNT      = "download_speed_limit_amount"
     const val DEFAULT_SPEED_LIMIT_AMOUNT   = 0
     const val PREF_TOTAL_SPEED_LIMIT_AMOUNT = "download_total_speed_limit_amount"

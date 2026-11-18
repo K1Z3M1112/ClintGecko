@@ -1,10 +1,7 @@
 package com.simplefox.browser.settings.lookandfeel
 
-import com.simplefox.browser.customtheme.CustomThemeRepository
-import com.simplefox.browser.customtheme.ThemeSlot
-import com.simplefox.browser.customtheme.customAccentFor
-import androidx.compose.ui.text.style.TextOverflow
 import com.simplefox.browser.ui.theme.rememberIsLightTheme
+import com.simplefox.browser.ui.theme.resolveClintColors
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -22,7 +19,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -32,7 +28,6 @@ import com.simplefox.browser.ui.ClintDialog
 import com.simplefox.browser.ui.scrollToSelection
 import com.simplefox.browser.settings.common.SettingsPickerOptionBottomSpacing
 import com.simplefox.browser.settings.common.SettingsPickerOptionContentPadding
-import com.simplefox.browser.setup.AccentSwatch
 import com.simplefox.browser.setup.AddressBarPreview
 import com.simplefox.browser.setup.CheckSlot
 import com.simplefox.browser.setup.DefaultChip
@@ -41,9 +36,7 @@ import com.simplefox.browser.setup.ScrollHidePreview
 import com.simplefox.browser.setup.SelectableCard
 import com.simplefox.browser.setup.navBarSlotDescRes
 import com.simplefox.browser.setup.navBarSlotTitleRes
-import com.simplefox.browser.setup.rememberIntensitySwatchColors
 import com.simplefox.browser.setup.scrollCardVisible
-import com.simplefox.browser.ui.ThemeSwatchUtils
 import com.simplefox.browser.ui.theme.LocalClintColors
 import com.simplefox.browser.util.LocaleHelper
 
@@ -51,13 +44,9 @@ private val OptionContentPadding = SettingsPickerOptionContentPadding
 private val OptionBottomSpacing = SettingsPickerOptionBottomSpacing
 
 @Composable
-private fun rememberBgSurface(theme: String, accent: String): Pair<Color, Color> {
-    val context = LocalContext.current
-    val isLight = rememberIsLightTheme(theme)
-    return remember(theme, accent, isLight) {
-        val swatch = ThemeSwatchUtils.resolveSwatchColors(context, theme, accent)
-        Color(swatch.bg) to Color(swatch.surface)
-    }
+private fun rememberBgSurface(theme: String): Pair<Color, Color> {
+    val colors = resolveClintColors(rememberIsLightTheme(theme))
+    return colors.background to colors.surface
 }
 
 @Composable
@@ -89,223 +78,15 @@ fun ThemeSelectorDialog(current: String, hideStatusBar: Boolean, hideSystemNavig
 }
 
 @Composable
-private fun AccentSectionLabel(text: String) {
-    Text(
-        text,
-        color = LocalClintColors.current.primary,
-        fontSize = 12.sp,
-        fontWeight = FontWeight.SemiBold,
-        modifier = Modifier.padding(start = 24.dp, top = 4.dp, bottom = 8.dp)
-    )
-}
-
-@Composable
-fun AccentColorDialog(current: String, theme: String, hideStatusBar: Boolean, hideSystemNavigation: Boolean, onSelect: (String) -> Unit, onDismiss: () -> Unit) {
-    val colors = LocalClintColors.current
-    val context = LocalContext.current
-    val scrollState = rememberScrollState()
-    ClintDialog(title = stringResource(R.string.pref_accent_color_title), hideStatusBar = hideStatusBar, hideSystemNavigation = hideSystemNavigation, onDismiss = onDismiss, scrollState = scrollState) {
-        data class AccentOption(val key: String, val titleRes: Int, val descRes: Int)
-        val customThemes = remember { CustomThemeRepository.all(context) }
-        if (customThemes.isNotEmpty()) {
-            AccentSectionLabel(stringResource(R.string.custom_themes_title))
-            customThemes.forEach { theme ->
-                val key = customAccentFor(theme.id)
-                val palette = theme.palette(colors.isLight)
-                SelectableCard(
-                    selected = current == key, onClick = { onSelect(key) },
-                    cardBackground = colors.surfaceVariant, primary = colors.primary,
-                    contentPadding = OptionContentPadding, bottomSpacing = OptionBottomSpacing,
-                    modifier = Modifier.scrollToSelection(scrollState, current == key)
-                ) {
-                    AccentSwatch(palette.color(ThemeSlot.BACKGROUND), palette.color(ThemeSlot.SURFACE), palette.color(ThemeSlot.PRIMARY))
-                    Column(Modifier.weight(1f).padding(start = 16.dp, end = 8.dp)) {
-                        Text(theme.name, color = colors.onSurface, fontSize = 15.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                        Text(
-                            theme.description.ifBlank { stringResource(R.string.custom_theme_tap_to_apply) },
-                            color = colors.secondaryText, fontSize = 13.sp, maxLines = 2, overflow = TextOverflow.Ellipsis,
-                            modifier = Modifier.padding(top = 2.dp)
-                        )
-                    }
-                    CheckSlot(current == key, colors.primary)
-                }
-            }
-            AccentSectionLabel(stringResource(R.string.accent_section_presets))
-        }
-        listOf(
-            AccentOption("material_you", R.string.accent_material_you, R.string.accent_material_you_desc),
-            AccentOption("purple", R.string.accent_purple, R.string.accent_purple_desc),
-            AccentOption("deep_purple", R.string.accent_deep_purple, R.string.accent_deep_purple_desc),
-            AccentOption("royal_purple", R.string.accent_royal_purple, R.string.accent_royal_purple_desc),
-            AccentOption("amethyst", R.string.accent_amethyst, R.string.accent_amethyst_desc),
-            AccentOption("lavender", R.string.accent_lavender, R.string.accent_lavender_desc),
-            AccentOption("plum", R.string.accent_plum, R.string.accent_plum_desc),
-            AccentOption("violet", R.string.accent_violet, R.string.accent_violet_desc),
-            AccentOption("default", R.string.accent_default, R.string.accent_default_desc),
-            AccentOption("charcoal", R.string.accent_charcoal, R.string.accent_charcoal_desc),
-            AccentOption("slate", R.string.accent_slate, R.string.accent_slate_desc),
-            AccentOption("graphite", R.string.accent_graphite, R.string.accent_graphite_desc),
-            AccentOption("obsidian", R.string.accent_obsidian, R.string.accent_obsidian_desc),
-            AccentOption("onyx", R.string.accent_onyx, R.string.accent_onyx_desc),
-            AccentOption("titanium", R.string.accent_titanium, R.string.accent_titanium_desc),
-            AccentOption("indigo", R.string.accent_indigo, R.string.accent_indigo_desc),
-            AccentOption("blue", R.string.accent_blue, R.string.accent_blue_desc),
-            AccentOption("midnight", R.string.accent_midnight, R.string.accent_midnight_desc),
-            AccentOption("cyan", R.string.accent_cyan, R.string.accent_cyan_desc),
-            AccentOption("sky", R.string.accent_sky, R.string.accent_sky_desc),
-            AccentOption("teal", R.string.accent_teal, R.string.accent_teal_desc),
-            AccentOption("azure", R.string.accent_azure, R.string.accent_azure_desc),
-            AccentOption("yellow", R.string.accent_yellow, R.string.accent_yellow_desc),
-            AccentOption("lemon", R.string.accent_lemon, R.string.accent_lemon_desc),
-            AccentOption("gold", R.string.accent_gold, R.string.accent_gold_desc),
-            AccentOption("amber", R.string.accent_amber, R.string.accent_amber_desc),
-            AccentOption("sand", R.string.accent_sand, R.string.accent_sand_desc),
-            AccentOption("sepia", R.string.accent_sepia, R.string.accent_sepia_desc),
-            AccentOption("mustard", R.string.accent_mustard, R.string.accent_mustard_desc),
-            AccentOption("red", R.string.accent_red, R.string.accent_red_desc),
-            AccentOption("crimson", R.string.accent_crimson, R.string.accent_crimson_desc),
-            AccentOption("ruby", R.string.accent_ruby, R.string.accent_ruby_desc),
-            AccentOption("pink", R.string.accent_pink, R.string.accent_pink_desc),
-            AccentOption("coral", R.string.accent_coral, R.string.accent_coral_desc),
-            AccentOption("burgundy", R.string.accent_burgundy, R.string.accent_burgundy_desc),
-            AccentOption("scarlet", R.string.accent_scarlet, R.string.accent_scarlet_desc),
-            AccentOption("orange", R.string.accent_orange, R.string.accent_orange_desc),
-            AccentOption("deep_orange", R.string.accent_deep_orange, R.string.accent_deep_orange_desc),
-            AccentOption("tangerine", R.string.accent_tangerine, R.string.accent_tangerine_desc),
-            AccentOption("apricot", R.string.accent_apricot, R.string.accent_apricot_desc),
-            AccentOption("copper", R.string.accent_copper, R.string.accent_copper_desc),
-            AccentOption("peach", R.string.accent_peach, R.string.accent_peach_desc),
-            AccentOption("terracotta", R.string.accent_terracotta, R.string.accent_terracotta_desc),
-            AccentOption("green", R.string.accent_green, R.string.accent_green_desc),
-            AccentOption("emerald", R.string.accent_emerald, R.string.accent_emerald_desc),
-            AccentOption("mint", R.string.accent_mint, R.string.accent_mint_desc),
-            AccentOption("forest", R.string.accent_forest, R.string.accent_forest_desc),
-            AccentOption("sage", R.string.accent_sage, R.string.accent_sage_desc),
-            AccentOption("lime", R.string.accent_lime, R.string.accent_lime_desc),
-            AccentOption("olive", R.string.accent_olive, R.string.accent_olive_desc)
-        ).forEach { option ->
-            val swatch = remember(theme, option.key, colors.isLight) {
-                ThemeSwatchUtils.resolveSwatchColors(context, theme, option.key)
-            }
-            SelectableCard(
-                selected = current == option.key, onClick = { onSelect(option.key) },
-                cardBackground = colors.surfaceVariant, primary = colors.primary,
-                contentPadding = OptionContentPadding, bottomSpacing = OptionBottomSpacing,
-                modifier = Modifier.scrollToSelection(scrollState, current == option.key)
-            ) {
-                AccentSwatch(Color(swatch.bg), Color(swatch.surface), Color(swatch.accent))
-                Column(Modifier.weight(1f).padding(start = 16.dp, end = 8.dp)) {
-                    Text(stringResource(option.titleRes), color = colors.onSurface, fontSize = 15.sp, fontWeight = FontWeight.Bold)
-                    Text(stringResource(option.descRes), color = colors.secondaryText, fontSize = 13.sp, modifier = Modifier.padding(top = 2.dp))
-                }
-                CheckSlot(current == option.key, colors.primary)
-            }
-        }
-    }
-}
-
-@Composable
-fun SurfaceIntensityDialog(
-    current: String,
-    theme: String,
-    accent: String,
-    hideStatusBar: Boolean, hideSystemNavigation: Boolean,
-    onSelect: (String) -> Unit,
-    onDismiss: () -> Unit
-) {
-    val colors = LocalClintColors.current
-    val strongVisible = accent in setOf("purple", "deep_purple", "royal_purple", "amethyst", "lavender", "teal", "pink", "indigo", "cyan", "amber", "mint", "crimson", "slate", "graphite", "obsidian", "onyx", "coral", "midnight", "sepia", "forest", "plum", "sand", "ruby", "sky", "charcoal", "peach", "emerald", "blue", "yellow", "lemon", "gold", "red", "green", "orange", "deep_orange", "tangerine", "apricot", "copper", "scarlet", "lime", "olive", "default", "material_you", "violet", "titanium", "azure", "mustard", "burgundy", "terracotta", "sage")
-    val swatches = rememberIntensitySwatchColors(theme, accent)
-    val scrollState = rememberScrollState()
-
-    ClintDialog(title = stringResource(R.string.pref_surface_intensity_title), hideStatusBar = hideStatusBar, hideSystemNavigation = hideSystemNavigation, onDismiss = onDismiss, scrollState = scrollState) {
-        SelectableCard(
-            selected = current == "no_tint", onClick = { onSelect("no_tint") },
-            cardBackground = colors.surfaceVariant, primary = colors.primary,
-            contentPadding = OptionContentPadding, bottomSpacing = OptionBottomSpacing,
-            modifier = Modifier.scrollToSelection(scrollState, current == "no_tint")
-        ) {
-            AccentSwatch(swatches.noTintBg, swatches.noTintSurface, swatches.accent)
-            Column(Modifier.weight(1f).padding(start = 16.dp, end = 8.dp)) {
-                Text(stringResource(R.string.surface_intensity_no_tint), color = colors.onSurface, fontSize = 15.sp, fontWeight = FontWeight.Bold)
-                Text(stringResource(R.string.surface_intensity_no_tint_desc), color = colors.secondaryText, fontSize = 13.sp, modifier = Modifier.padding(top = 2.dp))
-            }
-            CheckSlot(current == "no_tint", colors.primary)
-        }
-        SelectableCard(
-            selected = current == "soft_tint", onClick = { onSelect("soft_tint") },
-            cardBackground = colors.surfaceVariant, primary = colors.primary,
-            contentPadding = OptionContentPadding, bottomSpacing = OptionBottomSpacing,
-            modifier = Modifier.scrollToSelection(scrollState, current == "soft_tint")
-        ) {
-            AccentSwatch(swatches.softBg, swatches.softSurface, swatches.accent)
-            Column(Modifier.weight(1f).padding(start = 16.dp, end = 8.dp)) {
-                Text(stringResource(R.string.surface_intensity_soft), color = colors.onSurface, fontSize = 15.sp, fontWeight = FontWeight.Bold)
-                Text(stringResource(R.string.surface_intensity_soft_desc), color = colors.secondaryText, fontSize = 13.sp, modifier = Modifier.padding(top = 2.dp))
-            }
-            CheckSlot(current == "soft_tint", colors.primary)
-        }
-        if (strongVisible) {
-            SelectableCard(
-                selected = current == "strong_tint", onClick = { onSelect("strong_tint") },
-                cardBackground = colors.surfaceVariant, primary = colors.primary,
-                contentPadding = OptionContentPadding, bottomSpacing = OptionBottomSpacing,
-                modifier = Modifier.scrollToSelection(scrollState, current == "strong_tint")
-            ) {
-                AccentSwatch(swatches.strongBg, swatches.strongSurface, swatches.accent)
-                Column(Modifier.weight(1f).padding(start = 16.dp, end = 8.dp)) {
-                    Text(stringResource(R.string.surface_intensity_strong), color = colors.onSurface, fontSize = 15.sp, fontWeight = FontWeight.Bold)
-                    Text(stringResource(R.string.surface_intensity_strong_desc), color = colors.secondaryText, fontSize = 13.sp, modifier = Modifier.padding(top = 2.dp))
-                }
-                CheckSlot(current == "strong_tint", colors.primary)
-            }
-        }
-        SelectableCard(
-            selected = current == "pure_mode", onClick = { onSelect("pure_mode") },
-            cardBackground = colors.surfaceVariant, primary = colors.primary,
-            contentPadding = OptionContentPadding, bottomSpacing = OptionBottomSpacing,
-            modifier = Modifier.scrollToSelection(scrollState, current == "pure_mode")
-        ) {
-            AccentSwatch(swatches.pureBg, swatches.pureSurface, swatches.accent)
-            Column(Modifier.weight(1f).padding(start = 16.dp, end = 8.dp)) {
-                Text(stringResource(R.string.surface_intensity_pure), color = colors.onSurface, fontSize = 15.sp, fontWeight = FontWeight.Bold)
-                Text(
-                    stringResource(if (colors.isLight) R.string.surface_intensity_pure_light_desc else R.string.surface_intensity_pure_dark_desc),
-                    color = colors.secondaryText, fontSize = 13.sp, modifier = Modifier.padding(top = 2.dp)
-                )
-            }
-            CheckSlot(current == "pure_mode", colors.primary)
-        }
-        SelectableCard(
-            selected = current == "amoled_no_tint", onClick = { onSelect("amoled_no_tint") },
-            cardBackground = colors.surfaceVariant, primary = colors.primary,
-            contentPadding = OptionContentPadding, bottomSpacing = OptionBottomSpacing,
-            modifier = Modifier.scrollToSelection(scrollState, current == "amoled_no_tint")
-        ) {
-            AccentSwatch(swatches.pureBg, swatches.pureSurface, swatches.accent)
-            Column(Modifier.weight(1f).padding(start = 16.dp, end = 8.dp)) {
-                Text(stringResource(R.string.surface_intensity_amoled_no_tint), color = colors.onSurface, fontSize = 15.sp, fontWeight = FontWeight.Bold)
-                Text(
-                    stringResource(if (colors.isLight) R.string.surface_intensity_amoled_no_tint_light_desc else R.string.surface_intensity_amoled_no_tint_dark_desc),
-                    color = colors.secondaryText, fontSize = 13.sp, modifier = Modifier.padding(top = 2.dp)
-                )
-            }
-            CheckSlot(current == "amoled_no_tint", colors.primary)
-        }
-    }
-}
-
-@Composable
 fun AddressBarPositionDialog(
     current: String,
     theme: String,
-    accent: String,
     hideStatusBar: Boolean, hideSystemNavigation: Boolean,
     onSelect: (String) -> Unit,
     onDismiss: () -> Unit
 ) {
     val colors = LocalClintColors.current
-    val (bg, surface) = rememberBgSurface(theme, accent)
+    val (bg, surface) = rememberBgSurface(theme)
     val onSurface = colors.onSurface
     val scrollState = rememberScrollState()
 
@@ -365,18 +146,61 @@ fun TabBarPositionDialog(
     }
 }
 
+fun tabPreviewResolutionSummaryRes(key: String): Int = when (com.simplefox.browser.tabs.TabThumbnailCache.normalizeResolution(key)) {
+    com.simplefox.browser.tabs.TabThumbnailCache.RES_LOW -> R.string.tab_preview_resolution_low
+    com.simplefox.browser.tabs.TabThumbnailCache.RES_HIGH -> R.string.tab_preview_resolution_high
+    com.simplefox.browser.tabs.TabThumbnailCache.RES_VERY_HIGH -> R.string.tab_preview_resolution_very_high
+    else -> R.string.tab_preview_resolution_standard
+}
+
 @Composable
-fun ScrollHideModeDialog(
+fun TabPreviewResolutionDialog(
     current: String,
-    addressBarPosition: String,
-    theme: String,
-    accent: String,
     hideStatusBar: Boolean, hideSystemNavigation: Boolean,
     onSelect: (String) -> Unit,
     onDismiss: () -> Unit
 ) {
     val colors = LocalClintColors.current
-    val (bg, surface) = rememberBgSurface(theme, accent)
+    val scrollState = rememberScrollState()
+    val selectedKey = com.simplefox.browser.tabs.TabThumbnailCache.normalizeResolution(current)
+    ClintDialog(
+        title = stringResource(R.string.pref_tab_preview_resolution_title),
+        hideStatusBar = hideStatusBar, hideSystemNavigation = hideSystemNavigation,
+        onDismiss = onDismiss, scrollState = scrollState
+    ) {
+        listOf(
+            Triple(com.simplefox.browser.tabs.TabThumbnailCache.RES_LOW, R.string.tab_preview_resolution_low, R.string.tab_preview_resolution_low_desc),
+            Triple(com.simplefox.browser.tabs.TabThumbnailCache.RES_STANDARD, R.string.tab_preview_resolution_standard, R.string.tab_preview_resolution_standard_desc),
+            Triple(com.simplefox.browser.tabs.TabThumbnailCache.RES_HIGH, R.string.tab_preview_resolution_high, R.string.tab_preview_resolution_high_desc),
+            Triple(com.simplefox.browser.tabs.TabThumbnailCache.RES_VERY_HIGH, R.string.tab_preview_resolution_very_high, R.string.tab_preview_resolution_very_high_desc)
+        ).forEach { (key, titleRes, descRes) ->
+            SelectableCard(
+                selected = selectedKey == key, onClick = { onSelect(key) },
+                cardBackground = colors.surfaceVariant, primary = colors.primary,
+                contentPadding = OptionContentPadding, bottomSpacing = OptionBottomSpacing,
+                modifier = Modifier.scrollToSelection(scrollState, selectedKey == key)
+            ) {
+                Column(Modifier.weight(1f).padding(start = 4.dp, end = 8.dp)) {
+                    Text(stringResource(titleRes), color = colors.onSurface, fontSize = 15.sp, fontWeight = FontWeight.Medium)
+                    Text(stringResource(descRes), color = colors.secondaryText, fontSize = 12.sp, modifier = Modifier.padding(top = 2.dp))
+                }
+                CheckSlot(selectedKey == key, colors.primary)
+            }
+        }
+    }
+}
+
+@Composable
+fun ScrollHideModeDialog(
+    current: String,
+    addressBarPosition: String,
+    theme: String,
+    hideStatusBar: Boolean, hideSystemNavigation: Boolean,
+    onSelect: (String) -> Unit,
+    onDismiss: () -> Unit
+) {
+    val colors = LocalClintColors.current
+    val (bg, surface) = rememberBgSurface(theme)
     val onSurface = colors.onSurface
     val scrollState = rememberScrollState()
 

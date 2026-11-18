@@ -1,4 +1,5 @@
 package com.simplefox.browser.browser.delegates
+import com.simplefox.browser.tabs.restorableUrl
 import com.simplefox.browser.browser.MainActivity
 
 import android.annotation.SuppressLint
@@ -12,6 +13,9 @@ import com.simplefox.browser.tabs.TabThumbnailCache
 import com.simplefox.browser.browser.webview.ClintAutofill
 import com.simplefox.browser.browser.webview.ClintWebChromeClient
 import com.simplefox.browser.browser.webview.ClintWebViewClient
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.yield
 
 internal const val PREF_REMEMBER_BROWSING_MODE = "remember_browsing_mode"
 internal const val PREF_LAST_BROWSING_MODE_INCOGNITO = "last_browsing_mode_incognito"
@@ -49,6 +53,7 @@ internal fun MainActivity.closeAllIncognitoTabs() {
 }
 
 internal fun MainActivity.saveTabs() {
+    if (isRestoringTabs) return
     tabManager.touchActive()
     val activeTab = tabManager.activeTab
     val restoreActiveId = if (activeTab != null && tabManager.isGhostTab(activeTab)) {
@@ -59,10 +64,7 @@ internal fun MainActivity.saveTabs() {
     val savedTabs = tabManager.tabs
         .filter { !it.isIncognito && !it.isRefreshLinkTab && !tabManager.isGhostTab(it) }
         .mapIndexedNotNull { index, tab ->
-            val url = tab.pendingUrl?.takeIf { it.isNotEmpty() && it != "about:blank" }
-                ?: tab.webView.url?.takeIf { it.isNotEmpty() && it != "about:blank" }
-                ?: tab.url.takeIf { it.isNotEmpty() && it != "about:blank" }
-                ?: return@mapIndexedNotNull null
+            val url = tab.restorableUrl() ?: return@mapIndexedNotNull null
             SavedTab(
                 position = index,
                 url = url,
@@ -81,36 +83,51 @@ internal fun MainActivity.saveTabs() {
     persistAllShortcutTabGroups()
 }
 
-internal fun MainActivity.discardSavedTabs() {
-    TabSessionManager.awaitPendingWrites()
-    TabSessionManager.clear(this)
-    TabThumbnailCache.pruneDisk(this, emptySet())
-}
-
 internal fun MainActivity.discardSavedTabsAsync() {
     TabSessionManager.clearAsync(this)
     TabThumbnailCache.pruneDisk(this, emptySet())
 }
 
-internal fun MainActivity.restoreTabs(): Boolean {
-    TabSessionManager.awaitPendingWrites()
-    migrateTabsFromPrefsIfNeeded()
-    val savedTabs = TabSessionManager.load(this).filter { it.shortcutId == null }
+internal suspend fun MainActivity.restoreTabs(): Boolean {
+    val groupsEnabled = TabGroupPrefs.isEnabled(prefs)
+    val (savedTabs, savedGroups) = withContext(Dispatchers.IO) {
+        TabSessionManager.awaitPendingWrites()
+        migrateTabsFromPrefsIfNeeded()
+        val tabs = TabSessionManager.load(this@restoreTabs).filter { it.shortcutId == null }
+        val groupIds = tabs.mapNotNull { it.groupId }.toSet()
+        val groups = if (groupsEnabled && groupIds.isNotEmpty()) {
+            TabSessionManager.loadGroups(this@restoreTabs).filter { it.id in groupIds }
+        } else {
+            emptyList()
+        }
+        tabs to groups
+    }
     if (savedTabs.isEmpty()) return false
     val activeIndex = savedTabs.indexOfFirst { it.isActive }.coerceAtLeast(0)
-    val groupsEnabled = TabGroupPrefs.isEnabled(prefs)
-    val referencedGroupIds = savedTabs.mapNotNull { it.groupId }.toSet()
-    if (groupsEnabled) {
-        TabSessionManager.loadGroups(this)
-            .filter { it.id in referencedGroupIds }
-            .forEach { tabManager.restoreGroup(it) }
-    }
+    val savedTabIds = savedTabs.mapTo(HashSet()) { it.tabId }
+    savedGroups.forEach { tabManager.restoreGroup(it) }
     savedTabs.forEachIndexed { index, saved ->
-        openNewTabSilent(saved.url, saved.tabId, saved.shortcutId, deferLoad = index != activeIndex, title = saved.title, profileId = saved.profileId, groupId = saved.groupId.takeIf { groupsEnabled })
+        val currentActiveId = tabManager.activeTab?.id
+        val userTabActive = currentActiveId != null && currentActiveId !in savedTabIds
+        openNewTabSilent(
+            saved.url,
+            saved.tabId,
+            saved.shortcutId,
+            deferLoad = index != activeIndex || userTabActive,
+            title = saved.title,
+            profileId = saved.profileId,
+            groupId = saved.groupId.takeIf { groupsEnabled }
+        )
+        if (index % 3 == 2) yield()
     }
     tabManager.pruneEmptyGroups()
-    val activeTabId = savedTabs[activeIndex].tabId
-    tabManager.switchTo(tabManager.tabs.indexOfFirst { it.id == activeTabId }.coerceAtLeast(0))
+    val currentActiveId = tabManager.activeTab?.id
+    if (currentActiveId != null && currentActiveId !in savedTabIds) {
+        tabManager.activeIndex = tabManager.tabs.indexOfFirst { it.id == currentActiveId }.coerceAtLeast(0)
+    } else {
+        val activeTabId = savedTabs[activeIndex].tabId
+        tabManager.switchTo(tabManager.tabs.indexOfFirst { it.id == activeTabId }.coerceAtLeast(0))
+    }
     savedTabs.forEach { saved ->
         tabManager.tabs.firstOrNull { it.id == saved.tabId }?.lastActiveAt = saved.lastActiveAt
     }
@@ -119,7 +136,7 @@ internal fun MainActivity.restoreTabs(): Boolean {
     return true
 }
 
-internal fun MainActivity.closeInactiveTabs() {
+internal fun MainActivity.closeInactiveTabs(preserveTabId: String? = null) {
     val setting = InactiveTabsPolicy.normalize(prefs.getString(InactiveTabsPolicy.PREF_DELETE_INACTIVE_TABS, null))
     if (setting == InactiveTabsPolicy.NEVER) return
     tabManager.touchActive()
@@ -128,6 +145,7 @@ internal fun MainActivity.closeInactiveTabs() {
     val now = System.currentTimeMillis()
     val expired = tabManager.tabs.filter { tab ->
         tab.id != activeId &&
+            tab.id != preserveTabId &&
             !tab.isRefreshLinkTab &&
             !tabManager.isGhostTab(tab) &&
             !tab.webView.isMediaPlaying &&
@@ -136,7 +154,6 @@ internal fun MainActivity.closeInactiveTabs() {
     if (expired.isEmpty()) return
     expired.forEach { tab ->
         removeDesktopScript(tab)
-        com.simplefox.browser.mediacapture.MediaCaptureStore.removeTab(tab.id)
         if (!tab.isIncognito) com.simplefox.browser.ui.FaviconCache.evict(this, tab.url)
         TabThumbnailCache.evict(this, tab.id)
         val index = tabManager.tabs.indexOfFirst { it.id == tab.id }
@@ -152,6 +169,16 @@ internal fun MainActivity.captureActiveTabThumbnail() {
     if (uiState.isHomePage) return
     val tab = tabManager.activeTab ?: return
     TabThumbnailCache.capture(tab.id, tab.webView, tab.isIncognito)
+}
+
+/** Captures the active tab's thumbnail and runs [then] as soon as the frame is grabbed (immediately if it can't be). */
+internal fun MainActivity.captureActiveTabThen(then: () -> Unit) {
+    val tab = tabManager.activeTab
+    if (tab == null || uiState.isHomePage) {
+        then()
+        return
+    }
+    TabThumbnailCache.captureThen(tab.id, tab.webView, tab.isIncognito, then = then)
 }
 
 private fun MainActivity.migrateTabsFromPrefsIfNeeded() {
@@ -250,7 +277,7 @@ internal fun MainActivity.openNewTabInBackground(url: String, openerTabId: Strin
     }
     val sourceTab = openerTabId?.let { id -> tabManager.tabs.firstOrNull { it.id == id } } ?: tabManager.activeTab
     val sourceProfile = sourceTab?.takeIf { !it.isIncognito }?.profileId ?: WebProfiles.DEFAULT_ID
-    val webView = createClintWebView(false, WebProfiles.resolve(this, sourceProfile))
+    val webView = createClintWebView(false, WebProfiles.resolve(this, sourceProfile), deferOpen = true)
     val inheritedGroupId = sourceTab?.takeIf { !it.isIncognito }?.groupId
     val tab = BrowserTab(url = url, openerTabId = openerTabId, profileId = WebProfiles.profileOf(webView), groupId = inheritedGroupId, webView = webView)
     tabManager.addInBackground(tab)
@@ -291,7 +318,7 @@ internal fun MainActivity.openNewTabInBackground(url: String, openerTabId: Strin
             showPopupAlertDialog(newUrl, false, tab.id)
         }
     )
-    webView.loadUrl(url)
+    tab.pendingUrl = url
     updateTabCount()
 }
 
@@ -366,9 +393,14 @@ internal fun MainActivity.switchToTabMode(incognito: Boolean) {
         openNewTab(isIncognito = incognito)
         return
     }
-    captureActiveTabThumbnail()
-    tabManager.switchTo(index)
-    attachActiveWebView()
+    val targetId = tabManager.tabs[index].id
+    captureActiveTabThen {
+        val newIndex = tabManager.tabs.indexOfFirst { it.id == targetId }
+        if (newIndex != -1) {
+            tabManager.switchTo(newIndex)
+            attachActiveWebView()
+        }
+    }
 }
 
 internal fun MainActivity.attachActiveWebView() {
@@ -408,16 +440,18 @@ internal fun MainActivity.attachActiveWebView() {
 
 internal fun MainActivity.syncTabPlayback() {
     val activeId = tabManager.activeTab?.id
-    val singleTab = com.simplefox.browser.settings.datasaver.DataSaverMode.isSingleTabActive(prefs)
     tabManager.tabs.forEach { tab ->
         if (tab.id == activeId) {
             tab.webView.onResume()
         } else if (tab.pendingUrl == null) {
-            if (singleTab) tab.webView.stopLoading()
-            tab.webView.onPause()
+            if (tab.webView.isMediaPlaying) {
+                tab.webView.onPause()
+            } else {
+                tab.webView.stopAndHibernateWhenInactive()
+            }
         }
     }
-    trimBackgroundTabs(if (singleTab) 0 else MAX_LIVE_BACKGROUND_TABS)
+    trimBackgroundTabs()
 }
 
 internal fun MainActivity.focusTabById(tabId: String) {
@@ -506,7 +540,6 @@ internal fun MainActivity.closePopupTabToOpener(tab: BrowserTab): Boolean {
     if (closingIndex !in tabManager.tabs.indices) return false
 
     removeDesktopScript(tab)
-    com.simplefox.browser.mediacapture.MediaCaptureStore.removeTab(tab.id)
     if (!tab.isIncognito) com.simplefox.browser.ui.FaviconCache.evict(this, tab.url)
     TabThumbnailCache.evict(this, tab.id)
     tabManager.closeTab(closingIndex)

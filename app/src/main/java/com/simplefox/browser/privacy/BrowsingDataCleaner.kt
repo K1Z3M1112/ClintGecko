@@ -2,7 +2,7 @@ package com.simplefox.browser.privacy
 
 import android.content.Context
 import android.net.Uri
-import androidx.preference.PreferenceManager
+import com.simplefox.browser.util.PreferenceManager
 import com.simplefox.browser.browser.webview.ClintGecko
 import com.simplefox.browser.history.SearchHistoryManager
 import com.simplefox.browser.settings.datasaver.DataSaverSiteException

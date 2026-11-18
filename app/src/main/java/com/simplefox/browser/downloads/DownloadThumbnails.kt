@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.ImageDecoder
 import android.graphics.pdf.PdfRenderer
@@ -22,7 +21,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.graphics.scale
-import com.caverock.androidsvg.SVG
+import com.simplefox.browser.util.SimpleSvg
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
@@ -87,7 +86,7 @@ internal object DownloadThumbnailLoader {
     private const val BUNDLE_ICON_PX = 256
 
     private val cache = object : LruCache<String, DownloadThumbnail>(
-        (Runtime.getRuntime().maxMemory() / 1024L / 24L).toInt().coerceIn(4 * 1024, 48 * 1024)
+        (Runtime.getRuntime().maxMemory() / 1024L / 64L).toInt().coerceIn(2 * 1024, 12 * 1024)
     ) {
         override fun sizeOf(key: String, value: DownloadThumbnail): Int =
             ((value.bitmap?.let { it.width * it.height * 4 } ?: 0) / 1024).coerceAtLeast(1)
@@ -95,6 +94,19 @@ internal object DownloadThumbnailLoader {
     private val bundleCache = LruCache<String, DownloadThumbnail>(12)
     private val misses: MutableSet<String> = Collections.newSetFromMap(ConcurrentHashMap())
     private val gate = Semaphore(3)
+
+    fun trimMemory(level: Int) {
+        when {
+            level >= 40 || level == 15 -> {
+                cache.evictAll()
+                bundleCache.evictAll()
+            }
+            level >= 10 -> {
+                cache.trimToSize(cache.maxSize() / 2)
+                bundleCache.trimToSize(bundleCache.maxSize() / 2)
+            }
+        }
+    }
 
     fun keyFor(item: DownloadItem): String? {
         if (item.status != DownloadStatus.COMPLETE) return null
@@ -188,19 +200,8 @@ internal object DownloadThumbnailLoader {
     }
 
     private fun decodeSvg(context: Context, file: File?, uri: Uri?, sizePx: Int): Bitmap? {
-        val svg = open(context, file, uri)?.use { SVG.getFromInputStream(it) } ?: return null
-        val vb = svg.documentViewBox
-        val rawW = vb?.width()?.takeIf { it > 0f } ?: svg.documentWidth.takeIf { it > 0f } ?: sizePx.toFloat()
-        val rawH = vb?.height()?.takeIf { it > 0f } ?: svg.documentHeight.takeIf { it > 0f } ?: sizePx.toFloat()
-        if (vb == null) svg.setDocumentViewBox(0f, 0f, rawW, rawH)
-        val scale = sizePx / maxOf(rawW, rawH)
-        val width = (rawW * scale).toInt().coerceAtLeast(1)
-        val height = (rawH * scale).toInt().coerceAtLeast(1)
-        svg.setDocumentWidth(width.toFloat())
-        svg.setDocumentHeight(height.toFloat())
-        val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
-        svg.renderToCanvas(Canvas(bitmap))
-        return bitmap
+        val text = open(context, file, uri)?.use { it.readBytes().toString(Charsets.UTF_8) } ?: return null
+        return SimpleSvg.toBitmap(text, sizePx)
     }
 
     private fun decodeMedia(context: Context, file: File?, uri: Uri?, isVideo: Boolean, sizePx: Int): DownloadThumbnail? {

@@ -14,7 +14,6 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.Dp
 
 /**
  * Animation-free replacements for the Compose animation APIs used across the app.
@@ -38,14 +37,6 @@ fun animateColorAsState(
     label: String = "ColorAnimation",
     finishedListener: ((Color) -> Unit)? = null
 ): State<Color> = rememberUpdatedState(targetValue)
-
-@Composable
-fun animateDpAsState(
-    targetValue: Dp,
-    animationSpec: AnimationSpec<Dp> = spring(),
-    label: String = "DpAnimation",
-    finishedListener: ((Dp) -> Unit)? = null
-): State<Dp> = rememberUpdatedState(targetValue)
 
 @Composable
 fun AnimatedVisibility(

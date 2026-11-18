@@ -2,7 +2,7 @@ package com.simplefox.browser.privacy
 
 import android.content.Context
 import android.content.SharedPreferences
-import androidx.preference.PreferenceManager
+import com.simplefox.browser.util.PreferenceManager
 import org.mozilla.geckoview.GeckoPreferenceController
 
 object PrivacyPrefs {

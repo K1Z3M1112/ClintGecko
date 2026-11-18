@@ -1,7 +1,6 @@
 package com.simplefox.browser.blocker.engine
 
 import java.io.File
-import java.io.FileOutputStream
 import java.io.RandomAccessFile
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
@@ -14,6 +13,12 @@ import java.util.concurrent.atomic.AtomicLong
  * Pure Kotlin implementation of the website blocker engine (previously C++/JNI).
  * Public API and on-disk format are unchanged: little-endian header
  * (magic u32, version u32, domainCount u64, checksum u64) followed by sorted unsigned u64 FNV-1a hashes.
+ *
+ * Performance notes:
+ *  - Hosts-file parsing works directly on a reusable CharArray: no per-line String/StringBuilder allocations.
+ *  - The builder de-duplicates while it grows, so overlapping lists don't inflate peak memory.
+ *  - Finalizing sorts/de-dupes in place and streams the file out in chunks (no full-size ByteBuffer copy).
+ *  - Lookups are allocation-free.
  */
 object WebsiteBlockerNative {
     private const val MAGIC = 0x314C4257
@@ -22,6 +27,10 @@ object WebsiteBlockerNative {
     private const val FNV_OFFSET = -3750763034362895579L // 14695981039346656037ULL
     private const val FNV_PRIME = 1099511628211L
 
+    private const val READ_CHARS = 1 shl 16
+    private const val WRITE_CHUNK_LONGS = 1 shl 13
+    private const val DEDUPE_ON_GROW_MIN = 1 shl 20
+
     private val nextHandle = AtomicLong(1L)
     private val builders = ConcurrentHashMap<Long, Builder>()
     private val databases = ConcurrentHashMap<Long, Database>()
@@ -29,13 +38,29 @@ object WebsiteBlockerNative {
     private class Builder {
         var hashes = LongArray(1024)
         var size = 0
+
         fun add(hash: Long) {
-            if (size == hashes.size) hashes = hashes.copyOf(size * 2)
+            if (size == hashes.size) makeRoom()
             hashes[size++] = hash
+        }
+
+        /**
+         * Large lists overlap heavily, so before doubling the array try to reclaim space by
+         * sorting + de-duplicating. If that frees at least half the capacity we skip the growth.
+         * Sorting only happens at (at most) each doubling point, so total extra cost stays bounded.
+         */
+        private fun makeRoom() {
+            if (size >= DEDUPE_ON_GROW_MIN) {
+                sortUnsigned(hashes, size)
+                size = dedupe(hashes, size)
+                if (size <= hashes.size / 2) return
+            }
+            val newCap = if (hashes.size > Int.MAX_VALUE / 2) Int.MAX_VALUE - 8 else hashes.size * 2
+            hashes = hashes.copyOf(newCap)
         }
     }
 
-    private class Database(val hashes: LongBuffer, val count: Long)
+    private class Database(val hashes: LongBuffer, val count: Int)
 
     // ---- builder ----
 
@@ -45,51 +70,128 @@ object WebsiteBlockerNative {
         return id
     }
 
+    private const val EMPTY_STATS = "{\"added\":0,\"skipped\":0}"
+
     fun nativeAddText(builderPtr: Long, text: String): String {
-        val builder = builders[builderPtr] ?: return "{\"added\":0,\"skipped\":0}"
-        var added = 0L
-        var skipped = 0L
+        val builder = builders[builderPtr] ?: return EMPTY_STATS
+        val stats = LongArray(2)
         synchronized(builder) {
-            val len = text.length
-            var pos = 0
-            while (pos < len) {
-                var lineEnd = text.indexOf('\n', pos)
-                if (lineEnd < 0) lineEnd = len
-                var start = pos
-                var end = lineEnd
-                pos = lineEnd + 1
+            val chars = text.toCharArray()
+            val consumed = consumeLines(builder, chars, 0, chars.size, stats)
+            if (consumed < chars.size) handleLine(builder, chars, consumed, chars.size, stats)
+        }
+        return statsJson(stats)
+    }
 
-                while (start < end && (text[start] == ' ' || text[start] == '\t')) start++
-                while (end > start && isSpace(text[end - 1])) end--
-                if (end == start) continue
+    /**
+     * Streams a hosts file through a fixed char buffer. Unlike nativeAddText(file.readText()) this never
+     * holds the whole file (tens of MB for large lists) as a single String, and unlike readLine() it
+     * doesn't allocate a String per line.
+     */
+    fun nativeAddFile(builderPtr: Long, file: File): String {
+        val builder = builders[builderPtr] ?: return EMPTY_STATS
+        val stats = LongArray(2)
+        synchronized(builder) { streamFile(builder, file, stats) }
+        return statsJson(stats)
+    }
 
-                val first = text[start]
-                if (first == '#' || first == ';' || first == '!') continue
+    /** Counts valid domains in a hosts file without retaining any hashes (used for category display). */
+    fun nativeCountFile(file: File): Long {
+        val stats = LongArray(2)
+        streamFile(null, file, stats)
+        return stats[0]
+    }
 
-                val line = text.substring(start, end)
-                val sep = indexOfBlank(line, 0)
-                val token: String = if (sep < 0) {
-                    line
-                } else {
-                    val firstToken = line.substring(0, sep)
-                    val rest = indexOfNonBlank(line, sep)
-                    val second = if (rest < 0) "" else {
-                        val e = indexOfBlank(line, rest)
-                        line.substring(rest, if (e < 0) line.length else e)
-                    }
-                    if (looksLikeIp(firstToken) && second.isNotEmpty()) second else firstToken
+    private fun statsJson(stats: LongArray) = "{\"added\":${stats[0]},\"skipped\":${stats[1]}}"
+
+    private fun streamFile(builder: Builder?, file: File, stats: LongArray) {
+        file.inputStream().reader(Charsets.UTF_8).use { reader ->
+            var buf = CharArray(READ_CHARS)
+            var len = 0
+            while (true) {
+                if (len == buf.size) buf = buf.copyOf(buf.size * 2) // pathological very long line
+                val n = reader.read(buf, len, buf.size - len)
+                if (n < 0) break
+                len += n
+                val consumed = consumeLines(builder, buf, 0, len, stats)
+                if (consumed > 0) {
+                    System.arraycopy(buf, consumed, buf, 0, len - consumed)
+                    len -= consumed
                 }
+            }
+            if (len > 0) handleLine(builder, buf, 0, len, stats)
+        }
+    }
 
-                val domain = normalizeDomain(token)
-                if (domain.isEmpty() || domain.indexOf('.') < 0 || isBoilerplate(domain)) {
-                    skipped++
-                    continue
-                }
-                builder.add(fnv1a(domain, 0, domain.length))
-                added++
+    /** Processes every complete line in [from, to); returns the index just past the last terminator. */
+    private fun consumeLines(builder: Builder?, buf: CharArray, from: Int, to: Int, stats: LongArray): Int {
+        var pos = from
+        var i = from
+        while (i < to) {
+            val c = buf[i]
+            if (c == '\n' || c == '\r') {
+                handleLine(builder, buf, pos, i, stats)
+                pos = i + 1
+            }
+            i++
+        }
+        return pos
+    }
+
+    private fun handleLine(builder: Builder?, buf: CharArray, from: Int, to: Int, stats: LongArray) {
+        val result = processLine(builder, buf, from, to)
+        if (result > 0) stats[0]++ else if (result < 0) stats[1]++
+    }
+
+    /**
+     * Returns 1 if a domain was added, -1 if the line was skipped as invalid, 0 if ignored (blank/comment).
+     * Hash is computed in the same pass that validates and lower-cases the token.
+     */
+    private fun processLine(builder: Builder?, buf: CharArray, from: Int, to: Int): Int {
+        var start = from
+        var end = to
+        while (start < end && (buf[start] == ' ' || buf[start] == '\t')) start++
+        while (end > start && isSpace(buf[end - 1])) end--
+        if (end == start) return 0
+
+        val first = buf[start]
+        if (first == '#' || first == ';' || first == '!') return 0
+
+        var tokStart = start
+        var tokEnd = end
+        val sep = indexOfBlank(buf, start, end)
+        if (sep >= 0) {
+            tokEnd = sep
+            val rest = indexOfNonBlank(buf, sep, end)
+            if (rest >= 0 && looksLikeIp(buf, start, sep)) {
+                val e = indexOfBlank(buf, rest, end)
+                tokStart = rest
+                tokEnd = if (e < 0) end else e
             }
         }
-        return "{\"added\":$added,\"skipped\":$skipped}"
+
+        // normalize: trim whitespace, drop trailing dots
+        while (tokStart < tokEnd && isSpace(buf[tokStart])) tokStart++
+        while (tokEnd > tokStart && isSpace(buf[tokEnd - 1])) tokEnd--
+        while (tokEnd > tokStart && buf[tokEnd - 1] == '.') tokEnd--
+        if (tokEnd == tokStart) return -1
+
+        var h = FNV_OFFSET
+        var hasDot = false
+        for (i in tokStart until tokEnd) {
+            var c = buf[i]
+            if (c == '.') {
+                hasDot = true
+            } else if (c in 'A'..'Z') {
+                c += 32
+            } else if (!(c in 'a'..'z' || c in '0'..'9' || c == '-')) {
+                return -1
+            }
+            h = (h xor c.code.toLong()) * FNV_PRIME
+        }
+        if (!hasDot || isBoilerplate(h)) return -1
+        builder?.add(h)
+        return 1
     }
 
     fun nativeFinalizeBuilder(builderPtr: Long, outputPath: String): String {
@@ -99,24 +201,40 @@ object WebsiteBlockerNative {
         var count = 0L
         var sizeBytes = 0L
         try {
-            val sorted = synchronized(builder) { builder.hashes.copyOf(builder.size) }
-            sortUnsigned(sorted)
-            val unique = dedupe(sorted)
-            count = unique.size.toLong()
+            synchronized(builder) {
+                // In place: no extra full-size copies of the hash array.
+                sortUnsigned(builder.hashes, builder.size)
+                builder.size = dedupe(builder.hashes, builder.size)
+                val n = builder.size
+                val hashes = builder.hashes
 
-            val dataBytes = count * 8
-            val buf = ByteBuffer.allocate((HEADER_BYTES + dataBytes).toInt()).order(ByteOrder.LITTLE_ENDIAN)
-            buf.putInt(MAGIC).putInt(VERSION).putLong(count).putLong(0L)
-            val dataStart = buf.position()
-            for (h in unique) buf.putLong(h)
-            var checksum = FNV_OFFSET
-            val arr = buf.array()
-            for (i in dataStart until arr.size) {
-                checksum = (checksum xor (arr[i].toLong() and 0xFF)) * FNV_PRIME
+                val chunk = ByteBuffer.allocate(WRITE_CHUNK_LONGS * 8).order(ByteOrder.LITTLE_ENDIAN)
+                val bytes = chunk.array()
+                var checksum = FNV_OFFSET
+
+                RandomAccessFile(File(outputPath), "rw").use { raf ->
+                    raf.setLength(0)
+                    raf.seek(HEADER_BYTES)
+                    var i = 0
+                    while (i < n) {
+                        val take = minOf(WRITE_CHUNK_LONGS, n - i)
+                        chunk.clear()
+                        for (k in 0 until take) chunk.putLong(hashes[i + k])
+                        val len = take * 8
+                        for (b in 0 until len) {
+                            checksum = (checksum xor (bytes[b].toLong() and 0xFF)) * FNV_PRIME
+                        }
+                        raf.write(bytes, 0, len)
+                        i += take
+                    }
+                    val header = ByteBuffer.allocate(HEADER_BYTES.toInt()).order(ByteOrder.LITTLE_ENDIAN)
+                    header.putInt(MAGIC).putInt(VERSION).putLong(n.toLong()).putLong(checksum)
+                    raf.seek(0)
+                    raf.write(header.array())
+                }
+                count = n.toLong()
+                sizeBytes = HEADER_BYTES + count * 8
             }
-            buf.putLong(16, checksum)
-            FileOutputStream(File(outputPath)).use { it.write(arr) }
-            sizeBytes = HEADER_BYTES + dataBytes
             success = true
         } catch (_: Exception) {
             success = false
@@ -132,7 +250,12 @@ object WebsiteBlockerNative {
 
     // ---- database ----
 
-    fun nativeLoadDatabase(path: String): Long {
+    /**
+     * @param verifyChecksum when false the (O(file size)) checksum pass is skipped; the header and
+     * size are still validated. Callers pass false only when the file is known to be unchanged since
+     * it was last verified (see WebsiteBlockerEngine).
+     */
+    fun nativeLoadDatabase(path: String, verifyChecksum: Boolean = true): Long {
         return try {
             RandomAccessFile(path, "r").use { raf ->
                 val size = raf.length()
@@ -144,17 +267,27 @@ object WebsiteBlockerNative {
                 val checksum = map.getLong(16)
                 if (count < 0 || count > (size - HEADER_BYTES) / 8) return 0L
                 if (magic != MAGIC || version != VERSION || HEADER_BYTES + count * 8 != size) return 0L
+                if (count > Int.MAX_VALUE) return 0L
 
-                var h = FNV_OFFSET
-                for (i in HEADER_BYTES.toInt() until size.toInt()) {
-                    h = (h xor (map.get(i).toLong() and 0xFF)) * FNV_PRIME
+                if (verifyChecksum) {
+                    var h = FNV_OFFSET
+                    val reader = map.duplicate()
+                    reader.position(HEADER_BYTES.toInt())
+                    val chunk = ByteArray(1 shl 16)
+                    while (reader.hasRemaining()) {
+                        val n = minOf(chunk.size, reader.remaining())
+                        reader.get(chunk, 0, n)
+                        for (i in 0 until n) {
+                            h = (h xor (chunk[i].toLong() and 0xFF)) * FNV_PRIME
+                        }
+                    }
+                    if (h != checksum) return 0L
                 }
-                if (h != checksum) return 0L
 
                 map.position(HEADER_BYTES.toInt())
                 val longs = map.slice().order(ByteOrder.LITTLE_ENDIAN).asLongBuffer()
                 val id = nextHandle.getAndIncrement()
-                databases[id] = Database(longs, count)
+                databases[id] = Database(longs, count.toInt())
                 id
             }
         } catch (_: Exception) {
@@ -162,21 +295,32 @@ object WebsiteBlockerNative {
         }
     }
 
+    /** Allocation-free: hashes the host (lower-cased on the fly) and each parent-domain suffix. */
     fun nativeIsBlocked(handle: Long, host: String): Boolean {
         val db = databases[handle] ?: return false
-        val n = normalizeDomain(host)
-        if (n.isEmpty()) return false
-        if (contains(db, fnv1a(n, 0, n.length))) return true
-        var dot = n.indexOf('.')
-        while (dot >= 0) {
-            if (n.indexOf('.', dot + 1) < 0) break
-            if (contains(db, fnv1a(n, dot + 1, n.length))) return true
-            dot = n.indexOf('.', dot + 1)
+        var start = 0
+        var end = host.length
+        while (start < end && isSpace(host[start])) start++
+        while (end > start && isSpace(host[end - 1])) end--
+        while (end > start && host[end - 1] == '.') end--
+        if (end == start) return false
+        for (i in start until end) {
+            val c = host[i]
+            if (!(isAsciiAlnum(c) || c == '.' || c == '-')) return false
+        }
+
+        if (contains(db, fnvLower(host, start, end))) return true
+        var dot = host.indexOf('.', start)
+        while (dot in start until end) {
+            val next = host.indexOf('.', dot + 1)
+            if (next < 0 || next >= end) break // never test the bare TLD
+            if (contains(db, fnvLower(host, dot + 1, end))) return true
+            dot = next
         }
         return false
     }
 
-    fun nativeDomainCount(handle: Long): Long = databases[handle]?.count ?: 0L
+    fun nativeDomainCount(handle: Long): Long = databases[handle]?.count?.toLong() ?: 0L
 
     fun nativeUnloadDatabase(handle: Long) {
         databases.remove(handle)
@@ -185,79 +329,76 @@ object WebsiteBlockerNative {
     // ---- helpers ----
 
     private fun contains(db: Database, hash: Long): Boolean {
+        val hashes = db.hashes
         var lo = 0
-        var hi = db.count.toInt() - 1
+        var hi = db.count - 1
         while (lo <= hi) {
             val mid = (lo + hi) ushr 1
-            val c = java.lang.Long.compareUnsigned(db.hashes.get(mid), hash)
+            val c = java.lang.Long.compareUnsigned(hashes.get(mid), hash)
             if (c < 0) lo = mid + 1 else if (c > 0) hi = mid - 1 else return true
         }
         return false
     }
 
-    private fun fnv1a(s: CharSequence, from: Int, to: Int): Long {
+    private fun fnvLower(s: String, from: Int, to: Int): Long {
         var h = FNV_OFFSET
         for (i in from until to) {
-            h = (h xor (s[i].code.toLong() and 0xFF)) * FNV_PRIME
+            var c = s[i]
+            if (c in 'A'..'Z') c += 32
+            h = (h xor c.code.toLong()) * FNV_PRIME
         }
         return h
     }
 
-    private fun sortUnsigned(a: LongArray) {
-        for (i in a.indices) a[i] = a[i] xor Long.MIN_VALUE
-        a.sort()
-        for (i in a.indices) a[i] = a[i] xor Long.MIN_VALUE
+    private fun sortUnsigned(a: LongArray, size: Int) {
+        for (i in 0 until size) a[i] = a[i] xor Long.MIN_VALUE
+        java.util.Arrays.sort(a, 0, size)
+        for (i in 0 until size) a[i] = a[i] xor Long.MIN_VALUE
     }
 
-    private fun dedupe(a: LongArray): LongArray {
-        if (a.isEmpty()) return a
+    /** In-place de-dupe of a sorted prefix; returns the new size. */
+    private fun dedupe(a: LongArray, size: Int): Int {
+        if (size == 0) return 0
         var n = 1
-        for (i in 1 until a.size) if (a[i] != a[n - 1]) a[n++] = a[i]
-        return a.copyOf(n)
+        for (i in 1 until size) if (a[i] != a[n - 1]) a[n++] = a[i]
+        return n
     }
 
     private fun isSpace(c: Char) = c == ' ' || c in '\t'..'\r'
 
     private fun isAsciiAlnum(c: Char) = c in 'a'..'z' || c in 'A'..'Z' || c in '0'..'9'
 
-    private fun indexOfBlank(s: String, from: Int): Int {
-        for (i in from until s.length) if (s[i] == ' ' || s[i] == '\t') return i
+    private fun indexOfBlank(s: CharArray, from: Int, to: Int): Int {
+        for (i in from until to) if (s[i] == ' ' || s[i] == '\t') return i
         return -1
     }
 
-    private fun indexOfNonBlank(s: String, from: Int): Int {
-        for (i in from until s.length) if (s[i] != ' ' && s[i] != '\t') return i
+    private fun indexOfNonBlank(s: CharArray, from: Int, to: Int): Int {
+        for (i in from until to) if (s[i] != ' ' && s[i] != '\t') return i
         return -1
     }
 
-    private fun looksLikeIp(token: String): Boolean {
-        if (token.isEmpty()) return false
-        for (c in token) {
-            if (!(c in '0'..'9' || c in 'a'..'f' || c in 'A'..'F' || c == '.' || c == ':')) return false
+    private fun looksLikeIp(s: CharArray, from: Int, to: Int): Boolean {
+        if (from >= to) return false
+        var punct = false
+        for (i in from until to) {
+            val c = s[i]
+            if (c == '.' || c == ':') punct = true
+            else if (!(c in '0'..'9' || c in 'a'..'f' || c in 'A'..'F')) return false
         }
-        return token.indexOf('.') >= 0 || token.indexOf(':') >= 0
+        return punct
     }
 
-    private val boilerplate = setOf(
+    private fun hashOf(s: String): Long = fnvLower(s, 0, s.length)
+
+    private val boilerplateHashes: LongArray = arrayOf(
         "0.0.0.0", "localhost", "localhost.localdomain", "local", "broadcasthost",
         "ip6-localhost", "ip6-loopback", "ip6-allnodes", "ip6-allrouters",
         "ip6-localnet", "ip6-mcastprefix"
-    )
+    ).map(::hashOf).toLongArray()
 
-    private fun isBoilerplate(d: String) = d in boilerplate
-
-    private fun normalizeDomain(raw: String): String {
-        var start = 0
-        var end = raw.length
-        while (start < end && isSpace(raw[start])) start++
-        while (end > start && isSpace(raw[end - 1])) end--
-        while (end > start && raw[end - 1] == '.') end--
-        val sb = StringBuilder(end - start)
-        for (i in start until end) {
-            val c = raw[i]
-            if (!(isAsciiAlnum(c) || c == '.' || c == '-')) return ""
-            sb.append(if (c in 'A'..'Z') c + 32 else c)
-        }
-        return sb.toString()
+    private fun isBoilerplate(hash: Long): Boolean {
+        for (b in boilerplateHashes) if (b == hash) return true
+        return false
     }
 }

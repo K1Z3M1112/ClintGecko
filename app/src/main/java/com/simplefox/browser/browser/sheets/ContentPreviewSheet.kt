@@ -1,9 +1,6 @@
 package com.simplefox.browser.browser.sheets
 import com.simplefox.browser.ui.theme.SystemDarkState
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.OpenInNew
-import androidx.compose.material.icons.filled.Public
+import com.simplefox.browser.ui.icons.Icons
 
 import android.annotation.SuppressLint
 import android.graphics.Bitmap
@@ -47,7 +44,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.preference.PreferenceManager
+import com.simplefox.browser.util.PreferenceManager
 import com.simplefox.browser.settings.datasaver.DataSaverMode
 import com.simplefox.browser.R
 import com.simplefox.browser.browser.MainActivity
@@ -122,7 +119,7 @@ internal fun ContentPreviewSheet(request: ContentPreviewRequest, activity: MainA
                         Image(favicon!!.asImageBitmap(), contentDescription = null, modifier = Modifier.size(20.dp))
                     } else {
                         Icon(
-                            androidx.compose.material.icons.Icons.Filled.Public,
+                            com.simplefox.browser.ui.icons.Icons.Filled.Public,
                             contentDescription = null,
                             tint = colors.iconTint,
                             modifier = Modifier.size(20.dp)
@@ -137,10 +134,10 @@ internal fun ContentPreviewSheet(request: ContentPreviewRequest, activity: MainA
                         onDismiss()
                         activity.onPreviewOpenInNewTab(currentUrl)
                     }, modifier = Modifier.size(44.dp)) {
-                        Icon(androidx.compose.material.icons.Icons.AutoMirrored.Filled.OpenInNew, contentDescription = stringResource(R.string.link_open_in_new_tab), tint = colors.iconTint)
+                        Icon(com.simplefox.browser.ui.icons.Icons.AutoMirrored.Filled.OpenInNew, contentDescription = stringResource(R.string.link_open_in_new_tab), tint = colors.iconTint)
                     }
                     IconButton(onClick = onDismiss, modifier = Modifier.size(44.dp)) {
-                        Icon(androidx.compose.material.icons.Icons.Filled.Close, contentDescription = stringResource(R.string.close_tab), tint = Color.White)
+                        Icon(com.simplefox.browser.ui.icons.Icons.Filled.Close, contentDescription = stringResource(R.string.close_tab), tint = Color.White)
                     }
                 }
             }

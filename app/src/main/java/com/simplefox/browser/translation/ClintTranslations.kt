@@ -1,18 +1,21 @@
 package com.simplefox.browser.translation
 
 import android.content.Context
-import androidx.preference.PreferenceManager
+import com.simplefox.browser.util.PreferenceManager
 import com.simplefox.browser.browser.webview.ClintWebView
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withContext
 import org.mozilla.geckoview.GeckoPreferenceController
 import org.mozilla.geckoview.GeckoResult
 import org.mozilla.geckoview.GeckoSession
 import org.mozilla.geckoview.TranslationsController.RuntimeTranslation
 import org.mozilla.geckoview.TranslationsController.SessionTranslation
 import java.util.Locale
+import java.util.concurrent.ConcurrentHashMap
 import kotlin.coroutines.resume
 
 const val PREF_TRANSLATION_OFFER = "translation_offer"
@@ -105,7 +108,10 @@ class PageTranslator(private val session: GeckoSession, private val onOffer: () 
     suspend fun translate(from: String, to: String): Boolean {
         val translation = session.sessionTranslation ?: return false
         val options = SessionTranslation.TranslationOptions.Builder().downloadModel(true).build()
-        return runCatching { translation.translate(from, to, options) }.getOrNull()?.awaitResult()?.isSuccess == true
+        val success = runCatching { translation.translate(from, to, options) }.getOrNull()?.awaitResult()?.isSuccess == true
+        // The language pair may have just been downloaded, so earlier download-size answers are stale.
+        ClintTranslations.invalidateDownloadSizes()
+        return success
     }
 
     suspend fun restoreOriginal(): Boolean {
@@ -128,6 +134,19 @@ object ClintTranslations {
 
     @Volatile var offerHandler: ((ClintWebView) -> Unit)? = null
 
+    // Gecko answers these over IPC and the display-name mapping is not free, so keep the results for the process.
+    @Volatile private var engineSupportedCache = false
+    private val supportCache = ConcurrentHashMap<String, TranslationLanguageSupport>()
+    private val downloadSizeCache = ConcurrentHashMap<String, Long>()
+    private val baseLanguageCache = ConcurrentHashMap<String, String>()
+
+    fun cachedSupport(locale: Locale): TranslationLanguageSupport? = supportCache[locale.toLanguageTag()]
+
+    fun invalidateDownloadSizes() = downloadSizeCache.clear()
+
+    private fun baseLanguage(tag: String): String =
+        baseLanguageCache.getOrPut(tag) { Locale.forLanguageTag(tag).language.lowercase(Locale.ROOT) }
+
     fun applyPrefs(context: Context) {
         val prefs = PreferenceManager.getDefaultSharedPreferences(context)
         runCatching {
@@ -144,7 +163,7 @@ object ClintTranslations {
 
     fun sameLanguage(first: String?, second: String?): Boolean {
         if (first.isNullOrEmpty() || second.isNullOrEmpty()) return false
-        return Locale.forLanguageTag(first).language.equals(Locale.forLanguageTag(second).language, ignoreCase = true)
+        return baseLanguage(first) == baseLanguage(second)
     }
 
     fun displayName(code: String, locale: Locale, fallback: String? = null, capitalize: Boolean = true): String {
@@ -178,31 +197,45 @@ object ClintTranslations {
         return state.userLanguage?.takeIf { !sameLanguage(it, state.docLanguage) }
     }
 
-    suspend fun isEngineSupported(): Boolean =
-        runCatching { RuntimeTranslation.isTranslationsEngineSupported() }.getOrNull()?.awaitResult()?.getOrNull() == true
+    suspend fun isEngineSupported(): Boolean {
+        if (engineSupportedCache) return true
+        // Only a positive answer is kept: an unsupported/not-ready engine may be reported differently later.
+        val supported = runCatching { RuntimeTranslation.isTranslationsEngineSupported() }.getOrNull()?.awaitResult()?.getOrNull() == true
+        if (supported) engineSupportedCache = true
+        return supported
+    }
 
     suspend fun supportedLanguages(locale: Locale): TranslationLanguageSupport? {
+        val tag = locale.toLanguageTag()
+        supportCache[tag]?.let { return it }
         val support = runCatching { RuntimeTranslation.listSupportedLanguages() }.getOrNull()?.awaitResult()?.getOrNull() ?: return null
-        fun map(list: List<org.mozilla.geckoview.TranslationsController.Language>?): List<TranslationLanguage> =
-            list.orEmpty()
-                .map { TranslationLanguage(it.code, displayName(it.code, locale, it.localizedDisplayName)) }
-                .distinctBy { it.code }
-                .sortedBy { it.name.lowercase(locale) }
-        return TranslationLanguageSupport(map(support.fromLanguages), map(support.toLanguages))
+        // Display names and sorting for a few hundred languages: keep it off the main thread.
+        val mapped = withContext(Dispatchers.Default) {
+            fun map(list: List<org.mozilla.geckoview.TranslationsController.Language>?): List<TranslationLanguage> =
+                list.orEmpty()
+                    .map { TranslationLanguage(it.code, displayName(it.code, locale, it.localizedDisplayName)) }
+                    .distinctBy { it.code }
+                    .sortedBy { it.name.lowercase(locale) }
+            TranslationLanguageSupport(map(support.fromLanguages), map(support.toLanguages))
+        }
+        supportCache[tag] = mapped
+        return mapped
     }
 
     suspend fun models(locale: Locale): List<TranslationModel>? {
         val models = runCatching { RuntimeTranslation.listModelDownloadStates() }.getOrNull()?.awaitResult()?.getOrNull() ?: return null
-        return models
-            .mapNotNull { model ->
-                val language = model.language ?: return@mapNotNull null
-                TranslationModel(
-                    language = TranslationLanguage(language.code, displayName(language.code, locale, language.localizedDisplayName)),
-                    isDownloaded = model.isDownloaded == true,
-                    size = model.size
-                )
-            }
-            .sortedBy { it.language.name.lowercase(locale) }
+        return withContext(Dispatchers.Default) {
+            models
+                .mapNotNull { model ->
+                    val language = model.language ?: return@mapNotNull null
+                    TranslationModel(
+                        language = TranslationLanguage(language.code, displayName(language.code, locale, language.localizedDisplayName)),
+                        isDownloaded = model.isDownloaded == true,
+                        size = model.size
+                    )
+                }
+                .sortedBy { it.language.name.lowercase(locale) }
+        }
     }
 
     private suspend fun manage(operation: String, level: String, code: String?): Boolean {
@@ -213,14 +246,19 @@ object ClintTranslations {
         return runCatching { RuntimeTranslation.manageLanguageModel(builder.build()) }.getOrNull()?.awaitResult()?.isSuccess == true
     }
 
-    suspend fun downloadLanguage(code: String): Boolean = manage(RuntimeTranslation.DOWNLOAD, RuntimeTranslation.LANGUAGE, code)
+    suspend fun downloadLanguage(code: String): Boolean = manage(RuntimeTranslation.DOWNLOAD, RuntimeTranslation.LANGUAGE, code).also { invalidateDownloadSizes() }
 
-    suspend fun deleteLanguage(code: String): Boolean = manage(RuntimeTranslation.DELETE, RuntimeTranslation.LANGUAGE, code)
+    suspend fun deleteLanguage(code: String): Boolean = manage(RuntimeTranslation.DELETE, RuntimeTranslation.LANGUAGE, code).also { invalidateDownloadSizes() }
 
-    suspend fun deleteAllLanguages(): Boolean = manage(RuntimeTranslation.DELETE, RuntimeTranslation.ALL, null)
+    suspend fun deleteAllLanguages(): Boolean = manage(RuntimeTranslation.DELETE, RuntimeTranslation.ALL, null).also { invalidateDownloadSizes() }
 
-    suspend fun downloadSize(from: String, to: String): Long? =
-        runCatching { RuntimeTranslation.checkPairDownloadSize(from, to) }.getOrNull()?.awaitResult()?.getOrNull()
+    suspend fun downloadSize(from: String, to: String): Long? {
+        val key = "$from>$to"
+        downloadSizeCache[key]?.let { return it }
+        val size = runCatching { RuntimeTranslation.checkPairDownloadSize(from, to) }.getOrNull()?.awaitResult()?.getOrNull()
+        if (size != null) downloadSizeCache[key] = size
+        return size
+    }
 
     suspend fun languageSetting(code: String): TranslationLanguageSetting? {
         val value = runCatching { RuntimeTranslation.getLanguageSetting(code) }.getOrNull()?.awaitResult()?.getOrNull() ?: return null

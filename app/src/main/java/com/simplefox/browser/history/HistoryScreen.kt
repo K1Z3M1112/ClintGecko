@@ -1,16 +1,4 @@
 package com.simplefox.browser.history
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Checklist
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.DeleteSweep
-import androidx.compose.material.icons.filled.History
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.Public
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.SearchOff
-import androidx.compose.material.icons.automirrored.filled.Sort
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 
 import com.simplefox.browser.R
 
@@ -203,7 +191,7 @@ fun HistoryScreen(
                         contentColor = colors.buttonIconTint,
                         icon = {
                             Icon(
-                                androidx.compose.material.icons.Icons.Filled.Delete,
+                                com.simplefox.browser.ui.icons.Icons.Filled.Delete,
                                 contentDescription = null
                             )
                         },
@@ -236,7 +224,7 @@ private fun HistoryToolbar(
         Row(Modifier.fillMaxWidth().height(64.dp).padding(horizontal = 4.dp), verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = onBack) {
                 Icon(
-                    if (state.isInSelectionMode) androidx.compose.material.icons.Icons.Filled.Close else androidx.compose.material.icons.Icons.AutoMirrored.Filled.ArrowBack,
+                    if (state.isInSelectionMode) com.simplefox.browser.ui.icons.Icons.Filled.Close else com.simplefox.browser.ui.icons.Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = stringResource(if (state.isInSelectionMode) R.string.history_cancel_selection_desc else R.string.back),
                     tint = colors.onSurface
                 )
@@ -260,11 +248,11 @@ private fun HistoryToolbar(
 
             if (showToolbarIcons) {
                 IconButton(onClick = { state.isSearchMode = true }) {
-                    Icon(androidx.compose.material.icons.Icons.Filled.Search, contentDescription = stringResource(R.string.history_search), tint = colors.iconTint)
+                    Icon(com.simplefox.browser.ui.icons.Icons.Filled.Search, contentDescription = stringResource(R.string.history_search), tint = colors.iconTint)
                 }
                 Box {
                     IconButton(onClick = { state.sortMenuOpen = true }) {
-                        Icon(androidx.compose.material.icons.Icons.AutoMirrored.Filled.Sort, contentDescription = stringResource(R.string.history_sort), tint = colors.iconTint)
+                        Icon(com.simplefox.browser.ui.icons.Icons.AutoMirrored.Filled.Sort, contentDescription = stringResource(R.string.history_sort), tint = colors.iconTint)
                     }
                     SortMenu(
                         expanded = state.sortMenuOpen,
@@ -279,7 +267,7 @@ private fun HistoryToolbar(
                 }
                 Box {
                     IconButton(onClick = { state.historyActionsMenuOpen = true }) {
-                        Icon(androidx.compose.material.icons.Icons.Filled.MoreVert, contentDescription = stringResource(R.string.history_actions_desc), tint = colors.iconTint)
+                        Icon(com.simplefox.browser.ui.icons.Icons.Filled.MoreVert, contentDescription = stringResource(R.string.history_actions_desc), tint = colors.iconTint)
                     }
                     HistoryActionsMenu(
                         expanded = state.historyActionsMenuOpen,
@@ -292,7 +280,7 @@ private fun HistoryToolbar(
             if (state.isInSelectionMode) {
                 Box {
                     IconButton(onClick = { state.selectionOptionsMenuOpen = true }) {
-                        Icon(androidx.compose.material.icons.Icons.Filled.Checklist, contentDescription = stringResource(R.string.history_more_options), tint = colors.primary)
+                        Icon(com.simplefox.browser.ui.icons.Icons.Filled.Checklist, contentDescription = stringResource(R.string.history_more_options), tint = colors.primary)
                     }
                     SelectionOptionsMenu(
                         expanded = state.selectionOptionsMenuOpen,
@@ -316,10 +304,10 @@ private fun HistoryActionsMenu(expanded: Boolean, onDismiss: () -> Unit, onClear
         containerColor = colors.popupBackground,
         border = null
     ) {
-        ListMenuItem(androidx.compose.material.icons.Icons.Filled.DeleteSweep, stringResource(R.string.delete_data_title), checked = false) {
+        ListMenuItem(com.simplefox.browser.ui.icons.Icons.Filled.DeleteSweep, stringResource(R.string.delete_data_title), checked = false) {
             onDismiss(); onDeleteBrowsingDataClick()
         }
-        ListMenuItem(androidx.compose.material.icons.Icons.Filled.Delete, stringResource(R.string.history_clear_all), checked = false) {
+        ListMenuItem(com.simplefox.browser.ui.icons.Icons.Filled.Delete, stringResource(R.string.history_clear_all), checked = false) {
             onDismiss(); onClearAllClick()
         }
     }
@@ -401,7 +389,7 @@ private fun HistoryRow(
         ) {
             when {
                 isSelected -> Icon(
-                    androidx.compose.material.icons.Icons.Filled.Check,
+                    com.simplefox.browser.ui.icons.Icons.Filled.Check,
                     contentDescription = null, tint = colors.onPrimary, modifier = Modifier.size(22.dp)
                 )
                 favicon != null -> Image(
@@ -409,7 +397,7 @@ private fun HistoryRow(
                     modifier = Modifier.size(22.dp).clip(RoundedCornerShape(4.dp))
                 )
                 else -> Icon(
-                    if (isUrl) androidx.compose.material.icons.Icons.Filled.Public else androidx.compose.material.icons.Icons.Filled.Search,
+                    if (isUrl) com.simplefox.browser.ui.icons.Icons.Filled.Public else com.simplefox.browser.ui.icons.Icons.Filled.Search,
                     contentDescription = null, tint = colors.iconTint, modifier = Modifier.size(20.dp)
                 )
             }
@@ -433,7 +421,7 @@ private fun HistoryRow(
         } else {
             IconButton(onClick = onDelete) {
                 Icon(
-                    androidx.compose.material.icons.Icons.Filled.Close,
+                    com.simplefox.browser.ui.icons.Icons.Filled.Close,
                     contentDescription = stringResource(R.string.history_delete_desc),
                     tint = colors.secondaryText,
                     modifier = Modifier.size(20.dp)
@@ -456,7 +444,7 @@ private fun HistoryEmptyState(query: String, modifier: Modifier = Modifier) {
             contentAlignment = Alignment.Center
         ) {
             Icon(
-                if (isSearching) androidx.compose.material.icons.Icons.Filled.SearchOff else androidx.compose.material.icons.Icons.Filled.History,
+                if (isSearching) com.simplefox.browser.ui.icons.Icons.Filled.SearchOff else com.simplefox.browser.ui.icons.Icons.Filled.History,
                 contentDescription = null,
                 tint = colors.primary,
                 modifier = Modifier.size(40.dp)

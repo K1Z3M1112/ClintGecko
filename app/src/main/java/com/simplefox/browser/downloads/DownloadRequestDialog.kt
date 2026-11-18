@@ -1,7 +1,4 @@
 package com.simplefox.browser.downloads
-import androidx.compose.material.icons.filled.ArrowDownward
-import androidx.compose.material.icons.filled.Folder
-import androidx.compose.material.icons.filled.Link
 
 import com.simplefox.browser.R
 
@@ -44,7 +41,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.fragment.app.FragmentManager
 import com.simplefox.browser.settings.common.dialogSectionBackground
 import com.simplefox.browser.settings.common.SettingsSection
 import com.simplefox.browser.settings.downloads.DownloadSettingsKeys
@@ -52,7 +48,6 @@ import com.simplefox.browser.ui.ClintDialog
 import com.simplefox.browser.ui.ClintScheduleDateTimeRows
 import com.simplefox.browser.ui.ClintOutlinedTextField
 import com.simplefox.browser.ui.ClintSlider
-import com.simplefox.browser.ui.ClintSwitch
 import com.simplefox.browser.ui.listscreen.ConfirmDialogConfig
 import com.simplefox.browser.ui.listscreen.ConfirmDialogHost
 import com.simplefox.browser.ui.listscreen.PopupShape
@@ -104,14 +99,13 @@ fun DownloadRequestDialog(
     initialSpeedLimitAmount: Int = 0,
     initialSpeedLimitUnit: String = DEFAULT_SPEED_LIMIT_UNIT,
     showAddButton: Boolean = true,
-    fragmentManager: FragmentManager,
     onLaunchFolderPicker: (onPicked: (Uri) -> Unit) -> Unit,
     onDismiss: () -> Unit,
     onSubmit: (DownloadRequestSubmission, onDismiss: () -> Unit, onRename: () -> Unit) -> Unit
 ) {
     val context = LocalContext.current
     val colors = LocalClintColors.current
-    val prefs = remember { androidx.preference.PreferenceManager.getDefaultSharedPreferences(context) }
+    val prefs = remember { com.simplefox.browser.util.PreferenceManager.getDefaultSharedPreferences(context) }
     val keyboardController = LocalSoftwareKeyboardController.current
     val filenameFocusRequester = remember { FocusRequester() }
 
@@ -324,7 +318,7 @@ fun DownloadRequestDialog(
                 SettingsSection(colors.dialogSectionBackground, bottomSpacing = 8.dp) {
                     Row(Modifier.fillMaxWidth().padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
                         Icon(
-                            androidx.compose.material.icons.Icons.Filled.Link,
+                            com.simplefox.browser.ui.icons.Icons.Filled.Link,
                             contentDescription = stringResource(R.string.download_dialog_link_clip_label),
                             tint = colors.iconTint,
                             modifier = Modifier.size(18.dp).clickable { onCopyLink() }.padding(2.dp)
@@ -373,7 +367,7 @@ fun DownloadRequestDialog(
                                         color = colors.onSurface, fontSize = 14.sp, modifier = Modifier.padding(top = 2.dp)
                                     )
                                 }
-                                Icon(androidx.compose.material.icons.Icons.Filled.ArrowDownward, contentDescription = null, tint = colors.iconTint)
+                                Icon(com.simplefox.browser.ui.icons.Icons.Filled.ArrowDownward, contentDescription = null, tint = colors.iconTint)
                             }
                             DropdownMenu(
                                 expanded = locationMenuOpen, onDismissRequest = { locationMenuOpen = false },
@@ -394,7 +388,7 @@ fun DownloadRequestDialog(
                                 Modifier.fillMaxWidth().clickable { pickCustomFolder() }.padding(vertical = 6.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Icon(androidx.compose.material.icons.Icons.Filled.Folder, contentDescription = null, tint = colors.iconTint, modifier = Modifier.size(20.dp))
+                                Icon(com.simplefox.browser.ui.icons.Icons.Filled.Folder, contentDescription = null, tint = colors.iconTint, modifier = Modifier.size(20.dp))
                                 Text(
                                     customUri?.let { uriToDisplayPath(it) } ?: stringResource(R.string.download_location_tap_to_choose),
                                     color = colors.onSurface, fontSize = 13.sp, modifier = Modifier.padding(start = 10.dp)
@@ -404,18 +398,13 @@ fun DownloadRequestDialog(
                         if (showStorageInfo && storageInfoText.isNotEmpty()) {
                             Text(storageInfoText, color = colors.secondaryText, fontSize = 11.sp, modifier = Modifier.padding(top = 4.dp))
                         }
-                        Row(
-                            Modifier.fillMaxWidth().clickable {
-                                categorizeEnabled = !categorizeEnabled
-                            }.padding(top = 8.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Column(Modifier.weight(1f)) {
-                                Text(stringResource(R.string.download_categorize_title), color = colors.onSurface, fontSize = 14.sp, fontWeight = FontWeight.Medium)
-                                Text(stringResource(R.string.download_categorize_summary), color = colors.secondaryText, fontSize = 12.sp, modifier = Modifier.padding(top = 2.dp))
-                            }
-                            ClintSwitch(checked = categorizeEnabled)
-                        }
+                        DownloadToggleRow(
+                            title = stringResource(R.string.download_categorize_title),
+                            summary = stringResource(R.string.download_categorize_summary),
+                            checked = categorizeEnabled,
+                            onToggle = { categorizeEnabled = !categorizeEnabled },
+                            modifier = Modifier.padding(top = 8.dp)
+                        )
                         destinationPreviewText?.let {
                             Text(
                                 it, color = colors.secondaryText, fontSize = 11.sp, fontFamily = FontFamily.Monospace,
@@ -429,26 +418,20 @@ fun DownloadRequestDialog(
                     DialogSectionLabel(stringResource(R.string.download_dialog_section_options))
                     SettingsSection(colors.dialogSectionBackground, bottomSpacing = 8.dp) {
                         Column(Modifier.padding(12.dp)) {
-                            Row(
-                                Modifier.fillMaxWidth().clickable { retryEnabled = !retryEnabled }.padding(vertical = 6.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Column(Modifier.weight(1f)) {
-                                    Text(stringResource(R.string.download_retry_enabled_title), color = colors.onSurface, fontSize = 14.sp, fontWeight = FontWeight.Medium)
-                                    Text(stringResource(R.string.download_retry_enabled_summary), color = colors.secondaryText, fontSize = 12.sp, modifier = Modifier.padding(top = 2.dp))
-                                }
-                                ClintSwitch(checked = retryEnabled)
-                            }
-                            Row(
-                                Modifier.fillMaxWidth().clickable { unmeteredOnly = !unmeteredOnly }.padding(vertical = 6.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Column(Modifier.weight(1f)) {
-                                    Text(stringResource(R.string.download_unmetered_only_title), color = colors.onSurface, fontSize = 14.sp, fontWeight = FontWeight.Medium)
-                                    Text(stringResource(R.string.download_dialog_unmetered_summary), color = colors.secondaryText, fontSize = 12.sp, modifier = Modifier.padding(top = 2.dp))
-                                }
-                                ClintSwitch(checked = unmeteredOnly)
-                            }
+                            DownloadToggleRow(
+                                title = stringResource(R.string.download_retry_enabled_title),
+                                summary = stringResource(R.string.download_retry_enabled_summary),
+                                checked = retryEnabled,
+                                onToggle = { retryEnabled = !retryEnabled },
+                                modifier = Modifier.padding(vertical = 6.dp)
+                            )
+                            DownloadToggleRow(
+                                title = stringResource(R.string.download_unmetered_only_title),
+                                summary = stringResource(R.string.download_dialog_unmetered_summary),
+                                checked = unmeteredOnly,
+                                onToggle = { unmeteredOnly = !unmeteredOnly },
+                                modifier = Modifier.padding(vertical = 6.dp)
+                            )
 
                             if (showSplitAndMultithreading) {
                                 Text(
@@ -518,7 +501,7 @@ fun DownloadRequestDialog(
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
                                         Text(speedUnitLabel, color = colors.onSurface, fontSize = 14.sp)
-                                        Icon(androidx.compose.material.icons.Icons.Filled.ArrowDownward, contentDescription = null, tint = colors.iconTint, modifier = Modifier.padding(start = 2.dp))
+                                        Icon(com.simplefox.browser.ui.icons.Icons.Filled.ArrowDownward, contentDescription = null, tint = colors.iconTint, modifier = Modifier.padding(start = 2.dp))
                                     }
                                     DropdownMenu(
                                         expanded = speedUnitMenuOpen, onDismissRequest = { speedUnitMenuOpen = false },
@@ -532,16 +515,13 @@ fun DownloadRequestDialog(
                             }
 
                             if (showSchedule) {
-                                Row(
-                                    Modifier.fillMaxWidth().clickable { toggleSchedule() }.padding(vertical = 6.dp).padding(top = 6.dp),
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Column(Modifier.weight(1f)) {
-                                        Text(stringResource(R.string.download_schedule_this_title), color = colors.onSurface, fontSize = 14.sp, fontWeight = FontWeight.Medium)
-                                        Text(stringResource(R.string.download_schedule_this_summary), color = colors.secondaryText, fontSize = 12.sp, modifier = Modifier.padding(top = 2.dp))
-                                    }
-                                    ClintSwitch(checked = scheduleEnabled)
-                                }
+                                DownloadToggleRow(
+                                    title = stringResource(R.string.download_schedule_this_title),
+                                    summary = stringResource(R.string.download_schedule_this_summary),
+                                    checked = scheduleEnabled,
+                                    onToggle = { toggleSchedule() },
+                                    modifier = Modifier.padding(vertical = 6.dp).padding(top = 6.dp)
+                                )
                                 if (scheduleEnabled) {
                                     ClintScheduleDateTimeRows(
                                         scheduledMillis = scheduledMillis,

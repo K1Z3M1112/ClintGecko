@@ -1,7 +1,7 @@
 package com.simplefox.browser.blocker.additional
 
 import android.content.Context
-import androidx.preference.PreferenceManager
+import com.simplefox.browser.util.PreferenceManager
 
 object AdditionalWebsitesState {
 

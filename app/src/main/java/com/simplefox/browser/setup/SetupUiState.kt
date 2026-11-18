@@ -1,16 +1,12 @@
 package com.simplefox.browser.setup
 
-import androidx.compose.foundation.ScrollState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 
 class SetupUiState(
     initialPage: Int,
-    initialScrollY: Int,
     initialTheme: String,
-    initialAccent: String,
-    initialIntensity: String,
     initialLanguage: String,
     initialAddressBarPosition: String,
     initialScrollHideMode: String,
@@ -22,8 +18,6 @@ class SetupUiState(
     var consentChecked by mutableStateOf(false)
 
     var theme by mutableStateOf(initialTheme)
-    var accent by mutableStateOf(initialAccent)
-    var intensity by mutableStateOf(initialIntensity)
     var language by mutableStateOf(initialLanguage)
 
     var addressBarPosition by mutableStateOf(initialAddressBarPosition)
@@ -35,9 +29,6 @@ class SetupUiState(
     var customEngineName by mutableStateOf(initialCustomEngineName)
     var customEngineUrl by mutableStateOf(initialCustomEngineUrl)
 
-    var isDefaultBrowser by mutableStateOf(false)
 
     var confirmDialogConfig by mutableStateOf<com.simplefox.browser.ui.listscreen.ConfirmDialogConfig?>(null)
-
-    val themePageScrollState = ScrollState(initialScrollY)
 }

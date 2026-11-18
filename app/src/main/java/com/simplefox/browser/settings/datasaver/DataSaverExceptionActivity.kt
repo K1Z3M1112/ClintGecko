@@ -6,7 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.ui.res.stringResource
 import androidx.core.view.WindowCompat
-import androidx.preference.PreferenceManager
+import com.simplefox.browser.util.PreferenceManager
 import com.simplefox.browser.R
 import com.simplefox.browser.base.ClintActivity
 import com.simplefox.browser.settings.site.AddSiteDialog

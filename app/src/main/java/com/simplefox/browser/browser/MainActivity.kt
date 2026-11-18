@@ -23,7 +23,9 @@ import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.lifecycle.lifecycleScope
 import kotlin.math.abs
+import kotlinx.coroutines.launch
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import com.simplefox.browser.ui.foundation.SnackbarHostState
@@ -31,7 +33,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
-import androidx.preference.PreferenceManager
+import com.simplefox.browser.util.PreferenceManager
 import com.simplefox.browser.base.ClintActivity
 import com.simplefox.browser.R
 import com.simplefox.browser.crash.CrashHandler
@@ -47,6 +49,7 @@ class MainActivity : ClintActivity(), OverlayHostActivity, SnackbarHostActivity,
 
     companion object {
         private const val TRIM_MEMORY_BACKGROUND_LEVEL = 40
+        private const val BACKGROUND_RELEASE_DELAY_MS = 30_000L
         private const val TRIM_MEMORY_MODERATE_LEVEL = 60
         const val EXTRA_REFRESH_LINK_MODE = "extra_refresh_link_mode"
         const val EXTRA_REFRESH_LINK_DOWNLOAD_ID = "extra_refresh_link_download_id"
@@ -83,6 +86,9 @@ class MainActivity : ClintActivity(), OverlayHostActivity, SnackbarHostActivity,
 
     internal lateinit var prefs: SharedPreferences
     internal val tabManager = TabManager()
+    internal var isRestoringTabs = false
+    private var startupIntentSuperseded = false
+    private var pendingStartupMediaTabId: String? = null
     internal var isDesktopMode: Boolean
         get() = uiState.isDesktopMode
         set(value) { uiState.isDesktopMode = value }
@@ -237,13 +243,13 @@ class MainActivity : ClintActivity(), OverlayHostActivity, SnackbarHostActivity,
     ) { result ->
         val uris = if (result.resultCode == android.app.Activity.RESULT_OK) {
             val data = result.data
+            val clip = data?.clipData
+            val single = data?.data
+            val camera = cameraImageUri
             when {
-                data?.clipData != null -> {
-                    val clip = data.clipData!!
-                    Array(clip.itemCount) { clip.getItemAt(it).uri }
-                }
-                data?.data != null -> arrayOf(data.data!!)
-                cameraImageUri != null -> arrayOf(cameraImageUri!!)
+                clip != null -> Array(clip.itemCount) { clip.getItemAt(it).uri }
+                single != null -> arrayOf(single)
+                camera != null -> arrayOf(camera)
                 else -> null
             }
         } else {
@@ -293,12 +299,19 @@ class MainActivity : ClintActivity(), OverlayHostActivity, SnackbarHostActivity,
             "do_not_track" -> applyDoNotTrackSettings()
             com.simplefox.browser.browser.webview.ClintAutofill.PREF_AUTOFILL_ENABLED -> applyAutofillSettings()
             "custom_user_agent" -> applyUserAgent()
-            com.simplefox.browser.mediacapture.MEDIA_CAPTURE_ENABLED_PREF -> updateMediaCaptureEnabledState()
             "show_home_button" -> updateHomeButtonState()
             com.simplefox.browser.tabs.TabGroupPrefs.PREF_SHOW_GROUP_BAR, com.simplefox.browser.tabs.TabStripPrefs.PREF_SHOW_TAB_STRIP -> updateTabCount()
             com.simplefox.browser.tabs.TabGroupPrefs.PREF_TAB_GROUPS_ENABLED -> applyTabGroupsSetting()
             com.simplefox.browser.tabs.TabBarPlacement.PREF_TAB_STRIP_POSITION, com.simplefox.browser.tabs.TabBarPlacement.PREF_TAB_GROUP_BAR_POSITION -> updateTabBarPositions()
-            "data_saver_enabled", "data_saver_metered_only", "data_saver_disable_images", "data_saver_disable_autoplay", "data_saver_send_header", "data_saver_block_fonts", "data_saver_block_frames", "data_saver_block_preload", "data_saver_block_video", "data_saver_block_scripts", "data_saver_block_css", "data_saver_cache_first" -> applyDataSaverSettings()
+            "data_saver_enabled", "data_saver_metered_only", "data_saver_disable_images", "data_saver_disable_autoplay", "data_saver_send_header", "data_saver_block_fonts", "data_saver_block_frames", "data_saver_block_preload", "data_saver_block_video", "data_saver_block_scripts", "data_saver_block_css", "data_saver_cache_first", "data_saver_reduce_effects" -> {
+                applyDataSaverSettings()
+                if (uiState.searchOverlayOpen && (key == "data_saver_enabled" || key == "data_saver_metered_only")) {
+                    onSearchQueryChanged(uiState.searchQuery)
+                }
+            }
+            "data_saver_disable_suggestions" -> {
+                if (uiState.searchOverlayOpen) onSearchQueryChanged(uiState.searchQuery)
+            }
             "data_saver_single_tab" -> syncTabPlayback()
             "hide_bars_on_scroll" -> {
                 if (!prefs.getBoolean("hide_bars_on_scroll", true)) {
@@ -312,7 +325,9 @@ class MainActivity : ClintActivity(), OverlayHostActivity, SnackbarHostActivity,
             }
         }
         onTranslationPrefChanged(key)
-        com.simplefox.browser.browser.webview.ClintGecko.pushConfig()
+        if (key == null || key == "do_not_track" || key.startsWith("data_saver_")) {
+            com.simplefox.browser.browser.webview.ClintGecko.pushConfig()
+        }
     }
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -341,8 +356,10 @@ class MainActivity : ClintActivity(), OverlayHostActivity, SnackbarHostActivity,
         com.simplefox.browser.browser.webview.ClintGecko.setCookiePolicy(com.simplefox.browser.privacy.PrivacyPrefs.cookiePolicy(prefs))
         syncBaseScripts()
         syncGlobalScripts()
-        DataSaverMode.onActiveChanged = { applyDataSaverSettings() }
-        updateMediaCaptureEnabledState()
+        DataSaverMode.onActiveChanged = {
+            applyDataSaverSettings()
+            if (uiState.searchOverlayOpen) onSearchQueryChanged(uiState.searchQuery)
+        }
         updateHomeButtonState()
         updateTabBarPositions()
         setupTranslations()
@@ -356,14 +373,22 @@ class MainActivity : ClintActivity(), OverlayHostActivity, SnackbarHostActivity,
                 MainScreen(activity = this, state = uiState)
                 overlayContent?.invoke()
                 com.simplefox.browser.extensions.ExtensionHost()
-                ClintSnackbarHost(hostState = snackbarHostState)
+                ClintSnackbarHost(
+                    hostState = snackbarHostState,
+                    bottomBarVisiblePx = {
+                        when {
+                            uiState.tabMenuOpen -> uiState.tabMenuBottomBarPx
+                            uiState.isFullscreen -> 0
+                            else -> (uiState.bottomBarFullHeightPx * (1f - uiState.bottomBarFraction)).toInt()
+                        }
+                    }
+                )
             }
         }
 
         ClintDownloadManager.createNotificationChannel(this)
         ClintDownloadManager.init(this)
         initializeWebsiteBlockerEngine()
-        installServiceWorkerMediaCapture()
         createWebNotificationChannel()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
             ContextCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS)
@@ -376,43 +401,61 @@ class MainActivity : ClintActivity(), OverlayHostActivity, SnackbarHostActivity,
         setupSwipeRefresh()
         setupAddressBar()
         applyAddressBarPosition()
-        if (savedInstanceState == null && com.simplefox.browser.privacy.PrivacyPrefs.closesTabsOnExit(prefs)) discardSavedTabs()
+        if (savedInstanceState == null && com.simplefox.browser.privacy.PrivacyPrefs.closesTabsOnExit(prefs)) discardSavedTabsAsync()
         com.simplefox.browser.privacy.IncognitoNotification.closeTabsHandler = closeIncognitoTabsHandler
-        val isRefreshLinkMode = intent.getBooleanExtra(EXTRA_REFRESH_LINK_MODE, false)
-        val shortcutId = intent.getStringExtra(EXTRA_SHORTCUT_ID)
+        val startupIntent = android.content.Intent(intent)
+        val isRefreshLinkMode = startupIntent.getBooleanExtra(EXTRA_REFRESH_LINK_MODE, false)
+        val shortcutId = startupIntent.getStringExtra(EXTRA_SHORTCUT_ID)
         applyShortcutFrameless(shortcutId)
-        if (isRefreshLinkMode) {
-            val downloadId = intent.getIntExtra(EXTRA_REFRESH_LINK_DOWNLOAD_ID, -1)
-            val filename = intent.getStringExtra(EXTRA_REFRESH_LINK_FILENAME) ?: ""
-            val originalUrl = intent.getStringExtra(EXTRA_REFRESH_LINK_ORIGINAL_URL) ?: ""
-            val originalReferer = intent.getStringExtra(EXTRA_REFRESH_LINK_ORIGINAL_REFERER) ?: ""
-            val pageUrl = intent.getStringExtra(EXTRA_REFRESH_LINK_PAGE_URL) ?: ""
-            setIntent(android.content.Intent())
-            if (downloadId != -1) {
+        setIntent(android.content.Intent())
+        val refreshLinkDownloadId = startupIntent.getIntExtra(EXTRA_REFRESH_LINK_DOWNLOAD_ID, -1)
+        val refreshLinkFilename = startupIntent.getStringExtra(EXTRA_REFRESH_LINK_FILENAME) ?: ""
+        val refreshLinkOriginalUrl = startupIntent.getStringExtra(EXTRA_REFRESH_LINK_ORIGINAL_URL) ?: ""
+        val refreshLinkOriginalReferer = startupIntent.getStringExtra(EXTRA_REFRESH_LINK_ORIGINAL_REFERER) ?: ""
+        val refreshLinkPageUrl = startupIntent.getStringExtra(EXTRA_REFRESH_LINK_PAGE_URL) ?: ""
+        val startupUrl = getUrlFromIntent(startupIntent)
+        val shortcutFallbackUrl = startupUrl
+        isRestoringTabs = true
+        lifecycleScope.launch {
+            val restored = try {
                 restoreTabs()
-                refreshLinkSession = RefreshLinkSession(downloadId, filename, originalUrl, originalReferer, tabManager.activeIndex, pageUrl)
-                openRefreshLinkTab(refreshLinkStartUrl(pageUrl, originalReferer, originalUrl))
-            } else if (!restoreTabs()) {
-                openNewTab(isIncognito = false, url = getHomepageUrl(false))
+            } finally {
+                isRestoringTabs = false
             }
-        } else if (shortcutId != null) {
-            val fallbackUrl = getUrlFromIntent(intent)
-            setIntent(android.content.Intent())
-            restoreTabs()
-            openOrResumeShortcutTab(shortcutId, fallbackUrl)
-        } else {
-            val intentUrl = getUrlFromIntent(intent)
-            setIntent(android.content.Intent())
-            if (!intentUrl.isNullOrEmpty()) {
-                restoreTabs()
-                openNewTab(isIncognito = false, url = intentUrl)
-            } else {
-                val restored = restoreTabs()
-                if (shouldReopenInIncognito()) {
+            if (isFinishing || isDestroyed) return@launch
+            if (!startupIntentSuperseded) {
+                if (isRefreshLinkMode) {
+                    if (refreshLinkDownloadId != -1) {
+                        refreshLinkSession = RefreshLinkSession(
+                            refreshLinkDownloadId,
+                            refreshLinkFilename,
+                            refreshLinkOriginalUrl,
+                            refreshLinkOriginalReferer,
+                            tabManager.activeIndex,
+                            refreshLinkPageUrl
+                        )
+                        openRefreshLinkTab(refreshLinkStartUrl(refreshLinkPageUrl, refreshLinkOriginalReferer, refreshLinkOriginalUrl))
+                    } else if (!restored && tabManager.tabs.isEmpty()) {
+                        openNewTab(isIncognito = false, url = getHomepageUrl(false))
+                    }
+                } else if (shortcutId != null) {
+                    openOrResumeShortcutTab(shortcutId, shortcutFallbackUrl)
+                } else if (!startupUrl.isNullOrEmpty()) {
+                    openNewTab(isIncognito = false, url = startupUrl)
+                } else if (shouldReopenInIncognito()) {
                     openNewTab(isIncognito = true, url = getHomepageUrl(true))
-                } else if (!restored) {
+                } else if (!restored && tabManager.tabs.isEmpty()) {
                     openNewTab(isIncognito = false, url = getHomepageUrl(false))
                 }
+            }
+            val mediaTabIdToFocus = pendingStartupMediaTabId
+            pendingStartupMediaTabId = null
+            if (lifecycle.currentState.isAtLeast(androidx.lifecycle.Lifecycle.State.RESUMED)) {
+                closeInactiveTabs(preserveTabId = mediaTabIdToFocus)
+            }
+            mediaTabIdToFocus?.let { focusTabById(it) }
+            if (!lifecycle.currentState.isAtLeast(androidx.lifecycle.Lifecycle.State.STARTED)) {
+                tabManager.activeTab?.webView?.onPause()
             }
         }
         setupBackPressedDispatcher()
@@ -425,12 +468,18 @@ class MainActivity : ClintActivity(), OverlayHostActivity, SnackbarHostActivity,
 
     override fun onNewIntent(intent: android.content.Intent) {
         super.onNewIntent(intent)
+        if (isRestoringTabs) startupIntentSuperseded = true
         val mediaTabId = intent.getStringExtra(com.simplefox.browser.media.MediaPlaybackService.EXTRA_TAB_ID)
         if (mediaTabId != null) {
             setIntent(android.content.Intent())
-            focusTabById(mediaTabId)
+            if (isRestoringTabs) {
+                pendingStartupMediaTabId = mediaTabId
+            } else {
+                focusTabById(mediaTabId)
+            }
             return
         }
+        pendingStartupMediaTabId = null
         syncFramelessShortcuts()
         val isRefreshLinkMode = intent.getBooleanExtra(EXTRA_REFRESH_LINK_MODE, false)
         val shortcutId = intent.getStringExtra(EXTRA_SHORTCUT_ID)
@@ -509,6 +558,7 @@ class MainActivity : ClintActivity(), OverlayHostActivity, SnackbarHostActivity,
 
     override fun onStart() {
         super.onStart()
+        backgroundReleaseHandler.removeCallbacks(backgroundReleaseRunnable)
         tabManager.activeTab?.webView?.onResume()
     }
 
@@ -517,8 +567,15 @@ class MainActivity : ClintActivity(), OverlayHostActivity, SnackbarHostActivity,
         enterVideoPictureInPicture()
     }
 
+    override fun onPause() {
+        super.onPause()
+        captureActiveTabThumbnail()
+    }
+
     override fun onStop() {
         super.onStop()
+        backgroundReleaseHandler.removeCallbacks(backgroundReleaseRunnable)
+        if (!isFinishing) backgroundReleaseHandler.postDelayed(backgroundReleaseRunnable, BACKGROUND_RELEASE_DELAY_MS)
         recordBrowsingMode()
         if (isFinishing && com.simplefox.browser.privacy.PrivacyPrefs.closesTabsOnExit(prefs)) {
             discardSavedTabsAsync()
@@ -536,11 +593,11 @@ class MainActivity : ClintActivity(), OverlayHostActivity, SnackbarHostActivity,
         super.onTrimMemory(level)
         when {
             level >= TRIM_MEMORY_MODERATE_LEVEL -> {
-                trimBackgroundTabs(0)
+                trimBackgroundTabs()
                 hibernateActiveTabIfHidden()
             }
-            level >= TRIM_MEMORY_BACKGROUND_LEVEL -> trimBackgroundTabs(BACKGROUND_TRIM_KEEP_LIVE)
-            level == 10 || level == 15 -> trimBackgroundTabs(0)
+            level >= TRIM_MEMORY_BACKGROUND_LEVEL -> trimBackgroundTabs()
+            level == 10 || level == 15 -> trimBackgroundTabs()
         }
     }
 
@@ -550,6 +607,7 @@ class MainActivity : ClintActivity(), OverlayHostActivity, SnackbarHostActivity,
     }
 
     override fun onDestroy() {
+        backgroundReleaseHandler.removeCallbacks(backgroundReleaseRunnable)
         teardownExtensions()
         teardownTranslations()
         prefs.unregisterOnSharedPreferenceChangeListener(prefsListener)
@@ -668,7 +726,36 @@ class MainActivity : ClintActivity(), OverlayHostActivity, SnackbarHostActivity,
         )
     }
 
-    fun onTabSelected(index: Int) { captureActiveTabThumbnail(); tabManager.switchTo(index); attachActiveWebView() }
+    private var pendingTabSwitchId: String? = null
+    // Runs a while after the app is hidden: parks every tab that can be parked and drops reusable caches.
+    private val backgroundReleaseHandler = Handler(Looper.getMainLooper())
+    private val backgroundReleaseRunnable = Runnable {
+        if (isFinishing || isDestroyed) return@Runnable
+        if (lifecycle.currentState.isAtLeast(androidx.lifecycle.Lifecycle.State.STARTED)) return@Runnable
+        trimBackgroundTabs()
+        hibernateActiveTabIfHidden()
+        com.simplefox.browser.browser.webview.ClintGecko.releaseCachesInBackground()
+        com.simplefox.browser.ui.FaviconCache.trimMemory(40)
+        com.simplefox.browser.ui.SharpFavicon.trimMemory(40)
+        com.simplefox.browser.browser.home.HomeTileIconFetcher.trimMemory(40)
+        com.simplefox.browser.downloads.DownloadThumbnailLoader.trimMemory(40)
+    }
+    /** Snapshots the tab being left first, then switches, so its preview shows the page as it was when you left it. */
+    fun onTabSelected(index: Int) {
+        val targetId = tabManager.tabs.getOrNull(index)?.id ?: return
+        val alreadyPending = pendingTabSwitchId != null
+        pendingTabSwitchId = targetId // a newer tap just retargets the switch that is already waiting
+        if (alreadyPending) return
+        captureActiveTabThen {
+            val id = pendingTabSwitchId
+            pendingTabSwitchId = null
+            val newIndex = tabManager.tabs.indexOfFirst { it.id == id }
+            if (newIndex != -1) {
+                tabManager.switchTo(newIndex)
+                attachActiveWebView()
+            }
+        }
+    }
     fun onSwipeTabChange(direction: Int): Boolean {
         // direction: 1 = swipe right (previous tab), -1 = swipe left (next tab).
         // Only moves through tabs of the current mode (normal / incognito); no wrap-around at the ends.
@@ -690,7 +777,6 @@ class MainActivity : ClintActivity(), OverlayHostActivity, SnackbarHostActivity,
             val index = tabManager.tabs.indexOfFirst { it.id == id }
             val tab = tabManager.tabs.getOrNull(index) ?: return@forEach
             removeDesktopScript(tab)
-            com.simplefox.browser.mediacapture.MediaCaptureStore.removeTab(tab.id)
             com.simplefox.browser.ui.FaviconCache.evict(this, tab.url)
             com.simplefox.browser.tabs.TabThumbnailCache.evict(this, tab.id)
             tabManager.closeTab(index)
@@ -701,7 +787,6 @@ class MainActivity : ClintActivity(), OverlayHostActivity, SnackbarHostActivity,
         val tab = tabManager.tabs.getOrNull(index)
         tab?.let {
             removeDesktopScript(it)
-            com.simplefox.browser.mediacapture.MediaCaptureStore.removeTab(it.id)
             if (!it.isIncognito) com.simplefox.browser.ui.FaviconCache.evict(this, it.url)
             com.simplefox.browser.tabs.TabThumbnailCache.evict(this, it.id)
         }
@@ -845,10 +930,6 @@ class MainActivity : ClintActivity(), OverlayHostActivity, SnackbarHostActivity,
     }
     fun onMenuOpenExtensionsSettings() {
         com.simplefox.browser.extensions.ExtensionsActivity.launch(this)
-    }
-    fun onMenuMediaCapture() {
-        val enabled = !prefs.getBoolean(com.simplefox.browser.mediacapture.MEDIA_CAPTURE_ENABLED_PREF, true)
-        prefs.edit().putBoolean(com.simplefox.browser.mediacapture.MEDIA_CAPTURE_ENABLED_PREF, enabled).apply()
     }
     fun onMenuDisableDataSaverForSite() {
         val tab = tabManager.activeTab ?: return
@@ -1076,9 +1157,12 @@ class MainActivity : ClintActivity(), OverlayHostActivity, SnackbarHostActivity,
 
     private fun getUrlFromIntent(intent: android.content.Intent?): String? {
         if (intent == null) return null
-        return when (intent.action) {
+        val raw = when (intent.action) {
             android.content.Intent.ACTION_SEND -> intent.getStringExtra(android.content.Intent.EXTRA_TEXT)
             else -> intent.data?.toString()
         }
+        val isLocalHtml = intent.data?.scheme.equals("file", ignoreCase = true) &&
+            intent.data?.path?.let { !com.simplefox.browser.security.IntentSecurity.isInPrivateAppStorage(this, java.io.File(it)) } == true
+        return if (isLocalHtml) raw else com.simplefox.browser.security.IntentSecurity.sanitizeLaunchUrl(raw)
     }
 }

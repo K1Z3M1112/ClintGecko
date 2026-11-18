@@ -1,16 +1,4 @@
 package com.simplefox.browser.settings.main
-import androidx.compose.material.icons.filled.Accessibility
-import androidx.compose.material.icons.filled.BugReport
-import androidx.compose.material.icons.filled.DataSaverOn
-import androidx.compose.material.icons.filled.Download
-import androidx.compose.material.icons.filled.Explore
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.Palette
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.SettingsBackupRestore
-import androidx.compose.material.icons.filled.Tune
-import androidx.compose.material.icons.filled.WebAsset
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -70,55 +58,55 @@ fun MainSettingsScreen(
     val groups = listOf(
         stringResource(R.string.settings_group_general) to listOf(
             MainSettingsItem(
-                MainSettingsEntry.BROWSER, androidx.compose.material.icons.Icons.Filled.Explore,
+                MainSettingsEntry.BROWSER, com.simplefox.browser.ui.icons.Icons.Filled.Explore,
                 stringResource(R.string.browser_settings), stringResource(R.string.browser_settings_summary), onBrowserClick
             ),
             MainSettingsItem(
-                MainSettingsEntry.LOOK_AND_FEEL, androidx.compose.material.icons.Icons.Filled.Palette,
+                MainSettingsEntry.LOOK_AND_FEEL, com.simplefox.browser.ui.icons.Icons.Filled.Palette,
                 stringResource(R.string.look_and_feel), stringResource(R.string.look_and_feel_summary), onLookAndFeelClick
             ),
             MainSettingsItem(
-                MainSettingsEntry.ACCESSIBILITY, androidx.compose.material.icons.Icons.Filled.Accessibility,
+                MainSettingsEntry.ACCESSIBILITY, com.simplefox.browser.ui.icons.Icons.Filled.Accessibility,
                 stringResource(R.string.accessibility_title), stringResource(R.string.accessibility_summary), onAccessibilityClick
             )
         ),
         stringResource(R.string.settings_group_privacy) to listOf(
             MainSettingsItem(
-                MainSettingsEntry.PRIVACY, androidx.compose.material.icons.Icons.Filled.Lock,
+                MainSettingsEntry.PRIVACY, com.simplefox.browser.ui.icons.Icons.Filled.Lock,
                 stringResource(R.string.privacy_settings), stringResource(R.string.privacy_settings_summary), onPrivacyClick
             ),
             MainSettingsItem(
-                MainSettingsEntry.SITE_SETTINGS, androidx.compose.material.icons.Icons.Filled.WebAsset,
+                MainSettingsEntry.SITE_SETTINGS, com.simplefox.browser.ui.icons.Icons.Filled.WebAsset,
                 stringResource(R.string.site_settings), stringResource(R.string.site_settings_summary), onSiteSettingsClick
             )
         ),
         stringResource(R.string.settings_group_data) to listOf(
             MainSettingsItem(
-                MainSettingsEntry.DOWNLOADS, androidx.compose.material.icons.Icons.Filled.Download,
+                MainSettingsEntry.DOWNLOADS, com.simplefox.browser.ui.icons.Icons.Filled.Download,
                 stringResource(R.string.download_settings_title), stringResource(R.string.download_settings_summary), onDownloadsClick
             ),
             MainSettingsItem(
-                MainSettingsEntry.DATA_SAVER, androidx.compose.material.icons.Icons.Filled.DataSaverOn,
+                MainSettingsEntry.DATA_SAVER, com.simplefox.browser.ui.icons.Icons.Filled.DataSaverOn,
                 stringResource(R.string.data_saver_title), stringResource(R.string.data_saver_settings_summary), onDataSaverClick
             ),
             MainSettingsItem(
-                MainSettingsEntry.BACKUP_RESTORE, androidx.compose.material.icons.Icons.Filled.SettingsBackupRestore,
+                MainSettingsEntry.BACKUP_RESTORE, com.simplefox.browser.ui.icons.Icons.Filled.SettingsBackupRestore,
                 stringResource(R.string.backup_restore_title), stringResource(R.string.backup_restore_summary), onBackupRestoreClick
             )
         ),
         stringResource(R.string.settings_group_advanced) to listOf(
             MainSettingsItem(
-                MainSettingsEntry.MISC, androidx.compose.material.icons.Icons.Filled.Tune,
+                MainSettingsEntry.MISC, com.simplefox.browser.ui.icons.Icons.Filled.Tune,
                 stringResource(R.string.pref_misc_title), stringResource(R.string.pref_misc_summary), onMiscClick
             ),
             MainSettingsItem(
-                MainSettingsEntry.DEBUG, androidx.compose.material.icons.Icons.Filled.BugReport,
+                MainSettingsEntry.DEBUG, com.simplefox.browser.ui.icons.Icons.Filled.BugReport,
                 stringResource(R.string.debug_title), stringResource(R.string.debug_summary), onDebugClick
             )
         ),
         null to listOf(
             MainSettingsItem(
-                MainSettingsEntry.ABOUT, androidx.compose.material.icons.Icons.Filled.Info,
+                MainSettingsEntry.ABOUT, com.simplefox.browser.ui.icons.Icons.Filled.Info,
                 stringResource(R.string.about), stringResource(R.string.about_summary, versionName), onAboutClick
             )
         )
@@ -180,7 +168,7 @@ private fun SettingsSearchBar(onClick: () -> Unit) {
             .padding(horizontal = 16.dp)
     ) {
         Icon(
-            androidx.compose.material.icons.Icons.Filled.Search,
+            com.simplefox.browser.ui.icons.Icons.Filled.Search,
             contentDescription = null,
             tint = colors.iconTint,
             modifier = Modifier.size(22.dp)

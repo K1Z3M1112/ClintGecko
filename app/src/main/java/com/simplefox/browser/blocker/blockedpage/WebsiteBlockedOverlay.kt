@@ -11,9 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Shield
-import androidx.compose.material.icons.filled.RestartAlt
+import com.simplefox.browser.ui.icons.Icons
 import com.simplefox.browser.ui.foundation.Button
 import com.simplefox.browser.ui.foundation.ButtonDefaults
 import com.simplefox.browser.ui.foundation.Icon

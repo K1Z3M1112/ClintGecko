@@ -1,13 +1,5 @@
 package com.simplefox.browser.blocker.additional
 
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Checklist
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Language
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -94,7 +86,7 @@ fun AdditionalWebsitesScreen(
                     Text(stringResource(R.string.additional_websites_master_switch_title), color = colors.onSurface, fontSize = 15.sp, fontWeight = FontWeight.Medium)
                     Text(stringResource(R.string.additional_websites_master_switch_summary), color = colors.secondaryText, fontSize = 13.sp, modifier = Modifier.padding(top = 2.dp))
                 }
-                ClintSwitch(checked = state.isEnabled)
+                ClintSwitch(checked = state.isEnabled, onCheckedChange = { onToggleEnabled(!state.isEnabled) })
             }
 
             Box(Modifier.weight(1f).fillMaxWidth()) {
@@ -144,7 +136,7 @@ fun AdditionalWebsitesScreen(
                         containerColor = colors.buttonBackground, contentColor = colors.buttonIconTint,
                         modifier = Modifier.align(Alignment.BottomEnd).navigationBarsPadding().padding(bottom = 24.dp, end = 20.dp)
                     ) {
-                        Icon(androidx.compose.material.icons.Icons.Filled.Delete, contentDescription = stringResource(R.string.action_delete))
+                        Icon(com.simplefox.browser.ui.icons.Icons.Filled.Delete, contentDescription = stringResource(R.string.action_delete))
                     }
                 }
                 if (showAddFab) {
@@ -153,7 +145,7 @@ fun AdditionalWebsitesScreen(
                         containerColor = colors.buttonBackground, contentColor = colors.buttonIconTint,
                         modifier = Modifier.align(Alignment.BottomEnd).navigationBarsPadding().padding(bottom = 24.dp, end = 20.dp)
                     ) {
-                        Icon(androidx.compose.material.icons.Icons.Filled.Add, contentDescription = stringResource(R.string.additional_websites_add_fab_desc))
+                        Icon(com.simplefox.browser.ui.icons.Icons.Filled.Add, contentDescription = stringResource(R.string.additional_websites_add_fab_desc))
                     }
                 }
             }
@@ -179,11 +171,11 @@ private fun AdditionalWebsitesToolbar(
     val colors = LocalClintColors.current
     val showToolbarIcons = !state.isInSelectionMode && !state.isSearchMode
 
-    Surface(color = colors.surface, shadowElevation = 4.dp, modifier = Modifier.statusBarsPadding()) {
+    Surface(color = colors.surface, modifier = Modifier.statusBarsPadding()) {
         Row(Modifier.fillMaxWidth().height(56.dp).padding(horizontal = 4.dp), verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = onBack) {
                 Icon(
-                    if (state.isInSelectionMode) androidx.compose.material.icons.Icons.Filled.Close else androidx.compose.material.icons.Icons.AutoMirrored.Filled.ArrowBack,
+                    if (state.isInSelectionMode) com.simplefox.browser.ui.icons.Icons.Filled.Close else com.simplefox.browser.ui.icons.Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = stringResource(if (state.isInSelectionMode) R.string.history_cancel_selection_desc else R.string.back),
                     tint = colors.onSurface
                 )
@@ -207,12 +199,12 @@ private fun AdditionalWebsitesToolbar(
 
             if (showToolbarIcons) {
                 IconButton(onClick = { state.isSearchMode = true }) {
-                    Icon(androidx.compose.material.icons.Icons.Filled.Search, contentDescription = stringResource(R.string.history_search), tint = colors.iconTint)
+                    Icon(com.simplefox.browser.ui.icons.Icons.Filled.Search, contentDescription = stringResource(R.string.history_search), tint = colors.iconTint)
                 }
             }
             if (state.isInSelectionMode) {
                 IconButton(onClick = { state.selectedIds = displayed.map { it.id }.toSet() }) {
-                    Icon(androidx.compose.material.icons.Icons.Filled.Checklist, contentDescription = stringResource(R.string.history_more_options), tint = colors.primary)
+                    Icon(com.simplefox.browser.ui.icons.Icons.Filled.Checklist, contentDescription = stringResource(R.string.history_more_options), tint = colors.primary)
                 }
             }
         }
@@ -243,7 +235,7 @@ private fun AdditionalWebsiteRuleRow(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
-            androidx.compose.material.icons.Icons.Filled.Language,
+            com.simplefox.browser.ui.icons.Icons.Filled.Language,
             contentDescription = null,
             tint = colors.iconTint,
             modifier = Modifier.size(20.dp)
@@ -261,14 +253,14 @@ private fun AdditionalWebsiteRuleRow(
             Box(Modifier.size(48.dp), contentAlignment = Alignment.Center) {
                 if (isSelected) {
                     Icon(
-                        androidx.compose.material.icons.Icons.Filled.Check, contentDescription = null,
+                        com.simplefox.browser.ui.icons.Icons.Filled.Check, contentDescription = null,
                         tint = colors.primary, modifier = Modifier.size(24.dp)
                     )
                 }
             }
         } else {
             IconButton(onClick = onDeleteClick) {
-                Icon(androidx.compose.material.icons.Icons.Filled.Delete, contentDescription = stringResource(R.string.action_delete), tint = colors.iconTint)
+                Icon(com.simplefox.browser.ui.icons.Icons.Filled.Delete, contentDescription = stringResource(R.string.action_delete), tint = colors.iconTint)
             }
         }
     }

@@ -1,19 +1,4 @@
 package com.simplefox.browser.settings.datasaver
-import androidx.compose.material.icons.filled.Block
-import androidx.compose.material.icons.filled.Code
-import androidx.compose.material.icons.filled.Style
-import androidx.compose.material.icons.filled.DataSaverOn
-import androidx.compose.material.icons.filled.HideImage
-import androidx.compose.material.icons.filled.History
-import androidx.compose.material.icons.filled.SignalCellularAlt
-import androidx.compose.material.icons.filled.Language
-import androidx.compose.material.icons.filled.SearchOff
-import androidx.compose.material.icons.filled.TextFields
-import androidx.compose.material.icons.filled.Web
-import androidx.compose.material.icons.filled.VideocamOff
-import androidx.compose.material.icons.filled.PausePresentation
-import androidx.compose.material.icons.filled.Speed
-import androidx.compose.material.icons.filled.Tab
 
 import com.simplefox.browser.ui.ClintSwitch
 import androidx.compose.runtime.Composable
@@ -43,7 +28,8 @@ fun DataSaverScreen(
     onDisableFaviconsClick: () -> Unit,
     onBlockScriptsClick: () -> Unit,
     onBlockCssClick: () -> Unit,
-    onSingleTabClick: () -> Unit = {}
+    onSingleTabClick: () -> Unit = {},
+    onReduceEffectsClick: () -> Unit = {}
 ) {
     val colors = LocalClintColors.current
 
@@ -51,7 +37,7 @@ fun DataSaverScreen(
         SettingsSectionLabel(stringResource(R.string.data_saver_section))
         SettingsSection(colors.cardBackground) {
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.DataSaverOn,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.DataSaverOn,
                 title = stringResource(R.string.data_saver_title),
                 summary = stringResource(R.string.data_saver_summary),
                 colors = colors,
@@ -62,7 +48,7 @@ fun DataSaverScreen(
             )
             RowDivider(colors.divider)
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.SignalCellularAlt,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.SignalCellularAlt,
                 title = stringResource(R.string.data_saver_metered_only_title),
                 summary = stringResource(R.string.data_saver_metered_only_summary),
                 colors = colors,
@@ -76,7 +62,7 @@ fun DataSaverScreen(
         SettingsSectionLabel(stringResource(R.string.data_saver_media_section))
         SettingsSection(colors.cardBackground) {
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.HideImage,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.HideImage,
                 title = stringResource(R.string.data_saver_disable_images_title),
                 summary = stringResource(R.string.data_saver_disable_images_summary),
                 colors = colors,
@@ -88,7 +74,7 @@ fun DataSaverScreen(
             )
             RowDivider(colors.divider)
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.VideocamOff,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.VideocamOff,
                 title = stringResource(R.string.data_saver_block_video_title),
                 summary = stringResource(R.string.data_saver_block_video_summary),
                 colors = colors,
@@ -100,7 +86,7 @@ fun DataSaverScreen(
             )
             RowDivider(colors.divider)
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.PausePresentation,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.PausePresentation,
                 title = stringResource(R.string.data_saver_disable_autoplay_title),
                 summary = stringResource(R.string.data_saver_disable_autoplay_summary),
                 colors = colors,
@@ -112,7 +98,7 @@ fun DataSaverScreen(
             )
             RowDivider(colors.divider)
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.Block,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.Block,
                 title = stringResource(R.string.data_saver_block_preload_title),
                 summary = stringResource(R.string.data_saver_block_preload_summary),
                 colors = colors,
@@ -126,7 +112,7 @@ fun DataSaverScreen(
         SettingsSectionLabel(stringResource(R.string.data_saver_loading_section))
         SettingsSection(colors.cardBackground) {
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.TextFields,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.TextFields,
                 title = stringResource(R.string.data_saver_block_fonts_title),
                 summary = stringResource(R.string.data_saver_block_fonts_summary),
                 colors = colors,
@@ -138,7 +124,7 @@ fun DataSaverScreen(
             )
             RowDivider(colors.divider)
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.Web,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.Web,
                 title = stringResource(R.string.data_saver_block_frames_title),
                 summary = stringResource(R.string.data_saver_block_frames_summary),
                 colors = colors,
@@ -150,7 +136,7 @@ fun DataSaverScreen(
             )
             RowDivider(colors.divider)
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.Code,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.Code,
                 title = stringResource(R.string.data_saver_block_scripts_title),
                 summary = stringResource(R.string.data_saver_block_scripts_summary),
                 colors = colors,
@@ -162,7 +148,7 @@ fun DataSaverScreen(
             )
             RowDivider(colors.divider)
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.Style,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.Style,
                 title = stringResource(R.string.data_saver_block_css_title),
                 summary = stringResource(R.string.data_saver_block_css_summary),
                 colors = colors,
@@ -174,7 +160,19 @@ fun DataSaverScreen(
             )
             RowDivider(colors.divider)
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.History,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.Speed,
+                title = stringResource(R.string.data_saver_reduce_effects_title),
+                summary = stringResource(R.string.data_saver_reduce_effects_summary),
+                colors = colors,
+                onClick = onReduceEffectsClick,
+                enabled = state.enabled,
+                trailing = {
+                    ClintSwitch(checked = state.reduceEffects)
+                }
+            )
+            RowDivider(colors.divider)
+            SettingsRow(
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.History,
                 title = stringResource(R.string.data_saver_cache_first_title),
                 summary = stringResource(R.string.data_saver_cache_first_summary),
                 colors = colors,
@@ -186,7 +184,7 @@ fun DataSaverScreen(
             )
             RowDivider(colors.divider)
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.Speed,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.Speed,
                 title = stringResource(R.string.data_saver_send_header_title),
                 summary = stringResource(R.string.data_saver_send_header_summary),
                 colors = colors,
@@ -200,7 +198,7 @@ fun DataSaverScreen(
         SettingsSectionLabel(stringResource(R.string.data_saver_browser_section))
         SettingsSection(colors.cardBackground) {
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.Tab,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.Tab,
                 title = stringResource(R.string.data_saver_single_tab_title),
                 summary = stringResource(R.string.data_saver_single_tab_summary),
                 colors = colors,
@@ -212,7 +210,7 @@ fun DataSaverScreen(
             )
             RowDivider(colors.divider)
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.SearchOff,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.SearchOff,
                 title = stringResource(R.string.data_saver_disable_suggestions_title),
                 summary = stringResource(R.string.data_saver_disable_suggestions_summary),
                 colors = colors,
@@ -224,7 +222,7 @@ fun DataSaverScreen(
             )
             RowDivider(colors.divider)
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.Language,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.Language,
                 title = stringResource(R.string.data_saver_disable_favicons_title),
                 summary = stringResource(R.string.data_saver_disable_favicons_summary),
                 colors = colors,

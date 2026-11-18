@@ -1,5 +1,4 @@
 package com.simplefox.browser.ui.listscreen
-import androidx.compose.material.icons.filled.Close
 
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.padding
@@ -38,7 +37,7 @@ fun RowScope.ClintSearchField(
     val colors = LocalClintColors.current
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusRequester = remember { FocusRequester() }
-    val state = rememberSyncedTextFieldState(query, onQueryChange)
+    val state = rememberSyncedTextFieldState(query, onQueryChange, debounceMs = 120L)
 
     LaunchedEffect(Unit) {
         if (autoFocus) {
@@ -64,7 +63,7 @@ fun RowScope.ClintSearchField(
     )
     IconButton(onClick = onClose) {
         Icon(
-            androidx.compose.material.icons.Icons.Filled.Close,
+            com.simplefox.browser.ui.icons.Icons.Filled.Close,
             contentDescription = stringResource(R.string.action_close_search),
             tint = colors.iconTint
         )

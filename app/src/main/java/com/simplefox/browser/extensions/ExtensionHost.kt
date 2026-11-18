@@ -17,9 +17,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Warning
+import com.simplefox.browser.ui.icons.Icons
 import com.simplefox.browser.ui.foundation.Icon
 import com.simplefox.browser.ui.foundation.IconButton
 import com.simplefox.browser.ui.foundation.Surface
@@ -46,7 +44,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import androidx.preference.PreferenceManager
+import com.simplefox.browser.util.PreferenceManager
 import com.simplefox.browser.R
 import com.simplefox.browser.browser.dialogs.JsDialog
 import com.simplefox.browser.ui.ClintDialog
@@ -212,7 +210,7 @@ private fun ExtensionPromptDialog(prompt: ExtensionPrompt, hideStatusBar: Boolea
                         fontSize = 14.sp,
                         modifier = Modifier.weight(1f).padding(end = 12.dp)
                     )
-                    ClintSwitch(checked = allowPrivate)
+                    ClintSwitch(checked = allowPrivate, onCheckedChange = { allowPrivate = !allowPrivate })
                 }
             }
         }

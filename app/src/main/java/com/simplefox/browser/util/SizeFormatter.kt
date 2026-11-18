@@ -1,7 +1,6 @@
 package com.simplefox.browser.util
 
 import android.content.Context
-import androidx.preference.PreferenceManager
 import java.util.Locale
 
 const val PREF_MEASUREMENT_SYSTEM = "measurement_system"
@@ -12,21 +11,13 @@ const val DEFAULT_MEASUREMENT_SYSTEM = MEASUREMENT_SYSTEM_BINARY
 @Volatile
 private var decimalUnitsEnabled = false
 
-@Volatile
-private var formatEpoch = 0
-
-val measurementSystemEpoch: Int get() = formatEpoch
-
 fun loadMeasurementSystemPreference(context: Context) {
     decimalUnitsEnabled = PreferenceManager.getDefaultSharedPreferences(context)
         .getString(PREF_MEASUREMENT_SYSTEM, DEFAULT_MEASUREMENT_SYSTEM) == MEASUREMENT_SYSTEM_DECIMAL
 }
 
 fun setMeasurementSystemDecimal(decimal: Boolean) {
-    if (decimalUnitsEnabled != decimal) {
-        decimalUnitsEnabled = decimal
-        formatEpoch++
-    }
+    decimalUnitsEnabled = decimal
 }
 
 fun formatFileSize(bytes: Long): String {

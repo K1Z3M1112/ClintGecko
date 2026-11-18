@@ -9,7 +9,7 @@ import android.util.Base64
 import android.view.View
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import androidx.preference.PreferenceManager
+import com.simplefox.browser.util.PreferenceManager
 import com.simplefox.browser.R
 import com.simplefox.browser.browser.longshot.LongShot
 import com.simplefox.browser.privacy.PrivacyPrefs
@@ -243,13 +243,11 @@ internal object ClintErrorPage {
     fun themeStyle(context: Context): ThemeStyle {
         val prefs = PreferenceManager.getDefaultSharedPreferences(context)
         val theme = prefs.getString("app_theme", ThemeMode.SYSTEM) ?: ThemeMode.SYSTEM
-        val accent = prefs.getString("accent_color", "material_you") ?: "material_you"
-        val intensity = prefs.getString("surface_intensity", "soft_tint") ?: "soft_tint"
         val palette = when (theme) {
-            ThemeMode.LIGHT -> ":root{${cssVars(resolveClintColors(context, true, accent, intensity))}}"
-            ThemeMode.DARK -> ":root{${cssVars(resolveClintColors(context, false, accent, intensity))}}"
-            else -> ":root{${cssVars(resolveClintColors(context, true, accent, intensity))}}" +
-                "@media (prefers-color-scheme:dark){:root{${cssVars(resolveClintColors(context, false, accent, intensity))}}}"
+            ThemeMode.LIGHT -> ":root{${cssVars(resolveClintColors(true))}}"
+            ThemeMode.DARK -> ":root{${cssVars(resolveClintColors(false))}}"
+            else -> ":root{${cssVars(resolveClintColors(true))}}" +
+                "@media (prefers-color-scheme:dark){:root{${cssVars(resolveClintColors(false))}}}"
         }
         val colorScheme = when (theme) {
             ThemeMode.LIGHT -> "light"

@@ -21,6 +21,14 @@ object TabSessionManager {
 
     private const val PENDING_WRITE_TIMEOUT_MS = 2000L
 
+    // Drift in lastActiveAt alone (touchActive() runs on every save) is not worth a full rewrite.
+    private const val LAST_ACTIVE_TOLERANCE_MS = 60_000L
+
+    private val snapshotLock = Any()
+    // What the database currently holds, or null when unknown. Guarded by snapshotLock.
+    private var lastSavedTabs: List<SavedTab>? = null
+    private var lastSavedGroups: List<TabGroup>? = null
+
     @Volatile private var db: TabDatabase? = null
 
     private val writer = Executors.newSingleThreadExecutor { runnable ->
@@ -47,7 +55,34 @@ object TabSessionManager {
         runCatching { writer.submit(Runnable {}).get(PENDING_WRITE_TIMEOUT_MS, TimeUnit.MILLISECONDS) }
     }
 
+    /** Forget what we believe is stored; call after anything replaces the database file behind our back. */
+    fun invalidateSnapshot() {
+        synchronized(snapshotLock) {
+            lastSavedTabs = null
+            lastSavedGroups = null
+        }
+    }
+
+    private fun sameTabs(a: List<SavedTab>, b: List<SavedTab>): Boolean {
+        if (a.size != b.size) return false
+        for (i in a.indices) {
+            val x = a[i]
+            val y = b[i]
+            if (kotlin.math.abs(x.lastActiveAt - y.lastActiveAt) >= LAST_ACTIVE_TOLERANCE_MS) return false
+            if (x.copy(lastActiveAt = y.lastActiveAt) != y) return false
+        }
+        return true
+    }
+
     fun save(context: Context, tabs: List<SavedTab>, groups: List<TabGroup> = emptyList()) {
+        synchronized(snapshotLock) { saveLocked(context, tabs, groups) }
+    }
+
+    private fun saveLocked(context: Context, tabs: List<SavedTab>, groups: List<TabGroup>) {
+        if (lastSavedGroups == groups && lastSavedTabs?.let { sameTabs(it, tabs) } == true) return
+        // Invalidate first so a failed write never leaves a stale "already saved" snapshot behind.
+        lastSavedTabs = null
+        lastSavedGroups = null
         val writable = db(context).writableDatabase
         writable.beginTransaction()
         try {
@@ -81,6 +116,8 @@ object TabSessionManager {
         } finally {
             writable.endTransaction()
         }
+        lastSavedTabs = tabs.toList()
+        lastSavedGroups = groups.toList()
     }
 
     fun load(context: Context): List<SavedTab> {
@@ -160,10 +197,12 @@ object TabSessionManager {
     }
 
     fun removeProfile(context: Context, profileId: String) {
+        invalidateSnapshot()
         db(context).writableDatabase.delete(TabDatabase.TABLE, "${TabDatabase.COL_PROFILE_ID} = ?", arrayOf(profileId))
     }
 
     fun clear(context: Context) {
+        invalidateSnapshot()
         val writable = db(context).writableDatabase
         writable.delete(TabDatabase.TABLE, null, null)
         writable.delete(TabDatabase.GROUPS_TABLE, null, null)

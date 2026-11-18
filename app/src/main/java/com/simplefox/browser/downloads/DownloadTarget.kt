@@ -7,7 +7,7 @@ import android.os.StatFs
 import android.provider.DocumentsContract
 import android.system.Os
 import android.system.OsConstants
-import androidx.documentfile.provider.DocumentFile
+import com.simplefox.browser.util.DocumentFile
 import com.simplefox.browser.downloads.mega.MegaPaths
 import java.io.File
 import java.io.FileNotFoundException

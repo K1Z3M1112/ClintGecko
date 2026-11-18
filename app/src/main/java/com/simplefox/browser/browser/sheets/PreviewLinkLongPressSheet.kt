@@ -1,10 +1,4 @@
 package com.simplefox.browser.browser.sheets
-import androidx.compose.material.icons.filled.ContentCopy
-import androidx.compose.material.icons.filled.Link
-import androidx.compose.material.icons.automirrored.filled.OpenInNew
-import androidx.compose.material.icons.filled.Share
-import androidx.compose.material.icons.filled.Tab
-import androidx.compose.material.icons.filled.VisibilityOff
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -23,7 +17,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.preference.PreferenceManager
+import com.simplefox.browser.util.PreferenceManager
 import com.simplefox.browser.R
 import com.simplefox.browser.browser.MainActivity
 import com.simplefox.browser.ui.theme.LocalClintColors
@@ -51,7 +45,7 @@ internal fun PreviewLinkLongPressSheet(request: PreviewLinkLongPressRequest, act
                 Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 4.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(androidx.compose.material.icons.Icons.Filled.Link, contentDescription = null, tint = colors.iconTint, modifier = Modifier.size(20.dp))
+                Icon(com.simplefox.browser.ui.icons.Icons.Filled.Link, contentDescription = null, tint = colors.iconTint, modifier = Modifier.size(20.dp))
                 Column(Modifier.padding(start = 12.dp)) {
                     if (hasLinkText) {
                         Text(request.linkText, color = colors.onSurface, fontSize = 14.sp, fontWeight = FontWeight.Bold, maxLines = 1)
@@ -61,29 +55,29 @@ internal fun PreviewLinkLongPressSheet(request: PreviewLinkLongPressRequest, act
             }
 
             ActionSheetDivider()
-            ActionSheetRow(androidx.compose.material.icons.Icons.AutoMirrored.Filled.OpenInNew, stringResource(R.string.link_open_in_new_tab)) {
+            ActionSheetRow(com.simplefox.browser.ui.icons.Icons.AutoMirrored.Filled.OpenInNew, stringResource(R.string.link_open_in_new_tab)) {
                 dismissAnd { activity.onPreviewLinkOpenInNewTab(request.url) }
             }
             ActionSheetDivider()
-            ActionSheetRow(androidx.compose.material.icons.Icons.Filled.VisibilityOff, stringResource(R.string.link_open_incognito)) {
+            ActionSheetRow(com.simplefox.browser.ui.icons.Icons.Filled.VisibilityOff, stringResource(R.string.link_open_incognito)) {
                 dismissAnd { activity.onPreviewLinkOpenIncognito(request.url) }
             }
             ActionSheetDivider()
-            ActionSheetRow(androidx.compose.material.icons.Icons.Filled.Tab, stringResource(R.string.preview_link_open_in_current_tab)) {
+            ActionSheetRow(com.simplefox.browser.ui.icons.Icons.Filled.Tab, stringResource(R.string.preview_link_open_in_current_tab)) {
                 dismissAnd { activity.onPreviewLinkOpenInCurrentTab(request.url) }
             }
             ActionSheetDivider()
-            ActionSheetRow(androidx.compose.material.icons.Icons.Filled.ContentCopy, stringResource(R.string.link_copy_address)) {
+            ActionSheetRow(com.simplefox.browser.ui.icons.Icons.Filled.ContentCopy, stringResource(R.string.link_copy_address)) {
                 dismissAnd { activity.onPreviewLinkCopyAddress(request.url) }
             }
             if (hasLinkText) {
                 ActionSheetDivider()
-                ActionSheetRow(androidx.compose.material.icons.Icons.Filled.ContentCopy, stringResource(R.string.link_copy_text)) {
+                ActionSheetRow(com.simplefox.browser.ui.icons.Icons.Filled.ContentCopy, stringResource(R.string.link_copy_text)) {
                     dismissAnd { activity.onPreviewLinkCopyText(request.url, request.linkText) }
                 }
             }
             ActionSheetDivider()
-            ActionSheetRow(androidx.compose.material.icons.Icons.Filled.Share, stringResource(R.string.link_share)) {
+            ActionSheetRow(com.simplefox.browser.ui.icons.Icons.Filled.Share, stringResource(R.string.link_share)) {
                 dismissAnd { activity.onPreviewLinkShare(request.url) }
             }
         }

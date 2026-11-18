@@ -21,16 +21,7 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.Cookie
-import androidx.compose.material.icons.filled.History
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.PhotoLibrary
-import androidx.compose.material.icons.filled.Schedule
-import androidx.compose.material.icons.filled.Tab
-import androidx.compose.material.icons.filled.Tune
+import com.simplefox.browser.ui.icons.Icons
 import com.simplefox.browser.ui.foundation.Button
 import com.simplefox.browser.ui.foundation.ButtonDefaults
 import com.simplefox.browser.ui.foundation.CircularProgressIndicator

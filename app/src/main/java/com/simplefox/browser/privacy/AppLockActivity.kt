@@ -15,8 +15,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Lock
+import com.simplefox.browser.ui.icons.Icons
 import com.simplefox.browser.ui.foundation.Button
 import com.simplefox.browser.ui.foundation.ButtonDefaults
 import com.simplefox.browser.ui.foundation.Icon
@@ -31,7 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
-import androidx.preference.PreferenceManager
+import com.simplefox.browser.util.PreferenceManager
 import com.simplefox.browser.R
 import com.simplefox.browser.backup.AuthGateResult
 import com.simplefox.browser.backup.BackupAuthGate

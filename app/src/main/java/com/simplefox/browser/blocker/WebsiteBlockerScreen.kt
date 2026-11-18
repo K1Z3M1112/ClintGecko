@@ -1,19 +1,5 @@
 package com.simplefox.browser.blocker
 
-import androidx.compose.material.icons.filled.Checklist
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Language
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.Public
-import androidx.compose.material.icons.filled.Save
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Shield
-import androidx.compose.material.icons.filled.Update
-import androidx.compose.material.icons.filled.Warning
-import androidx.compose.material.icons.automirrored.filled.ArrowForward
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.Sort
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -187,7 +173,7 @@ fun WebsiteBlockerScreen(
                     Modifier.fillMaxWidth().background(colors.colorErrorContainer).padding(horizontal = 20.dp, vertical = 12.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(androidx.compose.material.icons.Icons.Filled.Warning, contentDescription = null, tint = colors.colorError, modifier = Modifier.size(20.dp))
+                    Icon(com.simplefox.browser.ui.icons.Icons.Filled.Warning, contentDescription = null, tint = colors.colorError, modifier = Modifier.size(20.dp))
                     Text(message, color = colors.colorOnErrorContainer, fontSize = 13.sp, modifier = Modifier.padding(start = 12.dp))
                 }
             }
@@ -266,13 +252,13 @@ fun WebsiteBlockerScreen(
 private fun MasterSwitchRow(masterEnabled: Boolean, onToggle: (Boolean) -> Unit) {
     val colors = LocalClintColors.current
     SettingsRow(
-        icon = androidx.compose.material.icons.Icons.Filled.Shield,
+        icon = com.simplefox.browser.ui.icons.Icons.Filled.Shield,
         title = stringResource(R.string.website_blocker_master_switch_title),
         summary = stringResource(R.string.website_blocker_settings_summary),
         colors = colors,
         onClick = { onToggle(!masterEnabled) },
         trailing = {
-            ClintSwitch(checked = masterEnabled)
+            ClintSwitch(checked = masterEnabled, onCheckedChange = { onToggle(!masterEnabled) })
         }
     )
 }
@@ -297,7 +283,7 @@ private fun AdditionalWebsitesRow(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Box(Modifier.size(40.dp).clip(CircleShape).background(colors.surfaceVariant), contentAlignment = Alignment.Center) {
-            Icon(androidx.compose.material.icons.Icons.Filled.Language, contentDescription = null, tint = colors.iconTint, modifier = Modifier.size(20.dp))
+            Icon(com.simplefox.browser.ui.icons.Icons.Filled.Language, contentDescription = null, tint = colors.iconTint, modifier = Modifier.size(20.dp))
         }
         Column(Modifier.weight(1f).padding(start = 12.dp)) {
             Text(stringResource(R.string.additional_websites_title), color = colors.onSurface, fontSize = 14.sp, fontWeight = FontWeight.Medium)
@@ -306,7 +292,7 @@ private fun AdditionalWebsitesRow(
                 color = colors.secondaryText, fontSize = 12.sp, modifier = Modifier.padding(top = 2.dp)
             )
         }
-        Icon(androidx.compose.material.icons.Icons.AutoMirrored.Filled.ArrowForward, contentDescription = null, tint = colors.iconTint, modifier = Modifier.size(18.dp))
+        Icon(com.simplefox.browser.ui.icons.Icons.AutoMirrored.Filled.ArrowForward, contentDescription = null, tint = colors.iconTint, modifier = Modifier.size(18.dp))
     }
 }
 
@@ -333,11 +319,11 @@ private fun WebsiteBlockerToolbar(
     val showToolbarIcons = !state.isInSelectionMode && !state.isSearchMode
     var selectionItemOptionsMenuOpen by remember { mutableStateOf(false) }
 
-    Surface(color = colors.surface, shadowElevation = 4.dp, modifier = Modifier.statusBarsPadding()) {
+    Surface(color = colors.surface, modifier = Modifier.statusBarsPadding()) {
         Row(Modifier.fillMaxWidth().height(56.dp).padding(horizontal = 4.dp), verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = onBack) {
                 Icon(
-                    if (state.isInSelectionMode) androidx.compose.material.icons.Icons.Filled.Close else androidx.compose.material.icons.Icons.AutoMirrored.Filled.ArrowBack,
+                    if (state.isInSelectionMode) com.simplefox.browser.ui.icons.Icons.Filled.Close else com.simplefox.browser.ui.icons.Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = null, tint = colors.onSurface
                 )
             }
@@ -360,14 +346,14 @@ private fun WebsiteBlockerToolbar(
 
             if (showToolbarIcons) {
                 IconButton(onClick = { state.isSearchMode = true }) {
-                    Icon(androidx.compose.material.icons.Icons.Filled.Search, contentDescription = null, tint = colors.iconTint)
+                    Icon(com.simplefox.browser.ui.icons.Icons.Filled.Search, contentDescription = null, tint = colors.iconTint)
                 }
                 IconButton(onClick = onRefreshClick) {
-                    Icon(androidx.compose.material.icons.Icons.Filled.Update, contentDescription = null, tint = colors.iconTint)
+                    Icon(com.simplefox.browser.ui.icons.Icons.Filled.Update, contentDescription = null, tint = colors.iconTint)
                 }
                 Box {
                     IconButton(onClick = { state.sortMenuOpen = true }) {
-                        Icon(androidx.compose.material.icons.Icons.AutoMirrored.Filled.Sort, contentDescription = null, tint = colors.iconTint)
+                        Icon(com.simplefox.browser.ui.icons.Icons.AutoMirrored.Filled.Sort, contentDescription = null, tint = colors.iconTint)
                     }
                     SortMenu(
                         expanded = state.sortMenuOpen,
@@ -381,7 +367,7 @@ private fun WebsiteBlockerToolbar(
                 }
                 Box {
                     IconButton(onClick = { state.actionsMenuOpen = true }) {
-                        Icon(androidx.compose.material.icons.Icons.Filled.MoreVert, contentDescription = null, tint = colors.iconTint)
+                        Icon(com.simplefox.browser.ui.icons.Icons.Filled.MoreVert, contentDescription = null, tint = colors.iconTint)
                     }
                     WebsiteBlockerActionsMenu(
                         expanded = state.actionsMenuOpen,
@@ -397,7 +383,7 @@ private fun WebsiteBlockerToolbar(
             if (state.isInSelectionMode) {
                 Box {
                     IconButton(onClick = { state.selectionOptionsMenuOpen = true }) {
-                        Icon(androidx.compose.material.icons.Icons.Filled.Checklist, contentDescription = null, tint = colors.iconTint)
+                        Icon(com.simplefox.browser.ui.icons.Icons.Filled.Checklist, contentDescription = null, tint = colors.iconTint)
                     }
                     SelectionOptionsMenu(
                         expanded = state.selectionOptionsMenuOpen,
@@ -409,7 +395,7 @@ private fun WebsiteBlockerToolbar(
                 if (state.selectedIds.isNotEmpty()) {
                     Box {
                         IconButton(onClick = { selectionItemOptionsMenuOpen = true }) {
-                            Icon(androidx.compose.material.icons.Icons.Filled.MoreVert, contentDescription = null, tint = colors.iconTint)
+                            Icon(com.simplefox.browser.ui.icons.Icons.Filled.MoreVert, contentDescription = null, tint = colors.iconTint)
                         }
                         FilterListItemOptionsMenu(
                             expanded = selectionItemOptionsMenuOpen,
@@ -479,7 +465,7 @@ private fun WebsiteBlockerCategoryRow(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Box(Modifier.size(40.dp).clip(CircleShape).background(colors.surfaceVariant), contentAlignment = Alignment.Center) {
-            Icon(androidx.compose.material.icons.Icons.Filled.Public, contentDescription = null, tint = colors.iconTint, modifier = Modifier.size(20.dp))
+            Icon(com.simplefox.browser.ui.icons.Icons.Filled.Public, contentDescription = null, tint = colors.iconTint, modifier = Modifier.size(20.dp))
         }
         Column(Modifier.weight(1f).padding(start = 12.dp, end = 4.dp)) {
             Text(title, color = colors.onSurface, fontSize = 14.sp, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis)
@@ -491,11 +477,15 @@ private fun WebsiteBlockerCategoryRow(
             Text(statusText, color = colors.secondaryText, fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(top = 2.dp))
         }
         if (!isInSelectionMode) {
-            ClintSwitch(checked = category.isEnabled)
+            ClintSwitch(
+                checked = category.isEnabled,
+                enabled = masterEnabled && !interactionLocked,
+                onCheckedChange = { onClick() }
+            )
         }
         Box {
             IconButton(onClick = { optionsMenuOpen = true }, enabled = masterEnabled && !interactionLocked) {
-                Icon(androidx.compose.material.icons.Icons.Filled.MoreVert, contentDescription = null, tint = colors.iconTint)
+                Icon(com.simplefox.browser.ui.icons.Icons.Filled.MoreVert, contentDescription = null, tint = colors.iconTint)
             }
             FilterListItemOptionsMenu(
                 expanded = optionsMenuOpen,
@@ -527,7 +517,7 @@ private fun BoxScope.WebsiteBlockerFab(
             containerColor = colors.buttonBackground, contentColor = colors.buttonIconTint,
             modifier = Modifier.align(Alignment.BottomEnd).navigationBarsPadding().padding(bottom = 24.dp, end = 20.dp)
         ) {
-            Icon(androidx.compose.material.icons.Icons.Filled.Delete, contentDescription = stringResource(R.string.action_delete))
+            Icon(com.simplefox.browser.ui.icons.Icons.Filled.Delete, contentDescription = stringResource(R.string.action_delete))
         }
     } else if (showPrimaryFab) {
         FloatingActionButton(
@@ -537,7 +527,7 @@ private fun BoxScope.WebsiteBlockerFab(
                 .align(Alignment.BottomEnd).navigationBarsPadding().padding(bottom = 24.dp, end = 20.dp)
                 .alpha(if (!enabled) 0.38f else 1f)
         ) {
-            Icon(androidx.compose.material.icons.Icons.Filled.Save, contentDescription = stringResource(R.string.website_blocker_fab_save_desc))
+            Icon(com.simplefox.browser.ui.icons.Icons.Filled.Save, contentDescription = stringResource(R.string.website_blocker_fab_save_desc))
         }
     }
 }

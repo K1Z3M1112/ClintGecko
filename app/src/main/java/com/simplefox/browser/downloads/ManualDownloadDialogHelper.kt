@@ -2,12 +2,10 @@ package com.simplefox.browser.downloads
 
 import android.content.Intent
 import android.net.Uri
-import androidx.documentfile.provider.DocumentFile
-import androidx.preference.PreferenceManager
+import com.simplefox.browser.util.DocumentFile
+import com.simplefox.browser.util.PreferenceManager
 import com.simplefox.browser.R
 import com.simplefox.browser.browser.delegates.PREF_BATTERY_OPT_ASKED
-import com.simplefox.browser.mediacapture.download.StreamContainerFormat
-import com.simplefox.browser.mediacapture.download.StreamDownloadRequest
 import com.simplefox.browser.settings.downloads.DownloadSettingsKeys
 import java.io.File
 
@@ -110,37 +108,6 @@ private fun DownloadsActivity.enqueueManualDownload(
     onDismiss: () -> Unit
 ) {
     if (DownloadFileHelper.isCustomLocationAccessible(this, submission.locationMode, submission.customLocationUri)) onDismiss()
-    if (submission.isStream) {
-        val request = StreamDownloadRequest(
-            format = submission.streamFormat ?: StreamContainerFormat.HLS,
-            videoUrl = submission.streamVideoUrl,
-            audioUrl = submission.streamAudioUrl,
-            subtitleUrl = null,
-            pageUrl = "",
-            referer = "",
-            cookies = "",
-            userAgent = userAgent,
-            filename = submission.filename,
-            estimatedTotalBytes = submission.estimatedTotalBytes,
-            speedLimitBytesPerSec = submission.speedLimitBytesPerSec,
-            concurrentSegments = submission.concurrentSegments,
-            convertTsToMp4 = submission.convertTsToMp4
-        )
-        ClintDownloadManager.enqueueStream(
-            context = this,
-            request = request,
-            videoWidth = submission.streamVideoWidth,
-            videoHeight = submission.streamVideoHeight,
-            videoBandwidth = submission.streamVideoBandwidth,
-            audioBandwidth = submission.streamAudioBandwidth,
-            primaryIsAudio = submission.streamPrimaryIsAudio,
-            locationMode = submission.locationMode,
-            customLocationUri = submission.customLocationUri,
-            categorizeEnabled = submission.categorizeEnabled,
-            startPaused = submission.startPaused
-        )
-        return
-    }
     ClintDownloadManager.enqueue(
         this, submission.url, submission.filename, userAgent, "", "",
         submission.retryEnabled, submission.unmeteredOnly, submission.splitParts, submission.multithreadingParts,

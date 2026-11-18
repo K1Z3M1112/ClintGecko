@@ -22,7 +22,7 @@ internal object DownloadAutoTuner {
     private const val MAX_SEGMENTS_HTTP1 = 16
     private const val METERED_SEGMENTS = 12
     private const val CONSTRAINED_SEGMENTS = 6
-    private const val START_CONNECTIONS = 3
+    private const val START_CONNECTIONS = 6
     private const val START_SEGMENTS = 4
 
     private const val PREFS_NAME = "clint_download_auto"
@@ -137,6 +137,7 @@ internal class AutoConcurrencyController(
     private var lastRate = -1.0
     private var probing = false
     private var holdUntil = 0L
+    private var strongGain = false
 
     fun onTick(now: Long, totalBytes: Long, canGrow: Boolean, blocked: Boolean) {
         if (windowStartAt == 0L) {
@@ -162,23 +163,28 @@ internal class AutoConcurrencyController(
             if (lastRate > 0.0 && rate < lastRate * (1.0 + REQUIRED_GAIN)) {
                 current.updateAndGet { (it - 1).coerceAtLeast(1) }
                 lastRate = rate
+                strongGain = false
                 holdUntil = now + HOLD_MS
                 return
             }
+            // Far from saturated: the last connection added a lot, so ramp faster next time.
+            strongGain = lastRate > 0.0 && rate >= lastRate * (1.0 + STRONG_GAIN)
         }
         lastRate = rate
         val limit = speedLimit()
         val nearLimit = limit > 0L && rate >= limit * LIMIT_SATURATION
         if (now >= holdUntil && canGrow && !nearLimit && current.get() < ceiling) {
-            current.incrementAndGet()
+            val step = if (strongGain) 2 else 1
+            current.updateAndGet { minOf(it + step, ceiling) }
             probing = true
         }
     }
 
     private companion object {
-        const val WINDOW_MS = 3000L
+        const val WINDOW_MS = 2000L
         const val HOLD_MS = 30_000L
         const val REQUIRED_GAIN = 0.07
+        const val STRONG_GAIN = 0.35
         const val LIMIT_SATURATION = 0.9
     }
 }

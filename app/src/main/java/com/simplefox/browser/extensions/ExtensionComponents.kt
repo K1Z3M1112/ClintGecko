@@ -2,7 +2,6 @@ package com.simplefox.browser.extensions
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,8 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Public
+import com.simplefox.browser.ui.icons.Icons
 import com.simplefox.browser.ui.foundation.Icon
 import com.simplefox.browser.ui.foundation.Text
 import androidx.compose.runtime.Composable
@@ -241,13 +239,9 @@ fun DataCollectionLines(keys: List<String>) {
     keys.forEach { key ->
         val res = ExtensionPermissions.dataLabelRes(key)
         PermissionLine(
-            icon = androidx.compose.material.icons.Icons.Filled.Public,
+            icon = com.simplefox.browser.ui.icons.Icons.Filled.Public,
             text = if (res != null) stringResource(res) else stringResource(R.string.ext_perm_unknown, key),
             risk = ExtensionRisk.MEDIUM
         )
     }
 }
-
-@Composable
-fun ClickableRowModifier(onClick: (() -> Unit)?): Modifier =
-    if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier

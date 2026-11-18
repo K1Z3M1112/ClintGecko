@@ -14,9 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Public
+import com.simplefox.browser.ui.icons.Icons
 import com.simplefox.browser.ui.foundation.Icon
 import com.simplefox.browser.ui.foundation.Text
 import com.simplefox.browser.ui.foundation.TextButton
@@ -170,7 +168,7 @@ internal fun CreateShortcutDialog(
                     modifier = Modifier.padding(top = 2.dp)
                 )
             }
-            ClintSwitch(checked = frameless)
+            ClintSwitch(checked = frameless, onCheckedChange = { frameless = !frameless })
         }
         if (shortcutProfileFieldVisible(context, profileId)) {
             ShortcutProfileField(profileId, hideStatusBar, hideSystemNavigation) { profileId = it }

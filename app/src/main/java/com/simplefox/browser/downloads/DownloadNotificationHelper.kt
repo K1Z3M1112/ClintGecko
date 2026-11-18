@@ -10,7 +10,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.SystemClock
 import androidx.core.app.NotificationCompat
-import androidx.preference.PreferenceManager
+import com.simplefox.browser.util.PreferenceManager
 import com.simplefox.browser.R
 import com.simplefox.browser.settings.downloads.DownloadSettingsKeys
 import java.util.concurrent.ConcurrentHashMap

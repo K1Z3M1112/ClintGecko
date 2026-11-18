@@ -1,6 +1,4 @@
 package com.simplefox.browser.downloads
-import androidx.compose.material.icons.filled.ArrowDownward
-import androidx.compose.material.icons.filled.Folder
 
 import com.simplefox.browser.R
 
@@ -43,17 +41,6 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.simplefox.browser.mediacapture.DetectedMedia
-import com.simplefox.browser.mediacapture.HlsSegmentEstimator
-import com.simplefox.browser.mediacapture.MEDIA_CAPTURE_CONVERT_TS_TO_MP4_DEFAULT
-import com.simplefox.browser.mediacapture.MEDIA_CAPTURE_CONVERT_TS_TO_MP4_PREF
-import com.simplefox.browser.mediacapture.ManifestType
-import com.simplefox.browser.mediacapture.MediaKind
-import com.simplefox.browser.mediacapture.MediaManifestParser
-import com.simplefox.browser.mediacapture.pickPairedAudio
-import com.simplefox.browser.mediacapture.download.HlsPlaylistFetcher
-import com.simplefox.browser.mediacapture.download.StreamContainerFormat
-import com.simplefox.browser.mediacapture.download.TrackKind
 import com.simplefox.browser.settings.common.dialogSectionBackground
 import com.simplefox.browser.settings.common.SettingsSection
 import com.simplefox.browser.settings.downloads.DownloadSettingsKeys
@@ -61,7 +48,6 @@ import com.simplefox.browser.ui.ClintDialog
 import com.simplefox.browser.ui.ClintScheduleDateTimeRows
 import com.simplefox.browser.ui.ClintOutlinedTextField
 import com.simplefox.browser.ui.ClintSlider
-import com.simplefox.browser.ui.ClintSwitch
 import com.simplefox.browser.ui.listscreen.ConfirmDialogConfig
 import com.simplefox.browser.ui.listscreen.ConfirmDialogHost
 import com.simplefox.browser.ui.listscreen.PopupShape
@@ -84,165 +70,8 @@ data class ManualDownloadSubmission(
     val customLocationUri: String?,
     val categorizeEnabled: Boolean,
     val scheduledStartAtMillis: Long,
-    val isStream: Boolean = false,
-    val streamFormat: StreamContainerFormat? = null,
-    val streamVideoUrl: String? = null,
-    val streamAudioUrl: String? = null,
-    val streamVideoWidth: Int? = null,
-    val streamVideoHeight: Int? = null,
-    val streamVideoBandwidth: Long? = null,
-    val streamAudioBandwidth: Long? = null,
-    val streamPrimaryIsAudio: Boolean = false,
-    val estimatedTotalBytes: Long = 0L,
-    val concurrentSegments: Int = DownloadAutoTuner.AUTO,
-    val convertTsToMp4: Boolean = false,
     val startPaused: Boolean = false
 )
-
-private data class ManualStreamPlan(
-    val format: StreamContainerFormat,
-    val videoUrl: String?,
-    val audioUrl: String?,
-    val videoWidth: Int?,
-    val videoHeight: Int?,
-    val videoBandwidth: Long?,
-    val audioBandwidth: Long?,
-    val primaryIsAudio: Boolean,
-    val estimatedTotalBytes: Long,
-    val containerExtension: String,
-    val convertTsToMp4: Boolean = false
-)
-
-private const val MANUAL_MANIFEST_MAX_CHARS = 3 * 1024 * 1024
-
-private fun manualManifestTypeFromExtension(url: String): ManifestType? {
-    val path = url.substringBefore('?').substringBefore('#')
-    return when (path.substringAfterLast('.', "").lowercase()) {
-        "m3u8" -> ManifestType.HLS
-        "mpd" -> ManifestType.DASH
-        else -> null
-    }
-}
-
-private fun manualManifestTypeFromContentType(contentType: String?): ManifestType? {
-    val ct = contentType?.substringBefore(';')?.trim()?.lowercase() ?: return null
-    return when {
-        ct.contains("mpegurl") -> ManifestType.HLS
-        ct == "application/dash+xml" -> ManifestType.DASH
-        else -> null
-    }
-}
-
-private fun manualHeadContentType(url: String, userAgent: String): String? = try {
-    val request = okhttp3.Request.Builder().url(url).head().header("User-Agent", userAgent).build()
-    ClintDownloadManager.httpClient.newCall(request).execute().use { resp ->
-        if (!resp.isSuccessful && resp.code != 405) null else resp.header("Content-Type")
-    }
-} catch (_: Exception) { null }
-
-private fun fetchManualManifestText(url: String, userAgent: String): String? = try {
-    val request = okhttp3.Request.Builder().url(url).header("User-Agent", userAgent).build()
-    ClintDownloadManager.httpClient.newCall(request).execute().use { resp ->
-        if (!resp.isSuccessful) null
-        else resp.body.byteStream().bufferedReader().use { reader ->
-            val buffer = CharArray(8 * 1024)
-            val sb = StringBuilder()
-            var total = 0
-            while (total < MANUAL_MANIFEST_MAX_CHARS) {
-                val read = reader.read(buffer)
-                if (read == -1) break
-                sb.append(buffer, 0, read)
-                total += read
-            }
-            sb.toString()
-        }
-    }
-} catch (_: Exception) { null }
-
-private fun resolveManualHlsPlan(url: String, userAgent: String, convertTsToMp4Pref: Boolean): ManualStreamPlan? {
-    val text = fetchManualManifestText(url, userAgent) ?: return null
-    val entries = MediaManifestParser.parseHls(text, url)
-    if (entries.isEmpty()) return null
-    val isLeaf = entries.size == 1 && entries[0].groupUrl == null
-    val chosen: DetectedMedia?
-    val pairedAudio: DetectedMedia?
-    if (isLeaf) {
-        chosen = entries[0]
-        pairedAudio = null
-    } else {
-        chosen = entries.filter { it.kind == MediaKind.VIDEO }.maxByOrNull { it.bandwidthBitsPerSec ?: 0L }
-            ?: entries.filter { it.kind == MediaKind.AUDIO }.maxByOrNull { it.bandwidthBitsPerSec ?: 0L }
-        pairedAudio = chosen?.takeIf { it.kind == MediaKind.VIDEO }?.let { pickPairedAudio(it, entries) }
-    }
-    if (chosen == null) return null
-    val primaryIsAudio = chosen.kind == MediaKind.AUDIO
-    val trackKind = if (primaryIsAudio) TrackKind.AUDIO else TrackKind.VIDEO
-    val track = HlsPlaylistFetcher.fetch(chosen.url, "", "", userAgent, trackKind) ?: return null
-    val estimatedBytes = HlsSegmentEstimator.estimate(chosen, track, url).estimatedBytes ?: 0L
-    val hasAudio = pairedAudio != null
-    val convertTsToMp4 = convertTsToMp4Pref
-    val finalExtension = when {
-        hasAudio -> "mp4"
-        primaryIsAudio -> when (track.containerHintExtension) {
-            "mp4" -> "m4a"
-            "ts" -> if (convertTsToMp4) "aac" else "ts"
-            else -> track.containerHintExtension
-        }
-        track.containerHintExtension == "mp4" || convertTsToMp4 -> "mp4"
-        else -> track.containerHintExtension
-    }
-    return ManualStreamPlan(
-        format = StreamContainerFormat.HLS,
-        videoUrl = if (!primaryIsAudio) chosen.url else null,
-        audioUrl = pairedAudio?.url ?: (if (primaryIsAudio) chosen.url else null),
-        videoWidth = if (!primaryIsAudio) chosen.width else null,
-        videoHeight = if (!primaryIsAudio) chosen.height else null,
-        videoBandwidth = if (!primaryIsAudio) chosen.bandwidthBitsPerSec else null,
-        audioBandwidth = pairedAudio?.bandwidthBitsPerSec,
-        primaryIsAudio = primaryIsAudio,
-        estimatedTotalBytes = estimatedBytes,
-        containerExtension = finalExtension,
-        convertTsToMp4 = convertTsToMp4
-    )
-}
-
-private fun resolveManualDashPlan(url: String, userAgent: String): ManualStreamPlan? {
-    val text = fetchManualManifestText(url, userAgent) ?: return null
-    val entries = MediaManifestParser.parseDash(text, url)
-    if (entries.isEmpty()) return null
-    val videoCandidate = entries.filter { it.kind == MediaKind.VIDEO }.maxByOrNull { it.bandwidthBitsPerSec ?: 0L }
-    val primaryIsAudio = videoCandidate == null
-    val chosen = videoCandidate
-        ?: entries.filter { it.kind == MediaKind.AUDIO }.maxByOrNull { it.bandwidthBitsPerSec ?: 0L }
-        ?: return null
-    val pairedAudio = if (!primaryIsAudio) entries.filter { it.kind == MediaKind.AUDIO }.maxByOrNull { it.bandwidthBitsPerSec ?: 0L } else null
-    val duration = chosen.durationSeconds
-    val totalBandwidth = (chosen.bandwidthBitsPerSec ?: 0L) + (pairedAudio?.bandwidthBitsPerSec ?: 0L)
-    val estimatedBytes = if (duration != null && duration > 0.0 && totalBandwidth > 0L) {
-        ((duration * totalBandwidth) / 8.0).toLong()
-    } else 0L
-    return ManualStreamPlan(
-        format = StreamContainerFormat.DASH,
-        videoUrl = if (!primaryIsAudio) url else null,
-        audioUrl = pairedAudio?.url ?: (if (primaryIsAudio) url else null),
-        videoWidth = if (!primaryIsAudio) chosen.width else null,
-        videoHeight = if (!primaryIsAudio) chosen.height else null,
-        videoBandwidth = if (!primaryIsAudio) chosen.bandwidthBitsPerSec else null,
-        audioBandwidth = pairedAudio?.bandwidthBitsPerSec,
-        primaryIsAudio = primaryIsAudio,
-        estimatedTotalBytes = estimatedBytes,
-        containerExtension = if (primaryIsAudio) "m4a" else "mp4"
-    )
-}
-
-private fun resolveManualStreamPlan(url: String, userAgent: String, convertTsToMp4Pref: Boolean): ManualStreamPlan? {
-    val type = manualManifestTypeFromExtension(url) ?: manualManifestTypeFromContentType(manualHeadContentType(url, userAgent))
-    return when (type) {
-        ManifestType.HLS -> resolveManualHlsPlan(url, userAgent, convertTsToMp4Pref)
-        ManifestType.DASH -> resolveManualDashPlan(url, userAgent)
-        null -> null
-    }
-}
 
 @Composable
 fun DownloadManualDialog(
@@ -255,7 +84,7 @@ fun DownloadManualDialog(
     val activity = context as DownloadsActivity
     val colors = LocalClintColors.current
     val scope = rememberCoroutineScope()
-    val prefs = remember { androidx.preference.PreferenceManager.getDefaultSharedPreferences(context) }
+    val prefs = remember { com.simplefox.browser.util.PreferenceManager.getDefaultSharedPreferences(context) }
 
     var url by remember { mutableStateOf(prefillUrl ?: "") }
     var isFetching by remember { mutableStateOf(false) }
@@ -265,10 +94,6 @@ fun DownloadManualDialog(
     var extension by remember { mutableStateOf("") }
     var fileSizeText by remember { mutableStateOf<String?>(null) }
     var fetchedContentLength by remember { mutableStateOf(-1L) }
-    var streamPlan by remember { mutableStateOf<ManualStreamPlan?>(null) }
-    var concurrentSegments by remember {
-        mutableStateOf(prefs.getInt(DownloadSettingsKeys.PREF_STREAM_CONCURRENT_SEGMENTS, DownloadSettingsKeys.DEFAULT_STREAM_CONCURRENT_SEGMENTS).coerceIn(0, 24))
-    }
 
     var locationMode by remember {
         mutableStateOf(prefs.getString(DownloadSettingsKeys.PREF_DOWNLOAD_LOCATION_MODE, DownloadSettingsKeys.MODE_DEFAULT) ?: DownloadSettingsKeys.MODE_DEFAULT)
@@ -312,22 +137,6 @@ fun DownloadManualDialog(
         isFetching = true
         scope.launch {
             val ua = com.simplefox.browser.browser.webview.ClintGecko.defaultUserAgent()
-            val convertTsToMp4Pref = prefs.getBoolean(MEDIA_CAPTURE_CONVERT_TS_TO_MP4_PREF, MEDIA_CAPTURE_CONVERT_TS_TO_MP4_DEFAULT)
-            val plan = withContext(Dispatchers.IO) { resolveManualStreamPlan(typed, ua, convertTsToMp4Pref) }
-            if (plan != null) {
-                isFetching = false
-                isFetched = true
-                streamPlan = plan
-                fetchedContentLength = plan.estimatedTotalBytes
-                val urlName = Uri.parse(typed).lastPathSegment?.substringBeforeLast('.')?.takeIf { it.isNotBlank() } ?: "download"
-                filename = urlName
-                extension = plan.containerExtension
-                fileSizeText = if (plan.estimatedTotalBytes > 0L)
-                    context.getString(R.string.download_dialog_file_size_estimated, formatFileSize(plan.estimatedTotalBytes))
-                else context.getString(R.string.download_dialog_file_size_unknown)
-                return@launch
-            }
-            streamPlan = null
             val result = withContext(Dispatchers.IO) {
                 try {
                     val headRequest = okhttp3.Request.Builder().url(typed).head().header("User-Agent", ua).build()
@@ -374,7 +183,6 @@ fun DownloadManualDialog(
             extension = ""
             fileSizeText = null
             fetchedContentLength = -1L
-            streamPlan = null
         }
     }
 
@@ -421,7 +229,6 @@ fun DownloadManualDialog(
         val speedAmount = speedLimitText.toIntOrNull()?.coerceAtLeast(0) ?: 0
         val speedUnit = if (speedUnitLabel == mbLabel) SPEED_LIMIT_UNIT_MB else SPEED_LIMIT_UNIT_KB
         val speedLimitBytesPerSec = resolveSpeedLimitBytesPerSec(context, speedAmount, speedUnit)
-        val plan = streamPlan
         val submission = ManualDownloadSubmission(
             url = url.trim(),
             filename = resolvedFilename,
@@ -434,18 +241,6 @@ fun DownloadManualDialog(
             customLocationUri = customUri?.toString(),
             categorizeEnabled = categorizeEnabled,
             scheduledStartAtMillis = if (startPaused) 0L else effectiveScheduledMillis,
-            isStream = plan != null,
-            streamFormat = plan?.format,
-            streamVideoUrl = plan?.videoUrl,
-            streamAudioUrl = plan?.audioUrl,
-            streamVideoWidth = plan?.videoWidth,
-            streamVideoHeight = plan?.videoHeight,
-            streamVideoBandwidth = plan?.videoBandwidth,
-            streamAudioBandwidth = plan?.audioBandwidth,
-            streamPrimaryIsAudio = plan?.primaryIsAudio ?: false,
-            estimatedTotalBytes = plan?.estimatedTotalBytes ?: 0L,
-            concurrentSegments = concurrentSegments,
-            convertTsToMp4 = plan?.convertTsToMp4 ?: false,
             startPaused = startPaused
         )
         onSubmit(submission, onDismiss) {}
@@ -519,10 +314,8 @@ fun DownloadManualDialog(
                 destinationPreviewText = destinationPreviewText,
                 retryEnabled = retryEnabled, onRetryToggle = { retryEnabled = !retryEnabled },
                 unmeteredOnly = unmeteredOnly, onUnmeteredToggle = { unmeteredOnly = !unmeteredOnly },
-                isStream = streamPlan != null,
                 splitParts = splitParts, onSplitPartsChange = { splitParts = it },
                 multithreadingParts = multithreadingParts, onMultithreadingPartsChange = { multithreadingParts = it },
-                concurrentSegments = concurrentSegments, onConcurrentSegmentsChange = { concurrentSegments = it },
                 speedLimitText = speedLimitText, onSpeedLimitTextChange = { speedLimitText = it },
                 speedUnitLabel = speedUnitLabel, kbLabel = kbLabel, mbLabel = mbLabel, onSpeedUnitChange = { speedUnitLabel = it },
                 scheduleEnabled = scheduleEnabled,
@@ -590,7 +383,7 @@ fun DownloadManualDialog(
                                     color = colors.onSurface, fontSize = 14.sp, modifier = Modifier.padding(top = 2.dp)
                                 )
                             }
-                            Icon(androidx.compose.material.icons.Icons.Filled.ArrowDownward, contentDescription = null, tint = colors.iconTint)
+                            Icon(com.simplefox.browser.ui.icons.Icons.Filled.ArrowDownward, contentDescription = null, tint = colors.iconTint)
                         }
                         DropdownMenu(
                             expanded = locationMenuOpen, onDismissRequest = { locationMenuOpen = false },
@@ -619,25 +412,20 @@ fun DownloadManualDialog(
                             }.padding(vertical = 6.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Icon(androidx.compose.material.icons.Icons.Filled.Folder, contentDescription = null, tint = colors.iconTint, modifier = Modifier.size(20.dp))
+                            Icon(com.simplefox.browser.ui.icons.Icons.Filled.Folder, contentDescription = null, tint = colors.iconTint, modifier = Modifier.size(20.dp))
                             Text(
                                 customUri?.let { uriToDisplayPath(it) } ?: stringResource(R.string.download_location_tap_to_choose),
                                 color = colors.onSurface, fontSize = 13.sp, modifier = Modifier.padding(start = 10.dp)
                             )
                         }
                     }
-                    Row(
-                        Modifier.fillMaxWidth().clickable {
-                            categorizeEnabled = !categorizeEnabled
-                        }.padding(top = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Column(Modifier.weight(1f)) {
-                            Text(stringResource(R.string.download_categorize_title), color = colors.onSurface, fontSize = 14.sp, fontWeight = FontWeight.Medium)
-                            Text(stringResource(R.string.download_categorize_summary), color = colors.secondaryText, fontSize = 12.sp, modifier = Modifier.padding(top = 2.dp))
-                        }
-                        ClintSwitch(checked = categorizeEnabled)
-                    }
+                    DownloadToggleRow(
+                        title = stringResource(R.string.download_categorize_title),
+                        summary = stringResource(R.string.download_categorize_summary),
+                        checked = categorizeEnabled,
+                        onToggle = { categorizeEnabled = !categorizeEnabled },
+                        modifier = Modifier.padding(top = 8.dp)
+                    )
                     destinationPreviewText?.let {
                         Text(
                             it, color = colors.secondaryText, fontSize = 11.sp, fontFamily = FontFamily.Monospace,
@@ -650,70 +438,48 @@ fun DownloadManualDialog(
             DialogSectionLabel(stringResource(R.string.download_dialog_section_options))
             SettingsSection(colors.dialogSectionBackground, bottomSpacing = 8.dp) {
                 Column(Modifier.padding(12.dp)) {
-                    Row(
-                        Modifier.fillMaxWidth().clickable { retryEnabled = !retryEnabled }.padding(vertical = 6.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Column(Modifier.weight(1f)) {
-                            Text(stringResource(R.string.download_retry_enabled_title), color = colors.onSurface, fontSize = 14.sp, fontWeight = FontWeight.Medium)
-                            Text(stringResource(R.string.download_retry_enabled_summary), color = colors.secondaryText, fontSize = 12.sp, modifier = Modifier.padding(top = 2.dp))
-                        }
-                        ClintSwitch(checked = retryEnabled)
-                    }
-                    Row(
-                        Modifier.fillMaxWidth().clickable { unmeteredOnly = !unmeteredOnly }.padding(vertical = 6.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Column(Modifier.weight(1f)) {
-                            Text(stringResource(R.string.download_unmetered_only_title), color = colors.onSurface, fontSize = 14.sp, fontWeight = FontWeight.Medium)
-                            Text(stringResource(R.string.download_dialog_unmetered_summary), color = colors.secondaryText, fontSize = 12.sp, modifier = Modifier.padding(top = 2.dp))
-                        }
-                        ClintSwitch(checked = unmeteredOnly)
-                    }
+                    DownloadToggleRow(
+                        title = stringResource(R.string.download_retry_enabled_title),
+                        summary = stringResource(R.string.download_retry_enabled_summary),
+                        checked = retryEnabled,
+                        onToggle = { retryEnabled = !retryEnabled },
+                        modifier = Modifier.padding(vertical = 6.dp)
+                    )
+                    DownloadToggleRow(
+                        title = stringResource(R.string.download_unmetered_only_title),
+                        summary = stringResource(R.string.download_dialog_unmetered_summary),
+                        checked = unmeteredOnly,
+                        onToggle = { unmeteredOnly = !unmeteredOnly },
+                        modifier = Modifier.padding(vertical = 6.dp)
+                    )
 
-                    if (streamPlan == null) {
-                        Text(
-                            stringResource(R.string.download_split_parts_title), color = colors.onSurface,
-                            fontSize = 14.sp, fontWeight = FontWeight.Medium, modifier = Modifier.padding(top = 8.dp)
-                        )
-                        Text(
-                            autoOrCountLabel(splitParts, R.plurals.download_split_parts_value),
-                            color = colors.secondaryText, fontSize = 12.sp, modifier = Modifier.padding(top = 2.dp)
-                        )
-                        ClintSlider(
-                            value = autoSliderPosition(splitParts, 32).toFloat(),
-                            onValueChange = { splitParts = autoSliderValue(it.toInt(), 32) },
-                            valueRange = 1f..33f, steps = 31
-                        )
+                    Text(
+                        stringResource(R.string.download_split_parts_title), color = colors.onSurface,
+                        fontSize = 14.sp, fontWeight = FontWeight.Medium, modifier = Modifier.padding(top = 8.dp)
+                    )
+                    Text(
+                        autoOrCountLabel(splitParts, R.plurals.download_split_parts_value),
+                        color = colors.secondaryText, fontSize = 12.sp, modifier = Modifier.padding(top = 2.dp)
+                    )
+                    ClintSlider(
+                        value = autoSliderPosition(splitParts, 32).toFloat(),
+                        onValueChange = { splitParts = autoSliderValue(it.toInt(), 32) },
+                        valueRange = 1f..33f, steps = 31
+                    )
 
-                        Text(
-                            stringResource(R.string.download_multithreading_title), color = colors.onSurface,
-                            fontSize = 14.sp, fontWeight = FontWeight.Medium, modifier = Modifier.padding(top = 6.dp)
-                        )
-                        Text(
-                            autoOrCountLabel(multithreadingParts, R.plurals.download_multithreading_value),
-                            color = colors.secondaryText, fontSize = 12.sp, modifier = Modifier.padding(top = 2.dp)
-                        )
-                        ClintSlider(
-                            value = autoSliderPosition(multithreadingParts, 8).toFloat(),
-                            onValueChange = { multithreadingParts = autoSliderValue(it.toInt(), 8) },
-                            valueRange = 1f..9f, steps = 7
-                        )
-                    } else {
-                        Text(
-                            stringResource(R.string.download_concurrent_segments_title), color = colors.onSurface,
-                            fontSize = 14.sp, fontWeight = FontWeight.Medium, modifier = Modifier.padding(top = 8.dp)
-                        )
-                        Text(
-                            autoOrCountLabel(concurrentSegments, R.plurals.download_concurrent_segments_value),
-                            color = colors.secondaryText, fontSize = 12.sp, modifier = Modifier.padding(top = 2.dp)
-                        )
-                        ClintSlider(
-                            value = autoSliderPosition(concurrentSegments, 24).toFloat(),
-                            onValueChange = { concurrentSegments = autoSliderValue(it.toInt(), 24) },
-                            valueRange = 1f..25f, steps = 23
-                        )
-                    }
+                    Text(
+                        stringResource(R.string.download_multithreading_title), color = colors.onSurface,
+                        fontSize = 14.sp, fontWeight = FontWeight.Medium, modifier = Modifier.padding(top = 6.dp)
+                    )
+                    Text(
+                        autoOrCountLabel(multithreadingParts, R.plurals.download_multithreading_value),
+                        color = colors.secondaryText, fontSize = 12.sp, modifier = Modifier.padding(top = 2.dp)
+                    )
+                    ClintSlider(
+                        value = autoSliderPosition(multithreadingParts, 8).toFloat(),
+                        onValueChange = { multithreadingParts = autoSliderValue(it.toInt(), 8) },
+                        valueRange = 1f..9f, steps = 7
+                    )
 
                     Text(
                         stringResource(R.string.download_dialog_speed_limit_title), color = colors.onSurface,
@@ -737,7 +503,7 @@ fun DownloadManualDialog(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Text(speedUnitLabel, color = colors.onSurface, fontSize = 14.sp)
-                                Icon(androidx.compose.material.icons.Icons.Filled.ArrowDownward, contentDescription = null, tint = colors.iconTint, modifier = Modifier.padding(start = 2.dp))
+                                Icon(com.simplefox.browser.ui.icons.Icons.Filled.ArrowDownward, contentDescription = null, tint = colors.iconTint, modifier = Modifier.padding(start = 2.dp))
                             }
                             DropdownMenu(
                                 expanded = speedUnitMenuOpen, onDismissRequest = { speedUnitMenuOpen = false },
@@ -750,22 +516,20 @@ fun DownloadManualDialog(
                         }
                     }
 
-                    Row(
-                        Modifier.fillMaxWidth().clickable {
+                    val toggleScheduleRow = {
                             scheduleEnabled = !scheduleEnabled
                             if (scheduleEnabled) {
                                 scheduledMillis = Calendar.getInstance().apply { add(Calendar.MINUTE, 1) }.timeInMillis
                                 if (needsExactAlarmPermissionRationale(context)) blockingError = exactAlarmPermissionDialogConfig(context)
                             }
-                        }.padding(vertical = 6.dp).padding(top = 6.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Column(Modifier.weight(1f)) {
-                            Text(stringResource(R.string.download_schedule_this_title), color = colors.onSurface, fontSize = 14.sp, fontWeight = FontWeight.Medium)
-                            Text(stringResource(R.string.download_schedule_this_summary), color = colors.secondaryText, fontSize = 12.sp, modifier = Modifier.padding(top = 2.dp))
-                        }
-                        ClintSwitch(checked = scheduleEnabled)
                     }
+                    DownloadToggleRow(
+                        title = stringResource(R.string.download_schedule_this_title),
+                        summary = stringResource(R.string.download_schedule_this_summary),
+                        checked = scheduleEnabled,
+                        onToggle = { toggleScheduleRow() },
+                        modifier = Modifier.padding(vertical = 6.dp).padding(top = 6.dp)
+                    )
                     if (scheduleEnabled) {
                         ClintScheduleDateTimeRows(
                             scheduledMillis = scheduledMillis,

@@ -58,7 +58,21 @@ object ShortcutTabSessionManager {
         }
     }
 
+    // What the database currently holds per shortcut, so unchanged sessions are not rewritten.
+    private val lastSaved = java.util.concurrent.ConcurrentHashMap<String, List<ShortcutSavedTab>>()
+
+    /** Forget what we believe is stored; call after anything replaces the database file behind our back. */
+    fun invalidateSnapshot() {
+        lastSaved.clear()
+    }
+
     fun save(context: Context, shortcutId: String, tabs: List<ShortcutSavedTab>) {
+        synchronized(this) { saveLocked(context, shortcutId, tabs) }
+    }
+
+    private fun saveLocked(context: Context, shortcutId: String, tabs: List<ShortcutSavedTab>) {
+        if (lastSaved[shortcutId] == tabs) return
+        lastSaved.remove(shortcutId)
         val writable = db(context).writableDatabase
         writable.beginTransaction()
         try {
@@ -78,6 +92,7 @@ object ShortcutTabSessionManager {
         } finally {
             writable.endTransaction()
         }
+        lastSaved[shortcutId] = tabs.toList()
     }
 
     fun load(context: Context, shortcutId: String): List<ShortcutSavedTab> {
@@ -111,6 +126,7 @@ object ShortcutTabSessionManager {
     }
 
     fun clear(context: Context, shortcutId: String) {
+        lastSaved.remove(shortcutId)
         db(context).writableDatabase.delete(
             ShortcutTabDatabase.TABLE, "${ShortcutTabDatabase.COL_SHORTCUT_ID} = ?", arrayOf(shortcutId)
         )

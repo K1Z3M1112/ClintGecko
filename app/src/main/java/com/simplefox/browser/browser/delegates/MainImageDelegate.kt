@@ -63,7 +63,7 @@ internal fun MainActivity.handleImagePreview(imageUrl: String) {
 }
 
 internal fun MainActivity.handleImageDownload(imageUrl: String, altText: String) {
-    val quickImages = androidx.preference.PreferenceManager.getDefaultSharedPreferences(this)
+    val quickImages = com.simplefox.browser.util.PreferenceManager.getDefaultSharedPreferences(this)
         .getBoolean(com.simplefox.browser.settings.downloads.DownloadSettingsKeys.PREF_QUICK_DOWNLOAD_IMAGES, com.simplefox.browser.settings.downloads.DownloadSettingsKeys.DEFAULT_QUICK_DOWNLOAD_IMAGES)
     if (imageUrl.startsWith("data:")) {
         val commaIdx = imageUrl.indexOf(",")
@@ -120,7 +120,7 @@ private fun resolveImageFilename(imageUrl: String, altText: String = ""): String
         return if (ext in knownExts) path else null
     }
 
-    fun sanitize(name: String) = name.replace(Regex("[\\\\/:*?\"<>|]"), "_").trim().take(100)
+    fun sanitize(name: String) = name.replace(IMAGE_NAME_ILLEGAL_REGEX, "_").trim().take(100)
 
     if (imageUrl.startsWith("data:")) {
         val mimeType = dataUriMimeType(imageUrl)
@@ -296,3 +296,5 @@ private fun MainActivity.shareImageUrl(imageUrl: String) {
     }
     startActivity(Intent.createChooser(intent, getString(R.string.image_share)))
 }
+
+private val IMAGE_NAME_ILLEGAL_REGEX = Regex("[\\\\/:*?\"<>|]")

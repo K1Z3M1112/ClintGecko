@@ -26,26 +26,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
-import androidx.compose.material.icons.filled.Block
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.ContentPaste
-import androidx.compose.material.icons.filled.Cookie
-import androidx.compose.material.icons.filled.ExpandMore
-import androidx.compose.material.icons.automirrored.filled.HelpOutline
-import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.LockOpen
-import androidx.compose.material.icons.filled.Mic
-import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.filled.Public
-import androidx.compose.material.icons.filled.RemoveModerator
-import androidx.compose.material.icons.filled.Shield
-import androidx.compose.material.icons.filled.Tune
-import androidx.compose.material.icons.filled.Verified
-import androidx.compose.material.icons.filled.Videocam
-import androidx.compose.material.icons.filled.Warning
+import com.simplefox.browser.ui.icons.Icons
 import com.simplefox.browser.ui.foundation.BottomSheetDefaults
 import com.simplefox.browser.ui.foundation.DropdownMenu
 import com.simplefox.browser.ui.foundation.HorizontalDivider
@@ -350,7 +331,7 @@ private fun TrackingProtectionCard(enabled: Boolean, trackers: SiteInfoTrackers?
                     modifier = Modifier.padding(top = 2.dp)
                 )
             }
-            ClintSwitch(checked = enabled)
+            ClintSwitch(checked = enabled, onCheckedChange = { onChange(!enabled) })
         }
         if (enabled && trackers != null) {
             SiteInfoDivider()

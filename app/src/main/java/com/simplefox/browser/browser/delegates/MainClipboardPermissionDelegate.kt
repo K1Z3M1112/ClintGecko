@@ -1,7 +1,7 @@
 package com.simplefox.browser.browser.delegates
 
 import android.net.Uri
-import androidx.preference.PreferenceManager
+import com.simplefox.browser.util.PreferenceManager
 import com.simplefox.browser.R
 import com.simplefox.browser.browser.MainActivity
 import com.simplefox.browser.browser.webview.ClintWebView

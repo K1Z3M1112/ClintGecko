@@ -1,7 +1,4 @@
 package com.simplefox.browser.bookmarks
-import androidx.compose.material.icons.filled.Description
-import androidx.compose.material.icons.filled.Folder
-import androidx.compose.material.icons.filled.Storage
 
 import com.simplefox.browser.R
 
@@ -183,13 +180,13 @@ fun BookmarksFormatPickerDialog(
     ) {
         Column(Modifier.fillMaxWidth()) {
             BookmarksFormatRow(
-                icon = androidx.compose.material.icons.Icons.Filled.Description,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.Description,
                 name = stringResource(R.string.bookmarks_format_html),
                 description = stringResource(R.string.bookmarks_format_html_desc),
                 onClick = onSelectHtml
             )
             BookmarksFormatRow(
-                icon = androidx.compose.material.icons.Icons.Filled.Storage,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.Storage,
                 name = stringResource(R.string.bookmarks_format_sqlite),
                 description = stringResource(R.string.bookmarks_format_sqlite_desc),
                 onClick = onSelectSqlite
@@ -221,7 +218,7 @@ private fun MoveToFolderRow(name: String, depth: Int, onClick: () -> Unit) {
             .clickable(onClick = onClick)
             .padding(start = (16 + depth * 20).dp, end = 16.dp, top = 12.dp, bottom = 12.dp),
     ) {
-        Icon(androidx.compose.material.icons.Icons.Filled.Folder, contentDescription = null, tint = colors.iconTint, modifier = Modifier.size(20.dp))
+        Icon(com.simplefox.browser.ui.icons.Icons.Filled.Folder, contentDescription = null, tint = colors.iconTint, modifier = Modifier.size(20.dp))
         Text(
             name, color = colors.onSurface, fontSize = 14.sp,
             modifier = Modifier.padding(start = 12.dp)

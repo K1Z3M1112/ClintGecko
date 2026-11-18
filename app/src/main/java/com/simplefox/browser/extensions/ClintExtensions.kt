@@ -318,10 +318,12 @@ object ClintExtensions {
         val parsed = Uri.parse(uri)
         val copied = runCatching {
             when (parsed.scheme?.lowercase()) {
-                "file" -> java.io.File(parsed.path ?: return null).inputStream().use { input ->
+                "file" -> java.io.File(parsed.path ?: return null).also {
+                    if (com.simplefox.browser.security.IntentSecurity.isInPrivateAppStorage(context, it)) return null
+                }.inputStream().use { input ->
                     target.outputStream().use { out -> input.copyTo(out) }
                 }
-                "content" -> context.contentResolver.openInputStream(parsed)!!.use { input ->
+                "content" -> (context.contentResolver.openInputStream(parsed) ?: return null).use { input ->
                     target.outputStream().use { out -> input.copyTo(out) }
                 }
                 "http", "https" -> {
@@ -424,7 +426,7 @@ object ClintExtensions {
                 val dir = java.io.File(appCtx.cacheDir, "extensions").apply { mkdirs() }
                 dir.listFiles()?.forEach { it.delete() }
                 val file = java.io.File(dir, "install-${System.currentTimeMillis()}.xpi")
-                appCtx.contentResolver.openInputStream(source)!!.use { input ->
+                (appCtx.contentResolver.openInputStream(source) ?: error("Cannot open $source")).use { input ->
                     file.outputStream().use { out -> input.copyTo(out) }
                 }
                 file

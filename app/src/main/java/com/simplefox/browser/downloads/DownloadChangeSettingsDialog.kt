@@ -1,5 +1,4 @@
 package com.simplefox.browser.downloads
-import androidx.compose.material.icons.filled.ArrowDownward
 
 import android.widget.Toast
 
@@ -9,7 +8,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import com.simplefox.browser.ui.foundation.DropdownMenu
@@ -33,7 +31,6 @@ import com.simplefox.browser.settings.common.SettingsSection
 import com.simplefox.browser.ui.ClintDialog
 import com.simplefox.browser.ui.ClintDialogActionFooter
 import com.simplefox.browser.ui.ClintOutlinedTextField
-import com.simplefox.browser.ui.ClintSwitch
 import com.simplefox.browser.ui.listscreen.PopupShape
 import com.simplefox.browser.ui.theme.LocalClintColors
 
@@ -83,27 +80,21 @@ fun DownloadChangeSettingsDialog(item: DownloadItem, hideStatusBar: Boolean, hid
 
             SettingsSection(colors.dialogSectionBackground) {
                 Column(Modifier.padding(16.dp)) {
-                    Row(
-                        Modifier.fillMaxWidth().clickable { retryEnabled = !retryEnabled }.padding(vertical = 10.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Column(Modifier.weight(1f)) {
-                            Text(stringResource(R.string.download_retry_enabled_title), color = colors.onSurface, fontSize = 14.sp, fontWeight = FontWeight.Medium)
-                            Text(stringResource(R.string.download_retry_enabled_summary), color = colors.secondaryText, fontSize = 12.sp, modifier = Modifier.padding(top = 2.dp))
-                        }
-                        ClintSwitch(checked = retryEnabled)
-                    }
+                    DownloadToggleRow(
+                        title = stringResource(R.string.download_retry_enabled_title),
+                        summary = stringResource(R.string.download_retry_enabled_summary),
+                        checked = retryEnabled,
+                        onToggle = { retryEnabled = !retryEnabled },
+                        modifier = Modifier.padding(vertical = 10.dp)
+                    )
 
-                    Row(
-                        Modifier.fillMaxWidth().clickable { unmeteredOnly = !unmeteredOnly }.padding(vertical = 10.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Column(Modifier.weight(1f)) {
-                            Text(stringResource(R.string.download_unmetered_only_title), color = colors.onSurface, fontSize = 14.sp, fontWeight = FontWeight.Medium)
-                            Text(stringResource(R.string.download_dialog_unmetered_summary), color = colors.secondaryText, fontSize = 12.sp, modifier = Modifier.padding(top = 2.dp))
-                        }
-                        ClintSwitch(checked = unmeteredOnly)
-                    }
+                    DownloadToggleRow(
+                        title = stringResource(R.string.download_unmetered_only_title),
+                        summary = stringResource(R.string.download_dialog_unmetered_summary),
+                        checked = unmeteredOnly,
+                        onToggle = { unmeteredOnly = !unmeteredOnly },
+                        modifier = Modifier.padding(vertical = 10.dp)
+                    )
 
                     Text(
                         stringResource(R.string.download_dialog_speed_limit_title), color = colors.onSurface,
@@ -128,7 +119,7 @@ fun DownloadChangeSettingsDialog(item: DownloadItem, hideStatusBar: Boolean, hid
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Text(unitLabel, color = colors.onSurface, fontSize = 14.sp)
-                                Icon(androidx.compose.material.icons.Icons.Filled.ArrowDownward, contentDescription = null, tint = colors.iconTint, modifier = Modifier.padding(start = 2.dp))
+                                Icon(com.simplefox.browser.ui.icons.Icons.Filled.ArrowDownward, contentDescription = null, tint = colors.iconTint, modifier = Modifier.padding(start = 2.dp))
                             }
                             DropdownMenu(
                                 expanded = unitMenuOpen,

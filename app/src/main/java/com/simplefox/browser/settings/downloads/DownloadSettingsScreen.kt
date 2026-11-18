@@ -1,31 +1,4 @@
 package com.simplefox.browser.settings.downloads
-import androidx.compose.material.icons.filled.Apps
-import androidx.compose.material.icons.filled.ArrowDownward
-import androidx.compose.material.icons.filled.BatterySaver
-import androidx.compose.material.icons.filled.BugReport
-import androidx.compose.material.icons.filled.Category
-import androidx.compose.material.icons.filled.CloudDownload
-import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material.icons.filled.Folder
-import androidx.compose.material.icons.filled.FormatSize
-import androidx.compose.material.icons.filled.HourglassBottom
-import androidx.compose.material.icons.filled.HourglassEmpty
-import androidx.compose.material.icons.filled.KeyboardDoubleArrowDown
-import androidx.compose.material.icons.filled.History
-import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.material.icons.filled.Numbers
-import androidx.compose.material.icons.filled.RestartAlt
-import androidx.compose.material.icons.filled.Speed
-import androidx.compose.material.icons.filled.Splitscreen
-import androidx.compose.material.icons.filled.Storage
-import androidx.compose.material.icons.filled.VideoSettings
-import androidx.compose.material.icons.filled.FlashOn
-import androidx.compose.material.icons.filled.FileCopy
-import androidx.compose.material.icons.filled.Image
-import androidx.compose.material.icons.filled.ViewCompact
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.Wifi
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -91,7 +64,6 @@ fun DownloadSettingsScreen(
     onConcurrentDownloadsChange: (Int) -> Unit,
     onSplitPartsChange: (Int) -> Unit,
     onMultithreadingPartsChange: (Int) -> Unit,
-    onConcurrentSegmentsChange: (Int) -> Unit,
     onSpeedLimitConfirm: (amount: Int, unit: String) -> Unit,
     onTotalSpeedLimitConfirm: (amount: Int, unit: String) -> Unit,
     onRetryEnabledClick: () -> Unit,
@@ -170,7 +142,7 @@ fun DownloadSettingsScreen(
         SettingsSectionLabel(stringResource(R.string.download_section_manager))
         SettingsSection(colors.cardBackground) {
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.Apps,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.Apps,
                 title = stringResource(R.string.download_manager_title),
                 summary = stringResource(downloadManagerOptionLabelRes(state.downloadManagerApp)),
                 colors = colors,
@@ -191,7 +163,7 @@ fun DownloadSettingsScreen(
                         .padding(4.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(androidx.compose.material.icons.Icons.Filled.Folder, contentDescription = null, tint = colors.iconTint, modifier = Modifier.size(20.dp))
+                    Icon(com.simplefox.browser.ui.icons.Icons.Filled.Folder, contentDescription = null, tint = colors.iconTint, modifier = Modifier.size(20.dp))
                     Text(
                         folderPathText, color = colors.onSurface, fontSize = 14.sp, fontFamily = FontFamily.Monospace,
                         maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(start = 12.dp)
@@ -201,7 +173,7 @@ fun DownloadSettingsScreen(
             }
             RowDivider(colors.divider)
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.Category,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.Category,
                 title = stringResource(R.string.download_categorize_title),
                 summary = stringResource(R.string.download_categorize_summary),
                 colors = colors,
@@ -213,7 +185,7 @@ fun DownloadSettingsScreen(
         SettingsSectionLabel(stringResource(R.string.download_section_general))
         SettingsSection(colors.cardBackground) {
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.FileCopy,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.FileCopy,
                 title = stringResource(R.string.download_duplicate_handling_title),
                 summary = stringResource(duplicateHandlingLabelRes(state.duplicateHandling)),
                 colors = colors,
@@ -221,7 +193,7 @@ fun DownloadSettingsScreen(
             )
             RowDivider(colors.divider)
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.FlashOn,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.FlashOn,
                 title = stringResource(R.string.download_quick_download_title),
                 summary = stringResource(R.string.download_quick_download_summary),
                 colors = colors,
@@ -230,7 +202,7 @@ fun DownloadSettingsScreen(
             )
             RowDivider(colors.divider)
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.Image,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.Image,
                 title = stringResource(R.string.download_quick_download_images_title),
                 summary = stringResource(R.string.download_quick_download_images_summary),
                 colors = colors,
@@ -240,7 +212,7 @@ fun DownloadSettingsScreen(
             )
             RowDivider(colors.divider)
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.CloudDownload,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.CloudDownload,
                 title = stringResource(R.string.download_detect_mega_title),
                 summary = stringResource(R.string.download_detect_mega_summary),
                 colors = colors,
@@ -249,7 +221,7 @@ fun DownloadSettingsScreen(
             )
             RowDivider(colors.divider)
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.Visibility,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.Visibility,
                 title = stringResource(R.string.download_keep_screen_on_title),
                 summary = stringResource(R.string.download_keep_screen_on_summary),
                 colors = colors,
@@ -258,7 +230,7 @@ fun DownloadSettingsScreen(
             )
             RowDivider(colors.divider)
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.BugReport,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.BugReport,
                 title = stringResource(R.string.download_log_title),
                 summary = stringResource(R.string.download_log_summary),
                 colors = colors,
@@ -270,7 +242,7 @@ fun DownloadSettingsScreen(
         SettingsSectionLabel(stringResource(R.string.download_section_dialog_ui))
         SettingsSection(colors.cardBackground) {
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.ViewCompact,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.ViewCompact,
                 title = stringResource(R.string.download_dialog_ui_title),
                 summary = stringResource(if (state.dialogUi == DownloadSettingsKeys.DIALOG_UI_COMPACT) R.string.download_dialog_ui_compact else R.string.download_dialog_ui_standard),
                 colors = colors,
@@ -281,7 +253,7 @@ fun DownloadSettingsScreen(
         SettingsSectionLabel(stringResource(R.string.download_section_notifications))
         SettingsSection(colors.cardBackground) {
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.Notifications,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.Notifications,
                 title = stringResource(R.string.download_push_notifications_title),
                 summary = stringResource(R.string.download_push_notifications_summary),
                 colors = colors,
@@ -293,7 +265,7 @@ fun DownloadSettingsScreen(
         SettingsSectionLabel(stringResource(R.string.download_section_history))
         SettingsSection(colors.cardBackground) {
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.History,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.History,
                 title = stringResource(R.string.download_history_normal_title),
                 summary = stringResource(R.string.download_history_normal_summary),
                 colors = colors,
@@ -302,7 +274,7 @@ fun DownloadSettingsScreen(
             )
             RowDivider(colors.divider)
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.VisibilityOff,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.VisibilityOff,
                 title = stringResource(R.string.download_history_incognito_title),
                 summary = stringResource(R.string.download_history_incognito_summary),
                 colors = colors,
@@ -314,7 +286,7 @@ fun DownloadSettingsScreen(
         SettingsSectionLabel(stringResource(R.string.download_section_network))
         SettingsSection(colors.cardBackground) {
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.Wifi,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.Wifi,
                 title = stringResource(R.string.download_unmetered_only_title),
                 summary = stringResource(R.string.download_unmetered_only_summary),
                 colors = colors,
@@ -326,7 +298,7 @@ fun DownloadSettingsScreen(
         SettingsSectionLabel(stringResource(R.string.download_section_scheduling))
         SettingsSection(colors.cardBackground) {
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.DateRange,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.DateRange,
                 title = stringResource(R.string.download_schedule_enabled_title),
                 summary = stringResource(R.string.download_schedule_enabled_summary, scheduleStartText, scheduleEndText),
                 colors = colors,
@@ -335,7 +307,7 @@ fun DownloadSettingsScreen(
             )
             RowDivider(colors.divider)
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.HourglassEmpty,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.HourglassEmpty,
                 title = stringResource(R.string.download_schedule_start_title),
                 summary = scheduleStartText,
                 colors = colors,
@@ -344,7 +316,7 @@ fun DownloadSettingsScreen(
             )
             RowDivider(colors.divider)
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.HourglassEmpty,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.HourglassEmpty,
                 title = stringResource(R.string.download_schedule_end_title),
                 summary = scheduleEndText,
                 colors = colors,
@@ -356,7 +328,7 @@ fun DownloadSettingsScreen(
         SettingsSectionLabel(stringResource(R.string.download_section_concurrent))
         SettingsSection(colors.cardBackground) {
             SliderSettingsCard(
-                icon = androidx.compose.material.icons.Icons.Filled.HourglassBottom,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.HourglassBottom,
                 title = stringResource(R.string.download_concurrent_title),
                 description = stringResource(R.string.download_concurrent_desc),
                 value = state.concurrentDownloads,
@@ -374,7 +346,7 @@ fun DownloadSettingsScreen(
         SettingsSectionLabel(stringResource(R.string.download_section_split_parts))
         SettingsSection(colors.cardBackground) {
             SliderSettingsCard(
-                icon = androidx.compose.material.icons.Icons.Filled.Splitscreen,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.Splitscreen,
                 title = stringResource(R.string.download_split_parts_title),
                 description = stringResource(R.string.download_split_parts_desc) + "\n" + stringResource(R.string.download_setting_auto_hint),
                 value = com.simplefox.browser.downloads.autoSliderPosition(state.splitParts, 32),
@@ -388,7 +360,7 @@ fun DownloadSettingsScreen(
         SettingsSectionLabel(stringResource(R.string.download_section_multithreading))
         SettingsSection(colors.cardBackground) {
             SliderSettingsCard(
-                icon = androidx.compose.material.icons.Icons.Filled.KeyboardDoubleArrowDown,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.KeyboardDoubleArrowDown,
                 title = stringResource(R.string.download_multithreading_title),
                 description = stringResource(R.string.download_multithreading_desc) + "\n" + stringResource(R.string.download_setting_auto_hint),
                 value = com.simplefox.browser.downloads.autoSliderPosition(state.multithreadingParts, 8),
@@ -399,25 +371,11 @@ fun DownloadSettingsScreen(
             )
         }
 
-        SettingsSectionLabel(stringResource(R.string.download_section_stream_segments))
-        SettingsSection(colors.cardBackground) {
-            SliderSettingsCard(
-                icon = androidx.compose.material.icons.Icons.Filled.VideoSettings,
-                title = stringResource(R.string.download_concurrent_segments_title),
-                description = stringResource(R.string.download_concurrent_segments_desc) + "\n" + stringResource(R.string.download_setting_auto_hint),
-                value = com.simplefox.browser.downloads.autoSliderPosition(state.concurrentSegments, 24),
-                valueRange = 1..25,
-                summary = com.simplefox.browser.downloads.autoOrCountLabel(state.concurrentSegments, R.plurals.download_concurrent_segments_value),
-                colors = colors,
-                onValueChange = { onConcurrentSegmentsChange(com.simplefox.browser.downloads.autoSliderValue(it, 24)) }
-            )
-        }
-
         SettingsSectionLabel(stringResource(R.string.download_section_speed_limit))
         SettingsSection(colors.cardBackground) {
             val unitLabel = stringResource(if (state.speedLimitUnit == SPEED_LIMIT_UNIT_MB) R.string.speed_limit_unit_mb else R.string.speed_limit_unit_kb)
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.Speed,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.Speed,
                 title = stringResource(R.string.download_speed_limit_title),
                 summary = if (state.speedLimitAmount <= 0) {
                     stringResource(R.string.download_speed_limit_unlimited)
@@ -430,7 +388,7 @@ fun DownloadSettingsScreen(
             RowDivider(colors.divider)
             val totalUnitLabel = stringResource(if (state.totalSpeedLimitUnit == SPEED_LIMIT_UNIT_MB) R.string.speed_limit_unit_mb else R.string.speed_limit_unit_kb)
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.Speed,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.Speed,
                 title = stringResource(R.string.download_total_speed_limit_title),
                 summary = if (state.totalSpeedLimitAmount <= 0) {
                     stringResource(R.string.download_total_speed_limit_unlimited)
@@ -445,7 +403,7 @@ fun DownloadSettingsScreen(
         SettingsSectionLabel(stringResource(R.string.download_section_retry))
         SettingsSection(colors.cardBackground) {
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.RestartAlt,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.RestartAlt,
                 title = stringResource(R.string.download_retry_enabled_title),
                 summary = stringResource(R.string.download_retry_enabled_summary),
                 colors = colors,
@@ -454,7 +412,7 @@ fun DownloadSettingsScreen(
             )
             RowDivider(colors.divider)
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.Storage,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.Storage,
                 title = stringResource(R.string.download_retry_unrecoverable_title),
                 summary = stringResource(R.string.download_retry_unrecoverable_summary),
                 colors = colors,
@@ -464,7 +422,7 @@ fun DownloadSettingsScreen(
             )
             RowDivider(colors.divider)
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.Numbers,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.Numbers,
                 title = stringResource(R.string.download_retry_count_title),
                 summary = if (state.retryCount == 0) {
                     stringResource(R.string.download_retry_count_unlimited)
@@ -477,7 +435,7 @@ fun DownloadSettingsScreen(
             )
             RowDivider(colors.divider)
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.HourglassEmpty,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.HourglassEmpty,
                 title = stringResource(R.string.download_retry_interval_title),
                 summary = stringResource(R.string.download_retry_interval_value, state.retryInterval),
                 colors = colors,
@@ -489,7 +447,7 @@ fun DownloadSettingsScreen(
         SettingsSectionLabel(stringResource(R.string.download_section_measurement))
         SettingsSection(colors.cardBackground) {
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.FormatSize,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.FormatSize,
                 title = stringResource(R.string.measurement_system_title),
                 summary = stringResource(if (state.measurementSystemDecimal) R.string.measurement_system_summary_decimal else R.string.measurement_system_summary_binary),
                 colors = colors,
@@ -500,7 +458,7 @@ fun DownloadSettingsScreen(
         SettingsSectionLabel(stringResource(R.string.download_section_permissions))
         SettingsSection(colors.cardBackground) {
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.BatterySaver,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.BatterySaver,
                 title = stringResource(R.string.download_ignore_battery_opt_title),
                 summary = stringResource(if (state.ignoringBatteryOptimizations) R.string.download_ignore_battery_opt_granted else R.string.download_ignore_battery_opt_summary),
                 colors = colors,
@@ -510,7 +468,7 @@ fun DownloadSettingsScreen(
             if (state.showGrantAllFilesAccessRow) {
                 RowDivider(colors.divider)
                 SettingsRow(
-                    icon = androidx.compose.material.icons.Icons.Filled.Folder,
+                    icon = com.simplefox.browser.ui.icons.Icons.Filled.Folder,
                     title = stringResource(R.string.download_grant_all_files_access_title),
                     summary = stringResource(if (state.allFilesAccessGranted) R.string.download_grant_all_files_access_granted else R.string.download_grant_all_files_access_summary),
                     colors = colors,
@@ -544,7 +502,7 @@ private fun DownloadLocationDropdown(mode: String, colors: ClintColors, onModeSe
             readOnly = true,
             enabled = false,
             label = { Text(stringResource(R.string.download_location_label)) },
-            trailingIcon = { Icon(androidx.compose.material.icons.Icons.Filled.ArrowDownward, contentDescription = null, tint = colors.iconTint) },
+            trailingIcon = { Icon(com.simplefox.browser.ui.icons.Icons.Filled.ArrowDownward, contentDescription = null, tint = colors.iconTint) },
             modifier = Modifier.fillMaxWidth()
         )
         Box(

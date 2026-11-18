@@ -18,95 +18,7 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.ManageSearch
-import androidx.compose.material.icons.automirrored.filled.AddToHomeScreen
-import androidx.compose.material.icons.automirrored.filled.OpenInNew
-import androidx.compose.material.icons.filled.Accessibility
-import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.Headphones
-import androidx.compose.material.icons.filled.Apps
-import androidx.compose.material.icons.filled.Backup
-import androidx.compose.material.icons.filled.CloudDownload
-import androidx.compose.material.icons.filled.Tab
-import androidx.compose.material.icons.filled.Workspaces
-import androidx.compose.material.icons.filled.BatterySaver
-import androidx.compose.material.icons.filled.Block
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Bookmark
-import androidx.compose.material.icons.filled.Brush
-import androidx.compose.material.icons.filled.BugReport
-import androidx.compose.material.icons.filled.Category
-import androidx.compose.material.icons.filled.Code
-import androidx.compose.material.icons.filled.Extension
-import androidx.compose.material.icons.filled.Style
-import androidx.compose.material.icons.filled.ContentPaste
-import androidx.compose.material.icons.filled.Cookie
-import androidx.compose.material.icons.filled.Keyboard
-import androidx.compose.material.icons.filled.VerifiedUser
-import androidx.compose.material.icons.filled.LinkOff
-import androidx.compose.material.icons.filled.Fingerprint
-import androidx.compose.material.icons.filled.GppGood
-import androidx.compose.material.icons.filled.PhonelinkLock
-import androidx.compose.material.icons.filled.ContentPasteOff
-import androidx.compose.material.icons.filled.DeleteSweep
-import androidx.compose.material.icons.filled.DataSaverOff
-import androidx.compose.material.icons.filled.DataSaverOn
-import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material.icons.filled.DesktopWindows
-import androidx.compose.material.icons.filled.Download
-import androidx.compose.material.icons.filled.Explore
-import androidx.compose.material.icons.filled.FlashOn
-import androidx.compose.material.icons.filled.FileCopy
-import androidx.compose.material.icons.filled.Folder
-import androidx.compose.material.icons.filled.FormatSize
-import androidx.compose.material.icons.filled.Fullscreen
-import androidx.compose.material.icons.filled.HideImage
-import androidx.compose.material.icons.filled.History
-import androidx.compose.material.icons.filled.HourglassBottom
-import androidx.compose.material.icons.filled.HourglassEmpty
-import androidx.compose.material.icons.filled.Image
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.KeyboardDoubleArrowDown
-import androidx.compose.material.icons.filled.Language
-import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.ManageAccounts
-import androidx.compose.material.icons.filled.Mic
-import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.filled.Numbers
-import androidx.compose.material.icons.filled.Palette
-import androidx.compose.material.icons.filled.Password
-import androidx.compose.material.icons.filled.PausePresentation
-import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material.icons.filled.Reorder
-import androidx.compose.material.icons.filled.RestartAlt
-import androidx.compose.material.icons.filled.Restore
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.SearchOff
-import androidx.compose.material.icons.filled.Security
-import androidx.compose.material.icons.filled.SettingsBackupRestore
-import androidx.compose.material.icons.filled.Shield
-import androidx.compose.material.icons.filled.SignalCellularAlt
-import androidx.compose.material.icons.filled.Speed
-import androidx.compose.material.icons.filled.Splitscreen
-import androidx.compose.material.icons.filled.Storage
-import androidx.compose.material.icons.filled.TextFields
-import androidx.compose.material.icons.filled.ZoomIn
-import androidx.compose.material.icons.filled.Translate
-import androidx.compose.material.icons.filled.Dns
-import androidx.compose.material.icons.filled.Tune
-import androidx.compose.material.icons.filled.VerticalAlignCenter
-import androidx.compose.material.icons.filled.VideoSettings
-import androidx.compose.material.icons.filled.Videocam
-import androidx.compose.material.icons.filled.VideocamOff
-import androidx.compose.material.icons.filled.ViewCompact
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.material.icons.filled.Web
-import androidx.compose.material.icons.filled.WebAsset
-import androidx.compose.material.icons.filled.Wifi
+import com.simplefox.browser.ui.icons.Icons
 import com.simplefox.browser.ui.foundation.Card
 import com.simplefox.browser.ui.foundation.CardDefaults
 import com.simplefox.browser.ui.foundation.Icon
@@ -206,59 +118,6 @@ private fun MutableList<SettingsSearchEntry>.category(
     add(SettingsSearchEntry(destination, title, summary, null, title, icon, emptyList(), false))
 }
 
-private val AccentNames = listOf(
-        R.string.accent_default,
-        R.string.accent_material_you,
-        R.string.accent_purple,
-        R.string.accent_deep_purple,
-        R.string.accent_royal_purple,
-        R.string.accent_amethyst,
-        R.string.accent_lavender,
-        R.string.accent_teal,
-        R.string.accent_azure,
-        R.string.accent_pink,
-        R.string.accent_indigo,
-        R.string.accent_cyan,
-        R.string.accent_amber,
-        R.string.accent_mint,
-        R.string.accent_crimson,
-        R.string.accent_slate,
-        R.string.accent_graphite,
-        R.string.accent_obsidian,
-        R.string.accent_onyx,
-        R.string.accent_titanium,
-        R.string.accent_coral,
-        R.string.accent_burgundy,
-        R.string.accent_midnight,
-        R.string.accent_sepia,
-        R.string.accent_mustard,
-        R.string.accent_forest,
-        R.string.accent_sage,
-        R.string.accent_plum,
-        R.string.accent_violet,
-        R.string.accent_sand,
-        R.string.accent_ruby,
-        R.string.accent_sky,
-        R.string.accent_charcoal,
-        R.string.accent_peach,
-        R.string.accent_terracotta,
-        R.string.accent_emerald,
-        R.string.accent_blue,
-        R.string.accent_yellow,
-        R.string.accent_lemon,
-        R.string.accent_gold,
-        R.string.accent_red,
-        R.string.accent_green,
-        R.string.accent_scarlet,
-        R.string.accent_lime,
-        R.string.accent_olive,
-        R.string.accent_orange,
-        R.string.accent_deep_orange,
-        R.string.accent_tangerine,
-        R.string.accent_apricot,
-        R.string.accent_copper
-)
-
 internal fun buildSettingsSearchEntries(context: Context): List<SettingsSearchEntry> = buildList {
     category(DEST_BROWSER, R.string.browser_settings, R.string.browser_settings_summary, Icons.Filled.Explore)
     category(DEST_LOOK_AND_FEEL, R.string.look_and_feel, R.string.look_and_feel_summary, Icons.Filled.Palette)
@@ -277,14 +136,6 @@ internal fun buildSettingsSearchEntries(context: Context): List<SettingsSearchEn
         item(
             R.string.pref_app_theme_title, R.string.pref_app_theme_summary, R.string.pref_category_appearance,
             listOf(R.string.theme_system, R.string.theme_light, R.string.theme_dark)
-        )
-        item(R.string.pref_accent_color_title, section = R.string.pref_category_appearance, extras = AccentNames, icon = Icons.Filled.Brush)
-        item(
-            R.string.pref_surface_intensity_title, section = R.string.pref_category_appearance,
-            extras = listOf(
-                R.string.surface_intensity_pure, R.string.surface_intensity_soft, R.string.surface_intensity_strong,
-                R.string.surface_intensity_no_tint, R.string.surface_intensity_amoled_no_tint
-            )
         )
         item(
             R.string.pref_nested_scroll_title, section = R.string.pref_category_address_bar,
@@ -350,10 +201,10 @@ internal fun buildSettingsSearchEntries(context: Context): List<SettingsSearchEn
         item(R.string.incognito_search_engine_title, section = R.string.pref_category_incognito, icon = Icons.Filled.Search)
         item(R.string.incognito_search_suggestions_api_title, section = R.string.pref_category_incognito, icon = Icons.AutoMirrored.Filled.ManageSearch)
         item(R.string.javascript_enabled, R.string.javascript_enabled_summary, R.string.pref_category_web_content, icon = Icons.Filled.DesktopWindows)
-        item(R.string.background_playback_title, R.string.background_playback_summary, R.string.pref_category_web_content, icon = androidx.compose.material.icons.Icons.Filled.Headphones)
-        item(R.string.profiles_title, R.string.profiles_settings_summary, R.string.pref_category_tools, icon = androidx.compose.material.icons.Icons.Filled.AccountCircle)
+        item(R.string.background_playback_title, R.string.background_playback_summary, R.string.pref_category_web_content, icon = com.simplefox.browser.ui.icons.Icons.Filled.Headphones)
+        item(R.string.profiles_title, R.string.profiles_settings_summary, R.string.pref_category_tools, icon = com.simplefox.browser.ui.icons.Icons.Filled.AccountCircle)
         item(R.string.translation_settings_title, R.string.translation_settings_summary, R.string.pref_category_tools, icon = Icons.Filled.Translate)
-        item(R.string.ext_title, R.string.ext_settings_summary, R.string.pref_category_tools, icon = androidx.compose.material.icons.Icons.Filled.Extension)
+        item(R.string.ext_title, R.string.ext_settings_summary, R.string.pref_category_tools, icon = com.simplefox.browser.ui.icons.Icons.Filled.Extension)
         item(R.string.shortcut_manager_title, R.string.shortcut_manager_summary, R.string.pref_category_tools, icon = Icons.AutoMirrored.Filled.AddToHomeScreen)
     }
 
@@ -418,6 +269,7 @@ internal fun buildSettingsSearchEntries(context: Context): List<SettingsSearchEn
         item(R.string.data_saver_block_frames_title, R.string.data_saver_block_frames_summary, R.string.data_saver_loading_section, icon = Icons.Filled.Web)
         item(R.string.data_saver_block_scripts_title, R.string.data_saver_block_scripts_summary, R.string.data_saver_loading_section, icon = Icons.Filled.Code)
         item(R.string.data_saver_block_css_title, R.string.data_saver_block_css_summary, R.string.data_saver_loading_section, icon = Icons.Filled.Style)
+        item(R.string.data_saver_reduce_effects_title, R.string.data_saver_reduce_effects_summary, R.string.data_saver_loading_section, icon = Icons.Filled.BlurOff)
         item(R.string.data_saver_cache_first_title, R.string.data_saver_cache_first_summary, R.string.data_saver_loading_section, icon = Icons.Filled.History)
         item(R.string.data_saver_send_header_title, R.string.data_saver_send_header_summary, R.string.data_saver_loading_section, icon = Icons.Filled.Speed)
         item(R.string.data_saver_single_tab_title, R.string.data_saver_single_tab_summary, R.string.data_saver_browser_section, icon = Icons.Filled.Tab)
@@ -480,7 +332,6 @@ internal fun buildSettingsSearchEntries(context: Context): List<SettingsSearchEn
         item(R.string.about_section_license)
         item(R.string.document_viewer_privacy_policy_title, section = R.string.about_section_legal)
         item(R.string.document_viewer_terms_title, section = R.string.about_section_legal)
-        item(R.string.about_section_contact, extras = listOf(R.string.about_contact_email_label))
     }
 }
 

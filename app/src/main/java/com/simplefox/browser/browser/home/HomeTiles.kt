@@ -16,8 +16,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
-import androidx.preference.PreferenceManager
-import com.caverock.androidsvg.SVG
+import com.simplefox.browser.util.PreferenceManager
+import com.simplefox.browser.util.SimpleSvg
 import com.simplefox.browser.bookmarks.BookmarkManager
 import com.simplefox.browser.settings.datasaver.DataSaverMode
 import com.simplefox.browser.ui.rememberClintFavicon
@@ -142,6 +142,9 @@ internal object HomeTileStore {
     @Volatile
     private var cache: List<HomeTile>? = null
 
+    // Last JSON written to disk; an unchanged layout is not rewritten. Guarded by the save() lock.
+    private var lastWrittenJson: String? = null
+
     private fun dataFile(context: Context): File = File(homepageImageDir(context), FILE_NAME)
 
     private fun iconFile(context: Context, id: String): File = File(homepageImageDir(context), "$ICON_PREFIX$id.png")
@@ -174,14 +177,18 @@ internal object HomeTileStore {
         runCatching {
             val dir = homepageImageDir(context)
             dir.mkdirs()
+            val json = serialize(tiles).toString()
+            if (json == lastWrittenJson && dataFile(context).exists()) return@runCatching
+            lastWrittenJson = null
             val temp = File(dir, "$FILE_NAME.tmp")
-            temp.writeText(serialize(tiles).toString())
+            temp.writeText(json)
             if (!temp.renameTo(dataFile(context))) {
                 temp.copyTo(dataFile(context), overwrite = true)
                 temp.delete()
             }
             val keep = tiles.allSites().filter { it.customIcon }.map { "$ICON_PREFIX${it.id}.png" }.toSet()
             dir.listFiles()?.forEach { if (it.name.startsWith(ICON_PREFIX) && it.name !in keep) it.delete() }
+            lastWrittenJson = json
         }
     }
 
@@ -281,6 +288,13 @@ internal object HomeTileIconFetcher {
 
     private class Candidate(val url: String, val size: Int, val vector: Boolean = false)
 
+    fun trimMemory(level: Int) {
+        when {
+            level >= 40 || level == 15 -> memory.evictAll()
+            level >= 10 -> memory.trimToSize(memory.maxSize() / 2)
+        }
+    }
+
     private fun originOf(pageUrl: String): String? = runCatching {
         val url = URL(pageUrl)
         if (url.protocol != "http" && url.protocol != "https") return@runCatching null
@@ -334,19 +348,29 @@ internal object HomeTileIconFetcher {
         bitmap
     }
 
-    private fun open(url: String): HttpURLConnection? = runCatching {
-        val conn = URL(url).openConnection() as HttpURLConnection
+    private fun open(url: String): HttpURLConnection? {
+        var conn: HttpURLConnection? = null
+        return try {
+            conn = URL(url).openConnection() as HttpURLConnection
+            openConfigured(conn)
+        } catch (_: Exception) {
+            conn?.disconnect()
+            null
+        }
+    }
+
+    private fun openConfigured(conn: HttpURLConnection): HttpURLConnection? {
         conn.connectTimeout = 6000
         conn.readTimeout = 6000
         conn.instanceFollowRedirects = true
         conn.setRequestProperty("User-Agent", USER_AGENT)
         conn.setRequestProperty("Accept", "text/html,application/xhtml+xml,application/manifest+json,image/avif,image/webp,image/png,image/svg+xml,image/*;q=0.8,*/*;q=0.5")
         conn.setRequestProperty("Accept-Language", java.util.Locale.getDefault().toLanguageTag())
-        if (conn.responseCode !in 200..299) {
+        return if (conn.responseCode !in 200..299) {
             conn.disconnect()
             null
         } else conn
-    }.getOrNull()
+    }
 
     private fun readLimited(stream: InputStream, limit: Int): ByteArray {
         val out = ByteArrayOutputStream()
@@ -416,7 +440,7 @@ internal object HomeTileIconFetcher {
                         candidates.add(Candidate(url, if (vector) 512 else declared ?: 32, vector))
                 }
             }
-            Regex("<meta\\b[^>]*>", RegexOption.IGNORE_CASE).findAll(head).forEach { match ->
+            HOME_META_TAG_REGEX.findAll(head).forEach { match ->
                 val tag = match.value
                 val name = (attr(tag, "property") ?: attr(tag, "name"))?.lowercase() ?: return@forEach
                 if (name == "msapplication-tileimage") {
@@ -502,22 +526,12 @@ internal object HomeTileIconFetcher {
         } else decoded
     }.getOrNull()
 
-    private fun decodeVector(bytes: ByteArray): Bitmap? = runCatching {
-        val text = String(bytes, Charsets.UTF_8)
-        if (!text.contains("<svg", ignoreCase = true)) return@runCatching null
-        val svg = SVG.getFromString(text)
-        val width = svg.documentWidth
-        val height = svg.documentHeight
-        if (svg.documentViewBox == null) {
-            if (width <= 0f || height <= 0f) return@runCatching null
-            svg.setDocumentViewBox(0f, 0f, width, height)
+    private fun decodeVector(bytes: ByteArray): Bitmap? =
+        SimpleSvg.parse(String(bytes, Charsets.UTF_8))?.let { svg ->
+            val bitmap = Bitmap.createBitmap(MAX_SIDE, MAX_SIDE, Bitmap.Config.ARGB_8888)
+            svg.render(Canvas(bitmap), MAX_SIDE.toFloat(), MAX_SIDE.toFloat())
+            bitmap
         }
-        svg.setDocumentWidth(MAX_SIDE.toFloat())
-        svg.setDocumentHeight(MAX_SIDE.toFloat())
-        val bitmap = Bitmap.createBitmap(MAX_SIDE, MAX_SIDE, Bitmap.Config.ARGB_8888)
-        svg.renderToCanvas(Canvas(bitmap))
-        bitmap
-    }.getOrNull()
 }
 
 internal class HomeTileIconImage(val bitmap: ImageBitmap, val fill: Boolean)
@@ -541,3 +555,5 @@ internal fun rememberHomeTileIcon(site: HomeSiteTile, iconVersion: Int): HomeTil
             ?: favicon?.takeIf { hd == null }?.let { HomeTileIconImage(it.asImageBitmap(), minOf(it.width, it.height) >= 96) }
     }
 }
+
+private val HOME_META_TAG_REGEX = Regex("<meta\\b[^>]*>", RegexOption.IGNORE_CASE)

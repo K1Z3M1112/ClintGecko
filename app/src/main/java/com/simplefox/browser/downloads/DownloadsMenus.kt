@@ -1,14 +1,4 @@
 package com.simplefox.browser.downloads
-import androidx.compose.material.icons.filled.Abc
-import androidx.compose.material.icons.filled.ArrowDownward
-import androidx.compose.material.icons.filled.ArrowUpward
-import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material.icons.filled.BugReport
-import androidx.compose.material.icons.filled.FormatSize
-import androidx.compose.material.icons.filled.Pause
-import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.SwapVert
 
 import com.simplefox.browser.R
 
@@ -42,23 +32,23 @@ fun DownloadsSortMenu(
         containerColor = colors.popupBackground,
         border = null
     ) {
-        ListMenuItem(androidx.compose.material.icons.Icons.Filled.Abc, stringResource(R.string.downloads_sort_by_name), sortKey == DownloadSortKey.NAME) {
+        ListMenuItem(com.simplefox.browser.ui.icons.Icons.Filled.Abc, stringResource(R.string.downloads_sort_by_name), sortKey == DownloadSortKey.NAME) {
             onDismiss(); onSortByName()
         }
-        ListMenuItem(androidx.compose.material.icons.Icons.Filled.DateRange, stringResource(R.string.downloads_sort_by_date), sortKey == DownloadSortKey.DATE) {
+        ListMenuItem(com.simplefox.browser.ui.icons.Icons.Filled.DateRange, stringResource(R.string.downloads_sort_by_date), sortKey == DownloadSortKey.DATE) {
             onDismiss(); onSortByDate()
         }
-        ListMenuItem(androidx.compose.material.icons.Icons.Filled.FormatSize, stringResource(R.string.downloads_sort_by_size), sortKey == DownloadSortKey.SIZE) {
+        ListMenuItem(com.simplefox.browser.ui.icons.Icons.Filled.FormatSize, stringResource(R.string.downloads_sort_by_size), sortKey == DownloadSortKey.SIZE) {
             onDismiss(); onSortBySize()
         }
-        ListMenuItem(androidx.compose.material.icons.Icons.Filled.SwapVert, stringResource(R.string.downloads_sort_by_status), sortKey == DownloadSortKey.STATUS) {
+        ListMenuItem(com.simplefox.browser.ui.icons.Icons.Filled.SwapVert, stringResource(R.string.downloads_sort_by_status), sortKey == DownloadSortKey.STATUS) {
             onDismiss(); onSortByStatus()
         }
         HorizontalDivider(color = colors.divider)
-        ListMenuItem(androidx.compose.material.icons.Icons.Filled.ArrowUpward, stringResource(R.string.history_sort_ascending), sortOrder == ListSortOrder.ASCENDING) {
+        ListMenuItem(com.simplefox.browser.ui.icons.Icons.Filled.ArrowUpward, stringResource(R.string.history_sort_ascending), sortOrder == ListSortOrder.ASCENDING) {
             onDismiss(); onSortAscending()
         }
-        ListMenuItem(androidx.compose.material.icons.Icons.Filled.ArrowDownward, stringResource(R.string.history_sort_descending), sortOrder == ListSortOrder.DESCENDING) {
+        ListMenuItem(com.simplefox.browser.ui.icons.Icons.Filled.ArrowDownward, stringResource(R.string.history_sort_descending), sortOrder == ListSortOrder.DESCENDING) {
             onDismiss(); onSortDescending()
         }
     }
@@ -81,13 +71,13 @@ fun DownloadsOverflowMenu(
         containerColor = colors.popupBackground,
         border = null
     ) {
-        ListMenuItem(androidx.compose.material.icons.Icons.Filled.PlayArrow, stringResource(R.string.downloads_resume_all), false) { onDismiss(); onResumeAll() }
-        ListMenuItem(androidx.compose.material.icons.Icons.Filled.Pause, stringResource(R.string.downloads_pause_all), false) { onDismiss(); onPauseAll() }
+        ListMenuItem(com.simplefox.browser.ui.icons.Icons.Filled.PlayArrow, stringResource(R.string.downloads_resume_all), false) { onDismiss(); onResumeAll() }
+        ListMenuItem(com.simplefox.browser.ui.icons.Icons.Filled.Pause, stringResource(R.string.downloads_pause_all), false) { onDismiss(); onPauseAll() }
         HorizontalDivider(color = colors.divider)
         if (onDownloadLog != null) {
-            ListMenuItem(androidx.compose.material.icons.Icons.Filled.BugReport, stringResource(R.string.download_log_title), false) { onDismiss(); onDownloadLog() }
+            ListMenuItem(com.simplefox.browser.ui.icons.Icons.Filled.BugReport, stringResource(R.string.download_log_title), false) { onDismiss(); onDownloadLog() }
         }
-        ListMenuItem(androidx.compose.material.icons.Icons.Filled.Settings, stringResource(R.string.download_settings_title), false) { onDismiss(); onSettings() }
+        ListMenuItem(com.simplefox.browser.ui.icons.Icons.Filled.Settings, stringResource(R.string.download_settings_title), false) { onDismiss(); onSettings() }
     }
 }
 

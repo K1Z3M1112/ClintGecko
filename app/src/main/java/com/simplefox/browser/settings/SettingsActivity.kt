@@ -1,6 +1,4 @@
 package com.simplefox.browser.settings
-import androidx.compose.material.icons.filled.Tune
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 
 import android.content.Intent
 import android.os.Bundle
@@ -43,7 +41,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.view.WindowCompat
-import androidx.preference.PreferenceManager
+import com.simplefox.browser.util.PreferenceManager
 import com.simplefox.browser.R
 import com.simplefox.browser.base.ClintActivity
 import com.simplefox.browser.settings.backuprestore.BackupRestorePane
@@ -362,7 +360,7 @@ private fun SettingsToolbar(title: String, onBack: () -> Unit, actions: @Composa
     Surface(color = colors.background, modifier = Modifier.statusBarsPadding()) {
         Row(Modifier.fillMaxWidth().height(64.dp).padding(horizontal = 4.dp), verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = onBack) {
-                Icon(androidx.compose.material.icons.Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back), tint = colors.onSurface)
+                Icon(com.simplefox.browser.ui.icons.Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back), tint = colors.onSurface)
             }
             Text(
                 title,
@@ -389,7 +387,7 @@ private fun SettingsEmptyDetailPane() {
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
-                        androidx.compose.material.icons.Icons.Filled.Tune,
+                        com.simplefox.browser.ui.icons.Icons.Filled.Tune,
                         contentDescription = null,
                         tint = colors.primary,
                         modifier = Modifier.size(40.dp)

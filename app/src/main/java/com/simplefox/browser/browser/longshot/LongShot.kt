@@ -5,7 +5,7 @@ import android.net.Uri
 import android.text.TextUtils
 import android.util.Base64
 import android.view.View
-import androidx.preference.PreferenceManager
+import com.simplefox.browser.util.PreferenceManager
 import com.simplefox.browser.R
 import com.simplefox.browser.browser.webview.ClintErrorPage
 import com.simplefox.browser.browser.webview.ClintWebView

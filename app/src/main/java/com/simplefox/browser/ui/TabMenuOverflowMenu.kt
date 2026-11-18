@@ -1,25 +1,11 @@
 package com.simplefox.browser.ui
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.CreateNewFolder
-import androidx.compose.material.icons.filled.ExpandLess
-import androidx.compose.material.icons.filled.ExpandMore
-import androidx.compose.material.icons.filled.Tab
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.FilterNone
-import androidx.compose.material.icons.filled.KeyboardDoubleArrowDown
-import androidx.compose.material.icons.automirrored.filled.ViewList
-import androidx.compose.material.icons.filled.SelectAll
-import androidx.compose.material.icons.filled.SwapHoriz
-import androidx.compose.material.icons.filled.VerticalAlignBottom
-import androidx.compose.material.icons.filled.VisibilityOff
+import com.simplefox.browser.ui.icons.Icons
 import com.simplefox.browser.ui.foundation.DropdownMenu
 import com.simplefox.browser.ui.foundation.HorizontalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import com.simplefox.browser.R
 import com.simplefox.browser.ui.listscreen.ListMenuItem
 import com.simplefox.browser.ui.listscreen.PopupShape
@@ -46,7 +32,9 @@ fun TabMenuOverflowMenu(
     buttonsAtBottom: Boolean = false,
     onToggleButtonsAtBottom: (() -> Unit)? = null,
     tabsAtBottom: Boolean = false,
-    onToggleTabsAtBottom: (() -> Unit)? = null
+    onToggleTabsAtBottom: (() -> Unit)? = null,
+    reorderMode: Boolean = false,
+    onToggleReorderMode: (() -> Unit)? = null
 ) {
     val colors = LocalClintColors.current
     DropdownMenu(
@@ -54,7 +42,8 @@ fun TabMenuOverflowMenu(
         onDismissRequest = onDismiss,
         shape = PopupShape,
         containerColor = colors.popupBackground,
-        border = null
+        border = null,
+        shadowElevation = 0.dp
     ) {
         ListMenuItem(Icons.Filled.Add, stringResource(R.string.new_tab), checked = false) {
             onDismiss(); onNewTab()
@@ -63,7 +52,7 @@ fun TabMenuOverflowMenu(
             onDismiss(); onNewIncognitoTab()
         }
         if (showProfileTab) {
-            ListMenuItem(androidx.compose.material.icons.Icons.Filled.AccountCircle, stringResource(R.string.profiles_new_tab_in), checked = false) {
+            ListMenuItem(com.simplefox.browser.ui.icons.Icons.Filled.AccountCircle, stringResource(R.string.profiles_new_tab_in), checked = false) {
                 onDismiss(); onNewProfileTab()
             }
         }
@@ -83,7 +72,12 @@ fun TabMenuOverflowMenu(
         ListMenuItem(Icons.Filled.SelectAll, stringResource(R.string.tab_menu_select_mode_desc), checked = false) {
             onDismiss(); onSelectTabs()
         }
-        if (onCollapseAllGroups != null || onExpandAllGroups != null || onToggleGroupBar != null || onToggleListView != null || onToggleButtonsAtBottom != null || onToggleTabsAtBottom != null) {
+        onToggleReorderMode?.let { action ->
+            ListMenuItem(Icons.Filled.DragIndicator, stringResource(R.string.tab_menu_reorder_mode), checked = reorderMode) {
+                onDismiss(); action()
+            }
+        }
+        if (onToggleReorderMode != null || onCollapseAllGroups != null || onExpandAllGroups != null || onToggleGroupBar != null || onToggleListView != null || onToggleButtonsAtBottom != null || onToggleTabsAtBottom != null) {
             HorizontalDivider(color = colors.divider)
         }
         onCollapseAllGroups?.let { action ->
@@ -133,7 +127,8 @@ fun TabSelectionOverflowMenu(
         onDismissRequest = onDismiss,
         shape = PopupShape,
         containerColor = colors.popupBackground,
-        border = null
+        border = null,
+        shadowElevation = 0.dp
     ) {
         ListMenuItem(Icons.Filled.SelectAll, stringResource(R.string.tab_menu_select_all), checked = false) {
             onDismiss(); onSelectAll()

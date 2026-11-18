@@ -1,16 +1,5 @@
 package com.simplefox.browser.browser.menu
 import android.net.Uri
-import androidx.compose.material.icons.filled.Bookmark
-import androidx.compose.material.icons.filled.BookmarkBorder
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.VolumeUp
-import androidx.compose.material.icons.automirrored.filled.ArrowForward
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -55,7 +44,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.preference.PreferenceManager
+import com.simplefox.browser.util.PreferenceManager
 import com.simplefox.browser.R
 import com.simplefox.browser.bookmarks.BookmarkManager
 import com.simplefox.browser.browser.MainActivity
@@ -89,8 +78,6 @@ internal data class BrowserMenuSnapshot(
     val isDesktopMode: Boolean,
     val isDataSaverEnabled: Boolean,
     val pendingDownloadCount: Long,
-    val mediaCaptureCount: Long,
-    val isMediaCaptureEnabled: Boolean,
     val isWebsiteBlockerEnabled: Boolean,
     val canCreateShortcut: Boolean,
     val canToggleTabMute: Boolean,
@@ -118,7 +105,6 @@ internal class BrowserMenuActions(
     val onOpenShortcutManager: () -> Unit,
     val onDownloads: () -> Unit,
     val onOpenDownloadSettings: () -> Unit,
-    val onMediaCapture: () -> Unit,
     val onExtensionClick: (String, Boolean) -> Unit,
     val onOpenExtensionSettings: (String) -> Unit,
     val onOpenExtensionsSettings: () -> Unit,
@@ -162,8 +148,6 @@ internal fun MainActivity.buildMenuSnapshot(previous: BrowserMenuSnapshot?): Bro
         isDataSaverEnabled = prefs.getBoolean("data_saver_enabled", false),
         pendingDownloadCount = ClintDownloadManager.downloadsFlow.value
             .count { it.status in DownloadStatus.RUNNING_OR_QUEUED }.toLong(),
-        mediaCaptureCount = com.simplefox.browser.mediacapture.MediaCaptureStore.countForTab(tabManager.activeTab?.id).toLong(),
-        isMediaCaptureEnabled = prefs.getBoolean(com.simplefox.browser.mediacapture.MEDIA_CAPTURE_ENABLED_PREF, true),
         isWebsiteBlockerEnabled = prefs.getBoolean("website_blocker_enabled", false),
         canCreateShortcut = currentUrl.isNotEmpty(),
         canToggleTabMute = wv != null && (wv.audioState.audible || wv.audioState.muted),
@@ -214,7 +198,6 @@ internal fun MainActivity.buildMenuActions(dismiss: () -> Unit): BrowserMenuActi
     onOpenShortcutManager = { dismiss(); onMenuOpenShortcutManager() },
     onDownloads = { dismiss(); onMenuDownloads() },
     onOpenDownloadSettings = { dismiss(); onMenuOpenDownloadSettings() },
-    onMediaCapture = { dismiss(); onMenuMediaCapture() },
     onExtensionClick = { id, actionable -> dismiss(); onMenuExtensionClick(id, actionable) },
     onOpenExtensionSettings = { id -> dismiss(); onMenuOpenExtensionSettings(id) },
     onOpenExtensionsSettings = { dismiss(); onMenuOpenExtensionsSettings() },
@@ -259,7 +242,7 @@ internal fun MenuTriggerButton(activity: MainActivity, modifier: Modifier = Modi
             expanded = true
         }) {
             Icon(
-                imageVector = androidx.compose.material.icons.Icons.Filled.MoreVert,
+                imageVector = com.simplefox.browser.ui.icons.Icons.Filled.MoreVert,
                 contentDescription = stringResource(R.string.menu),
                 tint = colors.iconTint
             )
@@ -299,7 +282,7 @@ internal fun MenuTriggerButton(activity: MainActivity, modifier: Modifier = Modi
                 com.simplefox.browser.ui.foundation.Surface(
                     color = colors.popupBackground,
                     shape = PopupShape,
-                    shadowElevation = 8.dp,
+                    shadowElevation = 0.dp,
                     modifier = Modifier.width(menuWidth).heightIn(max = maxMenuHeight)
                 ) {
                     Column(Modifier.verticalScroll(androidx.compose.foundation.rememberScrollState())) {
@@ -362,7 +345,7 @@ private fun BrowserMenuContent(
         val renderEntry: @Composable (MenuGridEntry) -> Unit = { entry ->
             when (entry) {
                 MenuGridEntry.Settings -> MenuGridCell(
-                    androidx.compose.material.icons.Icons.Filled.Settings,
+                    com.simplefox.browser.ui.icons.Icons.Filled.Settings,
                     stringResource(R.string.settings),
                     onClick = actions.onSettings
                 )
@@ -378,29 +361,29 @@ private fun BrowserMenuContent(
             Row {
                 if (snapshot.showNavRow) {
                     MenuGridCell(
-                        androidx.compose.material.icons.Icons.AutoMirrored.Filled.ArrowBack,
+                        com.simplefox.browser.ui.icons.Icons.AutoMirrored.Filled.ArrowBack,
                         stringResource(R.string.back),
                         enabled = snapshot.canGoBack,
                         onClick = actions.onGoBack
                     )
                     MenuGridCell(
-                        androidx.compose.material.icons.Icons.AutoMirrored.Filled.ArrowForward,
+                        com.simplefox.browser.ui.icons.Icons.AutoMirrored.Filled.ArrowForward,
                         stringResource(R.string.forward),
                         enabled = snapshot.canGoForward,
                         onClick = actions.onGoForward
                     )
                     MenuGridCell(
-                        androidx.compose.material.icons.Icons.Filled.Home,
+                        com.simplefox.browser.ui.icons.Icons.Filled.Home,
                         stringResource(R.string.home),
                         onClick = actions.onHome
                     )
                     MenuGridCell(
-                        if (snapshot.isLoading) androidx.compose.material.icons.Icons.Filled.Close else androidx.compose.material.icons.Icons.Filled.Refresh,
+                        if (snapshot.isLoading) com.simplefox.browser.ui.icons.Icons.Filled.Close else com.simplefox.browser.ui.icons.Icons.Filled.Refresh,
                         stringResource(R.string.refresh),
                         onClick = actions.onRefreshOrStop
                     )
                     MenuGridCell(
-                        if (snapshot.page.isBookmarked) androidx.compose.material.icons.Icons.Filled.Bookmark else androidx.compose.material.icons.Icons.Filled.BookmarkBorder,
+                        if (snapshot.page.isBookmarked) com.simplefox.browser.ui.icons.Icons.Filled.Bookmark else com.simplefox.browser.ui.icons.Icons.Filled.BookmarkBorder,
                         stringResource(R.string.content_desc_bookmark),
                         onClick = actions.onToggleBookmark
                     )
@@ -468,12 +451,6 @@ private fun MenuGridCellFor(
             onClick = actions.onDownloads,
             onLongClick = actions.onOpenDownloadSettings
         )
-        CustomizableMenuItem.MEDIA_CAPTURE -> MenuGridCell(
-            item.icon(),
-            stringResource(item.titleRes()),
-            checked = snapshot.isMediaCaptureEnabled,
-            onClick = actions.onMediaCapture
-        )
         CustomizableMenuItem.EXTENSIONS -> MenuGridCell(
             item.icon(),
             stringResource(item.titleRes()),
@@ -513,7 +490,7 @@ private fun MenuGridCellFor(
             onLongClick = actions.onOpenDataSaverSettings
         )
         CustomizableMenuItem.MUTE_TAB -> MenuGridCell(
-            if (snapshot.isTabMuted) androidx.compose.material.icons.Icons.AutoMirrored.Filled.VolumeUp else item.icon(),
+            if (snapshot.isTabMuted) com.simplefox.browser.ui.icons.Icons.AutoMirrored.Filled.VolumeUp else item.icon(),
             stringResource(if (snapshot.isTabMuted) R.string.menu_unmute_tab else item.titleRes()),
             onClick = actions.onToggleTabMute
         )
@@ -586,7 +563,7 @@ private fun MenuGridCell(
                             .background(colors.popupBackground)
                     ) {
                         Icon(
-                            imageVector = androidx.compose.material.icons.Icons.Filled.Check,
+                            imageVector = com.simplefox.browser.ui.icons.Icons.Filled.Check,
                             contentDescription = null,
                             tint = colors.popupCheck,
                             modifier = Modifier.size(12.dp)

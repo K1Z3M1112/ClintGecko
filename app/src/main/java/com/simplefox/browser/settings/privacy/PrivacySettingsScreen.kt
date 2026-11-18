@@ -1,26 +1,4 @@
 package com.simplefox.browser.settings.privacy
-import androidx.compose.material.icons.filled.ContentPasteOff
-import androidx.compose.material.icons.filled.Cookie
-import androidx.compose.material.icons.filled.DeleteSweep
-import androidx.compose.material.icons.filled.Checklist
-import androidx.compose.material.icons.filled.Fingerprint
-import androidx.compose.material.icons.filled.GppGood
-import androidx.compose.material.icons.filled.HideImage
-import androidx.compose.material.icons.filled.Keyboard
-import androidx.compose.material.icons.filled.LinkOff
-import androidx.compose.material.icons.filled.PhonelinkLock
-import androidx.compose.material.icons.filled.Security
-import androidx.compose.material.icons.filled.Shield
-import androidx.compose.material.icons.filled.Timer
-import androidx.compose.material.icons.filled.VerifiedUser
-import androidx.compose.material.icons.filled.Videocam
-import androidx.compose.material.icons.filled.Dns
-import androidx.compose.material.icons.filled.History
-import androidx.compose.material.icons.filled.Language
-import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.ManageAccounts
-import androidx.compose.material.icons.filled.Password
-import androidx.compose.material.icons.filled.VisibilityOff
 
 import com.simplefox.browser.ui.ClintSwitch
 import androidx.compose.runtime.Composable
@@ -74,7 +52,7 @@ fun PrivacySettingsScreen(
         SettingsSectionLabel(stringResource(R.string.privacy_section_privacy))
         SettingsSection(colors.cardBackground) {
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.Language,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.Language,
                 title = stringResource(R.string.custom_user_agent),
                 summary = stringResource(R.string.custom_user_agent_summary),
                 colors = colors,
@@ -85,7 +63,7 @@ fun PrivacySettingsScreen(
             )
             RowDivider(colors.divider)
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.Lock,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.Lock,
                 title = stringResource(R.string.https_only),
                 summary = stringResource(R.string.https_only_summary),
                 colors = colors,
@@ -96,7 +74,7 @@ fun PrivacySettingsScreen(
             )
             RowDivider(colors.divider)
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.VerifiedUser,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.VerifiedUser,
                 title = stringResource(R.string.strict_certificates_title),
                 summary = stringResource(R.string.strict_certificates_summary),
                 colors = colors,
@@ -107,7 +85,7 @@ fun PrivacySettingsScreen(
             )
             RowDivider(colors.divider)
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.Security,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.Security,
                 title = stringResource(R.string.website_isolation_title),
                 summary = stringResource(R.string.website_isolation_summary),
                 colors = colors,
@@ -118,7 +96,7 @@ fun PrivacySettingsScreen(
             )
             RowDivider(colors.divider)
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.VisibilityOff,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.VisibilityOff,
                 title = stringResource(R.string.do_not_track_title),
                 summary = stringResource(R.string.do_not_track_summary),
                 colors = colors,
@@ -129,7 +107,7 @@ fun PrivacySettingsScreen(
             )
             RowDivider(colors.divider)
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.Dns,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.Dns,
                 title = stringResource(R.string.secure_dns_title),
                 summary = stringResource(
                     when (state.secureDnsMode) {
@@ -144,7 +122,7 @@ fun PrivacySettingsScreen(
             if (state.secureDnsMode != SecureDns.MODE_OFF) {
                 RowDivider(colors.divider)
                 SettingsRow(
-                    icon = androidx.compose.material.icons.Icons.Filled.Dns,
+                    icon = com.simplefox.browser.ui.icons.Icons.Filled.Dns,
                     title = stringResource(R.string.secure_dns_provider_title),
                     summary = when (state.secureDnsProvider) {
                         SecureDns.PROVIDER_GOOGLE -> stringResource(R.string.secure_dns_provider_google)
@@ -161,7 +139,7 @@ fun PrivacySettingsScreen(
         SettingsSectionLabel(stringResource(R.string.privacy_section_tracking))
         SettingsSection(colors.cardBackground) {
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.Shield,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.Shield,
                 title = stringResource(R.string.etp_title),
                 summary = stringResource(etpLevelLabel(state.etpLevel)),
                 colors = colors,
@@ -169,7 +147,7 @@ fun PrivacySettingsScreen(
             )
             RowDivider(colors.divider)
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.Cookie,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.Cookie,
                 title = stringResource(R.string.cookie_policy_title),
                 summary = stringResource(cookiePolicyLabel(state.cookiePolicy)),
                 colors = colors,
@@ -177,7 +155,7 @@ fun PrivacySettingsScreen(
             )
             RowDivider(colors.divider)
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.LinkOff,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.LinkOff,
                 title = stringResource(R.string.strip_tracking_params_title),
                 summary = stringResource(R.string.strip_tracking_params_summary),
                 colors = colors,
@@ -188,7 +166,7 @@ fun PrivacySettingsScreen(
             )
             RowDivider(colors.divider)
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.Fingerprint,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.Fingerprint,
                 title = stringResource(R.string.fingerprinting_protection_title),
                 summary = stringResource(R.string.fingerprinting_protection_summary),
                 colors = colors,
@@ -199,7 +177,7 @@ fun PrivacySettingsScreen(
             )
             RowDivider(colors.divider)
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.GppGood,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.GppGood,
                 title = stringResource(R.string.global_privacy_control_title),
                 summary = stringResource(R.string.global_privacy_control_summary),
                 colors = colors,
@@ -210,7 +188,7 @@ fun PrivacySettingsScreen(
             )
             RowDivider(colors.divider)
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.Videocam,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.Videocam,
                 title = stringResource(R.string.webrtc_protection_title),
                 summary = stringResource(R.string.webrtc_protection_summary),
                 colors = colors,
@@ -224,7 +202,7 @@ fun PrivacySettingsScreen(
         SettingsSectionLabel(stringResource(R.string.privacy_section_device))
         SettingsSection(colors.cardBackground) {
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.PhonelinkLock,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.PhonelinkLock,
                 title = stringResource(R.string.app_lock_title),
                 summary = stringResource(R.string.app_lock_summary),
                 colors = colors,
@@ -236,7 +214,7 @@ fun PrivacySettingsScreen(
             if (state.appLock) {
                 RowDivider(colors.divider)
                 SettingsRow(
-                    icon = androidx.compose.material.icons.Icons.Filled.Timer,
+                    icon = com.simplefox.browser.ui.icons.Icons.Filled.Timer,
                     title = stringResource(R.string.app_lock_timeout_title),
                     summary = stringResource(appLockTimeoutLabel(state.appLockTimeout)),
                     colors = colors,
@@ -245,7 +223,7 @@ fun PrivacySettingsScreen(
             }
             RowDivider(colors.divider)
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.HideImage,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.HideImage,
                 title = stringResource(R.string.screenshot_blocking_title),
                 summary = stringResource(R.string.screenshot_blocking_summary),
                 colors = colors,
@@ -256,7 +234,7 @@ fun PrivacySettingsScreen(
             )
             RowDivider(colors.divider)
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.Keyboard,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.Keyboard,
                 title = stringResource(R.string.incognito_keyboard_title),
                 summary = stringResource(R.string.incognito_keyboard_summary),
                 colors = colors,
@@ -267,7 +245,7 @@ fun PrivacySettingsScreen(
             )
             RowDivider(colors.divider)
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.ContentPasteOff,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.ContentPasteOff,
                 title = stringResource(R.string.clipboard_clear_title),
                 summary = stringResource(clipboardClearLabel(state.clipboardClearSeconds)),
                 colors = colors,
@@ -275,7 +253,7 @@ fun PrivacySettingsScreen(
             )
             RowDivider(colors.divider)
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.DeleteSweep,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.DeleteSweep,
                 title = stringResource(R.string.clear_on_exit_title),
                 summary = stringResource(R.string.clear_on_exit_summary),
                 colors = colors,
@@ -287,7 +265,7 @@ fun PrivacySettingsScreen(
             if (state.clearOnExit) {
                 RowDivider(colors.divider)
                 SettingsRow(
-                    icon = androidx.compose.material.icons.Icons.Filled.Checklist,
+                    icon = com.simplefox.browser.ui.icons.Icons.Filled.Checklist,
                     title = stringResource(R.string.clear_on_exit_items_title),
                     summary = listOfNotNull(
                         historyLabel.takeIf { state.clearHistory },
@@ -305,7 +283,7 @@ fun PrivacySettingsScreen(
             SettingsSectionLabel(stringResource(R.string.privacy_section_autofill))
             SettingsSection(colors.cardBackground) {
                 SettingsRow(
-                    icon = androidx.compose.material.icons.Icons.Filled.Password,
+                    icon = com.simplefox.browser.ui.icons.Icons.Filled.Password,
                     title = stringResource(R.string.autofill_title),
                     summary = stringResource(R.string.autofill_summary),
                     colors = colors,
@@ -316,7 +294,7 @@ fun PrivacySettingsScreen(
                 )
                 RowDivider(colors.divider)
                 SettingsRow(
-                    icon = androidx.compose.material.icons.Icons.Filled.ManageAccounts,
+                    icon = com.simplefox.browser.ui.icons.Icons.Filled.ManageAccounts,
                     title = stringResource(R.string.autofill_service_title),
                     summary = stringResource(
                         if (state.autofillServiceActive) R.string.autofill_service_summary_active else R.string.autofill_service_summary_none
@@ -397,7 +375,7 @@ fun PrivacySettingsScreen(
         SettingsSectionLabel(stringResource(R.string.privacy_section_history))
         SettingsSection(colors.cardBackground) {
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.History,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.History,
                 title = stringResource(R.string.history_title),
                 summary = stringResource(R.string.history_summary),
                 colors = colors,
@@ -405,7 +383,7 @@ fun PrivacySettingsScreen(
             )
             RowDivider(colors.divider)
             SettingsRow(
-                icon = androidx.compose.material.icons.Icons.Filled.DeleteSweep,
+                icon = com.simplefox.browser.ui.icons.Icons.Filled.DeleteSweep,
                 title = stringResource(R.string.delete_data_title),
                 summary = stringResource(R.string.delete_data_settings_summary),
                 colors = colors,

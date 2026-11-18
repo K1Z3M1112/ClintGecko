@@ -5,14 +5,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 
 enum class LookAndFeelDialog {
-    THEME, ACCENT, SURFACE_INTENSITY, ADDRESS_BAR_POSITION, SCROLL_HIDE_MODE, EXIT_CONFIRMATION, POPUP_ALERT_STYLE, LANGUAGE,
-    TAB_STRIP_POSITION, TAB_GROUP_BAR_POSITION
+    THEME, ADDRESS_BAR_POSITION, SCROLL_HIDE_MODE, EXIT_CONFIRMATION, POPUP_ALERT_STYLE, LANGUAGE,
+    TAB_STRIP_POSITION, TAB_GROUP_BAR_POSITION, TAB_PREVIEW_RESOLUTION
 }
 
 class LookAndFeelUiState(
     initialTheme: String,
-    initialAccent: String,
-    initialIntensity: String,
     initialLanguage: String,
     initialScrollHideMode: String,
     initialAddressBarPosition: String,
@@ -22,12 +20,11 @@ class LookAndFeelUiState(
     initialTabStripPosition: String,
     initialTabGroupsEnabled: Boolean,
     initialTabGroupBarPosition: String,
+    initialTabPreviewResolution: String,
     initialExitConfirmation: String,
     initialPopupAlertStyle: String
 ) {
     var theme by mutableStateOf(initialTheme)
-    var accent by mutableStateOf(initialAccent)
-    var intensity by mutableStateOf(initialIntensity)
     var language by mutableStateOf(initialLanguage)
 
     var scrollHideMode by mutableStateOf(initialScrollHideMode)
@@ -39,6 +36,7 @@ class LookAndFeelUiState(
     var tabStripPosition by mutableStateOf(initialTabStripPosition)
     var tabGroupsEnabled by mutableStateOf(initialTabGroupsEnabled)
     var tabGroupBarPosition by mutableStateOf(initialTabGroupBarPosition)
+    var tabPreviewResolution by mutableStateOf(initialTabPreviewResolution)
 
     var exitConfirmation by mutableStateOf(initialExitConfirmation)
     var popupAlertStyle by mutableStateOf(initialPopupAlertStyle)

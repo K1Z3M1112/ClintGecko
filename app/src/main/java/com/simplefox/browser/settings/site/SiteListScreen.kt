@@ -1,12 +1,4 @@
 package com.simplefox.browser.settings.site
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Checklist
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Public
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.automirrored.filled.Sort
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 
 import com.simplefox.browser.ui.listscreen.ClintSearchField
 import com.simplefox.browser.ui.listscreen.ListFastScroller
@@ -160,7 +152,7 @@ fun SiteListScreen(
                         contentColor = colors.buttonIconTint,
                         modifier = Modifier.align(Alignment.BottomEnd).navigationBarsPadding().padding(bottom = 24.dp, end = 20.dp)
                     ) {
-                        Icon(androidx.compose.material.icons.Icons.Filled.Delete, contentDescription = null)
+                        Icon(com.simplefox.browser.ui.icons.Icons.Filled.Delete, contentDescription = null)
                     }
                 }
                 if (showAddFab) {
@@ -170,7 +162,7 @@ fun SiteListScreen(
                         contentColor = colors.buttonIconTint,
                         modifier = Modifier.align(Alignment.BottomEnd).navigationBarsPadding().padding(bottom = 24.dp, end = 20.dp)
                     ) {
-                        Icon(androidx.compose.material.icons.Icons.Filled.Add, contentDescription = null)
+                        Icon(com.simplefox.browser.ui.icons.Icons.Filled.Add, contentDescription = null)
                     }
                 }
             }
@@ -196,7 +188,7 @@ private fun SiteListToolbar(
         ) {
             IconButton(onClick = onBack) {
                 Icon(
-                    if (state.isInSelectionMode) androidx.compose.material.icons.Icons.Filled.Close else androidx.compose.material.icons.Icons.AutoMirrored.Filled.ArrowBack,
+                    if (state.isInSelectionMode) com.simplefox.browser.ui.icons.Icons.Filled.Close else com.simplefox.browser.ui.icons.Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = null, tint = colors.onSurface
                 )
             }
@@ -221,7 +213,7 @@ private fun SiteListToolbar(
                 if (!state.isInSelectionMode) {
                     Box {
                         IconButton(onClick = { state.sortMenuOpen = true }) {
-                            Icon(androidx.compose.material.icons.Icons.AutoMirrored.Filled.Sort, contentDescription = null, tint = colors.iconTint)
+                            Icon(com.simplefox.browser.ui.icons.Icons.AutoMirrored.Filled.Sort, contentDescription = null, tint = colors.iconTint)
                         }
                         SortMenu(
                             expanded = state.sortMenuOpen,
@@ -238,7 +230,7 @@ private fun SiteListToolbar(
                 if (state.isInSelectionMode) {
                     Box {
                         IconButton(onClick = { state.moreOptionsMenuOpen = true }) {
-                            Icon(androidx.compose.material.icons.Icons.Filled.Checklist, contentDescription = null, tint = colors.iconTint)
+                            Icon(com.simplefox.browser.ui.icons.Icons.Filled.Checklist, contentDescription = null, tint = colors.iconTint)
                         }
                         SelectionOptionsMenu(
                             expanded = state.moreOptionsMenuOpen,
@@ -250,7 +242,7 @@ private fun SiteListToolbar(
                     }
                 }
                 IconButton(onClick = { state.isSearchMode = true }) {
-                    Icon(androidx.compose.material.icons.Icons.Filled.Search, contentDescription = null, tint = colors.iconTint)
+                    Icon(com.simplefox.browser.ui.icons.Icons.Filled.Search, contentDescription = null, tint = colors.iconTint)
                 }
             }
         }
@@ -288,7 +280,7 @@ private fun SiteListRow(
             if (favicon != null) {
                 Image(bitmap = favicon.asImageBitmap(), contentDescription = null, modifier = Modifier.size(22.dp))
             } else {
-                Icon(androidx.compose.material.icons.Icons.Filled.Public, contentDescription = null, tint = colors.iconTint, modifier = Modifier.size(22.dp))
+                Icon(com.simplefox.browser.ui.icons.Icons.Filled.Public, contentDescription = null, tint = colors.iconTint, modifier = Modifier.size(22.dp))
             }
         }
         Column(Modifier.weight(1f).padding(start = 12.dp)) {

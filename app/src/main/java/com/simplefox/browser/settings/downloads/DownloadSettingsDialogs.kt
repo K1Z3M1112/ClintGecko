@@ -1,5 +1,4 @@
 package com.simplefox.browser.settings.downloads
-import androidx.compose.material.icons.filled.ArrowDownward
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
@@ -320,7 +319,7 @@ fun SpeedLimitDialog(
                         ) {
                             Text(unitLabel, color = colors.onSurface, fontSize = 15.sp, fontWeight = FontWeight.Medium)
                             Icon(
-                                androidx.compose.material.icons.Icons.Filled.ArrowDownward, contentDescription = null,
+                                com.simplefox.browser.ui.icons.Icons.Filled.ArrowDownward, contentDescription = null,
                                 tint = colors.iconTint, modifier = Modifier.padding(start = 4.dp)
                             )
                         }

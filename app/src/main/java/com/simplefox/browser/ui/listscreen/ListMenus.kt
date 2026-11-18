@@ -1,11 +1,4 @@
 package com.simplefox.browser.ui.listscreen
-import androidx.compose.material.icons.filled.Abc
-import androidx.compose.material.icons.filled.ArrowDownward
-import androidx.compose.material.icons.filled.ArrowUpward
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material.icons.filled.SwapVert
 
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -46,17 +39,17 @@ fun SortMenu(
         containerColor = colors.popupBackground,
         border = null
     ) {
-        ListMenuItem(androidx.compose.material.icons.Icons.Filled.Abc, stringResource(R.string.history_sort_by_title), sortKey == ListSortKey.TITLE) {
+        ListMenuItem(com.simplefox.browser.ui.icons.Icons.Filled.Abc, stringResource(R.string.history_sort_by_title), sortKey == ListSortKey.TITLE) {
             onDismiss(); onSortByTitle()
         }
-        ListMenuItem(androidx.compose.material.icons.Icons.Filled.DateRange, secondarySortLabel, sortKey == ListSortKey.DATE_ADDED) {
+        ListMenuItem(com.simplefox.browser.ui.icons.Icons.Filled.DateRange, secondarySortLabel, sortKey == ListSortKey.DATE_ADDED) {
             onDismiss(); onSortByDateAdded()
         }
         HorizontalDivider(color = colors.divider)
-        ListMenuItem(androidx.compose.material.icons.Icons.Filled.ArrowUpward, stringResource(R.string.history_sort_ascending), sortOrder == ListSortOrder.ASCENDING) {
+        ListMenuItem(com.simplefox.browser.ui.icons.Icons.Filled.ArrowUpward, stringResource(R.string.history_sort_ascending), sortOrder == ListSortOrder.ASCENDING) {
             onDismiss(); onSortAscending()
         }
-        ListMenuItem(androidx.compose.material.icons.Icons.Filled.ArrowDownward, stringResource(R.string.history_sort_descending), sortOrder == ListSortOrder.DESCENDING) {
+        ListMenuItem(com.simplefox.browser.ui.icons.Icons.Filled.ArrowDownward, stringResource(R.string.history_sort_descending), sortOrder == ListSortOrder.DESCENDING) {
             onDismiss(); onSortDescending()
         }
     }
@@ -78,15 +71,15 @@ fun SelectionOptionsMenu(
         containerColor = colors.popupBackground,
         border = null
     ) {
-        ListMenuItem(androidx.compose.material.icons.Icons.Filled.Check, stringResource(R.string.history_select_all), checked = false) {
+        ListMenuItem(com.simplefox.browser.ui.icons.Icons.Filled.Check, stringResource(R.string.history_select_all), checked = false) {
             onDismiss(); onSelectAll()
         }
         HorizontalDivider(color = colors.divider)
-        ListMenuItem(androidx.compose.material.icons.Icons.Filled.SwapVert, stringResource(R.string.history_invert_selection), checked = false) {
+        ListMenuItem(com.simplefox.browser.ui.icons.Icons.Filled.SwapVert, stringResource(R.string.history_invert_selection), checked = false) {
             onDismiss(); onInvertSelection()
         }
         HorizontalDivider(color = colors.divider)
-        ListMenuItem(androidx.compose.material.icons.Icons.Filled.Close, stringResource(R.string.history_deselect_all), checked = false) {
+        ListMenuItem(com.simplefox.browser.ui.icons.Icons.Filled.Close, stringResource(R.string.history_deselect_all), checked = false) {
             onDismiss(); onDeselectAll()
         }
     }
@@ -106,7 +99,7 @@ fun ListMenuItem(icon: androidx.compose.ui.graphics.vector.ImageVector, label: S
         trailingIcon = if (checked) {
             {
                 Icon(
-                    androidx.compose.material.icons.Icons.Filled.Check, contentDescription = null,
+                    com.simplefox.browser.ui.icons.Icons.Filled.Check, contentDescription = null,
                     tint = colors.primary, modifier = Modifier.size(18.dp)
                 )
             }
