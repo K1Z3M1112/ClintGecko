@@ -25,8 +25,8 @@ internal fun MainDialogsHost(
         com.simplefox.browser.browser.sheets.ContentPreviewSheet(request = req, activity = activity, onDismiss = { state.contentPreviewRequest = null })
     }
 
-    val hideStatusBarPref = remember { androidx.preference.PreferenceManager.getDefaultSharedPreferences(activity).getBoolean("hide_status_bar", false) }
-    val hideSystemNavigationPref = remember { androidx.preference.PreferenceManager.getDefaultSharedPreferences(activity).getBoolean("hide_system_navigation", false) }
+    val hideStatusBarPref = remember { com.simplefox.browser.util.PreferenceManager.getDefaultSharedPreferences(activity).getBoolean("hide_status_bar", false) }
+    val hideSystemNavigationPref = remember { com.simplefox.browser.util.PreferenceManager.getDefaultSharedPreferences(activity).getBoolean("hide_system_navigation", false) }
     com.simplefox.browser.ui.listscreen.ConfirmDialogHost(state.confirmDialogConfig, hideStatusBarPref, hideSystemNavigationPref) { state.confirmDialogConfig = null }
     state.conflictDialogRequest?.let { req ->
         com.simplefox.browser.downloads.DownloadConflictDialog(req, hideStatusBarPref, hideSystemNavigationPref) { state.conflictDialogRequest = null }

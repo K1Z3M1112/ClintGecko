@@ -16,8 +16,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
-import androidx.preference.PreferenceManager
-import com.caverock.androidsvg.SVG
+import com.simplefox.browser.util.PreferenceManager
+import com.simplefox.browser.util.SimpleSvg
 import com.simplefox.browser.bookmarks.BookmarkManager
 import com.simplefox.browser.settings.datasaver.DataSaverMode
 import com.simplefox.browser.ui.rememberClintFavicon
@@ -516,22 +516,12 @@ internal object HomeTileIconFetcher {
         } else decoded
     }.getOrNull()
 
-    private fun decodeVector(bytes: ByteArray): Bitmap? = runCatching {
-        val text = String(bytes, Charsets.UTF_8)
-        if (!text.contains("<svg", ignoreCase = true)) return@runCatching null
-        val svg = SVG.getFromString(text)
-        val width = svg.documentWidth
-        val height = svg.documentHeight
-        if (svg.documentViewBox == null) {
-            if (width <= 0f || height <= 0f) return@runCatching null
-            svg.setDocumentViewBox(0f, 0f, width, height)
+    private fun decodeVector(bytes: ByteArray): Bitmap? =
+        SimpleSvg.parse(String(bytes, Charsets.UTF_8))?.let { svg ->
+            val bitmap = Bitmap.createBitmap(MAX_SIDE, MAX_SIDE, Bitmap.Config.ARGB_8888)
+            svg.render(Canvas(bitmap), MAX_SIDE.toFloat(), MAX_SIDE.toFloat())
+            bitmap
         }
-        svg.setDocumentWidth(MAX_SIDE.toFloat())
-        svg.setDocumentHeight(MAX_SIDE.toFloat())
-        val bitmap = Bitmap.createBitmap(MAX_SIDE, MAX_SIDE, Bitmap.Config.ARGB_8888)
-        svg.renderToCanvas(Canvas(bitmap))
-        bitmap
-    }.getOrNull()
 }
 
 internal class HomeTileIconImage(val bitmap: ImageBitmap, val fill: Boolean)

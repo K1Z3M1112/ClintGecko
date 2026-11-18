@@ -2,7 +2,7 @@ package com.simplefox.browser.browser.webview
 
 import android.content.Context
 import android.net.Uri
-import androidx.preference.PreferenceManager
+import com.simplefox.browser.util.PreferenceManager
 import org.mozilla.geckoview.GeckoPreferenceController
 
 object SecureDns {

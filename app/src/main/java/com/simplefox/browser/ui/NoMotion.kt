@@ -40,14 +40,6 @@ fun animateColorAsState(
 ): State<Color> = rememberUpdatedState(targetValue)
 
 @Composable
-fun animateDpAsState(
-    targetValue: Dp,
-    animationSpec: AnimationSpec<Dp> = spring(),
-    label: String = "DpAnimation",
-    finishedListener: ((Dp) -> Unit)? = null
-): State<Dp> = rememberUpdatedState(targetValue)
-
-@Composable
 fun AnimatedVisibility(
     visible: Boolean,
     modifier: Modifier = Modifier,

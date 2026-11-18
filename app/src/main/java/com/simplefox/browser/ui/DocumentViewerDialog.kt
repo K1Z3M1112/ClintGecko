@@ -22,7 +22,8 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.simplefox.browser.R
 import com.simplefox.browser.ui.theme.LocalClintColors
-import io.noties.markwon.Markwon
+import android.text.method.LinkMovementMethod
+import com.simplefox.browser.util.SimpleMarkdown
 
 @Composable
 private fun DocumentViewerContent(state: DocumentViewerUiState) {
@@ -56,7 +57,8 @@ private fun DocumentViewerContent(state: DocumentViewerUiState) {
                 update = { tv ->
                     tv.setTextColor(onSurfaceArgb)
                     tv.setLinkTextColor(linkArgb)
-                    Markwon.create(tv.context).setMarkdown(tv, state.markdown.orEmpty())
+                    tv.movementMethod = LinkMovementMethod.getInstance()
+                    tv.text = SimpleMarkdown.render(state.markdown.orEmpty(), linkArgb)
                 }
             )
         }

@@ -7,7 +7,7 @@ import android.content.Context
 import android.os.Build
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.preference.PreferenceManager
+import com.simplefox.browser.util.PreferenceManager
 import com.simplefox.browser.browser.webview.ClintGecko
 import com.simplefox.browser.media.MediaPlaybackController
 import com.simplefox.browser.settings.datasaver.DataSaverMode

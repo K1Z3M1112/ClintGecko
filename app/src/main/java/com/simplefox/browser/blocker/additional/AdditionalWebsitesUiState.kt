@@ -27,9 +27,6 @@ class AdditionalWebsitesUiState {
     }
 }
 
-@Composable
-fun rememberAdditionalWebsitesUiState(): AdditionalWebsitesUiState = remember { AdditionalWebsitesUiState() }
-
 fun filterRules(rules: List<AdditionalWebsiteRule>, query: String): List<AdditionalWebsiteRule> {
     if (query.isBlank()) return rules
     return rules.filter { it.host.contains(query, ignoreCase = true) }

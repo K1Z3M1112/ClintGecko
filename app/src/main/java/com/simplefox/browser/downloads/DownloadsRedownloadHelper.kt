@@ -2,7 +2,7 @@ package com.simplefox.browser.downloads
 
 import android.net.Uri
 import android.widget.Toast
-import androidx.preference.PreferenceManager
+import com.simplefox.browser.util.PreferenceManager
 import com.simplefox.browser.R
 import com.simplefox.browser.settings.downloads.DownloadSettingsKeys
 import com.simplefox.browser.ui.showClintSnackbar
@@ -102,10 +102,6 @@ private fun DownloadsActivity.performRedownload(
 ) {
     fun startRedownload(effectiveUnmeteredOnly: Boolean) {
         if (DownloadFileHelper.isCustomLocationAccessible(this, locationMode, customLocationUri)) onDismiss()
-        if (item.isStream) {
-            ClintDownloadManager.enqueueStreamFromItem(this, item, filename, speedLimitBytesPerSec, locationMode, customLocationUri, categorizeEnabled, startPaused)
-            return
-        }
         val mega = item.mega
         if (mega != null) {
             ClintDownloadManager.enqueueMega(

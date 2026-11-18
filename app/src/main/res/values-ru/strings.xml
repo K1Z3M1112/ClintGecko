@@ -196,7 +196,6 @@
     <string name="search_bar_hint">Искать в %1$s или введите URL</string>
     <string name="default_label">По умолчанию</string>
     <string name="next">Далее \u2192</string>
-    <string name="get_started">Начать</string>
     <string name="setup_subtitle">Браузер для Android на основе Firefox со встроенным ADM, захватом медиа и расширениями</string>
     <string name="js_warning_title">Отключить JavaScript?</string>
     <string name="js_warning_message">Многие функции приложения зависят от JavaScript, включая веб-уведомления, режим ПК и режим чтения. Сайты также могут отображаться некорректно или вовсе не работать.\n\nВы уверены, что хотите его отключить?</string>
@@ -416,8 +415,6 @@
     <string name="crash_copy_template">Скопировать шаблон</string>
     <string name="crash_template_copied">Шаблон скопирован в буфер обмена</string>
     <string name="crash_open_github">Открыть GitHub Issues</string>
-    <string name="about_section_contact">КОНТАКТЫ</string>
-    <string name="about_contact_email">jhaiian@proton.me</string>
     <string name="about_section_libraries">ИСПОЛЬЗУЕМЫЕ БИБЛИОТЕКИ</string>
     <string name="about_library_geckoview_label">GeckoView от Mozilla</string>
     <string name="about_library_geckoview_license">Mozilla Public License 2.0 \u2197</string>
@@ -425,27 +422,15 @@
     <string name="about_library_androidx_label">AndroidX от Google</string>
     <string name="about_library_androidx_license">Apache License 2.0 \u2197</string>
     <string name="about_library_androidx_usage">Основные элементы интерфейса, настройки, параметры и управление жизненным циклом во всём приложении.</string>
-    <string name="about_library_markwon_label">Markwon от Noties</string>
-    <string name="about_library_markwon_license">Apache License 2.0 \u2197</string>
-    <string name="about_library_markwon_usage">Отображает содержимое в формате Markdown с GitHub внутри приложения.</string>
     <string name="about_library_okhttp_label">OkHttp от Square</string>
     <string name="about_library_okhttp_license">Apache License 2.0 \u2197</string>
     <string name="about_library_okhttp_usage">Обрабатывает сетевые запросы во всём приложении, включая проверку обновлений, просмотр документов, загрузку изображений в браузере, загрузки и многое другое.</string>
-    <string name="about_library_simplemagic_label">SimpleMagic от j256</string>
-    <string name="about_library_simplemagic_license">ISC License \u2197</string>
-    <string name="about_library_simplemagic_usage">Определяет MIME-тип файлов по содержимому при загрузке.</string>
     <string name="about_library_androidsvg_label">AndroidSVG от BigBadaboom</string>
     <string name="about_library_androidsvg_license">Apache License 2.0 \u2197</string>
     <string name="about_library_androidsvg_usage">Отображает SVG-изображения во всём приложении.</string>
     <string name="about_library_coroutines_label">Kotlin Coroutines от JetBrains</string>
     <string name="about_library_coroutines_license">Apache License 2.0 \u2197</string>
     <string name="about_library_coroutines_usage">Обеспечивает асинхронную и фоновую работу во всём приложении, например компиляцию списков фильтров и загрузки.</string>
-    <string name="about_library_bouncycastle_label">Bouncy Castle</string>
-    <string name="about_library_bouncycastle_license">Bouncy Castle License \u2197</string>
-    <string name="about_library_bouncycastle_usage">Обеспечивает вывод ключа Argon2id, используемый для преобразования пароля резервной копии в ключ шифрования.</string>
-    <string name="about_library_media3_label">AndroidX Media3</string>
-    <string name="about_library_media3_license">Apache License 2.0 \u2197</string>
-    <string name="about_library_media3_usage">Используется для объединения загруженных видео- и аудиодорожек в один файл.</string>
     <string name="about_linktree_url">jhaiian \u2197</string>
     <string name="open_in_app_dialog_title">Открыть в приложении?</string>
     <string name="open_in_app_dialog_message">%1$s хочет открыть %2$s.</string>
@@ -500,7 +485,6 @@
     <string name="download_dialog_file_size_fetching">Размер файла: получение\u2026</string>
     <string name="download_dialog_file_size_value">Размер файла: %1$s</string>
     <string name="download_dialog_file_size_unknown">Размер файла: неизвестен</string>
-    <string name="download_dialog_file_size_estimated">Размер файла: ~%1$s (приблизительно)</string>
     <string name="download_dialog_storage_value">Хранилище: %1$s / %2$s, свободно %3$s (%4$s%%)</string>
     <string name="download_dialog_storage_unavailable">Хранилище: недоступно</string>
     <string name="download_error_storage_title">Недостаточно места</string>
@@ -526,7 +510,6 @@
     <string name="download_update_link_dialog_fetch_failed">Не удалось получить ссылку</string>
     <string name="download_update_link_dialog_size_unverifiable">Не удалось проверить размер файла</string>
     <string name="download_update_link_dialog_size_mismatch">Размер файла не совпадает (%1$s против %2$s байт)</string>
-    <string name="download_update_link_dialog_not_a_manifest">Эта ссылка не ведёт на корректный плейлист потока</string>
     <string name="download_update_link_dialog_not_a_file">Эта ссылка открывает веб-страницу, а не файл</string>
     <string name="download_update_link_dialog_positive">Обновить</string>
     <string name="download_change_settings_dialog_title">Изменение настроек загрузки</string>
@@ -662,12 +645,7 @@
     <string name="download_status_failed_label">Ошибка</string>
     <string name="download_info_with_time">%1$s  \u2022  %2$s</string>
     <string name="download_error_unknown">Неизвестная ошибка</string>
-    <string name="download_error_playlist_unavailable">Не удалось получить плейлист видео. Возможно, он устарел — попробуйте определить медиа заново.</string>
-    <string name="download_error_stream_encryption_unsupported">Этот поток использует шифрование %1$s, которое SimpleFox не может расшифровать.</string>
-    <string name="download_error_stream_key_unavailable">Не удалось получить ключ для расшифровки этого потока. Возможно, он устарел — попробуйте определить медиа заново.</string>
     <string name="download_error_link_expired">Ссылка на загрузку истекла, пока файл был на паузе. Перезапустите загрузку, чтобы получить новую ссылку.</string>
-    <string name="download_error_mux_failed">Не удалось объединить загруженное видео и аудио в один файл.</string>
-    <string name="download_error_mux_failed_detail">Не удалось объединить загруженное видео и аудио в один файл: %1$s</string>
     <string name="download_error_saf_no_access">Нет доступа к выбранной папке загрузок</string>
     <string name="download_error_saf_not_writable">В выбранную папку загрузок нельзя записывать данные</string>
     <string name="download_location_invalid_title">Папка загрузок недоступна</string>
@@ -730,16 +708,9 @@
     <string name="download_concurrent_title">Одновременные загрузки</string>
     <string name="download_concurrent_desc">Сколько загрузок может выполняться одновременно. Остальные становятся в очередь и запускаются автоматически при освобождении слота.</string>
     <string name="download_concurrent_value_easter_egg">24 одновременные загрузки \uD83D\uDE08</string>
-    <string name="action_play">Воспроизвести</string>
     <string name="action_pause">Пауза</string>
     <string name="action_resume">Продолжить</string>
 
-    <string name="setup_default_browser_title">Браузер по умолчанию</string>
-    <string name="setup_default_browser_description">Сделайте SimpleFox браузером по умолчанию, чтобы ссылки из других приложений открывались в нём автоматически. Это полностью необязательно, вы можете изменить это в любой момент в настройках устройства.</string>
-    <string name="setup_default_browser_card_title">Сделать браузером по умолчанию</string>
-    <string name="setup_default_browser_card_desc">Нажмите кнопку ниже, чтобы сделать SimpleFox браузером по умолчанию</string>
-    <string name="setup_default_browser_set_button">Сделать браузером по умолчанию</string>
-    <string name="setup_default_browser_skip">Пропустить</string>
 
     <string name="document_viewer_error">Не удалось загрузить документ.\nПроверьте соединение и попробуйте снова.</string>
     <string name="document_viewer_privacy_policy_title">Политика конфиденциальности</string>
@@ -900,12 +871,6 @@
     <string name="setup_terms_agree">Я прочитал(а) и согласен(на) с Политикой конфиденциальности и Условиями использования</string>
     <string name="setup_terms_continue">Принять и продолжить</string>
 
-    <string name="setup_restore_title">Восстановить из резервной копии</string>
-    <string name="setup_restore_subtitle">Есть резервная копия SimpleFox? Восстановите её сейчас, чтобы вернуть свои настройки и данные, либо пропустите и настройте заново.</string>
-    <string name="setup_restore_card_title">Восстановить резервную копию</string>
-    <string name="setup_restore_card_desc">Выберите файл .clintbackup на вашем устройстве</string>
-    <string name="setup_restore_button">Восстановить резервную копию</string>
-    <string name="setup_restore_skip">Настроить заново</string>
 
     <string name="bookmarks_title">Закладки</string>
     <string name="content_desc_bookmark">Закладка</string>
@@ -1071,7 +1036,6 @@
 
     <string name="about_section_legal">ПРАВОВАЯ ИНФОРМАЦИЯ</string>
     <string name="about_legal_view">Просмотреть</string>
-    <string name="about_contact_email_label">Эл. почта</string>
 
     <string name="exit_confirmation_title">Подтверждение выхода</string>
     <string name="exit_confirmation_off">Выкл.</string>
@@ -1562,15 +1526,10 @@
     <string name="backup_password_hint">Любому, у кого есть этот файл, потребуется этот пароль для восстановления. Если вы забудете его, резервную копию восстановить не удастся.</string>
     <string name="backup_password_show">Показать пароль</string>
     <string name="backup_password_hide">Скрыть пароль</string>
-    <string name="backup_password_mismatch">Пароли не совпадают</string>
-    <string name="backup_password_too_short">Пароль должен содержать не менее 6 символов</string>
     <string name="backup_action_create">Создать резервную копию</string>
 
     <string name="backup_auth_title">Требуется аутентификация</string>
-    <string name="backup_auth_subtitle_backup">Подтвердите личность, чтобы создать резервную копию</string>
-    <string name="backup_auth_subtitle_restore">Подтвердите личность, чтобы восстановить резервную копию</string>
     <string name="backup_auth_unavailable_title">Требуется блокировка экрана</string>
-    <string name="backup_auth_unavailable_message">Настройте блокировку экрана (PIN-код, графический ключ, пароль или биометрию) в настройках устройства, чтобы использовать резервное копирование и восстановление.</string>
 
     <string name="backup_progress_creating">Создание резервной копии…</string>
     <string name="backup_progress_reading">Чтение файла резервной копии…</string>
@@ -2088,18 +2047,12 @@
     <string name="custom_theme_name_duplicate">Тема с таким названием уже существует</string>
     <string name="custom_theme_description_label">Описание (необязательно)</string>
     <string name="accent_section_presets">Готовые темы</string>
-    <string name="download_error_mux_missing_audio">В объединённом файле нет аудиодорожки. Повторите попытку, чтобы объединить заново без повторной загрузки.</string>
-    <string name="download_error_mux_missing_video">В объединённом файле нет видеодорожки. Повторите попытку, чтобы объединить заново без повторной загрузки.</string>
-    <string name="download_error_mux_unreadable">Не удалось прочитать объединённый файл. Повторите попытку, чтобы объединить заново без повторной загрузки.</string>
     <string name="download_stage_audio">Загрузка аудио</string>
     <string name="download_stage_merging">Объединение видео и аудио&#8230;</string>
     <string name="download_stage_merging_progress">Объединение видео и аудио&#8230; %1$d%%</string>
     <string name="download_stage_video">Загрузка видео</string>
     <string name="download_status_muxing_progress">Завершение обработки видео&#8230; %1$d%%</string>
     <string name="download_storage_permission_denied_message">Без доступа к хранилищу загрузки нельзя сохранить в папку «Загрузки». Разрешите доступ в настройках приложения или выберите другую папку для загрузок в настройках загрузок.</string>
-    <string name="download_update_link_dialog_video_label">Ссылка на видео</string>
-    <string name="download_update_link_dialog_audio_label">Ссылка на аудио</string>
-    <string name="download_update_link_dialog_segments_mismatch">Этот плейлист не совпадает с исходным (сегментов: %1$d, было: %2$d)</string>
     <string name="menu_cookies_control">Управление cookie</string>
     <string name="cookies_control_title">Управление cookie</string>
     <string name="cookies_control_cookie_count">Сохранено cookie: %1$d</string>

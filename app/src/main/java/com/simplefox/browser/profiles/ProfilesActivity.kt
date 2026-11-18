@@ -5,7 +5,7 @@ import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.mutableStateListOf
 import androidx.core.view.WindowCompat
-import androidx.preference.PreferenceManager
+import com.simplefox.browser.util.PreferenceManager
 import com.simplefox.browser.R
 import com.simplefox.browser.base.ClintActivity
 import com.simplefox.browser.shortcuts.ShortcutStore

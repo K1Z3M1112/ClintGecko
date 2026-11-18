@@ -188,7 +188,6 @@
     <string name="search_bar_hint">Search %1$s or type URL</string>
     <string name="default_label">Default</string>
     <string name="next">Next \u2192</string>
-    <string name="get_started">Get Started</string>
     <string name="setup_subtitle">Android Firefox-based browser with ADM, media capture, and extensions</string>
     <string name="js_warning_title">Disable JavaScript?</string>
     <string name="js_warning_message">Many app features rely on JavaScript, including web notifications, desktop mode, and reader mode. Websites may also break or display incorrectly.\n\nAre you sure you want to turn it off?</string>
@@ -408,8 +407,6 @@
     <string name="crash_copy_template">Copy template</string>
     <string name="crash_template_copied">Template copied to clipboard</string>
     <string name="crash_open_github">Open GitHub Issues</string>
-    <string name="about_section_contact">CONTACT</string>
-    <string name="about_contact_email">jhaiian@proton.me</string>
     <string name="about_section_libraries">USED LIBRARIES</string>
     <string name="about_library_geckoview_label">GeckoView by Mozilla</string>
     <string name="about_library_geckoview_license">Mozilla Public License 2.0 \u2197</string>
@@ -417,27 +414,15 @@
     <string name="about_library_androidx_label">AndroidX by Google</string>
     <string name="about_library_androidx_license">Apache License 2.0 \u2197</string>
     <string name="about_library_androidx_usage">Core UI components, settings, preferences, and lifecycle management throughout the app.</string>
-    <string name="about_library_markwon_label">Markwon by Noties</string>
-    <string name="about_library_markwon_license">Apache License 2.0 \u2197</string>
-    <string name="about_library_markwon_usage">Renders Markdown content from GitHub to display in the app.</string>
     <string name="about_library_okhttp_label">OkHttp by Square</string>
     <string name="about_library_okhttp_license">Apache License 2.0 \u2197</string>
     <string name="about_library_okhttp_usage">Handles network requests throughout the app, including update checking, document viewers, browser image loading, and downloads, and much more.</string>
-    <string name="about_library_simplemagic_label">SimpleMagic by j256</string>
-    <string name="about_library_simplemagic_license">ISC License \u2197</string>
-    <string name="about_library_simplemagic_usage">Detects file MIME types from content bytes when downloading files.</string>
     <string name="about_library_androidsvg_label">AndroidSVG by BigBadaboom</string>
     <string name="about_library_androidsvg_license">Apache License 2.0 \u2197</string>
     <string name="about_library_androidsvg_usage">Renders SVG images throughout the app.</string>
     <string name="about_library_coroutines_label">Kotlin Coroutines by JetBrains</string>
     <string name="about_library_coroutines_license">Apache License 2.0 \u2197</string>
     <string name="about_library_coroutines_usage">Powers asynchronous and background work throughout the app, such as filter list compiling and downloads.</string>
-    <string name="about_library_bouncycastle_label">Bouncy Castle</string>
-    <string name="about_library_bouncycastle_license">Bouncy Castle License \u2197</string>
-    <string name="about_library_bouncycastle_usage">Provides Argon2id key derivation used to turn your backup password into an encryption key.</string>
-    <string name="about_library_media3_label">AndroidX Media3</string>
-    <string name="about_library_media3_license">Apache License 2.0 \u2197</string>
-    <string name="about_library_media3_usage">Used to remux downloaded video and audio tracks into a single file.</string>
     <string name="about_linktree_url">jhaiian \u2197</string>
     <string name="open_in_app_dialog_title">Open in app?</string>
     <string name="open_in_app_dialog_message">%1$s wants to open %2$s.</string>
@@ -492,7 +477,6 @@
     <string name="download_dialog_file_size_fetching">File Size: Fetching\u2026</string>
     <string name="download_dialog_file_size_value">File Size: %1$s</string>
     <string name="download_dialog_file_size_unknown">File Size: Unknown</string>
-    <string name="download_dialog_file_size_estimated">File Size: ~%1$s (estimated)</string>
     <string name="download_dialog_storage_value">Storage: %1$s / %2$s, %3$s (%4$s%%) free</string>
     <string name="download_dialog_storage_unavailable">Storage: Unavailable</string>
     <string name="download_error_storage_title">Not Enough Storage</string>
@@ -518,7 +502,6 @@
     <string name="download_update_link_dialog_fetch_failed">Failed to fetch link</string>
     <string name="download_update_link_dialog_size_unverifiable">File size could not be verified</string>
     <string name="download_update_link_dialog_size_mismatch">File size does not match (%1$s vs %2$s bytes)</string>
-    <string name="download_update_link_dialog_not_a_manifest">This link doesn\'t point to a valid stream playlist</string>
     <string name="download_update_link_dialog_not_a_file">This link opens a web page, not the file</string>
     <string name="download_update_link_dialog_positive">Update</string>
     <string name="download_change_settings_dialog_title">Change Download Settings</string>
@@ -654,12 +637,7 @@
     <string name="download_status_failed_label">Failed</string>
     <string name="download_info_with_time">%1$s  \u2022  %2$s</string>
     <string name="download_error_unknown">Unknown error</string>
-    <string name="download_error_playlist_unavailable">Could not fetch the video playlist. It may have expired — try re-detecting the media.</string>
-    <string name="download_error_stream_encryption_unsupported">This stream uses %1$s encryption, which SimpleFox can\'t decrypt.</string>
-    <string name="download_error_stream_key_unavailable">Couldn\'t get the key needed to decrypt this stream. It may have expired — try re-detecting the media.</string>
     <string name="download_error_link_expired">The download link expired while paused. Restart the download to get a fresh link.</string>
-    <string name="download_error_mux_failed">Failed to combine the downloaded video and audio into one file.</string>
-    <string name="download_error_mux_failed_detail">Failed to combine the downloaded video and audio into one file: %1$s</string>
     <string name="download_error_saf_no_access">Cannot access the selected download folder</string>
     <string name="download_error_saf_not_writable">Selected download folder is not writable</string>
     <string name="download_location_invalid_title">Download folder unavailable</string>
@@ -722,16 +700,9 @@
     <string name="download_concurrent_title">Concurrent Downloads</string>
     <string name="download_concurrent_desc">How many downloads can run at once. Others are queued and start automatically when a slot opens up.</string>
     <string name="download_concurrent_value_easter_egg">24 simultaneous downloads \uD83D\uDE08</string>
-    <string name="action_play">Play</string>
     <string name="action_pause">Pause</string>
     <string name="action_resume">Resume</string>
 
-    <string name="setup_default_browser_title">Default Browser</string>
-    <string name="setup_default_browser_description">Make SimpleFox your default browser so links from other apps open here automatically. This is completely optional, you can change it at any time in your device settings.</string>
-    <string name="setup_default_browser_card_title">Set as Default Browser</string>
-    <string name="setup_default_browser_card_desc">Tap the button below to set SimpleFox as your default browser</string>
-    <string name="setup_default_browser_set_button">Set as Default Browser</string>
-    <string name="setup_default_browser_skip">Skip</string>
 
     <string name="document_viewer_error">Couldn\u2019t load document.\nPlease check your connection and try again.</string>
     <string name="document_viewer_privacy_policy_title">Privacy Policy</string>
@@ -892,12 +863,6 @@
     <string name="setup_terms_agree">I have read and agree to the Privacy Policy and Terms of Service</string>
     <string name="setup_terms_continue">Agree &amp; Continue</string>
 
-    <string name="setup_restore_title">Restore from Backup</string>
-    <string name="setup_restore_subtitle">Have a SimpleFox backup? Restore it now to bring back your settings and data, or skip to set up as new.</string>
-    <string name="setup_restore_card_title">Restore Backup</string>
-    <string name="setup_restore_card_desc">Choose a .clintbackup file from your device</string>
-    <string name="setup_restore_button">Restore Backup</string>
-    <string name="setup_restore_skip">Set Up as New</string>
 
     <string name="bookmarks_title">Bookmarks</string>
     <string name="content_desc_bookmark">Bookmark</string>
@@ -1053,7 +1018,6 @@
 
     <string name="about_section_legal">LEGAL</string>
     <string name="about_legal_view">View</string>
-    <string name="about_contact_email_label">Email</string>
 
     <string name="exit_confirmation_title">Exit Confirmation</string>
     <string name="exit_confirmation_off">Off</string>
@@ -1526,15 +1490,10 @@
     <string name="backup_password_hint">Anyone with this file will need this password to restore it. If you forget it, your backup can\'t be recovered.</string>
     <string name="backup_password_show">Show password</string>
     <string name="backup_password_hide">Hide password</string>
-    <string name="backup_password_mismatch">Passwords do not match</string>
-    <string name="backup_password_too_short">Password must be at least 6 characters</string>
     <string name="backup_action_create">Create Backup</string>
 
     <string name="backup_auth_title">Authentication Required</string>
-    <string name="backup_auth_subtitle_backup">Confirm it\'s you to create a backup</string>
-    <string name="backup_auth_subtitle_restore">Confirm it\'s you to restore a backup</string>
     <string name="backup_auth_unavailable_title">Screen Lock Required</string>
-    <string name="backup_auth_unavailable_message">Set up a screen lock (PIN, pattern, password, or biometrics) in your device settings to use Backup &amp; Restore.</string>
 
     <string name="backup_progress_creating">Creating backup…</string>
     <string name="backup_progress_reading">Reading backup file…</string>
@@ -2058,18 +2017,12 @@
     <string name="custom_theme_name_duplicate">A theme with this name already exists</string>
     <string name="custom_theme_description_label">Description (optional)</string>
     <string name="accent_section_presets">Presets</string>
-    <string name="download_error_mux_missing_audio">The merged file has no audio track. Retry to merge again without downloading.</string>
-    <string name="download_error_mux_missing_video">The merged file has no video track. Retry to merge again without downloading.</string>
-    <string name="download_error_mux_unreadable">The merged file could not be read. Retry to merge again without downloading.</string>
     <string name="download_stage_audio">Downloading audio</string>
     <string name="download_stage_merging">Merging video and audio&#8230;</string>
     <string name="download_stage_merging_progress">Merging video and audio&#8230; %1$d%%</string>
     <string name="download_stage_video">Downloading video</string>
     <string name="download_status_muxing_progress">Muxing&#8230; %1$d%%</string>
     <string name="download_storage_permission_denied_message">Downloads can\'t be saved to your Downloads folder without storage access. You can allow it in the app settings, or choose a different download folder in the download settings.</string>
-    <string name="download_update_link_dialog_video_label">Video link</string>
-    <string name="download_update_link_dialog_audio_label">Audio link</string>
-    <string name="download_update_link_dialog_segments_mismatch">This playlist doesn\'t match the original (%1$d segments vs %2$d)</string>
     <string name="menu_cookies_control">Cookies Control</string>
     <string name="cookies_control_title">Cookies Control</string>
     <string name="cookies_control_cookie_count">Cookies stored: %1$d</string>

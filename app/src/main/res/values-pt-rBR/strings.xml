@@ -188,7 +188,6 @@
     <string name="search_bar_hint">Pesquise no %1$s ou digite um URL</string>
     <string name="default_label">Padrão</string>
     <string name="next">Avançar →</string>
-    <string name="get_started">Começar</string>
     <string name="setup_subtitle">Navegador Android baseado no Firefox, com ADM, captura de mídia e extensões</string>
     <string name="js_warning_title">Desativar o JavaScript?</string>
     <string name="js_warning_message">Muitos recursos do app dependem do JavaScript, como notificações da web, modo desktop e modo de leitura. Os sites também podem quebrar ou aparecer de forma incorreta.\n\nTem certeza de que quer desativá-lo?</string>
@@ -408,8 +407,6 @@
     <string name="crash_copy_template">Copiar modelo</string>
     <string name="crash_template_copied">Modelo copiado para a área de transferência</string>
     <string name="crash_open_github">Abrir GitHub Issues</string>
-    <string name="about_section_contact">CONTATO</string>
-    <string name="about_contact_email">jhaiian@proton.me</string>
     <string name="about_section_libraries">BIBLIOTECAS USADAS</string>
     <string name="about_library_geckoview_label">GeckoView, da Mozilla</string>
     <string name="about_library_geckoview_license">Mozilla Public License 2.0 ↗</string>
@@ -417,27 +414,15 @@
     <string name="about_library_androidx_label">AndroidX, do Google</string>
     <string name="about_library_androidx_license">Apache License 2.0 ↗</string>
     <string name="about_library_androidx_usage">Componentes principais da interface, configurações, preferências e gerenciamento de ciclo de vida em todo o app.</string>
-    <string name="about_library_markwon_label">Markwon, da Noties</string>
-    <string name="about_library_markwon_license">Apache License 2.0 ↗</string>
-    <string name="about_library_markwon_usage">Renderiza o conteúdo em Markdown do GitHub para exibição no app.</string>
     <string name="about_library_okhttp_label">OkHttp, da Square</string>
     <string name="about_library_okhttp_license">Apache License 2.0 ↗</string>
     <string name="about_library_okhttp_usage">Cuida das solicitações de rede em todo o app, incluindo verificação de atualizações, visualizadores de documentos, carregamento de imagens no navegador, downloads e muito mais.</string>
-    <string name="about_library_simplemagic_label">SimpleMagic, de j256</string>
-    <string name="about_library_simplemagic_license">ISC License ↗</string>
-    <string name="about_library_simplemagic_usage">Detecta o tipo MIME dos arquivos a partir do conteúdo durante os downloads.</string>
     <string name="about_library_androidsvg_label">AndroidSVG, de BigBadaboom</string>
     <string name="about_library_androidsvg_license">Apache License 2.0 ↗</string>
     <string name="about_library_androidsvg_usage">Renderiza imagens SVG em todo o app.</string>
     <string name="about_library_coroutines_label">Kotlin Coroutines, da JetBrains</string>
     <string name="about_library_coroutines_license">Apache License 2.0 ↗</string>
     <string name="about_library_coroutines_usage">Executa as tarefas assíncronas e em segundo plano do app, como a compilação de listas de filtros e os downloads.</string>
-    <string name="about_library_bouncycastle_label">Bouncy Castle</string>
-    <string name="about_library_bouncycastle_license">Bouncy Castle License ↗</string>
-    <string name="about_library_bouncycastle_usage">Fornece a derivação de chave Argon2id usada para transformar a senha do seu backup em uma chave de criptografia.</string>
-    <string name="about_library_media3_label">AndroidX Media3</string>
-    <string name="about_library_media3_license">Apache License 2.0 ↗</string>
-    <string name="about_library_media3_usage">Usada para juntar as faixas de vídeo e áudio baixadas em um único arquivo.</string>
     <string name="about_linktree_url">jhaiian ↗</string>
     <string name="open_in_app_dialog_title">Abrir no app?</string>
     <string name="open_in_app_dialog_message">%1$s quer abrir %2$s.</string>
@@ -492,7 +477,6 @@
     <string name="download_dialog_file_size_fetching">Tamanho do arquivo: buscando…</string>
     <string name="download_dialog_file_size_value">Tamanho do arquivo: %1$s</string>
     <string name="download_dialog_file_size_unknown">Tamanho do arquivo: desconhecido</string>
-    <string name="download_dialog_file_size_estimated">Tamanho do arquivo: ~%1$s (estimado)</string>
     <string name="download_dialog_storage_value">Armazenamento: %1$s / %2$s, %3$s (%4$s%%) livres</string>
     <string name="download_dialog_storage_unavailable">Armazenamento: indisponível</string>
     <string name="download_error_storage_title">Armazenamento insuficiente</string>
@@ -518,7 +502,6 @@
     <string name="download_update_link_dialog_fetch_failed">Não foi possível buscar o link</string>
     <string name="download_update_link_dialog_size_unverifiable">Não foi possível verificar o tamanho do arquivo</string>
     <string name="download_update_link_dialog_size_mismatch">O tamanho do arquivo não confere (%1$s vs. %2$s bytes)</string>
-    <string name="download_update_link_dialog_not_a_manifest">Este link não leva a uma playlist de streaming válida</string>
     <string name="download_update_link_dialog_not_a_file">Este link abre uma página da web, não o arquivo</string>
     <string name="download_update_link_dialog_positive">Atualizar</string>
     <string name="download_change_settings_dialog_title">Alterar configurações do download</string>
@@ -654,12 +637,7 @@
     <string name="download_status_failed_label">Falhou</string>
     <string name="download_info_with_time">%1$s  •  %2$s</string>
     <string name="download_error_unknown">Erro desconhecido</string>
-    <string name="download_error_playlist_unavailable">Não foi possível buscar a playlist do vídeo. Ela pode ter expirado — tente detectar a mídia de novo.</string>
-    <string name="download_error_stream_encryption_unsupported">Este stream usa criptografia %1$s, que o SimpleFox não consegue descriptografar.</string>
-    <string name="download_error_stream_key_unavailable">Não foi possível obter a chave para descriptografar este stream. Ela pode ter expirado — tente detectar a mídia de novo.</string>
     <string name="download_error_link_expired">O link de download expirou enquanto estava pausado. Reinicie o download para obter um link novo.</string>
-    <string name="download_error_mux_failed">Não foi possível juntar o vídeo e o áudio baixados em um único arquivo.</string>
-    <string name="download_error_mux_failed_detail">Não foi possível juntar o vídeo e o áudio baixados em um único arquivo: %1$s</string>
     <string name="download_error_saf_no_access">Não é possível acessar a pasta de download selecionada</string>
     <string name="download_error_saf_not_writable">Não é possível gravar na pasta de download selecionada</string>
     <string name="download_location_invalid_title">Pasta de download indisponível</string>
@@ -722,16 +700,9 @@
     <string name="download_concurrent_title">Downloads simultâneos</string>
     <string name="download_concurrent_desc">Quantos downloads podem rodar ao mesmo tempo. Os demais ficam na fila e começam automaticamente quando uma vaga é liberada.</string>
     <string name="download_concurrent_value_easter_egg">24 downloads simultâneos 😈</string>
-    <string name="action_play">Reproduzir</string>
     <string name="action_pause">Pausar</string>
     <string name="action_resume">Retomar</string>
 
-    <string name="setup_default_browser_title">Navegador padrão</string>
-    <string name="setup_default_browser_description">Defina o SimpleFox como navegador padrão para que os links de outros apps abram aqui automaticamente. Isso é totalmente opcional, e você pode mudar a qualquer momento nas configurações do dispositivo.</string>
-    <string name="setup_default_browser_card_title">Definir como navegador padrão</string>
-    <string name="setup_default_browser_card_desc">Toque no botão abaixo para definir o SimpleFox como seu navegador padrão</string>
-    <string name="setup_default_browser_set_button">Definir como navegador padrão</string>
-    <string name="setup_default_browser_skip">Pular</string>
 
     <string name="document_viewer_error">Não foi possível carregar o documento.\nVerifique sua conexão e tente novamente.</string>
     <string name="document_viewer_privacy_policy_title">Política de Privacidade</string>
@@ -892,12 +863,6 @@
     <string name="setup_terms_agree">Li e concordo com a Política de Privacidade e os Termos de Serviço</string>
     <string name="setup_terms_continue">Concordar e continuar</string>
 
-    <string name="setup_restore_title">Restaurar backup</string>
-    <string name="setup_restore_subtitle">Tem um backup do SimpleFox? Restaure agora para recuperar suas configurações e dados, ou pule para configurar como novo.</string>
-    <string name="setup_restore_card_title">Restaurar backup</string>
-    <string name="setup_restore_card_desc">Escolha um arquivo .clintbackup do seu dispositivo</string>
-    <string name="setup_restore_button">Restaurar backup</string>
-    <string name="setup_restore_skip">Configurar como novo</string>
 
     <string name="bookmarks_title">Favoritos</string>
     <string name="content_desc_bookmark">Favorito</string>
@@ -1053,7 +1018,6 @@
 
     <string name="about_section_legal">JURÍDICO</string>
     <string name="about_legal_view">Ver</string>
-    <string name="about_contact_email_label">E-mail</string>
 
     <string name="exit_confirmation_title">Confirmação de saída</string>
     <string name="exit_confirmation_off">Desativada</string>
@@ -1500,15 +1464,10 @@
     <string name="backup_password_hint">Quem tiver este arquivo vai precisar desta senha para restaurá-lo. Se você esquecer a senha, não será possível recuperar o backup.</string>
     <string name="backup_password_show">Mostrar senha</string>
     <string name="backup_password_hide">Ocultar senha</string>
-    <string name="backup_password_mismatch">As senhas não são iguais</string>
-    <string name="backup_password_too_short">A senha precisa ter pelo menos 6 caracteres</string>
     <string name="backup_action_create">Criar backup</string>
 
     <string name="backup_auth_title">Autenticação necessária</string>
-    <string name="backup_auth_subtitle_backup">Confirme que é você para criar um backup</string>
-    <string name="backup_auth_subtitle_restore">Confirme que é você para restaurar um backup</string>
     <string name="backup_auth_unavailable_title">Bloqueio de tela necessário</string>
-    <string name="backup_auth_unavailable_message">Configure um bloqueio de tela (PIN, padrão, senha ou biometria) nas configurações do dispositivo para usar o Backup e restauração.</string>
 
     <string name="backup_progress_creating">Criando backup…</string>
     <string name="backup_progress_reading">Lendo arquivo de backup…</string>
@@ -2026,18 +1985,12 @@
     <string name="custom_theme_name_duplicate">Já existe um tema com este nome</string>
     <string name="custom_theme_description_label">Descrição (opcional)</string>
     <string name="accent_section_presets">Predefinições</string>
-    <string name="download_error_mux_missing_audio">O arquivo combinado não tem faixa de áudio. Tente de novo para combinar outra vez sem baixar.</string>
-    <string name="download_error_mux_missing_video">O arquivo combinado não tem faixa de vídeo. Tente de novo para combinar outra vez sem baixar.</string>
-    <string name="download_error_mux_unreadable">Não foi possível ler o arquivo combinado. Tente de novo para combinar outra vez sem baixar.</string>
     <string name="download_stage_audio">Baixando áudio</string>
     <string name="download_stage_merging">Juntando vídeo e áudio&#8230;</string>
     <string name="download_stage_merging_progress">Juntando vídeo e áudio&#8230; %1$d%%</string>
     <string name="download_stage_video">Baixando vídeo</string>
     <string name="download_status_muxing_progress">Juntando vídeo e áudio&#8230; %1$d%%</string>
     <string name="download_storage_permission_denied_message">Sem acesso ao armazenamento, os downloads não podem ser salvos na pasta Downloads. Você pode permitir o acesso nas configurações do app ou escolher outra pasta de download nas configurações de download.</string>
-    <string name="download_update_link_dialog_video_label">Link do vídeo</string>
-    <string name="download_update_link_dialog_audio_label">Link do áudio</string>
-    <string name="download_update_link_dialog_segments_mismatch">Esta playlist não corresponde à original (%1$d segmentos vs. %2$d)</string>
     <string name="menu_cookies_control">Controle de cookies</string>
     <string name="cookies_control_title">Controle de cookies</string>
     <string name="cookies_control_cookie_count">Cookies armazenados: %1$d</string>

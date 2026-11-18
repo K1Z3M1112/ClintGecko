@@ -111,7 +111,7 @@ fun DownloadRequestDialog(
 ) {
     val context = LocalContext.current
     val colors = LocalClintColors.current
-    val prefs = remember { androidx.preference.PreferenceManager.getDefaultSharedPreferences(context) }
+    val prefs = remember { com.simplefox.browser.util.PreferenceManager.getDefaultSharedPreferences(context) }
     val keyboardController = LocalSoftwareKeyboardController.current
     val filenameFocusRequester = remember { FocusRequester() }
 

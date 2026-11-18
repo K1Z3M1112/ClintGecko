@@ -482,7 +482,6 @@ internal fun buildSettingsSearchEntries(context: Context): List<SettingsSearchEn
         item(R.string.about_section_license)
         item(R.string.document_viewer_privacy_policy_title, section = R.string.about_section_legal)
         item(R.string.document_viewer_terms_title, section = R.string.about_section_legal)
-        item(R.string.about_section_contact, extras = listOf(R.string.about_contact_email_label))
     }
 }
 

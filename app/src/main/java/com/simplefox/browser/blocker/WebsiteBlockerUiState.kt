@@ -96,6 +96,3 @@ class WebsiteBlockerUiState {
         selectedIds = emptySet()
     }
 }
-
-@Composable
-fun rememberWebsiteBlockerUiState(): WebsiteBlockerUiState = remember { WebsiteBlockerUiState() }

@@ -20,7 +20,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Code
 import androidx.compose.material.icons.filled.ContentCopy
-import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.Favorite
@@ -66,20 +65,13 @@ import com.simplefox.browser.ui.theme.LocalClintColors
 private const val AUTHOR_URL = "https://linktr.ee/jhaiian"
 private const val KEEP_ANDROID_OPEN_URL = "https://keepandroidopen.org"
 private const val LICENSE_URL = "https://www.gnu.org/licenses/gpl-3.0.html"
-private const val CONTACT_EMAIL_URL = "mailto:jhaiian@proton.me"
 private const val APACHE_2_LICENSE_URL = "https://www.apache.org/licenses/LICENSE-2.0.txt"
 private const val GECKOVIEW_URL = "https://mozilla.github.io/geckoview/"
 private const val MPL_2_LICENSE_URL = "https://www.mozilla.org/MPL/2.0/"
-private const val MARKWON_URL = "https://github.com/noties/Markwon"
 private const val ANDROIDX_URL = "https://developer.android.com/jetpack/androidx"
 private const val OKHTTP_URL = "https://github.com/square/okhttp"
-private const val SIMPLEMAGIC_URL = "https://github.com/j256/simplemagic"
-private const val SIMPLEMAGIC_LICENSE_URL = "https://opensource.org/licenses/ISC"
 private const val ANDROIDSVG_URL = "https://github.com/BigBadaboom/androidsvg"
 private const val COROUTINES_URL = "https://github.com/Kotlin/kotlinx.coroutines"
-private const val BOUNCYCASTLE_URL = "https://www.bouncycastle.org"
-private const val BOUNCYCASTLE_LICENSE_URL = "https://www.bouncycastle.org/licence.html"
-private const val MEDIA3_URL = "https://developer.android.com/guide/topics/media/media3"
 
 private class AboutLibrary(
     val label: Int, val license: Int, val usage: Int, val url: String, val licenseUrl: String
@@ -88,13 +80,9 @@ private class AboutLibrary(
 private val aboutLibraries = listOf(
     AboutLibrary(R.string.about_library_geckoview_label, R.string.about_library_geckoview_license, R.string.about_library_geckoview_usage, GECKOVIEW_URL, MPL_2_LICENSE_URL),
     AboutLibrary(R.string.about_library_androidx_label, R.string.about_library_androidx_license, R.string.about_library_androidx_usage, ANDROIDX_URL, APACHE_2_LICENSE_URL),
-    AboutLibrary(R.string.about_library_markwon_label, R.string.about_library_markwon_license, R.string.about_library_markwon_usage, MARKWON_URL, APACHE_2_LICENSE_URL),
     AboutLibrary(R.string.about_library_okhttp_label, R.string.about_library_okhttp_license, R.string.about_library_okhttp_usage, OKHTTP_URL, APACHE_2_LICENSE_URL),
-    AboutLibrary(R.string.about_library_simplemagic_label, R.string.about_library_simplemagic_license, R.string.about_library_simplemagic_usage, SIMPLEMAGIC_URL, SIMPLEMAGIC_LICENSE_URL),
     AboutLibrary(R.string.about_library_androidsvg_label, R.string.about_library_androidsvg_license, R.string.about_library_androidsvg_usage, ANDROIDSVG_URL, APACHE_2_LICENSE_URL),
     AboutLibrary(R.string.about_library_coroutines_label, R.string.about_library_coroutines_license, R.string.about_library_coroutines_usage, COROUTINES_URL, APACHE_2_LICENSE_URL),
-    AboutLibrary(R.string.about_library_bouncycastle_label, R.string.about_library_bouncycastle_license, R.string.about_library_bouncycastle_usage, BOUNCYCASTLE_URL, BOUNCYCASTLE_LICENSE_URL),
-    AboutLibrary(R.string.about_library_media3_label, R.string.about_library_media3_license, R.string.about_library_media3_usage, MEDIA3_URL, APACHE_2_LICENSE_URL)
 )
 
 @Composable
@@ -356,10 +344,6 @@ fun AboutScreen(
             AboutLinkRow(stringResource(R.string.document_viewer_privacy_policy_title), stringResource(R.string.about_legal_view), colors, onPrivacyPolicyClick)
             AboutThinDivider(colors.surfaceVariant)
             AboutLinkRow(stringResource(R.string.document_viewer_terms_title), stringResource(R.string.about_legal_view), colors, onTermsClick)
-        }
-
-        AboutCard(stringResource(R.string.about_section_contact), Icons.Filled.Email, colors) {
-            AboutLinkRow(stringResource(R.string.about_contact_email_label), stringResource(R.string.about_contact_email), colors, { onLinkClick(CONTACT_EMAIL_URL) })
         }
 
         AboutCard(

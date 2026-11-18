@@ -2,7 +2,7 @@ package com.simplefox.browser.downloads
 
 import android.content.Context
 import android.content.SharedPreferences
-import androidx.preference.PreferenceManager
+import com.simplefox.browser.util.PreferenceManager
 import com.simplefox.browser.settings.downloads.DownloadSettingsKeys
 import com.simplefox.browser.util.formatFileSize
 import kotlinx.coroutines.CompletableDeferred

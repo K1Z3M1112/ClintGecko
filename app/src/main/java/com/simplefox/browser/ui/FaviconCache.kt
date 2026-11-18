@@ -7,7 +7,7 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Base64
 import android.util.LruCache
-import androidx.preference.PreferenceManager
+import com.simplefox.browser.util.PreferenceManager
 import com.simplefox.browser.settings.datasaver.DataSaverMode
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream

@@ -15,20 +15,6 @@ import com.simplefox.browser.ui.listscreen.ListMenuItem
 import com.simplefox.browser.ui.listscreen.PopupShape
 import com.simplefox.browser.ui.theme.LocalClintColors
 
-data class UpdateProgressUi(
-    val title: String,
-    val totalCount: Int,
-    val processedCount: Int = 0,
-    val statusText: String = "",
-    val currentListName: String = ""
-)
-
-data class UpdateResultUi(
-    val title: String,
-    val message: String,
-    val onCompile: (() -> Unit)? = null
-)
-
 fun formatElapsedSeconds(totalSeconds: Long): String {
     val m = totalSeconds / 60L
     val s = totalSeconds % 60L

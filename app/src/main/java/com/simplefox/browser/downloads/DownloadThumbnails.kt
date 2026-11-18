@@ -22,7 +22,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.graphics.scale
-import com.caverock.androidsvg.SVG
+import com.simplefox.browser.util.SimpleSvg
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
@@ -201,19 +201,8 @@ internal object DownloadThumbnailLoader {
     }
 
     private fun decodeSvg(context: Context, file: File?, uri: Uri?, sizePx: Int): Bitmap? {
-        val svg = open(context, file, uri)?.use { SVG.getFromInputStream(it) } ?: return null
-        val vb = svg.documentViewBox
-        val rawW = vb?.width()?.takeIf { it > 0f } ?: svg.documentWidth.takeIf { it > 0f } ?: sizePx.toFloat()
-        val rawH = vb?.height()?.takeIf { it > 0f } ?: svg.documentHeight.takeIf { it > 0f } ?: sizePx.toFloat()
-        if (vb == null) svg.setDocumentViewBox(0f, 0f, rawW, rawH)
-        val scale = sizePx / maxOf(rawW, rawH)
-        val width = (rawW * scale).toInt().coerceAtLeast(1)
-        val height = (rawH * scale).toInt().coerceAtLeast(1)
-        svg.setDocumentWidth(width.toFloat())
-        svg.setDocumentHeight(height.toFloat())
-        val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
-        svg.renderToCanvas(Canvas(bitmap))
-        return bitmap
+        val text = open(context, file, uri)?.use { it.readBytes().toString(Charsets.UTF_8) } ?: return null
+        return SimpleSvg.toBitmap(text, sizePx)
     }
 
     private fun decodeMedia(context: Context, file: File?, uri: Uri?, isVideo: Boolean, sizePx: Int): DownloadThumbnail? {

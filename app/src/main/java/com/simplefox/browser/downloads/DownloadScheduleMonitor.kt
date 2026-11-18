@@ -1,24 +1,18 @@
 package com.simplefox.browser.downloads
 
+import android.app.AlarmManager
+import android.app.PendingIntent
+import android.content.BroadcastReceiver
 import android.content.Context
-import android.content.pm.ServiceInfo
-import android.os.Build
-import androidx.preference.PreferenceManager
-import androidx.work.CoroutineWorker
-import androidx.work.ExistingWorkPolicy
-import androidx.work.ForegroundInfo
-import androidx.work.ListenableWorker.Result
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.WorkManager
-import androidx.work.WorkerParameters
+import android.content.Intent
+import com.simplefox.browser.util.PreferenceManager
 import com.simplefox.browser.settings.downloads.DownloadSettingsKeys
 import java.util.Calendar
 import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.TimeUnit
 
 internal object DownloadScheduleMonitor {
 
-    private const val UNIQUE_WORK_NAME = "download_schedule_check"
+    private const val REQUEST_CODE = 79_999
 
     internal val scheduleWaitingIds: MutableSet<Int> = ConcurrentHashMap.newKeySet()
 
@@ -59,21 +53,28 @@ internal object DownloadScheduleMonitor {
         return (deltaMinutes * 60_000L - secondsIntoMinute * 1000L).coerceAtLeast(1_000L)
     }
 
+    private fun pendingIntent(context: Context): PendingIntent =
+        PendingIntent.getBroadcast(
+            context,
+            REQUEST_CODE,
+            Intent(context, DownloadScheduleReceiver::class.java),
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
     fun scheduleNextCheck(context: Context) {
-        val workManager = WorkManager.getInstance(context)
-        if (!isEnabled(context)) {
-            workManager.cancelUniqueWork(UNIQUE_WORK_NAME)
-            return
-        }
+        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as? AlarmManager ?: return
+        val pendingIntent = pendingIntent(context)
         val (start, end) = windowMinutes(context)
-        if (start == end) {
-            workManager.cancelUniqueWork(UNIQUE_WORK_NAME)
+        if (!isEnabled(context) || start == end) {
+            alarmManager.cancel(pendingIntent)
             return
         }
-        val request = OneTimeWorkRequestBuilder<DownloadScheduleWorker>()
-            .setInitialDelay(millisUntilNextBoundary(context), TimeUnit.MILLISECONDS)
-            .build()
-        workManager.enqueueUniqueWork(UNIQUE_WORK_NAME, ExistingWorkPolicy.REPLACE, request)
+        val triggerAt = System.currentTimeMillis() + millisUntilNextBoundary(context)
+        if (DownloadCustomScheduleMonitor.canScheduleExact(context)) {
+            alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAt, pendingIntent)
+        } else {
+            alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAt, pendingIntent)
+        }
     }
 
     fun reconcile(context: Context) {
@@ -103,29 +104,17 @@ internal object DownloadScheduleMonitor {
     }
 }
 
-class DownloadScheduleWorker(appContext: Context, params: WorkerParameters) :
-    CoroutineWorker(appContext, params) {
+class DownloadScheduleReceiver : BroadcastReceiver() {
 
-    override suspend fun doWork(): Result {
-        runCatching { setForeground(foregroundInfo()) }
-        ClintDownloadManager.init(applicationContext).join()
-        DownloadScheduleMonitor.reconcile(applicationContext)
-        return Result.success()
-    }
-
-    private fun foregroundInfo(): ForegroundInfo {
-        ClintDownloadManager.createNotificationChannel(applicationContext)
-        val notification = DownloadNotificationHelper.buildSummaryNotification(applicationContext, 0)
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-            ForegroundInfo(
-                DownloadForegroundService.FOREGROUND_ID,
-                notification,
-                ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC or ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PROCESSING
-            )
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            ForegroundInfo(DownloadForegroundService.FOREGROUND_ID, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC)
-        } else {
-            ForegroundInfo(DownloadForegroundService.FOREGROUND_ID, notification)
+    override fun onReceive(context: Context, intent: Intent) {
+        val appContext = context.applicationContext
+        val pendingResult = goAsync()
+        ClintDownloadManager.init(appContext).invokeOnCompletion {
+            try {
+                DownloadScheduleMonitor.reconcile(appContext)
+            } finally {
+                pendingResult.finish()
+            }
         }
     }
 }

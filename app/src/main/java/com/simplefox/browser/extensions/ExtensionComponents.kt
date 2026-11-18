@@ -247,7 +247,3 @@ fun DataCollectionLines(keys: List<String>) {
         )
     }
 }
-
-@Composable
-fun ClickableRowModifier(onClick: (() -> Unit)?): Modifier =
-    if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier

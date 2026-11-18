@@ -24,7 +24,6 @@ class DownloadSettingsUiState(
     initialConcurrentDownloads: Int,
     initialSplitParts: Int,
     initialMultithreadingParts: Int,
-    initialConcurrentSegments: Int,
     initialSpeedLimitAmount: Int,
     initialSpeedLimitUnit: String,
     initialTotalSpeedLimitAmount: Int,
@@ -63,7 +62,6 @@ initialHideSystemNavigation: Boolean
     var concurrentDownloads by mutableStateOf(initialConcurrentDownloads)
     var splitParts by mutableStateOf(initialSplitParts)
     var multithreadingParts by mutableStateOf(initialMultithreadingParts)
-    var concurrentSegments by mutableStateOf(initialConcurrentSegments)
 
     var speedLimitAmount by mutableStateOf(initialSpeedLimitAmount)
     var speedLimitUnit by mutableStateOf(initialSpeedLimitUnit)

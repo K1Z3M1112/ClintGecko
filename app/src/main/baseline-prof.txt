@@ -27,7 +27,6 @@ HSPLcom/simplefox/browser/extensions/**;->**(**)**
 HSPLcom/simplefox/browser/util/**;->**(**)**
 HSPLcom/simplefox/browser/history/**;->**(**)**
 HSPLcom/simplefox/browser/bookmarks/**;->**(**)**
-HSPLandroidx/preference/**;->**(**)**
 HSPLandroidx/core/**;->**(**)**
 HSPLkotlinx/coroutines/**;->**(**)**
 HSPLokhttp3/**;->**(**)**
@@ -39,7 +38,6 @@ Lcom/simplefox/browser/extensions/**;
 Lcom/simplefox/browser/util/**;
 Lcom/simplefox/browser/history/**;
 Lcom/simplefox/browser/bookmarks/**;
-Landroidx/preference/**;
 Landroidx/core/**;
 Lkotlinx/coroutines/**;
 Lokhttp3/**;

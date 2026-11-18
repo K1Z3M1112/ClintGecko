@@ -52,8 +52,8 @@ import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.preference.PreferenceManager
-import com.caverock.androidsvg.SVG
+import com.simplefox.browser.util.PreferenceManager
+import com.simplefox.browser.util.SimpleSvg
 import com.simplefox.browser.R
 import com.simplefox.browser.browser.MainActivity
 import com.simplefox.browser.ui.theme.LocalClintColors
@@ -300,15 +300,5 @@ private fun decodeThumbnailDrawable(bytes: ByteArray): Drawable? {
     return decodeSvgDrawable(bytes)
 }
 
-private fun decodeSvgDrawable(bytes: ByteArray): Drawable? = runCatching {
-    val svg = SVG.getFromString(bytes.toString(Charsets.UTF_8))
-    val vb = svg.documentViewBox
-    val rawW = vb?.width()?.toInt()?.takeIf { it > 0 } ?: svg.documentWidth.toInt().takeIf { it > 0 } ?: 512
-    val rawH = vb?.height()?.toInt()?.takeIf { it > 0 } ?: svg.documentHeight.toInt().takeIf { it > 0 } ?: 512
-    val scale = 512f / maxOf(rawW, rawH).toFloat()
-    val bw = (rawW * scale).toInt().coerceAtLeast(1)
-    val bh = (rawH * scale).toInt().coerceAtLeast(1)
-    val bitmap = Bitmap.createBitmap(bw, bh, Bitmap.Config.ARGB_8888)
-    svg.renderToCanvas(Canvas(bitmap))
-    android.graphics.drawable.BitmapDrawable(null, bitmap)
-}.getOrNull()
+private fun decodeSvgDrawable(bytes: ByteArray): Drawable? =
+    SimpleSvg.toBitmap(bytes.toString(Charsets.UTF_8), 512)?.let { android.graphics.drawable.BitmapDrawable(null, it) }

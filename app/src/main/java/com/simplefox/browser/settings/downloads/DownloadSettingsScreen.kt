@@ -91,7 +91,6 @@ fun DownloadSettingsScreen(
     onConcurrentDownloadsChange: (Int) -> Unit,
     onSplitPartsChange: (Int) -> Unit,
     onMultithreadingPartsChange: (Int) -> Unit,
-    onConcurrentSegmentsChange: (Int) -> Unit,
     onSpeedLimitConfirm: (amount: Int, unit: String) -> Unit,
     onTotalSpeedLimitConfirm: (amount: Int, unit: String) -> Unit,
     onRetryEnabledClick: () -> Unit,
@@ -396,20 +395,6 @@ fun DownloadSettingsScreen(
                 summary = com.simplefox.browser.downloads.autoOrCountLabel(state.multithreadingParts, R.plurals.download_multithreading_value),
                 colors = colors,
                 onValueChange = { onMultithreadingPartsChange(com.simplefox.browser.downloads.autoSliderValue(it, 8)) }
-            )
-        }
-
-        SettingsSectionLabel(stringResource(R.string.download_section_stream_segments))
-        SettingsSection(colors.cardBackground) {
-            SliderSettingsCard(
-                icon = androidx.compose.material.icons.Icons.Filled.VideoSettings,
-                title = stringResource(R.string.download_concurrent_segments_title),
-                description = stringResource(R.string.download_concurrent_segments_desc) + "\n" + stringResource(R.string.download_setting_auto_hint),
-                value = com.simplefox.browser.downloads.autoSliderPosition(state.concurrentSegments, 24),
-                valueRange = 1..25,
-                summary = com.simplefox.browser.downloads.autoOrCountLabel(state.concurrentSegments, R.plurals.download_concurrent_segments_value),
-                colors = colors,
-                onValueChange = { onConcurrentSegmentsChange(com.simplefox.browser.downloads.autoSliderValue(it, 24)) }
             )
         }
 

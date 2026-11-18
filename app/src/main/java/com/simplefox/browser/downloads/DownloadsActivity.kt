@@ -24,7 +24,7 @@ import androidx.core.content.FileProvider
 import com.simplefox.browser.util.DocumentFile
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
-import androidx.preference.PreferenceManager
+import com.simplefox.browser.util.PreferenceManager
 import com.simplefox.browser.base.ClintActivity
 import com.simplefox.browser.settings.downloads.DownloadSettingsKeys
 import com.simplefox.browser.ui.ClintSnackbarHost

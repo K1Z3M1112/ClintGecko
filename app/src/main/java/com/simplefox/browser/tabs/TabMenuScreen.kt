@@ -277,7 +277,7 @@ fun TabMenuScreen(activity: MainActivity, onDismiss: () -> Unit) {
     val tabs = remember { mutableStateListOf<TabPreview>().apply { addAll(tabManager.previews()) } }
     val groups = remember { mutableStateListOf<TabGroup>().apply { addAll(tabManager.groups) } }
     var activeTabId by remember { mutableStateOf(tabManager.activeTab?.id) }
-    val prefs = remember { androidx.preference.PreferenceManager.getDefaultSharedPreferences(activity) }
+    val prefs = remember { com.simplefox.browser.util.PreferenceManager.getDefaultSharedPreferences(activity) }
     val hideStatusBar = remember { prefs.getBoolean("hide_status_bar", false) }
     val hideSystemNavigation = remember { prefs.getBoolean("hide_system_navigation", false) }
     var showGroupBar by remember { mutableStateOf(prefs.getBoolean(TabGroupPrefs.PREF_SHOW_GROUP_BAR, true)) }
@@ -541,24 +541,26 @@ fun TabMenuScreen(activity: MainActivity, onDismiss: () -> Unit) {
                     if (dragState.active) {
                         null
                     } else {
+                        // Cheap per-frame work: only the index window is computed while scrolling. The id list is
+                        // built in collect, and only when the window or the list itself actually changes.
+                        val list = currentRenderList
                         val visible = gridState.layoutInfo.visibleItemsInfo
                         if (visible.isEmpty()) {
-                            emptyList()
+                            IntRange.EMPTY to list
                         } else {
-                            val first = (visible.minOf { it.index } - columns).coerceAtLeast(0)
-                            val last = (visible.maxOf { it.index } + columns).coerceAtMost(currentRenderList.lastIndex)
-                            if (first > last) emptyList() else {
-                                (first..last).flatMap { index ->
-                                    when (val entry = currentRenderList.getOrNull(index)) {
-                                        is TabMenuItem.Tab -> listOf(entry.preview.id)
-                                        is TabMenuItem.GroupCard -> entry.tabs.take(4).map { it.id }
-                                        else -> emptyList()
-                                    }
-                                }
-                            }
+                            val first = (visible.first().index - columns).coerceAtLeast(0)
+                            val last = (visible.last().index + columns).coerceAtMost(list.lastIndex)
+                            (if (first > last) IntRange.EMPTY else first..last) to list
                         }
                     }
-                }.filterNotNull().distinctUntilChanged().collect { wantedIds ->
+                }.filterNotNull().distinctUntilChanged().collect { (window, list) ->
+                    val wantedIds = window.flatMap { index ->
+                        when (val entry = list.getOrNull(index)) {
+                            is TabMenuItem.Tab -> listOf(entry.preview.id)
+                            is TabMenuItem.GroupCard -> entry.tabs.take(4).map { it.id }
+                            else -> emptyList()
+                        }
+                    }
                     val wanted = wantedIds.toSet()
                     requestedThumbnailIds.clear()
                     requestedThumbnailIds.addAll(wanted)
@@ -578,7 +580,10 @@ fun TabMenuScreen(activity: MainActivity, onDismiss: () -> Unit) {
                             } else {
                                 loadJobs[id] = launch {
                                     try {
-                                        val bitmap = withContext(Dispatchers.IO) { TabThumbnailCache.get(activity, id) }
+                                        // While the grid is moving, wait briefly before touching the disk. Cards that scroll
+                                        // past during a fling leave the window, which cancels this job before any decode runs.
+                                        if (gridState.isScrollInProgress) delay(90)
+                                        val bitmap = withContext(ThumbnailDecodeDispatcher) { TabThumbnailCache.get(activity, id) }
                                         if (bitmap != null && id in requestedThumbnailIds) thumbnailBitmaps[id] = bitmap
                                     } finally {
                                         loadJobs.remove(id)
@@ -1408,6 +1413,9 @@ private fun TabMenuSelectionBarHost(
         onClose = { onClose(selectedIds) }
     )
 }
+
+// Caps concurrent thumbnail decodes so fast scrolling doesn't starve the UI/render threads.
+private val ThumbnailDecodeDispatcher = Dispatchers.IO.limitedParallelism(2, "clint-tab-thumbs")
 
 @Composable
 private fun LazyGridItemScope.AnimatedGridItem(content: @Composable () -> Unit) {

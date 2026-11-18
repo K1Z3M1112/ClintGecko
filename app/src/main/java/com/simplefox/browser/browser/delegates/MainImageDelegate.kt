@@ -63,7 +63,7 @@ internal fun MainActivity.handleImagePreview(imageUrl: String) {
 }
 
 internal fun MainActivity.handleImageDownload(imageUrl: String, altText: String) {
-    val quickImages = androidx.preference.PreferenceManager.getDefaultSharedPreferences(this)
+    val quickImages = com.simplefox.browser.util.PreferenceManager.getDefaultSharedPreferences(this)
         .getBoolean(com.simplefox.browser.settings.downloads.DownloadSettingsKeys.PREF_QUICK_DOWNLOAD_IMAGES, com.simplefox.browser.settings.downloads.DownloadSettingsKeys.DEFAULT_QUICK_DOWNLOAD_IMAGES)
     if (imageUrl.startsWith("data:")) {
         val commaIdx = imageUrl.indexOf(",")

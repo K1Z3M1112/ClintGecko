@@ -35,7 +35,7 @@ class ClintWebViewClient(
 
     @Volatile private var cachedPageUrl: String? = null
 
-    private val cooldownDomains = mutableMapOf<String, Long>()
+    private val cooldownDomains = java.util.concurrent.ConcurrentHashMap<String, Long>()
     private val allowedHttpHosts: MutableSet<String> = java.util.concurrent.ConcurrentHashMap.newKeySet()
     private val upgradedHostOrigins = java.util.concurrent.ConcurrentHashMap<String, String>()
     private val ipv4Regex = Regex("""^(\d{1,3}\.){3}\d{1,3}$""")

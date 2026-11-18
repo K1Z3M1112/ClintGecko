@@ -6,7 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
-import androidx.preference.PreferenceManager
+import com.simplefox.browser.util.PreferenceManager
 import com.simplefox.browser.base.ClintActivity
 import com.simplefox.browser.blocker.additional.AdditionalWebsitesActivity
 import com.simplefox.browser.blocker.additional.AdditionalWebsitesDatabase

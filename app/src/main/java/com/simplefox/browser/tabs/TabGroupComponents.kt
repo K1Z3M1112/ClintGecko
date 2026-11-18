@@ -110,32 +110,7 @@ internal fun TabGroupDot(color: Int, size: Dp, modifier: Modifier = Modifier) {
     Box(modifier.size(size).clip(CircleShape).background(Color(color)))
 }
 
-@Composable
-private fun TabGroupBarItem(tab: TabPreview, active: Boolean, groupColor: Int, onClick: () -> Unit) {
-    val colors = LocalClintColors.current
-    val favicon = rememberTabFavicon(tab)
-    val shape = RoundedCornerShape(10.dp)
-    Box(
-        Modifier
-            .size(34.dp)
-            .clip(shape)
-            .background(if (active) tabGroupTint(groupColor, colors.isLight, strong = true) else colors.surfaceVariant)
-            .border(if (active) 2.dp else 0.dp, if (active) Color(groupColor) else Color.Transparent, shape)
-            .clickable(onClick = onClick),
-        contentAlignment = Alignment.Center
-    ) {
-        if (favicon != null && !tab.isIncognito) {
-            Image(remember(favicon) { favicon.asImageBitmap() }, contentDescription = tab.title, modifier = Modifier.size(18.dp))
-        } else {
-            Icon(
-                if (tab.isIncognito) Icons.Filled.VisibilityOff else Icons.Filled.Public,
-                contentDescription = tab.title,
-                tint = colors.secondaryText,
-                modifier = Modifier.size(18.dp)
-            )
-        }
-    }
-}
+
 
 @Composable
 internal fun TabGroupChipsRow(

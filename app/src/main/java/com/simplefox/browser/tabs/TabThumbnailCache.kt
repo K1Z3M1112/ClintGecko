@@ -138,7 +138,7 @@ object TabThumbnailCache {
     @Synchronized
     fun refreshResolution(context: Context) {
         val key = normalizeResolution(
-            androidx.preference.PreferenceManager.getDefaultSharedPreferences(context.applicationContext)
+            com.simplefox.browser.util.PreferenceManager.getDefaultSharedPreferences(context.applicationContext)
                 .getString(PREF_RESOLUTION, DEFAULT_RESOLUTION)
         )
         val px = resolutionPx(key)

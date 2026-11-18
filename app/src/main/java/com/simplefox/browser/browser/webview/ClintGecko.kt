@@ -124,7 +124,7 @@ object ClintGecko {
         if (!::appContext.isInitialized) return true
         val context = appContext
         return runCatching {
-            androidx.preference.PreferenceManager.getDefaultSharedPreferences(context)
+            com.simplefox.browser.util.PreferenceManager.getDefaultSharedPreferences(context)
                 .getBoolean("custom_user_agent", true)
         }.getOrDefault(true)
     }
@@ -135,7 +135,7 @@ object ClintGecko {
     fun init(context: Context) {
         if (runtimeRef != null) return
         appContext = context.applicationContext
-        val startupPrefs = androidx.preference.PreferenceManager.getDefaultSharedPreferences(appContext)
+        val startupPrefs = com.simplefox.browser.util.PreferenceManager.getDefaultSharedPreferences(appContext)
         val aboutConfigEnabled = startupPrefs.getBoolean("about_config_enabled", false)
         val websiteIsolationEnabled = startupPrefs.getBoolean(PREF_WEBSITE_ISOLATION, DEFAULT_WEBSITE_ISOLATION)
         val settings = GeckoRuntimeSettings.Builder()
@@ -689,7 +689,7 @@ object ClintGecko {
     }
 
     fun applyTrackingProtection(context: Context) {
-        val prefs = androidx.preference.PreferenceManager.getDefaultSharedPreferences(context)
+        val prefs = com.simplefox.browser.util.PreferenceManager.getDefaultSharedPreferences(context)
         val level = com.simplefox.browser.privacy.PrivacyPrefs.etpLevel(prefs)
         val fingerprinting = prefs.getBoolean(
             com.simplefox.browser.privacy.PrivacyPrefs.FINGERPRINTING_PROTECTION,
@@ -728,7 +728,7 @@ object ClintGecko {
 
     fun applyFontSize(context: Context) {
         val rt = runtimeRef ?: return
-        val prefs = androidx.preference.PreferenceManager.getDefaultSharedPreferences(context)
+        val prefs = com.simplefox.browser.util.PreferenceManager.getDefaultSharedPreferences(context)
         val auto = com.simplefox.browser.settings.accessibility.AccessibilityPrefs.autoFontSize(prefs)
         val percent = com.simplefox.browser.settings.accessibility.AccessibilityPrefs.fontSizePercent(prefs)
         runCatching {
@@ -739,7 +739,7 @@ object ClintGecko {
 
     fun applyForceZoom(context: Context) {
         val rt = runtimeRef ?: return
-        val prefs = androidx.preference.PreferenceManager.getDefaultSharedPreferences(context)
+        val prefs = com.simplefox.browser.util.PreferenceManager.getDefaultSharedPreferences(context)
         val enabled = com.simplefox.browser.settings.accessibility.AccessibilityPrefs.forceZoom(prefs)
         runCatching { rt.settings.setForceUserScalableEnabled(enabled) }
     }

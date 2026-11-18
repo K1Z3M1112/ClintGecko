@@ -184,7 +184,6 @@
     <string name="search_bar_hint">Telusuri dengan %1$s atau ketik URL</string>
     <string name="default_label">Default</string>
     <string name="next">Lanjut →</string>
-    <string name="get_started">Mulai</string>
     <string name="setup_subtitle">Browser Android berbasis Firefox dengan ADM, perekam media, dan ekstensi</string>
     <string name="js_warning_title">Nonaktifkan JavaScript?</string>
     <string name="js_warning_message">Banyak fitur aplikasi yang bergantung pada JavaScript, termasuk notifikasi web, mode desktop, dan mode baca. Situs juga bisa rusak atau tampil tidak benar.\n\nYakin ingin menonaktifkannya?</string>
@@ -404,8 +403,6 @@
     <string name="crash_copy_template">Salin template</string>
     <string name="crash_template_copied">Template disalin ke papan klip</string>
     <string name="crash_open_github">Buka GitHub Issues</string>
-    <string name="about_section_contact">KONTAK</string>
-    <string name="about_contact_email">jhaiian@proton.me</string>
     <string name="about_section_libraries">LIBRARY YANG DIGUNAKAN</string>
     <string name="about_library_geckoview_label">GeckoView oleh Mozilla</string>
     <string name="about_library_geckoview_license">Mozilla Public License 2.0 ↗</string>
@@ -413,27 +410,15 @@
     <string name="about_library_androidx_label">AndroidX oleh Google</string>
     <string name="about_library_androidx_license">Apache License 2.0 ↗</string>
     <string name="about_library_androidx_usage">Komponen UI inti, setelan, preferensi, dan pengelolaan siklus hidup di seluruh aplikasi.</string>
-    <string name="about_library_markwon_label">Markwon oleh Noties</string>
-    <string name="about_library_markwon_license">Apache License 2.0 ↗</string>
-    <string name="about_library_markwon_usage">Merender konten Markdown dari GitHub untuk ditampilkan di aplikasi.</string>
     <string name="about_library_okhttp_label">OkHttp oleh Square</string>
     <string name="about_library_okhttp_license">Apache License 2.0 ↗</string>
     <string name="about_library_okhttp_usage">Menangani permintaan jaringan di seluruh aplikasi, termasuk pemeriksaan pembaruan, penampil dokumen, pemuatan gambar di browser, download, dan banyak lagi.</string>
-    <string name="about_library_simplemagic_label">SimpleMagic oleh j256</string>
-    <string name="about_library_simplemagic_license">ISC License ↗</string>
-    <string name="about_library_simplemagic_usage">Mendeteksi jenis MIME file dari isi file saat mendownload.</string>
     <string name="about_library_androidsvg_label">AndroidSVG oleh BigBadaboom</string>
     <string name="about_library_androidsvg_license">Apache License 2.0 ↗</string>
     <string name="about_library_androidsvg_usage">Merender gambar SVG di seluruh aplikasi.</string>
     <string name="about_library_coroutines_label">Kotlin Coroutines oleh JetBrains</string>
     <string name="about_library_coroutines_license">Apache License 2.0 ↗</string>
     <string name="about_library_coroutines_usage">Menjalankan proses asinkron dan latar belakang di seluruh aplikasi, seperti kompilasi daftar filter dan download.</string>
-    <string name="about_library_bouncycastle_label">Bouncy Castle</string>
-    <string name="about_library_bouncycastle_license">Bouncy Castle License ↗</string>
-    <string name="about_library_bouncycastle_usage">Menyediakan derivasi kunci Argon2id yang mengubah sandi cadangan Anda menjadi kunci enkripsi.</string>
-    <string name="about_library_media3_label">AndroidX Media3</string>
-    <string name="about_library_media3_license">Apache License 2.0 ↗</string>
-    <string name="about_library_media3_usage">Digunakan untuk menggabungkan trek video dan audio yang didownload menjadi satu file.</string>
     <string name="about_linktree_url">jhaiian ↗</string>
     <string name="open_in_app_dialog_title">Buka di aplikasi?</string>
     <string name="open_in_app_dialog_message">%1$s ingin membuka %2$s.</string>
@@ -488,7 +473,6 @@
     <string name="download_dialog_file_size_fetching">Ukuran File: Mengambil…</string>
     <string name="download_dialog_file_size_value">Ukuran File: %1$s</string>
     <string name="download_dialog_file_size_unknown">Ukuran File: Tidak diketahui</string>
-    <string name="download_dialog_file_size_estimated">Ukuran File: ~%1$s (perkiraan)</string>
     <string name="download_dialog_storage_value">Penyimpanan: %1$s / %2$s, %3$s (%4$s%%) tersisa</string>
     <string name="download_dialog_storage_unavailable">Penyimpanan: Tidak tersedia</string>
     <string name="download_error_storage_title">Penyimpanan Tidak Cukup</string>
@@ -514,7 +498,6 @@
     <string name="download_update_link_dialog_fetch_failed">Gagal mengambil link</string>
     <string name="download_update_link_dialog_size_unverifiable">Ukuran file tidak dapat diverifikasi</string>
     <string name="download_update_link_dialog_size_mismatch">Ukuran file tidak cocok (%1$s vs %2$s byte)</string>
-    <string name="download_update_link_dialog_not_a_manifest">Link ini tidak mengarah ke playlist streaming yang valid</string>
     <string name="download_update_link_dialog_not_a_file">Link ini membuka halaman web, bukan file-nya</string>
     <string name="download_update_link_dialog_positive">Perbarui</string>
     <string name="download_change_settings_dialog_title">Ubah Setelan Download</string>
@@ -650,12 +633,7 @@
     <string name="download_status_failed_label">Gagal</string>
     <string name="download_info_with_time">%1$s  •  %2$s</string>
     <string name="download_error_unknown">Error tidak diketahui</string>
-    <string name="download_error_playlist_unavailable">Tidak dapat mengambil playlist video. Mungkin sudah kedaluwarsa — coba deteksi ulang medianya.</string>
-    <string name="download_error_stream_encryption_unsupported">Streaming ini menggunakan enkripsi %1$s yang tidak dapat didekripsi oleh SimpleFox.</string>
-    <string name="download_error_stream_key_unavailable">Tidak dapat memperoleh kunci untuk mendekripsi streaming ini. Mungkin sudah kedaluwarsa — coba deteksi ulang medianya.</string>
     <string name="download_error_link_expired">Link download kedaluwarsa saat dijeda. Mulai ulang download untuk mendapatkan link baru.</string>
-    <string name="download_error_mux_failed">Gagal menggabungkan video dan audio yang didownload menjadi satu file.</string>
-    <string name="download_error_mux_failed_detail">Gagal menggabungkan video dan audio yang didownload menjadi satu file: %1$s</string>
     <string name="download_error_saf_no_access">Tidak dapat mengakses folder download yang dipilih</string>
     <string name="download_error_saf_not_writable">Folder download yang dipilih tidak dapat ditulisi</string>
     <string name="download_location_invalid_title">Folder download tidak tersedia</string>
@@ -718,16 +696,9 @@
     <string name="download_concurrent_title">Download Bersamaan</string>
     <string name="download_concurrent_desc">Berapa banyak download yang bisa berjalan bersamaan. Sisanya masuk antrean dan otomatis dimulai saat ada slot kosong.</string>
     <string name="download_concurrent_value_easter_egg">24 download bersamaan 😈</string>
-    <string name="action_play">Putar</string>
     <string name="action_pause">Jeda</string>
     <string name="action_resume">Lanjutkan</string>
 
-    <string name="setup_default_browser_title">Browser Default</string>
-    <string name="setup_default_browser_description">Jadikan SimpleFox sebagai browser default agar link dari aplikasi lain otomatis terbuka di sini. Langkah ini sepenuhnya opsional, dan Anda bisa mengubahnya kapan saja di setelan perangkat.</string>
-    <string name="setup_default_browser_card_title">Jadikan Browser Default</string>
-    <string name="setup_default_browser_card_desc">Ketuk tombol di bawah untuk menjadikan SimpleFox sebagai browser default Anda</string>
-    <string name="setup_default_browser_set_button">Jadikan Browser Default</string>
-    <string name="setup_default_browser_skip">Lewati</string>
 
     <string name="document_viewer_error">Tidak dapat memuat dokumen.\nPeriksa koneksi Anda, lalu coba lagi.</string>
     <string name="document_viewer_privacy_policy_title">Kebijakan Privasi</string>
@@ -888,12 +859,6 @@
     <string name="setup_terms_agree">Saya telah membaca dan menyetujui Kebijakan Privasi dan Persyaratan Layanan</string>
     <string name="setup_terms_continue">Setuju &amp; Lanjutkan</string>
 
-    <string name="setup_restore_title">Pulihkan dari Cadangan</string>
-    <string name="setup_restore_subtitle">Punya cadangan SimpleFox? Pulihkan sekarang untuk mengembalikan setelan dan data Anda, atau lewati untuk menyiapkan sebagai baru.</string>
-    <string name="setup_restore_card_title">Pulihkan Cadangan</string>
-    <string name="setup_restore_card_desc">Pilih file .clintbackup dari perangkat Anda</string>
-    <string name="setup_restore_button">Pulihkan Cadangan</string>
-    <string name="setup_restore_skip">Siapkan sebagai Baru</string>
 
     <string name="bookmarks_title">Bookmark</string>
     <string name="content_desc_bookmark">Bookmark</string>
@@ -1044,7 +1009,6 @@
 
     <string name="about_section_legal">HUKUM</string>
     <string name="about_legal_view">Lihat</string>
-    <string name="about_contact_email_label">Email</string>
 
     <string name="exit_confirmation_title">Konfirmasi Keluar</string>
     <string name="exit_confirmation_off">Nonaktif</string>
@@ -1478,15 +1442,10 @@
     <string name="backup_password_hint">Siapa pun yang memiliki file ini memerlukan sandi tersebut untuk memulihkannya. Jika Anda lupa, cadangan tidak dapat dipulihkan.</string>
     <string name="backup_password_show">Tampilkan sandi</string>
     <string name="backup_password_hide">Sembunyikan sandi</string>
-    <string name="backup_password_mismatch">Sandi tidak cocok</string>
-    <string name="backup_password_too_short">Sandi minimal 6 karakter</string>
     <string name="backup_action_create">Buat Cadangan</string>
 
     <string name="backup_auth_title">Autentikasi Diperlukan</string>
-    <string name="backup_auth_subtitle_backup">Pastikan ini Anda untuk membuat cadangan</string>
-    <string name="backup_auth_subtitle_restore">Pastikan ini Anda untuk memulihkan cadangan</string>
     <string name="backup_auth_unavailable_title">Kunci Layar Diperlukan</string>
-    <string name="backup_auth_unavailable_message">Siapkan kunci layar (PIN, pola, sandi, atau biometrik) di setelan perangkat untuk menggunakan Cadangkan &amp; Pulihkan.</string>
 
     <string name="backup_progress_creating">Membuat cadangan…</string>
     <string name="backup_progress_reading">Membaca file cadangan…</string>
@@ -2004,18 +1963,12 @@
     <string name="custom_theme_name_duplicate">Sudah ada tema dengan nama ini</string>
     <string name="custom_theme_description_label">Deskripsi (opsional)</string>
     <string name="accent_section_presets">Preset</string>
-    <string name="download_error_mux_missing_audio">File gabungan tidak memiliki trek audio. Coba lagi untuk menggabungkan ulang tanpa mendownload.</string>
-    <string name="download_error_mux_missing_video">File gabungan tidak memiliki trek video. Coba lagi untuk menggabungkan ulang tanpa mendownload.</string>
-    <string name="download_error_mux_unreadable">File gabungan tidak dapat dibaca. Coba lagi untuk menggabungkan ulang tanpa mendownload.</string>
     <string name="download_stage_audio">Mendownload audio</string>
     <string name="download_stage_merging">Menggabungkan video dan audio&#8230;</string>
     <string name="download_stage_merging_progress">Menggabungkan video dan audio&#8230; %1$d%%</string>
     <string name="download_stage_video">Mendownload video</string>
     <string name="download_status_muxing_progress">Menggabungkan&#8230; %1$d%%</string>
     <string name="download_storage_permission_denied_message">Download tidak dapat disimpan ke folder Download tanpa akses penyimpanan. Anda bisa mengizinkannya di setelan aplikasi, atau memilih folder download lain di setelan download.</string>
-    <string name="download_update_link_dialog_video_label">Link video</string>
-    <string name="download_update_link_dialog_audio_label">Link audio</string>
-    <string name="download_update_link_dialog_segments_mismatch">Playlist ini tidak cocok dengan yang asli (%1$d segmen vs %2$d)</string>
     <string name="menu_cookies_control">Kontrol Cookie</string>
     <string name="cookies_control_title">Kontrol Cookie</string>
     <string name="cookies_control_cookie_count">Cookie tersimpan: %1$d</string>

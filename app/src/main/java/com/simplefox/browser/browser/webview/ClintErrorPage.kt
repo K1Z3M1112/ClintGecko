@@ -9,7 +9,7 @@ import android.util.Base64
 import android.view.View
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import androidx.preference.PreferenceManager
+import com.simplefox.browser.util.PreferenceManager
 import com.simplefox.browser.R
 import com.simplefox.browser.browser.longshot.LongShot
 import com.simplefox.browser.privacy.PrivacyPrefs

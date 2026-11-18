@@ -7,7 +7,7 @@ import android.net.Network
 import android.net.NetworkCapabilities
 import android.os.Handler
 import android.os.Looper
-import androidx.preference.PreferenceManager
+import com.simplefox.browser.util.PreferenceManager
 
 object DataSaverMode {
 

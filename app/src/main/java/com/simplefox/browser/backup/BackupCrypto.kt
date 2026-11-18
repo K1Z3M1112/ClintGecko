@@ -1,7 +1,5 @@
 package com.simplefox.browser.backup
 
-import org.bouncycastle.crypto.generators.Argon2BytesGenerator
-import org.bouncycastle.crypto.params.Argon2Parameters
 import java.io.InputStream
 import java.io.OutputStream
 import java.nio.charset.StandardCharsets
@@ -73,27 +71,16 @@ object BackupCrypto {
     fun randomIv(): ByteArray = ByteArray(IV_SIZE).also { SecureRandom().nextBytes(it) }
 
     fun deriveKey(password: CharArray, salt: ByteArray, memoryKB: Int, iterations: Int, parallelism: Int): ByteArray {
-        val params = Argon2Parameters.Builder(Argon2Parameters.ARGON2_id)
-            .withVersion(Argon2Parameters.ARGON2_VERSION_13)
-            .withIterations(iterations)
-            .withMemoryAsKB(memoryKB)
-            .withParallelism(parallelism)
-            .withSalt(salt)
-            .build()
-        val generator = Argon2BytesGenerator()
-        generator.init(params)
-        val key = ByteArray(AES_KEY_SIZE)
         val passwordBytes = StandardCharsets.UTF_8.encode(java.nio.CharBuffer.wrap(password)).let { buffer ->
             val bytes = ByteArray(buffer.remaining())
             buffer.get(bytes)
             bytes
         }
         try {
-            generator.generateBytes(passwordBytes, key)
+            return Argon2id.hash(passwordBytes, salt, memoryKB, iterations, parallelism, AES_KEY_SIZE)
         } finally {
             passwordBytes.fill(0)
         }
-        return key
     }
 
     fun encryptStream(input: InputStream, output: OutputStream, key: ByteArray, iv: ByteArray) {

@@ -34,7 +34,7 @@ import androidx.core.content.pm.PackageInfoCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import androidx.preference.PreferenceManager
+import com.simplefox.browser.util.PreferenceManager
 import com.simplefox.browser.BuildConfig
 import com.simplefox.browser.R
 import com.simplefox.browser.crash.CrashHandler
@@ -1349,7 +1349,6 @@ fun DownloadSettingsPane(activity: SettingsActivity) {
             initialConcurrentDownloads = prefs.getInt(DownloadSettingsKeys.PREF_CONCURRENT_DOWNLOADS, DownloadSettingsKeys.DEFAULT_CONCURRENT_DOWNLOADS),
             initialSplitParts = prefs.getInt(DownloadSettingsKeys.PREF_SPLIT_PARTS, DownloadSettingsKeys.DEFAULT_SPLIT_PARTS),
             initialMultithreadingParts = prefs.getInt(DownloadSettingsKeys.PREF_MULTITHREADING_PARTS, DownloadSettingsKeys.DEFAULT_MULTITHREADING_PARTS),
-            initialConcurrentSegments = prefs.getInt(DownloadSettingsKeys.PREF_STREAM_CONCURRENT_SEGMENTS, DownloadSettingsKeys.DEFAULT_STREAM_CONCURRENT_SEGMENTS),
             initialSpeedLimitAmount = prefs.getInt(DownloadSettingsKeys.PREF_SPEED_LIMIT_AMOUNT, DownloadSettingsKeys.DEFAULT_SPEED_LIMIT_AMOUNT),
             initialSpeedLimitUnit = prefs.getString(DownloadSettingsKeys.PREF_SPEED_LIMIT_UNIT, DEFAULT_SPEED_LIMIT_UNIT) ?: DEFAULT_SPEED_LIMIT_UNIT,
             initialTotalSpeedLimitAmount = prefs.getInt(DownloadSettingsKeys.PREF_TOTAL_SPEED_LIMIT_AMOUNT, DownloadSettingsKeys.DEFAULT_TOTAL_SPEED_LIMIT_AMOUNT),
@@ -1493,10 +1492,6 @@ fun DownloadSettingsPane(activity: SettingsActivity) {
         onMultithreadingPartsChange = { value ->
             prefs.edit().putInt(DownloadSettingsKeys.PREF_MULTITHREADING_PARTS, value).apply()
             uiState.multithreadingParts = value
-        },
-        onConcurrentSegmentsChange = { value ->
-            prefs.edit().putInt(DownloadSettingsKeys.PREF_STREAM_CONCURRENT_SEGMENTS, value).apply()
-            uiState.concurrentSegments = value
         },
         onTotalSpeedLimitConfirm = { amount, unit ->
             prefs.edit().putInt(DownloadSettingsKeys.PREF_TOTAL_SPEED_LIMIT_AMOUNT, amount).putString(DownloadSettingsKeys.PREF_TOTAL_SPEED_LIMIT_UNIT, unit).apply()

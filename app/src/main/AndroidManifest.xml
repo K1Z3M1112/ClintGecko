@@ -259,6 +259,10 @@
             android:exported="false" />
 
         <receiver
+            android:name=".downloads.DownloadScheduleReceiver"
+            android:exported="false" />
+
+        <receiver
             android:name=".privacy.IncognitoCloseReceiver"
             android:exported="false" />
 
@@ -294,12 +298,6 @@
             android:name=".media.MediaPlaybackService"
             android:exported="false"
             android:foregroundServiceType="mediaPlayback" />
-
-        <!-- WorkManager runs DownloadScheduleWorker's setForeground() promotion through its own
-             internal service, so that service needs the same type declared here too. -->
-        <service
-            android:name="androidx.work.impl.foreground.SystemForegroundService"
-            android:foregroundServiceType="dataSync|mediaProcessing" />
 
     </application>
 

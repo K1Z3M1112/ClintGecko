@@ -112,7 +112,7 @@ internal fun DownloadsLibraryContent(
                 onToggleGrid = {
                     val grid = !state.libraryGrid
                     state.libraryGrid = grid
-                    androidx.preference.PreferenceManager.getDefaultSharedPreferences(context).edit()
+                    com.simplefox.browser.util.PreferenceManager.getDefaultSharedPreferences(context).edit()
                         .putBoolean(com.simplefox.browser.settings.downloads.DownloadSettingsKeys.PREF_LIBRARY_GRID, grid).apply()
                 }
             )

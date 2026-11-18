@@ -84,10 +84,6 @@ private fun probeLink(item: DownloadItem, url: String): LinkProbe? {
 
 @Composable
 fun DownloadUpdateLinkDialog(item: DownloadItem, hideStatusBar: Boolean, hideSystemNavigation: Boolean, onDismiss: () -> Unit) {
-    if (item.isStream) {
-        StreamUpdateLinkDialog(item, hideStatusBar, hideSystemNavigation, onDismiss)
-        return
-    }
     val context = LocalContext.current
     val colors = LocalClintColors.current
 

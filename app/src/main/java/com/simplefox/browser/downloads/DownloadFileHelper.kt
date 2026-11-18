@@ -9,14 +9,13 @@ import android.os.Environment
 import android.webkit.MimeTypeMap
 import androidx.core.content.ContextCompat
 import com.simplefox.browser.util.DocumentFile
-import androidx.preference.PreferenceManager
+import com.simplefox.browser.util.MagicSniffer
+import com.simplefox.browser.util.PreferenceManager
 import com.simplefox.browser.BuildConfig
 import com.simplefox.browser.settings.downloads.DownloadSettingsKeys
 import java.io.File
 
 internal object DownloadFileHelper {
-
-    private var contentInfoUtil: com.j256.simplemagic.ContentInfoUtil? = null
 
     fun isSafCustomMode(context: Context, item: DownloadItem? = null): Boolean {
         if (item != null) return item.locationMode == DownloadSettingsKeys.MODE_CUSTOM
@@ -281,26 +280,13 @@ internal object DownloadFileHelper {
         if (at(0) == 0x42 && at(1) == 0x4D) return "bmp"
         if (at(0) == 0x25 && at(1) == 0x50 && at(2) == 0x44 && at(3) == 0x46) return "pdf"
 
-        if (at(0) == 0x50 && at(1) == 0x4B && at(2) == 0x03 && at(3) == 0x04) {
-            return try {
-                if (contentInfoUtil == null) contentInfoUtil = com.j256.simplemagic.ContentInfoUtil()
-                contentInfoUtil?.findMatch(b)?.mimeType?.let { mime ->
-                    MimeTypeMap.getSingleton().getExtensionFromMimeType(mime)
-                } ?: "zip"
-            } catch (_: Throwable) { "zip" }
-        }
+        if (at(0) == 0x50 && at(1) == 0x4B && at(2) == 0x03 && at(3) == 0x04) return MagicSniffer.detectExtension(b) ?: "zip"
 
         if (at(0) == 0x52 && at(1) == 0x61 && at(2) == 0x72 && at(3) == 0x21) return "rar"
         if (at(0) == 0x37 && at(1) == 0x7A && at(2) == 0xBC && at(3) == 0xAF) return "7z"
         if (at(0) == 0x1F && at(1) == 0x8B) return "gz"
 
-        return try {
-            if (contentInfoUtil == null) contentInfoUtil = com.j256.simplemagic.ContentInfoUtil()
-            val info = contentInfoUtil?.findMatch(b) ?: return null
-            val mime = info.mimeType ?: return null
-            MimeTypeMap.getSingleton().getExtensionFromMimeType(mime)
-                ?: mime.substringAfterLast('/').takeIf { it.isNotEmpty() && !it.contains('+') }
-        } catch (_: Throwable) { null }
+        return MagicSniffer.detectExtension(b)
     }
 }
 

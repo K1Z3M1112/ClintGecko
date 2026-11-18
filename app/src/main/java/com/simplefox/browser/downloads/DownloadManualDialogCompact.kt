@@ -51,13 +51,10 @@ internal fun CompactManualDownloadContent(
     onRetryToggle: () -> Unit,
     unmeteredOnly: Boolean,
     onUnmeteredToggle: () -> Unit,
-    isStream: Boolean,
     splitParts: Int,
     onSplitPartsChange: (Int) -> Unit,
     multithreadingParts: Int,
     onMultithreadingPartsChange: (Int) -> Unit,
-    concurrentSegments: Int,
-    onConcurrentSegmentsChange: (Int) -> Unit,
     speedLimitText: String,
     onSpeedLimitTextChange: (String) -> Unit,
     speedUnitLabel: String,
@@ -140,24 +137,16 @@ internal fun CompactManualDownloadContent(
         CompactToggleRow(stringResource(R.string.download_retry_enabled_title), retryEnabled, onRetryToggle)
         CompactToggleRow(stringResource(R.string.download_unmetered_only_title), unmeteredOnly, onUnmeteredToggle)
 
-        if (!isStream) {
-            CompactSliderRow(
-                title = stringResource(R.string.download_split_parts_title),
-                valueText = autoOrCountLabel(splitParts, R.plurals.download_split_parts_value),
-                value = autoSliderPosition(splitParts, 32), range = 1..33, onChange = { onSplitPartsChange(autoSliderValue(it, 32)) }
-            )
-            CompactSliderRow(
-                title = stringResource(R.string.download_multithreading_title),
-                valueText = autoOrCountLabel(multithreadingParts, R.plurals.download_multithreading_value),
-                value = autoSliderPosition(multithreadingParts, 8), range = 1..9, onChange = { onMultithreadingPartsChange(autoSliderValue(it, 8)) }
-            )
-        } else {
-            CompactSliderRow(
-                title = stringResource(R.string.download_concurrent_segments_title),
-                valueText = autoOrCountLabel(concurrentSegments, R.plurals.download_concurrent_segments_value),
-                value = autoSliderPosition(concurrentSegments, 24), range = 1..25, onChange = { onConcurrentSegmentsChange(autoSliderValue(it, 24)) }
-            )
-        }
+        CompactSliderRow(
+            title = stringResource(R.string.download_split_parts_title),
+            valueText = autoOrCountLabel(splitParts, R.plurals.download_split_parts_value),
+            value = autoSliderPosition(splitParts, 32), range = 1..33, onChange = { onSplitPartsChange(autoSliderValue(it, 32)) }
+        )
+        CompactSliderRow(
+            title = stringResource(R.string.download_multithreading_title),
+            valueText = autoOrCountLabel(multithreadingParts, R.plurals.download_multithreading_value),
+            value = autoSliderPosition(multithreadingParts, 8), range = 1..9, onChange = { onMultithreadingPartsChange(autoSliderValue(it, 8)) }
+        )
 
         CompactSpeedLimitRow(
             text = speedLimitText, onTextChange = onSpeedLimitTextChange,

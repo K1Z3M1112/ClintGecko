@@ -5,7 +5,7 @@ import android.net.Uri
 import android.os.Environment
 import android.os.StatFs
 import android.os.storage.StorageManager
-import androidx.preference.PreferenceManager
+import com.simplefox.browser.util.PreferenceManager
 import com.simplefox.browser.R
 import com.simplefox.browser.settings.downloads.DownloadSettingsKeys
 import com.simplefox.browser.util.DEFAULT_MEASUREMENT_SYSTEM

@@ -119,8 +119,6 @@ internal fun MainActivity.buildRequestConfig(): org.json.JSONObject {
         .put("ds", dataSaver)
 }
 
-internal fun MainActivity.buildDesktopHeaders(): Map<String, String>? = null
-
 internal fun MainActivity.loadDataSaverJs(filename: String): String =
     "(function(){try{var hs=[location.hostname];if(window!==window.top&&document.referrer){hs.push(new URL(document.referrer).hostname);}var b=window.ClintDataSaverBridge;if(b){for(var i=0;i<hs.length;i++){if(b.isExcepted(hs[i])){return;}}}}catch(e){}\n" +
         loadJsAsset(filename) + "\n})();"

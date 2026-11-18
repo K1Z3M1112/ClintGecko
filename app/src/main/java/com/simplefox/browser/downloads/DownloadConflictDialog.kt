@@ -7,7 +7,7 @@ import androidx.compose.material.icons.filled.Save
 import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
-import androidx.preference.PreferenceManager
+import com.simplefox.browser.util.PreferenceManager
 import com.simplefox.browser.R
 import com.simplefox.browser.browser.sheets.ActionSheetRow
 import com.simplefox.browser.settings.downloads.DownloadSettingsKeys

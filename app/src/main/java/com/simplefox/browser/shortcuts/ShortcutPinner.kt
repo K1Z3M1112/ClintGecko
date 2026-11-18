@@ -45,7 +45,7 @@ object ShortcutPinner {
 
     fun migrateLaunchIntents(context: Context) {
         val appContext = context.applicationContext
-        val prefs = androidx.preference.PreferenceManager.getDefaultSharedPreferences(appContext)
+        val prefs = com.simplefox.browser.util.PreferenceManager.getDefaultSharedPreferences(appContext)
         if (prefs.getBoolean(PREF_LAUNCH_INTENTS_MIGRATED, false)) return
         Thread {
             val infos = runCatching { ShortcutStore.getAll(appContext) }.getOrDefault(emptyList()).mapNotNull { shortcut ->

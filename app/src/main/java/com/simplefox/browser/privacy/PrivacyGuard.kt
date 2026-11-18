@@ -12,7 +12,7 @@ import android.os.Handler
 import android.os.Looper
 import android.os.SystemClock
 import android.view.WindowManager
-import androidx.preference.PreferenceManager
+import com.simplefox.browser.util.PreferenceManager
 import com.simplefox.browser.browser.webview.ClintGecko
 import com.simplefox.browser.history.SearchHistoryManager
 import org.mozilla.geckoview.StorageController

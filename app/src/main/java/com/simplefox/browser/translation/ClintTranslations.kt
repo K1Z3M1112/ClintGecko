@@ -1,7 +1,7 @@
 package com.simplefox.browser.translation
 
 import android.content.Context
-import androidx.preference.PreferenceManager
+import com.simplefox.browser.util.PreferenceManager
 import com.simplefox.browser.browser.webview.ClintWebView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
